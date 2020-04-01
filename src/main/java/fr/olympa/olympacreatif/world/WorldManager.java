@@ -1,4 +1,4 @@
-package fr.olympa.world;
+package fr.olympa.olympacreatif.world;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;

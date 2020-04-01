@@ -1,4 +1,4 @@
-package fr.olympa.objects;
+package fr.olympa.olympacreatif.objects;
 
 import fr.olympa.api.objects.OlympaPlayer;
 
