@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.objects.Plot;
 import fr.olympa.olympacreatif.objects.PlotRank;
+import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
 
 public class WorldEditInstance {
 
@@ -24,9 +25,8 @@ public class WorldEditInstance {
 	private List<Undo> undoList = new ArrayList<Undo>();
 	
 	private Map<Location, BlockData> clipboard = new HashMap<Location, BlockData>();
+	
 	private Plot clipboardPlot;
-	private Location clipboardPos1;
-	private Location clipboardPos2;
 	
 	private Location pos1;
 	private Location pos2;
@@ -56,106 +56,7 @@ public class WorldEditInstance {
 		return false;
 	}
 	
-	//enregistre le degré de rotation à appliquer
-	public boolean setHorizontalRotation(int rotation) {
-		if (rotation % 90 == 0) {
-			
-			return true;
-		}else {
-			return false;
-		}
-	}
 	
-	//tourne le bloc de 90° horizontalement
-	private void setNewHorizontalBlockFace(BlockData data) {
-		if (!(data instanceof Directional))
-			return;
-		
-		switch (((Directional) data).getFacing()) {
-		case EAST:
-			((Directional) data).setFacing(BlockFace.NORTH);
-			break;
-		case EAST_NORTH_EAST:
-			((Directional) data).setFacing(BlockFace.NORTH_NORTH_WEST);
-			break;
-		case EAST_SOUTH_EAST:
-			((Directional) data).setFacing(BlockFace.NORTH_NORTH_EAST);
-			break;
-		case NORTH:
-			((Directional) data).setFacing(BlockFace.WEST);
-			break;
-		case NORTH_EAST:
-			((Directional) data).setFacing(BlockFace.NORTH_WEST);
-			break;
-		case NORTH_NORTH_EAST:
-			((Directional) data).setFacing(BlockFace.WEST_NORTH_WEST);
-			break;
-		case NORTH_NORTH_WEST:
-			((Directional) data).setFacing(BlockFace.WEST_SOUTH_WEST);
-			break;
-		case NORTH_WEST:
-			((Directional) data).setFacing(BlockFace.SOUTH_WEST);
-			break;
-		case SOUTH:
-			((Directional) data).setFacing(BlockFace.EAST);
-			break;
-		case SOUTH_EAST:
-			((Directional) data).setFacing(BlockFace.NORTH_EAST);
-			break;
-		case SOUTH_SOUTH_EAST:
-			((Directional) data).setFacing(BlockFace.EAST_NORTH_EAST);
-			break;
-		case SOUTH_SOUTH_WEST:
-			((Directional) data).setFacing(BlockFace.EAST_SOUTH_EAST);
-			break;
-		case SOUTH_WEST:
-			((Directional) data).setFacing(BlockFace.SOUTH_EAST);
-			break;
-		case WEST:
-			((Directional) data).setFacing(BlockFace.SOUTH);
-			break;
-		case WEST_NORTH_WEST:
-			((Directional) data).setFacing(BlockFace.SOUTH_SOUTH_WEST);
-			break;
-		case WEST_SOUTH_WEST:
-			((Directional) data).setFacing(BlockFace.SOUTH_SOUTH_EAST);
-			break;
-		default:
-			break;
-		
-		}
-	}
-
-	//tourne le bloc de 90° verticalement
-	private void setNewVerticalBlockFace(BlockData data) {
-		if (!(data instanceof Directional))
-			return;
-		
-		switch (((Directional) data).getFacing()) {
-		case DOWN:
-			((Directional) data).setFacing(BlockFace.EAST);
-			break;
-		case NORTH:
-			((Directional) data).setFacing(BlockFace.DOWN);
-			break;
-		case SOUTH:
-			((Directional) data).setFacing(BlockFace.UP);
-			break;
-		case EAST:
-			((Directional) data).setFacing(BlockFace.UP);
-			break;
-		case WEST:
-			((Directional) data).setFacing(BlockFace.DOWN);
-			break;
-		case UP:
-			((Directional) data).setFacing(BlockFace.WEST);
-			break;
-		default:
-			break;
-		
-		}
-	}
-
 	//copie les blocs de la sélection dans la mémoire (ATTENTION coordonnées relatives par rapport à la position actuelle du joueur)
 	public boolean copySelection() {
 		//cancel si zone trop grande
@@ -163,8 +64,6 @@ public class WorldEditInstance {
 			return false;
 		
 		clipboardPlot = plugin.getPlot(pos1);
-		clipboardPos1 = pos1.clone().subtract(p.getLocation());
-		clipboardPos2 = pos2.clone().subtract(p.getLocation());
 		
 		for (int x = Math.min(pos1.getBlockX(), pos2.getBlockX()) ; x >= Math.max(pos1.getBlockX(), pos2.getBlockX()) ; x++)
 			for (int y = Math.min(pos1.getBlockY(), pos2.getBlockY()) ; y >= Math.max(pos1.getBlockY(), pos2.getBlockY()) ; y++)
@@ -173,6 +72,28 @@ public class WorldEditInstance {
 					clipboard.put(p.getLocation().clone().subtract(loc), plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData());
 				}
 		
+		return true;
+	}
+	
+	//rotation de la sélection
+	public void rotateSelection(int rotX, int rotY, int rotZ) {
+		ClipboardEdition.rotateSelection(clipboard, rotX, rotY, rotZ);
+	}
+	
+	//symétrie de la sélection
+	public void symetricSelection(SymmetryPlan plan) {
+		ClipboardEdition.symmetrySelection(clipboard, plan);
+	}
+	
+	//effectuer un undo (retourne true si un undo a été effectué, false sinon)
+	public boolean executeUndo() {
+		if (undoList.size() == 0)
+			return false;
+		for (Entry<Location, BlockData> e : undoList.get(undoList.size()-1).getUndoData().entrySet()) {
+			plugin.getWorldManager().addToBuildWaitingList(e.getKey(), e.getValue());
+		}
+		
+		undoList.remove(undoList.size()-1);
 		return true;
 	}
 	
