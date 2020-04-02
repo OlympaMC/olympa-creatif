@@ -5,22 +5,24 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.olympacreatif.objects.Plot;
 import fr.olympa.olympacreatif.world.WorldManager;
+import fr.olympa.olympacreatif.worldedit.WorldEditManager;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
 	
-	private WorldManager worldManager;
-	
+	private WorldManager creativeWorldManager;
+	private WorldEditManager worldEditManager;
 	public final String worldName = "OLYMPA_CREATIF";
 	
 	public final int worldLevel = 3;
-	public final int plotXwidth = 10;
-	public final int plotZwidth = 10;
-	public final int roadWidth = 3;
-	public final int plotHalfRowMaxCount = 10;
+	public final int plotXwidth = 300;
+	public final int plotZwidth = 300;
+	public final int roadWidth = 10;
+	public final int maxWorldEditBlocks = 1000;
 	
 	public final String logPrefix = "[" + getName()+ "] ";
 	public final String prefix = "§2[§eO§6Crea§2] §a";
@@ -32,7 +34,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		//génération de la config de base
 		super.onEnable();
 		saveDefaultConfig();
-		worldManager = new WorldManager(this);
+		creativeWorldManager = new WorldManager(this);
+		worldEditManager = new WorldEditManager(this);
 		
 		/*try {
 			//OlympaCore.getInstance().getDatabase();
@@ -46,7 +49,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	}
 
 	public WorldManager getWorldManager() {
-		return worldManager;
+		return creativeWorldManager;
 	}
 	
 	public void addPlot(Plot plot) {
@@ -55,5 +58,12 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	
 	public List<Plot> getPlots(){
 		return Collections.unmodifiableList(plots);
+	}
+	
+	public Plot getPlot(Location loc) {
+		for (Plot p : getPlots())
+			if (p.getArea().isInPlot(loc))
+				return p;
+		return null;
 	}
 }

@@ -1,6 +1,5 @@
 package fr.olympa.olympacreatif.objects;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -66,11 +65,11 @@ public class PlotArea {
 	}
 	
 	public Location getFirstCorner(){
-		return new Location(plugin.getWorldManager().getWorld(), x1, plugin.worldLevel + 1, z1);
+		return new Location(plugin.getWorldManager().getWorld(), x1+0.5, plugin.worldLevel + 1, z1+0.5);
 	}
 	
 	public Location getSecondCorner() {
-		return new Location(plugin.getWorldManager().getWorld(), x2, plugin.worldLevel + 1, z2);
+		return new Location(plugin.getWorldManager().getWorld(), x2-0.5, plugin.worldLevel + 1, z2-0.5);
 	}
 	
 	public boolean isInPlot(Location loc) {
