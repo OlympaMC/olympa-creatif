@@ -5,19 +5,20 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
+import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class WorldEditManager {
 
 	private OlympaCreatifMain plugin;
-	private Map<Player, WorldEditInstance> playersWorldEdit = new HashMap<Player, WorldEditInstance>();
+	private Map<OlympaPlayer, WorldEditInstance> playersWorldEdit = new HashMap<OlympaPlayer, WorldEditInstance>();
 	
 	public WorldEditManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
 	}
 	
-	public void addPlayer(Player p) {
+	public void addPlayer(OlympaPlayer p) {
 		playersWorldEdit.put(p, new WorldEditInstance(plugin, p));
 	}
 	

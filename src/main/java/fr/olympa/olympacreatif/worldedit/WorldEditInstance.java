@@ -12,15 +12,16 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 
+import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.objects.Plot;
-import fr.olympa.olympacreatif.objects.PlotRank;
+import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotRank;
 import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
 
 public class WorldEditInstance {
 
 	private OlympaCreatifMain plugin;
-	private Player p;
+	private OlympaPlayer p;
 	
 	private List<Undo> undoList = new ArrayList<Undo>();
 	
@@ -31,12 +32,12 @@ public class WorldEditInstance {
 	private Location pos1;
 	private Location pos2;
 	
-	public WorldEditInstance(OlympaCreatifMain plugin, Player p) {
+	public WorldEditInstance(OlympaCreatifMain plugin, OlympaPlayer p) {
 		this.plugin = plugin;
 		this.p = p;
 	}
 
-	//définit la position 2 de copie si elle est dans la même zone que l'autre
+	//définit la position 1 de copie si elle est dans la même zone que l'autre (retourne vrai si le joueur a la perm worldedit, false sinon)
 	public boolean setPos1(Location loc) {
 		if (plugin.getPlot(loc).getMembers().containsKey(p))
 			if (plugin.getPlot(loc).getMembers().get(p).getLevel() > 1) {
@@ -46,7 +47,7 @@ public class WorldEditInstance {
 		return false;
 	}
 	
-	//définit la position 2 de copie si elle est dans la même zone que l'autre
+	//définit la position 2 de copie si elle est dans la même zone que l'autre (retourne vrai si le joueur a la perm worldedit, false sinon)
 	public boolean setPos2(Location loc) {
 		if (plugin.getPlot(loc).getMembers().containsKey(p))
 			if (plugin.getPlot(loc).getMembers().get(p).getLevel() > 1) {
@@ -69,7 +70,7 @@ public class WorldEditInstance {
 			for (int y = Math.min(pos1.getBlockY(), pos2.getBlockY()) ; y >= Math.max(pos1.getBlockY(), pos2.getBlockY()) ; y++)
 				for (int z = Math.min(pos1.getBlockZ(), pos2.getBlockZ()) ; z >= Math.max(pos1.getBlockZ(), pos2.getBlockZ()) ; z++) {
 					Location loc = new Location(plugin.getWorldManager().getWorld(), z, y, z);
-					clipboard.put(p.getLocation().clone().subtract(loc), plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData());
+					clipboard.put(p.getPlayer().getLocation().clone().subtract(loc), plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData());
 				}
 		
 		return true;
@@ -121,7 +122,7 @@ public class WorldEditInstance {
 				if (clipboardPlot.equals(targetPlot)) {
 					
 					//paste du block
-					Location loc = entry.getKey().clone().add(p.getLocation());
+					Location loc = entry.getKey().clone().add(p.getPlayer().getLocation());
 					undo.addBlock(loc, loc.getBlock().getBlockData().clone());
 					plugin.getWorldManager().addToBuildWaitingList(loc, entry.getValue());
 					
@@ -130,7 +131,7 @@ public class WorldEditInstance {
 					if (targetPlot.getPlayerRank(p)  == PlotRank.PERMISSIONS_OWNER && clipboardPlot.getPlayerRank(p)  == PlotRank.PERMISSIONS_OWNER ) {
 						
 						//paste du block
-						Location loc = entry.getKey().clone().add(p.getLocation());
+						Location loc = entry.getKey().clone().add(p.getPlayer().getLocation());
 						undo.addBlock(loc, loc.getBlock().getBlockData().clone());
 						plugin.getWorldManager().addToBuildWaitingList(loc, entry.getValue());
 						

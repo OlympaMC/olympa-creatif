@@ -8,7 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import fr.olympa.api.plugin.OlympaAPIPlugin;
-import fr.olympa.olympacreatif.objects.Plot;
+import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotsParameters;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.WorldEditManager;
 
@@ -36,6 +37,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		saveDefaultConfig();
 		creativeWorldManager = new WorldManager(this);
 		worldEditManager = new WorldEditManager(this);
+		
 		
 		/*try {
 			//OlympaCore.getInstance().getDatabase();

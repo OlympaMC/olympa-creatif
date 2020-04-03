@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.objects;
+package fr.olympa.olympacreatif.plot;
 
 import java.util.HashMap;
 
@@ -14,15 +14,19 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 public class Plot {
 
 	private OlympaCreatifMain plugin;
-	private HashMap<Player, PlotRank> members = new HashMap<Player, PlotRank>();
+	private HashMap<OlympaPlayer, PlotRank> members = new HashMap<OlympaPlayer, PlotRank>();
 	private PlotArea area;
+	private PlotParameters parameters;
+	private PlotId id;
 	
-	public Plot(OlympaCreatifMain plugin, Player p) {
+	//constructeur pour un plot n'existant pas encore
+	public Plot(OlympaCreatifMain plugin, OlympaPlayer p) {
 		this.plugin = plugin;
 		members.put(p, PlotRank.PERMISSIONS_OWNER);
 		area = new PlotArea(plugin);
-
-		Chunk previousLoadedChunk = null;
+		parameters = new PlotParameters(plugin);
+		id = new PlotId(area);
+		
 		//création des routes autour du plot
 		if (plugin.getPlot(area.getFirstCorner().clone().add(-plugin.plotXwidth-plugin.roadWidth, 0, 0)) == null)
 			for (int x = area.getFirstCorner().getBlockX()-1 ; x >= area.getFirstCorner().getBlockX()-plugin.roadWidth ; x--)
@@ -56,15 +60,32 @@ public class Plot {
 		}
 	}
 	
+	//constructeur pour un plot déjà existant
+	public Plot(OlympaCreatifMain plugin, PlotId id, PlotArea area, PlotParameters parameters, HashMap<OlympaPlayer, PlotRank> members) {
+		this.plugin = plugin;
+		this.id = id;
+		this.area = area;
+		this.parameters = parameters;
+		this.members = members;
+	}
+	
 	public PlotArea getArea() {
 		return area;
 	}
 	
-	public HashMap<Player, PlotRank> getMembers(){
+	public PlotId getId() {
+		return id;
+	}
+	
+	public PlotParameters getParameters() {
+		return parameters;
+	}
+	
+	public HashMap<OlympaPlayer, PlotRank> getMembers(){
 		return members;
 	}
 	
-	public PlotRank getPlayerRank(Player p) {
+	public PlotRank getPlayerRank(OlympaPlayer p) {
 		if (members.containsKey(p))
 			return members.get(p);
 		else

@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.objects;
+package fr.olympa.olympacreatif.plot;
 
 import org.bukkit.Location;
 

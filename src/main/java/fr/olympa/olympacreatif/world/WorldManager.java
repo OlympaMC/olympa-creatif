@@ -25,7 +25,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.objects.Plot;
+import fr.olympa.olympacreatif.plot.Plot;
 
 public class WorldManager {
 
@@ -33,6 +33,8 @@ public class WorldManager {
 	private List<AbstractMap.SimpleEntry<Location, BlockData>> plotsToBuild = new ArrayList<AbstractMap.SimpleEntry<Location,BlockData>>();
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
+		
+		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
 		
 		//chargement du monde s'il existe
 		for (World w : Bukkit.getWorlds())
@@ -42,22 +44,6 @@ public class WorldManager {
 		
 		//création du monde s'il n'existe pas
 		if (world == null) {
-
-			//enregistrement du listener de l'événement de création d'un chunk pour y créer les routes
-			//plugin.getServer().getPluginManager().registerEvents(new ChunkLoadListener(plugin), plugin);
-			plugin.getServer().getPluginManager().registerEvents(new Listener() {
-				@EventHandler
-				public void onPlayerJoin(PlayerJoinEvent e) {
-					e.getPlayer().teleport(new Location(world, 0,5,0));
-				}
-			}, plugin);
-			plugin.getServer().getPluginManager().registerEvents(new Listener() {
-				@EventHandler
-				public void onPlayerJoin(PlayerChatEvent e) {
-					plugin.addPlot(new Plot(plugin, e.getPlayer()));
-				}
-			}, plugin);
-
 			
 			WorldCreator worldCreator = new WorldCreator(plugin.worldName);
 			worldCreator.generateStructures(false);
@@ -77,16 +63,14 @@ public class WorldManager {
 			world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
 			world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, true);
 			world.setTime(6000);
-			//crée la worldborder pour forcer le chargement des chunks
-			//world.getWorldBorder().setCenter((plugin.plotXwidth - 1) / 2, (plugin.plotZwidth - 1) / 2);
-			//world.getWorldBorder().setSize((plugin.plotXwidth + plugin.roadWidth), 1);
 			
 			Bukkit.getLogger().info(plugin.logPrefix + "World fully generated !");
 			
+			//runnable de setblock délayé
 			new BukkitRunnable() {
 				public void run() {
 					int i = 0;
-					while (i < (plugin.plotXwidth+plugin.plotZwidth)/2 && plotsToBuild.size() > 0) {
+					while (i < 200 && plotsToBuild.size() > 0) {
 						plugin.getWorldManager().getWorld().loadChunk(plotsToBuild.get(0).getKey().getChunk());
 						plotsToBuild.get(0).getKey().getBlock().setBlockData(plotsToBuild.get(0).getValue());
 						plotsToBuild.remove(0);
@@ -95,16 +79,6 @@ public class WorldManager {
 				}
 			}.runTaskTimer(plugin, 20, 2);
 		}
-		
-		
-		plugin.getServer().getPluginManager().registerEvents(new Listener() {
-			@EventHandler
-			public void onAnimalSpawn(CreatureSpawnEvent e) {
-				if (e.getLocation().getWorld().equals(world))
-					if (e.getEntityType() != EntityType.PLAYER)
-						e.setCancelled(true);	
-			}
-		}, plugin);
 	}
 
 	public World getWorld() {

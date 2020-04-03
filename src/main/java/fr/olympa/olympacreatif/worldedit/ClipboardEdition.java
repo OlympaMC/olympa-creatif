@@ -237,8 +237,8 @@ public abstract class ClipboardEdition {
 	
 	public enum SymmetryPlan{
 		AXE_X("X"),
-		AXE_Y("X"),
-		AXE_Z("X");
+		AXE_Y("Y"),
+		AXE_Z("Z");
 		
 		String id;
 		
@@ -246,8 +246,14 @@ public abstract class ClipboardEdition {
 			id = s;
 		}
 		
+		public String getId() {
+			return id;
+		}
+		
 		public static SymmetryPlan getPlan(String s) {
-			
+			for (SymmetryPlan plan : SymmetryPlan.values())
+				if (plan.getId().equals(s))
+					return plan;
 			return null;
 		}
 	}
