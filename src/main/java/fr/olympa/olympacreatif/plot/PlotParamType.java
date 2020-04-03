@@ -3,7 +3,7 @@ package fr.olympa.olympacreatif.plot;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum PlotsParameters {
+public enum PlotParamType {
 
 	PLOT_TIME("plot_time"),
 	
@@ -57,11 +57,8 @@ public enum PlotsParameters {
 	
 	private String id;
 	
-	//
-	private static Map<String, Map<String, Object>> parameters = new HashMap<String, Map<String,Object>>();
 	
-	
-	private PlotsParameters(String s) {
+	private PlotParamType(String s) {
 		this.id = s;
 	}
 	
@@ -69,14 +66,15 @@ public enum PlotsParameters {
 		return id;
 	}
 	
-	public Object getValue() {
-		if (parameters.containsKey(this.getId()))
-			return parameters.get(this.getId());
-		
-		return null;
-	}
-	
 	public static void load() {
 		//TODO
+	}
+	
+	public static PlotParamType getFromString(String s) {
+		for (PlotParamType p : PlotParamType.values())
+			if (p.getId().equals(s))
+				return p;
+		
+		return null;
 	}
 }

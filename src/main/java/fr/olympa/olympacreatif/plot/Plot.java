@@ -9,23 +9,23 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.objects.OlympaPlayer;
+import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class Plot {
 
 	private OlympaCreatifMain plugin;
-	private HashMap<OlympaPlayer, PlotRank> members = new HashMap<OlympaPlayer, PlotRank>();
+	
+	private PlotMembers members;
 	private PlotArea area;
 	private PlotParameters parameters;
-	private PlotId id;
 	
 	//constructeur pour un plot n'existant pas encore
-	public Plot(OlympaCreatifMain plugin, OlympaPlayer p) {
+	public Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
 		this.plugin = plugin;
-		members.put(p, PlotRank.PERMISSIONS_OWNER);
+		members.set(p, PlotRank.PERMISSIONS_OWNER);
 		area = new PlotArea(plugin);
 		parameters = new PlotParameters(plugin);
-		id = new PlotId(area);
 		
 		//création des routes autour du plot
 		if (plugin.getPlot(area.getFirstCorner().clone().add(-plugin.plotXwidth-plugin.roadWidth, 0, 0)) == null)
@@ -61,9 +61,8 @@ public class Plot {
 	}
 	
 	//constructeur pour un plot déjà existant
-	public Plot(OlympaCreatifMain plugin, PlotId id, PlotArea area, PlotParameters parameters, HashMap<OlympaPlayer, PlotRank> members) {
+	public Plot(OlympaCreatifMain plugin, PlotArea area, PlotParameters parameters, PlotMembers members) {
 		this.plugin = plugin;
-		this.id = id;
 		this.area = area;
 		this.parameters = parameters;
 		this.members = members;
@@ -73,23 +72,15 @@ public class Plot {
 		return area;
 	}
 	
-	public PlotId getId() {
-		return id;
-	}
-	
 	public PlotParameters getParameters() {
 		return parameters;
 	}
 	
-	public HashMap<OlympaPlayer, PlotRank> getMembers(){
+	public PlotMembers getMembers(){
 		return members;
 	}
 	
 	public PlotRank getPlayerRank(OlympaPlayer p) {
-		if (members.containsKey(p))
-			return members.get(p);
-		else
-			return PlotRank.PERMISSIONS_NULL;
-		
+		return members.getPlayerRank(p);
 	}
 }

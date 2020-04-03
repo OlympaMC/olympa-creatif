@@ -39,21 +39,19 @@ public class WorldEditInstance {
 
 	//définit la position 1 de copie si elle est dans la même zone que l'autre (retourne vrai si le joueur a la perm worldedit, false sinon)
 	public boolean setPos1(Location loc) {
-		if (plugin.getPlot(loc).getMembers().containsKey(p))
-			if (plugin.getPlot(loc).getMembers().get(p).getLevel() > 1) {
-				this.pos1 = loc;
-				return true;
-			}
+		if (plugin.getPlot(loc).getMembers().getPlayerLevel(p) > 1) {
+			this.pos1 = loc;
+			return true;
+		}
 		return false;
 	}
 	
 	//définit la position 2 de copie si elle est dans la même zone que l'autre (retourne vrai si le joueur a la perm worldedit, false sinon)
 	public boolean setPos2(Location loc) {
-		if (plugin.getPlot(loc).getMembers().containsKey(p))
-			if (plugin.getPlot(loc).getMembers().get(p).getLevel() > 1) {
-				this.pos2 = loc;
-				return true;
-			}
+		if (plugin.getPlot(loc).getMembers().getPlayerLevel(p) > 1) {
+			this.pos2 = loc;
+			return true;
+		}
 		return false;
 	}
 	

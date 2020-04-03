@@ -3,8 +3,9 @@ package fr.olympa.olympacreatif.plot;
 import org.bukkit.Location;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.DatabaseSerializable;
 
-public class PlotArea {
+public class PlotArea implements DatabaseSerializable{
 
 	private OlympaCreatifMain plugin;
 	private int x1;
@@ -82,5 +83,14 @@ public class PlotArea {
 		else
 			return false;
 	}
+
+	@Override
+	public String toDbFormat() {
+		return x1 + "," + z1 + " " + x2 + "," + z2;
+	}
 	
+	public static PlotArea fromDbFormat(OlympaCreatifMain plugin, String data) {
+		return new PlotArea(plugin, Integer.valueOf(data.split(" ")[0].split(",")[0]), Integer.valueOf(data.split(" ")[0].split(",")[1])
+				, Integer.valueOf(data.split(" ")[1].split(",")[0]), Integer.valueOf(data.split(" ")[1].split(",")[1]));
+	}
 }

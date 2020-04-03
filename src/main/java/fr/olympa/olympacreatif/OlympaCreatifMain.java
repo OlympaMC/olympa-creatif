@@ -8,8 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import fr.olympa.api.plugin.OlympaAPIPlugin;
+import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotsParameters;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.WorldEditManager;
 
@@ -17,6 +17,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	
 	private WorldManager creativeWorldManager;
 	private WorldEditManager worldEditManager;
+	private DataManager dataManager;
+	
 	public final String worldName = "OLYMPA_CREATIF";
 	
 	public final int worldLevel = 3;
@@ -37,7 +39,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		saveDefaultConfig();
 		creativeWorldManager = new WorldManager(this);
 		worldEditManager = new WorldEditManager(this);
-		
+		dataManager = new DataManager(this);
 		
 		/*try {
 			//OlympaCore.getInstance().getDatabase();
@@ -52,6 +54,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	public WorldManager getWorldManager() {
 		return creativeWorldManager;
+	}
+	
+	public WorldEditManager getWorldEditManager() {
+		return worldEditManager;
 	}
 	
 	public void addPlot(Plot plot) {

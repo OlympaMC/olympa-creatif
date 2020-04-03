@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.messages;
+package fr.olympa.olympacreatif.data;
 
 import java.util.HashMap;
 import java.util.Map;
