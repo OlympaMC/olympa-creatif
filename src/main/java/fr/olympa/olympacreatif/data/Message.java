@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Message {
-
-	PLUGIN_PREFIX("plugin_prefix"),
 	
 	PLOT_CREATED("plot_created"),
 	PLOT_RANK_LOW("plot_rank_low"),
@@ -25,6 +23,13 @@ public enum Message {
 	PROHIBITED_BLOCK_PLACED("prohibited_block_placed"), 
 	TELEPORTED_TO_PLOT_SPAWN("teleport_to_plot_spawn"),
 	
+	PARAM_WORLDEDIT_BPS("parameter_worldedit_blocks_per_second"),
+	PARAM_WORLD_NAME("parameter_world_name"),
+	PARAM_WORLD_LEVEL("parameter_world_height"),
+	PARAM_PLOT_X_SIZE("parameter_x_plot_size"),
+	PARAM_PLOT_Z_SIZE("parameter_z_plot_size"),
+	PARAM_ROAD_SIZE("parameter_road_size"),
+	PARAM_PREFIX("parameter_chat_prefix"),
 	;
 	
 	private String id;
@@ -39,7 +44,7 @@ public enum Message {
 		return id;
 	}
 	
-	public String getMessage() {
+	public String getValue() {
 		return messagesList.get(toString());
 	}
 	

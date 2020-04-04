@@ -95,7 +95,7 @@ public class WorldEventsListener implements Listener{
 	public void onPlaceProhibitedBlock(BlockPlaceEvent e) {
 		if (plugin.getWorldManager().getProhibitedBlocks().contains(e.getBlockPlaced().getType())) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PROHIBITED_BLOCK_PLACED.getMessage());
+			e.getPlayer().sendMessage(Message.PROHIBITED_BLOCK_PLACED.getValue());
 		}
 	}
 }

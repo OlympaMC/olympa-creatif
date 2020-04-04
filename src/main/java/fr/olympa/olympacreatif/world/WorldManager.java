@@ -26,12 +26,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class WorldManager {
 
 	private World world = null;
-	private List<AbstractMap.SimpleEntry<Location, BlockData>> plotsToBuild = new ArrayList<AbstractMap.SimpleEntry<Location,BlockData>>();
 	private List<Material> prohibitedBlocks = new ArrayList<Material>();
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
@@ -40,7 +40,7 @@ public class WorldManager {
 		
 		//chargement du monde s'il existe
 		for (World w : Bukkit.getWorlds())
-			if (w.getName().equals(plugin.worldName))
+			if (w.getName().equals(Message.PARAM_WORLD_NAME.getValue()))
 				world = w;
 		
 		
@@ -48,18 +48,16 @@ public class WorldManager {
 		if (world == null) {
 			Bukkit.getServer().setDefaultGameMode(GameMode.CREATIVE);
 			
-			WorldCreator worldCreator = new WorldCreator(plugin.worldName);
+			WorldCreator worldCreator = new WorldCreator(Message.PARAM_WORLD_NAME.getValue());
 			worldCreator.generateStructures(false);
-			worldCreator.environment(Environment.NORMAL);
-			worldCreator.type(WorldType.FLAT);
-			worldCreator.generator("minecraft:bedrock," + (plugin.worldLevel-2) + "*minecraft:dirt,minecraft:grass_block;minecraft:plains;");
+			worldCreator.generator(new CustomChunkGenerator(plugin));
 
-			Bukkit.getLogger().log(Level.INFO, plugin.logPrefix + "World " + plugin.worldName + " not detected. Generation started. This may take a while...");
+			Bukkit.getLogger().log(Level.INFO, Message.PARAM_PREFIX.getValue() + "World " + Message.PARAM_WORLD_NAME.getValue() + " not detected. Generation started. This may take a while...");
 			
 			world = worldCreator.createWorld();
 			world.setDifficulty(Difficulty.PEACEFUL);
 			world.setTime(6000);
-			world.setSpawnLocation(0, plugin.worldLevel, 0);
+			world.setSpawnLocation(0, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue())+1, 0);
 
 			world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
 			world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
@@ -69,30 +67,12 @@ public class WorldManager {
 			world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
 			world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, true);
 			
-			Bukkit.getLogger().info(plugin.logPrefix + "World fully generated !");
-			
-			//runnable de setblock délayé
-			new BukkitRunnable() {
-				public void run() {
-					int i = 0;
-					while (i < 200 && plotsToBuild.size() > 0) {
-						plugin.getWorldManager().getWorld().loadChunk(plotsToBuild.get(0).getKey().getChunk());
-						plotsToBuild.get(0).getKey().getBlock().setBlockData(plotsToBuild.get(0).getValue());
-						plotsToBuild.remove(0);
-						i++;
-					}
-				}
-			}.runTaskTimer(plugin, 20, 2);
+			Bukkit.getLogger().info(Message.PARAM_PREFIX.getValue() + "World fully generated !");
 		}
 	}
 
 	public World getWorld() {
 		return world;
-	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void addToBuildWaitingList(Location loc, BlockData data) {
-		plotsToBuild.add(new AbstractMap.SimpleEntry(loc, data));
 	}
 	
 	public List<Material> getProhibitedBlocks(){

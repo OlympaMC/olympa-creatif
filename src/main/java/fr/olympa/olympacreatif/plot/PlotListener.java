@@ -44,7 +44,7 @@ public class PlotListener implements Listener {
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getMessage());
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
 		}
 	}
 	
@@ -55,7 +55,7 @@ public class PlotListener implements Listener {
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getMessage());
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
 		}
 	}
 	
@@ -70,7 +70,7 @@ public class PlotListener implements Listener {
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && 
 				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_PROHIBITED_INTERRACTION)).contains(e.getClickedBlock().getType())) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getMessage());
+			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 		}
 	}
 	
@@ -84,7 +84,7 @@ public class PlotListener implements Listener {
 		}
 		if (!(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT) && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_PRINT_TNT.getMessage());
+			e.getPlayer().sendMessage(Message.PLOT_CANT_PRINT_TNT.getValue());
 		}
 	}
 	
@@ -99,7 +99,7 @@ public class PlotListener implements Listener {
 				if (((List<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(e.getPlayer().getUniqueId()).getId())) {
 					e.setCancelled(true);
 					e.getPlayer().setVelocity(e.getPlayer().getVelocity().multiply(-1));
-					e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getMessage());
+					e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
 					return;
 				}
 				
@@ -112,7 +112,7 @@ public class PlotListener implements Listener {
 				//tp au spawn de la zone
 				if ((boolean)plot.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
 					e.getPlayer().teleport((Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC));
-					e.getPlayer().sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getMessage());
+					e.getPlayer().sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
 				}
 				
 				//définition de l'heure du joueur

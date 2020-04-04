@@ -4,6 +4,7 @@ import org.bukkit.Location;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.DatabaseSerializable;
+import fr.olympa.olympacreatif.data.Message;
 
 public class PlotArea implements DatabaseSerializable{
 
@@ -58,19 +59,19 @@ public class PlotArea implements DatabaseSerializable{
 		}
 
 		//attribution des coordonnées définitives du plot
-		x1 = iFinal * (plugin.plotXwidth + plugin.roadWidth);
-		z1 = jFinal * (plugin.plotZwidth + plugin.roadWidth);
-		x2 = x1 + plugin.plotXwidth;
-		z2 = z1 + plugin.plotZwidth;
+		x1 = iFinal * (Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
+		z1 = jFinal * (Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
+		x2 = x1 + Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue());
+		z2 = z1 + Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue());
 		
 	}
 	
 	public Location getFirstCorner(){
-		return new Location(plugin.getWorldManager().getWorld(), x1+0.5, plugin.worldLevel + 1, z1+0.5);
+		return new Location(plugin.getWorldManager().getWorld(), x1+0.5, Integer.parseInt(Message.PARAM_WORLD_LEVEL.getValue()) + 1, z1+0.5);
 	}
 	
 	public Location getSecondCorner() {
-		return new Location(plugin.getWorldManager().getWorld(), x2-0.5, plugin.worldLevel + 1, z2-0.5);
+		return new Location(plugin.getWorldManager().getWorld(), x2-0.5, Integer.parseInt(Message.PARAM_WORLD_LEVEL.getValue()) + 1, z2-0.5);
 	}
 	
 	public boolean isInPlot(Location loc) {

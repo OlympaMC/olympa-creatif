@@ -18,17 +18,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private WorldManager creativeWorldManager;
 	private WorldEditManager worldEditManager;
 	private DataManager dataManager;
-	
-	public final String worldName = "OLYMPA_CREATIF";
-	
-	public final int worldLevel = 3;
-	public final int plotXwidth = 300;
-	public final int plotZwidth = 300;
-	public final int roadWidth = 10;
-	public final int maxWorldEditBlocks = 1000;
-	
-	public final String logPrefix = "[" + getName()+ "] ";
-	public final String prefix = "§2[§eO§6Crea§2] §a";
 
 	private List<Plot> plots = new ArrayList<Plot>();
 	

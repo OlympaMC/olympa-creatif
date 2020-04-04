@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotRank;
 import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
@@ -59,7 +60,8 @@ public class WorldEditInstance {
 	//copie les blocs de la sélection dans la mémoire (ATTENTION coordonnées relatives par rapport à la position actuelle du joueur)
 	public boolean copySelection() {
 		//cancel si zone trop grande
-		if ((Math.abs(pos1.getBlockX()-pos2.getBlockX())+1) * (Math.abs(pos1.getBlockY()-pos2.getBlockY())+1) * (Math.abs(pos1.getBlockZ()-pos2.getBlockZ())+1) > plugin.maxWorldEditBlocks)
+		if ((Math.abs(pos1.getBlockX()-pos2.getBlockX())+1) * (Math.abs(pos1.getBlockY()-pos2.getBlockY())+1) * (Math.abs(pos1.getBlockZ()-pos2.getBlockZ())+1) 
+				> Integer.valueOf(Message.PARAM_WORLDEDIT_BPS.getValue()))
 			return false;
 		
 		clipboardPlot = plugin.getPlot(pos1);
@@ -89,7 +91,7 @@ public class WorldEditInstance {
 		if (undoList.size() == 0)
 			return false;
 		for (Entry<Location, BlockData> e : undoList.get(undoList.size()-1).getUndoData().entrySet()) {
-			plugin.getWorldManager().addToBuildWaitingList(e.getKey(), e.getValue());
+			plugin.getWorldEditManager().addToBuildWaitingList(e.getKey(), e.getValue());
 		}
 		
 		undoList.remove(undoList.size()-1);
@@ -122,7 +124,7 @@ public class WorldEditInstance {
 					//paste du block
 					Location loc = entry.getKey().clone().add(p.getPlayer().getLocation());
 					undo.addBlock(loc, loc.getBlock().getBlockData().clone());
-					plugin.getWorldManager().addToBuildWaitingList(loc, entry.getValue());
+					plugin.getWorldEditManager().addToBuildWaitingList(loc, entry.getValue());
 					
 				}else {//si le plot cible est pas égal à celui de départ
 					//si le propriétaire est le même dans les 2 plots
@@ -131,7 +133,7 @@ public class WorldEditInstance {
 						//paste du block
 						Location loc = entry.getKey().clone().add(p.getPlayer().getLocation());
 						undo.addBlock(loc, loc.getBlock().getBlockData().clone());
-						plugin.getWorldManager().addToBuildWaitingList(loc, entry.getValue());
+						plugin.getWorldEditManager().addToBuildWaitingList(loc, entry.getValue());
 						
 					}else {//si le joueur n'est pas propriétaire des 2 plots
 						undoList.add(undo);

@@ -2,14 +2,15 @@ package fr.olympa.olympacreatif.plot;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.DatabaseSerializable;
+import fr.olympa.olympacreatif.data.Message;
 
 public class PlotId implements DatabaseSerializable {
 
 	String id;
 	
 	public PlotId(OlympaCreatifMain plugin, PlotArea area) {
-		this.id = ((int) area.getFirstCorner().getBlockX() / (plugin.plotXwidth+plugin.roadWidth)) +  "," +
-				((int) area.getFirstCorner().getBlockZ() / (plugin.plotZwidth+plugin.roadWidth));
+		this.id = ((int) area.getFirstCorner().getBlockX() / (Integer.parseInt(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.parseInt(Message.PARAM_ROAD_SIZE.getValue()))) +  "," +
+				((int) area.getFirstCorner().getBlockZ() / (Integer.parseInt(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.parseInt(Message.PARAM_ROAD_SIZE.getValue())));
 	}
 	
 	public PlotId(OlympaCreatifMain plugin, String plotId) {
