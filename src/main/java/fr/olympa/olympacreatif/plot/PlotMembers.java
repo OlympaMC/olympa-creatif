@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.entity.Player;
+
 import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
@@ -31,22 +33,26 @@ public class PlotMembers implements DatabaseSerializable{
 		return pm;
 	}
 
+	public void set(Player p, PlotRank rank) {
+		members.put(AccountProvider.get(p.getUniqueId()).getInformation(), rank);
+	}
+	
 	public void set(OlympaPlayerInformations p, PlotRank rank) {
 		members.put(p, rank);
 	}
 
-	public PlotRank getPlayerRank(OlympaPlayer p) {
-		if (members.containsKey(p.getInformation()))
-			return members.get(p.getInformation());
+	public PlotRank getPlayerRank(Player p) {
+		if (members.containsKey(AccountProvider.get(p.getUniqueId()).getInformation()))
+			return members.get(AccountProvider.get(p.getUniqueId()).getInformation());
 		
-		else return PlotRank.PERMISSIONS_NULL;
+		else return PlotRank.VISITOR;
 	}
 
-	public int getPlayerLevel(OlympaPlayer p) {
-		if (members.containsKey(p.getInformation()))
-			return members.get(p.getInformation()).getLevel();
+	public int getPlayerLevel(Player p) {
+		if (members.containsKey(AccountProvider.get(p.getUniqueId()).getInformation()))
+			return members.get(AccountProvider.get(p.getUniqueId()).getInformation()).getLevel();
 		
-		else return PlotRank.PERMISSIONS_NULL.getLevel();
+		else return PlotRank.VISITOR.getLevel();
 	}
 
 }

@@ -2,11 +2,11 @@ package fr.olympa.olympacreatif.plot;
 
 public enum PlotRank {
 
-	PERMISSIONS_NULL("null_permissions_level", 0, "Visiteur"),
-	PERMISSIONS_LOW("low_permissions_level", 1, "Membre"),
-	PERMISSIONS_MEDIUM("medium_permissions_level", 2, "Contremaître"),
-	PERMISSIONS_HIGH("high_permissions_level", 3, "Co-propriétaire"),
-	PERMISSIONS_OWNER("owner_permission_level", 4, "Propriétaire");
+	VISITOR("visitor_level", 0, "Visiteur"),
+	MEMBER("member_level", 1, "Membre"),
+	TRUSTED("trusted_level", 2, "Contremaître"),
+	CO_OWNER("coowner_level", 3, "Co-propriétaire"),
+	OWNER("owner_level", 4, "Propriétaire");
 	
 	
 	private String s;

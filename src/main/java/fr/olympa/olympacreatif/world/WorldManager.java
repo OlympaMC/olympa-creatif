@@ -7,6 +7,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +32,7 @@ public class WorldManager {
 
 	private World world = null;
 	private List<AbstractMap.SimpleEntry<Location, BlockData>> plotsToBuild = new ArrayList<AbstractMap.SimpleEntry<Location,BlockData>>();
+	private List<Material> prohibitedBlocks = new ArrayList<Material>();
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
 		
@@ -44,6 +46,7 @@ public class WorldManager {
 		
 		//création du monde s'il n'existe pas
 		if (world == null) {
+			Bukkit.getServer().setDefaultGameMode(GameMode.CREATIVE);
 			
 			WorldCreator worldCreator = new WorldCreator(plugin.worldName);
 			worldCreator.generateStructures(false);
@@ -55,6 +58,9 @@ public class WorldManager {
 			
 			world = worldCreator.createWorld();
 			world.setDifficulty(Difficulty.PEACEFUL);
+			world.setTime(6000);
+			world.setSpawnLocation(0, plugin.worldLevel, 0);
+
 			world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
 			world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
 			world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
@@ -62,7 +68,6 @@ public class WorldManager {
 			world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
 			world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
 			world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, true);
-			world.setTime(6000);
 			
 			Bukkit.getLogger().info(plugin.logPrefix + "World fully generated !");
 			
@@ -85,8 +90,12 @@ public class WorldManager {
 		return world;
 	}
 	
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		public void addToBuildWaitingList(Location loc, BlockData data) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void addToBuildWaitingList(Location loc, BlockData data) {
 		plotsToBuild.add(new AbstractMap.SimpleEntry(loc, data));
+	}
+	
+	public List<Material> getProhibitedBlocks(){
+		return prohibitedBlocks;
 	}
 }

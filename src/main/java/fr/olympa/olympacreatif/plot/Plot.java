@@ -1,14 +1,10 @@
 package fr.olympa.olympacreatif.plot;
 
-import java.util.HashMap;
-
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 
-import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
@@ -19,13 +15,19 @@ public class Plot {
 	private PlotMembers members;
 	private PlotArea area;
 	private PlotParameters parameters;
+	private PlotId plotId;
+	private PlotListener listener;
 	
 	//constructeur pour un plot n'existant pas encore
 	public Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
 		this.plugin = plugin;
-		members.set(p, PlotRank.PERMISSIONS_OWNER);
+		members.set(p, PlotRank.OWNER);
 		area = new PlotArea(plugin);
-		parameters = new PlotParameters(plugin);
+		parameters = new PlotParameters(plugin, area, true);
+		plotId = new PlotId(plugin, area);
+		listener = new PlotListener(plugin, this);
+		
+		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
 		
 		//création des routes autour du plot
 		if (plugin.getPlot(area.getFirstCorner().clone().add(-plugin.plotXwidth-plugin.roadWidth, 0, 0)) == null)
@@ -58,14 +60,18 @@ public class Plot {
 			plugin.getWorldManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), area.getFirstCorner().getX()-1, plugin.worldLevel+1, z), Bukkit.createBlockData(Material.GRANITE_SLAB));
 			plugin.getWorldManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), area.getSecondCorner().getX()+1, plugin.worldLevel+1, z), Bukkit.createBlockData(Material.GRANITE_SLAB));
 		}
+		
 	}
 	
 	//constructeur pour un plot déjà existant
-	public Plot(OlympaCreatifMain plugin, PlotArea area, PlotParameters parameters, PlotMembers members) {
+	public Plot(OlympaCreatifMain plugin, PlotArea area, PlotParameters parameters, PlotMembers members, PlotId plotId) {
 		this.plugin = plugin;
 		this.area = area;
 		this.parameters = parameters;
 		this.members = members;
+		this.plotId = plotId;
+		
+		plugin.getServer().getPluginManager().registerEvents(new PlotListener(plugin, this), plugin);
 	}
 	
 	public PlotArea getArea() {
@@ -80,7 +86,7 @@ public class Plot {
 		return members;
 	}
 	
-	public PlotRank getPlayerRank(OlympaPlayer p) {
-		return members.getPlayerRank(p);
+	public void unregisterListener() {
+		HandlerList.unregisterAll(listener);
 	}
 }

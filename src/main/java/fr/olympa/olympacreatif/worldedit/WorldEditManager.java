@@ -11,14 +11,14 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 public class WorldEditManager {
 
 	private OlympaCreatifMain plugin;
-	private Map<OlympaPlayer, WorldEditInstance> playersWorldEdit = new HashMap<OlympaPlayer, WorldEditInstance>();
+	private Map<Player, WorldEditInstance> playersWorldEdit = new HashMap<Player, WorldEditInstance>();
 	
 	public WorldEditManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
 	}
 	
-	public void addPlayer(OlympaPlayer p) {
+	public void addPlayer(Player p) {
 		playersWorldEdit.put(p, new WorldEditInstance(plugin, p));
 	}
 	

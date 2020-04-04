@@ -17,6 +17,7 @@ import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Message;
 
 public class WorldEventsListener implements Listener{
 
@@ -24,6 +25,8 @@ public class WorldEventsListener implements Listener{
 	
 	public WorldEventsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		plugin.getWorldManager().getProhibitedBlocks().add(Material.DISPENSER);
+		
 	}
 	
 	@EventHandler //cancel spawn créatures, sauf si spawn par un plugin 
@@ -86,5 +89,13 @@ public class WorldEventsListener implements Listener{
 					e.getEntity().remove();
 			}
 		}.runTaskLater(plugin, 100);
+	}
+	
+	@EventHandler //cancel pose d'un bloc s'il est interdit
+	public void onPlaceProhibitedBlock(BlockPlaceEvent e) {
+		if (plugin.getWorldManager().getProhibitedBlocks().contains(e.getBlockPlaced().getType())) {
+			e.setCancelled(true);
+			e.getPlayer().sendMessage(Message.PROHIBITED_BLOCK_PLACED.getMessage());
+		}
 	}
 }

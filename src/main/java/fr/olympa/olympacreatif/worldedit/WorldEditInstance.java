@@ -21,7 +21,7 @@ import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
 public class WorldEditInstance {
 
 	private OlympaCreatifMain plugin;
-	private OlympaPlayer p;
+	private Player p;
 	
 	private List<Undo> undoList = new ArrayList<Undo>();
 	
@@ -32,7 +32,7 @@ public class WorldEditInstance {
 	private Location pos1;
 	private Location pos2;
 	
-	public WorldEditInstance(OlympaCreatifMain plugin, OlympaPlayer p) {
+	public WorldEditInstance(OlympaCreatifMain plugin, Player p) {
 		this.plugin = plugin;
 		this.p = p;
 	}
@@ -126,7 +126,7 @@ public class WorldEditInstance {
 					
 				}else {//si le plot cible est pas égal à celui de départ
 					//si le propriétaire est le même dans les 2 plots
-					if (targetPlot.getPlayerRank(p)  == PlotRank.PERMISSIONS_OWNER && clipboardPlot.getPlayerRank(p)  == PlotRank.PERMISSIONS_OWNER ) {
+					if (targetPlot.getMembers().getPlayerRank(p)  == PlotRank.OWNER && clipboardPlot.getMembers().getPlayerRank(p)  == PlotRank.OWNER ) {
 						
 						//paste du block
 						Location loc = entry.getKey().clone().add(p.getPlayer().getLocation());
