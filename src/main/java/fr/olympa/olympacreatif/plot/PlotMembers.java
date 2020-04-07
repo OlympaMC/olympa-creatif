@@ -14,12 +14,12 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 public class PlotMembers{
 
 	private OlympaCreatifMain plugin;
-	private Plot plot;
+	private PlotId plotId;
 	private Map<OlympaPlayerInformations, PlotRank> members = new HashMap<OlympaPlayerInformations, PlotRank>();
 
-	public PlotMembers(OlympaCreatifMain plugin, Plot plot) {
+	public PlotMembers(OlympaCreatifMain plugin, PlotId plotId) {
 		this.plugin = plugin;
-		this.plot = plot;
+		this.plotId = plotId;
 	}
 
 	public void set(Player p, PlotRank rank) {
@@ -32,7 +32,7 @@ public class PlotMembers{
 
 			@Override
 			public void run() {
-				plugin.getDataManager().setPlayerRank(plot.getPlotId(), p.getID());
+				plugin.getDataManager().setPlayerRank(plotId, p.getID());
 			}
 			
 		}).start();

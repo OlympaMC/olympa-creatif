@@ -12,7 +12,7 @@ import org.bukkit.event.HandlerList;
 
 import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.datas.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class Plot {
@@ -33,10 +33,10 @@ public class Plot {
 	//constructeur pour un plot n'existant pas encore
 	Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
 		this.plugin = plugin;
-		members = new PlotMembers(plugin, this);
 		area = new PlotArea(plugin);
 		parameters = new PlotParameters(plugin, area, true);
 		plotId = new PlotId(plugin, area);
+		members = new PlotMembers(plugin, plotId);
 		listener = new PlotListener(plugin, this);
 
 		members.set(p, PlotRank.OWNER);

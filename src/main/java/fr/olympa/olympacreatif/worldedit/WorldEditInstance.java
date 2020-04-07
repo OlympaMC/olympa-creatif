@@ -8,17 +8,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.Location;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 
-import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.datas.*;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
-import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
+import fr.olympa.olympacreatif.worldedit.*;
 
 public class WorldEditInstance {
 

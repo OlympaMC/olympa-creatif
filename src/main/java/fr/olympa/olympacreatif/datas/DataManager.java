@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.data;
+package fr.olympa.olympacreatif.datas;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,7 +11,6 @@ import fr.olympa.api.sql.OlympaStatement;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
-import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
@@ -22,14 +21,11 @@ public class DataManager {
 	public DataManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		Message.initialize();
-		
-
 	}
 	
 	
 	public void loadPlot(PlotId plotId) {
 		AsyncPlot plot = null;
-		
 		plugin.getPlotsManager().addAsyncPlot(plot, plotId);			
 	}
 

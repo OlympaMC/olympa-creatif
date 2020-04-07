@@ -1,8 +1,7 @@
-package fr.olympa.olympacreatif.data;
+package fr.olympa.olympacreatif.datas;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public enum Message {
 	
@@ -17,6 +16,9 @@ public enum Message {
 	PLOT_CANT_INTERRACT("plot_cant_interract"),
 	PLOT_CANT_PRINT_TNT("plot_cant_print_tnt"),
 	PLOT_CANT_ENTER_BANNED("plot_cant_enter_banned"),
+	
+	PLOT_NEW_CLAIM("plot_new_claim"),
+	MAX_PLOT_COUNT_REACHED("plot_max_count_reached"),
 	
 	PLOT_KICK_PLAYER("plot_kick_player"),
 	PLOT_HAVE_BEEN_KICKED("plot_have_been_kicked"),
@@ -35,7 +37,7 @@ public enum Message {
 	PARAM_PLOT_X_SIZE("parameter_x_plot_size"),
 	PARAM_PLOT_Z_SIZE("parameter_z_plot_size"),
 	PARAM_ROAD_SIZE("parameter_road_size"),
-	PARAM_PREFIX("parameter_chat_prefix"),
+	PARAM_PREFIX("parameter_chat_prefix"),  
 	;
 	
 	private String id;
@@ -50,7 +52,9 @@ public enum Message {
 	}
 	
 	public String getValue() {
-		return messagesList.get(getKey());
+		if (messagesList.containsKey(getKey()))
+			return messagesList.get(getKey());
+		return "§cMissing message : " + getKey();
 	}
 	
 	public static void initialize() {

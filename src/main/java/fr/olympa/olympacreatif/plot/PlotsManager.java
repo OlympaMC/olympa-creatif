@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.datas.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class PlotsManager {
@@ -79,11 +79,12 @@ public class PlotsManager {
 			plugin.getDataManager().loadPlot(plotId);
 	}
 	
-	public void createPlot(Player p) {
+	public Plot createPlot(Player p) {
 		Plot plot = new Plot(plugin, AccountProvider.get(p.getUniqueId()).getInformation());
 		
 		emptyPlots.remove(plot.getPlotId());		
 		loadedPlots.put(plot.getPlotId(), plot);
+		return plot;
 	}
 	
 	public Collection<Plot> getPlots(){

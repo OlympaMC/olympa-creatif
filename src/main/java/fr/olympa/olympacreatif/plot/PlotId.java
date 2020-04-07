@@ -3,7 +3,7 @@ package fr.olympa.olympacreatif.plot;
 import org.bukkit.Location;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.datas.Message;
 
 public class PlotId{
 

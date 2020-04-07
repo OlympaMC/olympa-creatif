@@ -9,8 +9,9 @@ import org.bukkit.Location;
 import org.bukkit.generator.ChunkGenerator;
 
 import fr.olympa.api.plugin.OlympaAPIPlugin;
-import fr.olympa.olympacreatif.data.DataManager;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.command.OcCommand;
+import fr.olympa.olympacreatif.datas.DataManager;
+import fr.olympa.olympacreatif.datas.Message;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.CustomChunkGenerator;
@@ -38,6 +39,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		creativeWorldManager = new WorldManager(this);
 		worldEditManager = new WorldEditManager(this);
 		plotsManager = new PlotsManager(this);
+		
+		new OcCommand(this);
 		/*try {
 			//OlympaCore.getInstance().getDatabase();
 			PreparedStatement preparedStatement = statement.getStatement();
