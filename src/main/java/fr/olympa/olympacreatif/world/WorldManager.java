@@ -35,6 +35,7 @@ public class WorldManager {
 	private List<Material> prohibitedBlocks = new ArrayList<Material>();
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
+		prohibitedBlocks.add(Material.DISPENSER);
 		
 		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
 		
@@ -53,7 +54,6 @@ public class WorldManager {
 			worldCreator.generator(new CustomChunkGenerator(plugin));
 
 			Bukkit.getLogger().log(Level.INFO, Message.PARAM_PREFIX.getValue() + "World " + Message.PARAM_WORLD_NAME.getValue() + " not detected. Generation started. This may take a while...");
-			
 			world = worldCreator.createWorld();
 			world.setDifficulty(Difficulty.PEACEFUL);
 			world.setTime(6000);
@@ -65,7 +65,7 @@ public class WorldManager {
 			world.setGameRule(GameRule.MOB_GRIEFING, false);
 			world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
 			world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-			world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, true);
+			world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
 			
 			Bukkit.getLogger().info(Message.PARAM_PREFIX.getValue() + "World fully generated !");
 		}

@@ -11,9 +11,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.DatabaseSerializable;
 
-public class PlotParameters implements DatabaseSerializable{
+public class PlotParameters {
 
 	private OlympaCreatifMain plugin;
 	private Map <PlotParamType, Object> parameters = new HashMap<PlotParamType, Object>();
@@ -72,107 +71,6 @@ public class PlotParameters implements DatabaseSerializable{
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	public String toDbFormat() {
-		String s = "";
-		for (Entry<PlotParamType, Object> e : parameters.entrySet())
-			switch (e.getKey()) {
-			case ALLOW_FLY_INCOMING_PLAYERS:
-				s += e.getKey().getId() + "=" + e.getValue().toString() + " ";
-				break;
-			case ALLOW_PRINT_TNT:
-				s += e.getKey().getId() + "=" + e.getValue().toString() + " ";
-				break;
-			case BANNED_PLAYERS:
-				s += e.getKey().getId() + "=" ;
-				for (int i = 0 ; i < ((ArrayList<Long>) e.getValue()).size()-1 ;i++)
-					s += ((ArrayList<Long>) e.getValue()).get(i).toString() + ",";
-					
-				if (((ArrayList<Long>) e.getValue()).size() > 0)
-					s += ((ArrayList<Long>) e.getValue()).get(((ArrayList<Long>) e.getValue()).size()-1);
-				s += " ";
-				break;
-			case CLEAR_INCOMING_PLAYERS:
-				s += e.getKey().getId() + "=" + e.getValue().toString() + " ";
-				break;
-			case FORCE_SPAWN_LOC:
-				s += e.getKey().getId() + "=" + e.getValue().toString() + " ";
-				break;
-			case GAMEMODE_INCOMING_PLAYERS:
-				s += e.getKey().getId() + "=" + e.getValue().toString() + " ";
-				break;
-			case LIST_PROHIBITED_INTERRACTION:
-				s += e.getKey().getId() + "=" ;
-				for (int i = 0 ; i < ((ArrayList<Material>) e.getValue()).size()-1 ;i++)
-					s += ((ArrayList<Material>) e.getValue()).get(i).toString() + ",";
-					
-				if (((ArrayList<Material>) e.getValue()).size() > 0)
-					s += ((ArrayList<Material>) e.getValue()).get(((ArrayList<Material>) e.getValue()).size()-1);
-				s += " ";
-				break;
-			case PLOT_TIME:
-				s += e.getKey().getId() + "=" + e.getValue().toString() + " ";
-				break;
-			case SPAWN_LOC:
-				s += e.getKey().getId() + "=" + ((Location) e.getValue()).getX() + "," + ((Location) e.getValue()).getY() + "," + ((Location) e.getValue()).getZ() + " ";
-				break;
-			default:
-				break;
-			
-			}
-		
-		return s;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static PlotParameters fromDbFormat(OlympaCreatifMain plugin, String data) {
-		PlotParameters paramsSet = new PlotParameters(plugin, null, false);
-		
-		for (String s : data.split(" "))
-			if (data.contains("=")) {
-				PlotParamType param = PlotParamType.getFromString(s.split("=")[0]);
-				String value = s.split("=")[1];
-				
-				switch (param) {
-				case ALLOW_FLY_INCOMING_PLAYERS:
-					paramsSet.setParameter(param, Boolean.valueOf(value));
-					break;
-				case ALLOW_PRINT_TNT:
-					paramsSet.setParameter(param, Boolean.valueOf(value));
-					break;
-				case BANNED_PLAYERS:
-					for (String st : value.split(","))
-						((ArrayList<Long>) paramsSet.getParameter(param)).add(Long.valueOf(st));
-					break;
-				case CLEAR_INCOMING_PLAYERS:
-					paramsSet.setParameter(param, Boolean.valueOf(value));
-					break;
-				case FORCE_SPAWN_LOC:
-					paramsSet.setParameter(param, Boolean.valueOf(value));
-					break;
-				case GAMEMODE_INCOMING_PLAYERS:
-					paramsSet.setParameter(param, GameMode.valueOf(value));
-					break;
-				case LIST_PROHIBITED_INTERRACTION:
-					for (String st : value.split(","))
-						((ArrayList<Material>) paramsSet.getParameter(param)).add(Material.valueOf(st));
-					break;
-				case PLOT_TIME:
-					paramsSet.setParameter(param, Long.valueOf(value));
-					break;
-				case SPAWN_LOC:
-					paramsSet.setParameter(param, new Location(plugin.getWorldManager().getWorld(),
-							Double.valueOf(value.split(",")[0]), Double.valueOf(value.split(",")[1]), Double.valueOf(value.split(",")[2])));
-					break;
-				default:
-					break;
-				}
-			}
-
-		return paramsSet;
-	}
-	
 	public static ArrayList<Material> getAllPossibleProhibitedBlocks(){
 		ArrayList<Material> list = new ArrayList<Material>();
 		list.add(Material.ACACIA_FENCE_GATE);
@@ -211,12 +109,25 @@ public class PlotParameters implements DatabaseSerializable{
 		list.add(Material.ENDER_CHEST);
 		list.add(Material.DISPENSER);
 		list.add(Material.DROPPER);
+		list.add(Material.HOPPER);
 		
 		list.add(Material.FURNACE);
 		list.add(Material.CRAFTING_TABLE);
 		list.add(Material.BREWING_STAND);
 		list.add(Material.ENCHANTING_TABLE);
 		list.add(Material.ANVIL);
+
+		list.add(Material.CARTOGRAPHY_TABLE);
+		list.add(Material.SMOKER);
+		list.add(Material.BLAST_FURNACE);
+		list.add(Material.BARREL);
+		list.add(Material.LOOM);
+		list.add(Material.GRINDSTONE);
+		list.add(Material.LECTERN);
+		list.add(Material.GRINDSTONE);
+		list.add(Material.STONECUTTER);
+		list.add(Material.BELL);
+		
 		
 		return list;
 	}

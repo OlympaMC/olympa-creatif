@@ -1,7 +1,12 @@
 package fr.olympa.olympacreatif.worldedit;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
@@ -21,8 +26,12 @@ public class Undo {
 		undoData.put(loc, data);
 	}
 	
-	public Map<Location, BlockData> getUndoData(){
-		return undoData;
+	public List<SimpleEntry<Location, BlockData>> getUndoData(){
+		List<SimpleEntry<Location, BlockData>> list = new ArrayList<SimpleEntry<Location,BlockData>>();
+		for (Entry<Location, BlockData> e : undoData.entrySet())
+			list.add(new SimpleEntry<Location, BlockData>(e));
+		
+		return list;
 	}
 	
 }

@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.data;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public enum Message {
 	
@@ -23,6 +24,11 @@ public enum Message {
 	PROHIBITED_BLOCK_PLACED("prohibited_block_placed"), 
 	TELEPORTED_TO_PLOT_SPAWN("teleport_to_plot_spawn"),
 	
+	WE_ACTION_ENDED("world_edit_action_terminated"),
+	WE_ACTION_QUEUED("worldedit_action_queued"),
+	WE_ANOTHER_ACTION_ALREADY_QUEUED("worldedit_another_action_already_queued"),
+	WE_NOTHING_TO_DO("worldedit_invalid_selection"),
+	
 	PARAM_WORLDEDIT_BPS("parameter_worldedit_blocks_per_second"),
 	PARAM_WORLD_NAME("parameter_world_name"),
 	PARAM_WORLD_LEVEL("parameter_world_height"),
@@ -39,17 +45,26 @@ public enum Message {
 		this.id = id;
 	}
 	
-	@Override
-	public String toString() {
+	public String getKey() {
 		return id;
 	}
 	
 	public String getValue() {
-		return messagesList.get(toString());
+		return messagesList.get(getKey());
 	}
 	
 	public static void initialize() {
-		//TODO
+		messagesList.put(PARAM_PLOT_X_SIZE.getKey(), "10");
+		messagesList.put(PARAM_PLOT_Z_SIZE.getKey(), "15");
+		messagesList.put(PARAM_ROAD_SIZE.getKey(), "4");
+		messagesList.put(PARAM_PREFIX.getKey(), "[prefix] ");
+		messagesList.put(PARAM_WORLDEDIT_BPS.getKey(), "1000");
+		messagesList.put(PARAM_WORLD_LEVEL.getKey(), "60");
+		messagesList.put(PARAM_WORLD_NAME.getKey(), "CREATIF");
+	}
+	
+	public void setValue(Object s) {
+		messagesList.put(id, s.toString());
 	}
 	
 }

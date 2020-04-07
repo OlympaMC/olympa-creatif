@@ -1,12 +1,19 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
 import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class Plot {
 
@@ -16,65 +23,43 @@ public class Plot {
 	private PlotArea area;
 	private PlotParameters parameters;
 	private PlotId plotId;
+	
 	private PlotListener listener;
+
+	private List<Player> playersInPlot = new ArrayList<Player>();
+	
+	private boolean isActive = true; //sert à détecter quand un chunk est inactif
 	
 	//constructeur pour un plot n'existant pas encore
-	public Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
+	Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
 		this.plugin = plugin;
-		members.set(p, PlotRank.OWNER);
+		members = new PlotMembers(plugin, this);
 		area = new PlotArea(plugin);
 		parameters = new PlotParameters(plugin, area, true);
 		plotId = new PlotId(plugin, area);
 		listener = new PlotListener(plugin, this);
+
+		members.set(p, PlotRank.OWNER);
+		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+	}
+	
+	public Plot(AsyncPlot ap) {
+		this.plugin = ap.getPlugin();
+		this.area = ap.getArea();
+		this.parameters = ap.getParameters();
+		this.members = ap.getMembers();
+		this.plotId = ap.getId();
+		
+		this.listener = new PlotListener(plugin, this);
 		
 		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
-		
-		//création des routes autour du plot  
-		/*
-		if (plugin.getPlot(area.getFirstCorner().clone().add(-plugin.plotXwidth-plugin.roadWidth, 0, 0)) == null)
-			for (int x = area.getFirstCorner().getBlockX()-1 ; x >= area.getFirstCorner().getBlockX()-plugin.roadWidth ; x--)
-				for (int z = area.getFirstCorner().getBlockZ()-plugin.roadWidth ; z <= area.getSecondCorner().getBlockZ()+plugin.roadWidth ; z++)
-					plugin.getWorldEditManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), x, plugin.worldLevel, z), Bukkit.createBlockData(Material.STONE));
 
-		if (plugin.getPlot(area.getFirstCorner().clone().add(plugin.plotXwidth+plugin.roadWidth, 0, 0)) == null)
-			for (int x = area.getSecondCorner().getBlockX()+1 ; x <= area.getSecondCorner().getBlockX()+plugin.roadWidth ; x++)
-				for (int z = area.getFirstCorner().getBlockZ()-plugin.roadWidth ; z <= area.getSecondCorner().getBlockZ()+plugin.roadWidth ; z++)
-					plugin.getWorldEditManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), x, plugin.worldLevel, z), Bukkit.createBlockData(Material.STONE));
-
-		if (plugin.getPlot(area.getFirstCorner().clone().add(0, 0, -plugin.plotZwidth-plugin.roadWidth)) == null)
-			for (int z = area.getFirstCorner().getBlockZ()-1 ; z >= area.getFirstCorner().getBlockZ()-plugin.roadWidth ; z--)
-				for (int x = area.getFirstCorner().getBlockX() ; x <= area.getSecondCorner().getBlockX() ; x++) 
-					plugin.getWorldEditManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), x, plugin.worldLevel, z), Bukkit.createBlockData(Material.STONE));
-
-		if (plugin.getPlot(area.getFirstCorner().clone().add(0, 0, plugin.plotZwidth+plugin.roadWidth)) == null)
-			for (int z = area.getSecondCorner().getBlockZ()+1 ; z <= area.getSecondCorner().getBlockZ()+plugin.roadWidth ; z++)
-				for (int x = area.getFirstCorner().getBlockX() ; x <= area.getSecondCorner().getBlockX() ; x++) 
-					plugin.getWorldEditManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), x, plugin.worldLevel, z), Bukkit.createBlockData(Material.STONE));
-
-		//création des bordures autour du plot
-		
-		for (int x = area.getFirstCorner().getBlockX()-1 ; x <= area.getSecondCorner().getBlockX()+1 ; x++) {
-			plugin.getWorldEditManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), x, plugin.worldLevel+1, area.getFirstCorner().getBlockZ()-1), Bukkit.createBlockData(Material.GRANITE_SLAB));
-			plugin.getWorldEditManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), x, plugin.worldLevel+1, area.getSecondCorner().getBlockZ()+1), Bukkit.createBlockData(Material.GRANITE_SLAB));	
-		}
-		for (int z = area.getFirstCorner().getBlockZ() ; z <= area.getSecondCorner().getBlockZ() ; z++) {
-			plugin.getWorldEditManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), area.getFirstCorner().getX()-1, plugin.worldLevel+1, z), Bukkit.createBlockData(Material.GRANITE_SLAB));
-			plugin.getWorldEditManager().addToBuildWaitingList(new Location(plugin.getWorldManager().getWorld(), area.getSecondCorner().getX()+1, plugin.worldLevel+1, z), Bukkit.createBlockData(Material.GRANITE_SLAB));
-		}*/
-		
+		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
+		for (Player p : Bukkit.getOnlinePlayers())
+			if (area.isInPlot(p.getLocation()))
+				listener.executeEntryActions(p);
 	}
-	
-	//constructeur pour un plot déjà existant
-	public Plot(OlympaCreatifMain plugin, PlotArea area, PlotParameters parameters, PlotMembers members, PlotId plotId) {
-		this.plugin = plugin;
-		this.area = area;
-		this.parameters = parameters;
-		this.members = members;
-		this.plotId = plotId;
-		
-		plugin.getServer().getPluginManager().registerEvents(new PlotListener(plugin, this), plugin);
-	}
-	
+
 	public PlotArea getArea() {
 		return area;
 	}
@@ -87,7 +72,34 @@ public class Plot {
 		return members;
 	}
 	
+	public PlotId getPlotId() {
+		return plotId;
+	}
 	public void unregisterListener() {
 		HandlerList.unregisterAll(listener);
+	}
+	
+	public boolean isActive() {
+		return isActive;
+	}
+	
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+	
+	public void addPlayerInPlot(Player p) {
+		playersInPlot.add(p);
+	}
+	
+	public void removePlayer(Player p) {
+		playersInPlot.remove(p);
+	}
+	
+	public List<Player> getPlayers(){
+		return Collections.unmodifiableList(playersInPlot);
+	}
+	
+	public void teleportOut(Player p) {
+		p.teleport(area.getFirstCorner().clone().add(-3, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue()), -3));
 	}
 }

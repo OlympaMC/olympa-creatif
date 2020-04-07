@@ -3,10 +3,9 @@ package fr.olympa.olympacreatif.plot;
 import org.bukkit.Location;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.DatabaseSerializable;
 import fr.olympa.olympacreatif.data.Message;
 
-public class PlotArea implements DatabaseSerializable{
+public class PlotArea {
 
 	private OlympaCreatifMain plugin;
 	private int x1;
@@ -14,7 +13,7 @@ public class PlotArea implements DatabaseSerializable{
 	private int z1;
 	private int z2;
 	
-	public PlotArea(OlympaCreatifMain plugin, int x1, int z1, int x2, int z2) {
+	PlotArea(OlympaCreatifMain plugin, int x1, int z1, int x2, int z2) {
 		this.plugin = plugin;
 		this.x1 = x1;
 		this.x2 = x2;
@@ -23,16 +22,52 @@ public class PlotArea implements DatabaseSerializable{
 	}
 	
 	//cherche une nouvelle zone libre opur un plot
-	public PlotArea(OlympaCreatifMain plugin) {
+	PlotArea(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
 		//recherche du premier cercle de plots non plein (le plot central étant compté comme plein)
-		int circleIndex = 0;
-		boolean plotFound = false;
-		int iFinal = 0;
-		int jFinal = 0;
+		int circleIndex = 1;
+		int plotIndex = 1;
+		int rowIndex = 0;
+		int plotRowIndex = 0;
 		
+		while (plugin.getPlotsManager().getTotalPlotCount() > Math.pow(circleIndex*2-1, 2)) {
+			circleIndex++;
+		}
+
+		
+		plotIndex = (int) (Math.pow(circleIndex*2-1, 2) - plugin.getPlotsManager().getTotalPlotCount());
+		rowIndex = plotIndex / ((int) (Math.pow(circleIndex, 2) - Math.pow(circleIndex-1, 2)) / 4);
+		plotRowIndex = (int) (plotIndex - rowIndex * ((Math.pow(circleIndex, 2) - Math.pow(circleIndex-1, 2)) / 4));
+		//sens : x++ (top to bottom)
+		switch (rowIndex) {
+		case 0: //x++, -z
+			x1 = plotRowIndex - circleIndex + 1;
+			z1 = -circleIndex + 1;
+			break;
+		case 1: //+x, z++
+			x1 = circleIndex - 1;
+			z1 = plotRowIndex - circleIndex + 1;
+			break;
+		case 2: //x--, +z
+			x1 = -plotRowIndex + circleIndex - 1;
+			z1 = circleIndex - 1;
+			break;
+		case 3: //-x, z--
+			x1 = -circleIndex + 1;
+			z1 = -plotRowIndex + circleIndex - 1;
+			break;
+		}
+
+		plugin.getPlotsManager().incrementTotalPlotsCount();
+		
+		x1 = x1 * (Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
+		z1 = z1 * (Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
+		x2 = x1 + Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue());
+		z2 = z1 + Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue());
+			
 		//tant qu'un plot libre n'a pas été trouvé
+		/*
 		while (!plotFound) {
 			//pour chaque cercle (on reteste aussi les cercles intérieurs déjà testés)
 			for (int i = -circleIndex ; i <= circleIndex ; i++) {
@@ -40,8 +75,9 @@ public class PlotArea implements DatabaseSerializable{
 					//pour chaque area potentielle, on regarde si elle est déjà occupée
 					if (!plotFound) {
 						boolean validPlot = true;
-						for (Plot plot : plugin.getPlots()) {
-							if (plot.getArea().isInPlot(i * (plugin.plotXwidth + plugin.roadWidth), j * (plugin.plotXwidth + plugin.roadWidth))) {
+						for (Plot plot : plugin.getPlotsManager().getPlots()) {
+							if (plot.getArea().isInPlot(i * (Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue())), 
+									j * (Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue())))) {
 								validPlot = false;
 							}
 						}
@@ -58,11 +94,7 @@ public class PlotArea implements DatabaseSerializable{
 			circleIndex++;
 		}
 
-		//attribution des coordonnées définitives du plot
-		x1 = iFinal * (Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
-		z1 = jFinal * (Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
-		x2 = x1 + Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue());
-		z2 = z1 + Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue());
+		*/
 		
 	}
 	
@@ -83,15 +115,5 @@ public class PlotArea implements DatabaseSerializable{
 			return true;
 		else
 			return false;
-	}
-
-	@Override
-	public String toDbFormat() {
-		return x1 + "," + z1 + " " + x2 + "," + z2;
-	}
-	
-	public static PlotArea fromDbFormat(OlympaCreatifMain plugin, String data) {
-		return new PlotArea(plugin, Integer.valueOf(data.split(" ")[0].split(",")[0]), Integer.valueOf(data.split(" ")[0].split(",")[1])
-				, Integer.valueOf(data.split(" ")[1].split(",")[0]), Integer.valueOf(data.split(" ")[1].split(",")[1]));
 	}
 }

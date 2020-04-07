@@ -24,9 +24,7 @@ public class WorldEventsListener implements Listener{
 	OlympaCreatifMain plugin;
 	
 	public WorldEventsListener(OlympaCreatifMain plugin) {
-		this.plugin = plugin;
-		plugin.getWorldManager().getProhibitedBlocks().add(Material.DISPENSER);
-		
+		this.plugin = plugin;		
 	}
 	
 	@EventHandler //cancel spawn créatures, sauf si spawn par un plugin 
@@ -39,24 +37,24 @@ public class WorldEventsListener implements Listener{
 
 	@EventHandler //cancel lava/water flow en dehors du plot. Cancel aussi toute téléportation d'un oeuf de dragon
 	public void onLiquidFlow(BlockFromToEvent e) {
-		if (e.getBlock().getType() == Material.DRAGON_EGG)
+		if (e.getBlock() != null && e.getBlock().getType() == Material.DRAGON_EGG)
 			e.setCancelled(true);
 		
-		if (!plugin.getPlot(e.getBlock().getLocation()).equals(plugin.getPlot(e.getToBlock().getLocation())))
+		if (!plugin.getPlotsManager().getPlot(e.getBlock().getLocation()).equals(plugin.getPlotsManager().getPlot(e.getToBlock().getLocation())))
 				e.setCancelled(true);
 	}
 	
 	@EventHandler //cancel rétractation piston si un bloc affecté se trouve sur une route
 	public void onPistonRetractEvent(BlockPistonRetractEvent e) {
 		for (Block block : e.getBlocks())
-			if (plugin.getPlot(block.getLocation()) == null)
+			if (plugin.getPlotsManager().getPlot(block.getLocation()) == null)
 				e.setCancelled(true);
 	}
 	
 	@EventHandler //cancel poussée piston si un bloc affecté se trouve sur une route
 	public void onPistonPushEvent(BlockPistonExtendEvent e) {
 		for (Block block : e.getBlocks())
-			if (plugin.getPlot(block.getLocation()) == null)
+			if (plugin.getPlotsManager().getPlot(block.getLocation()) == null)
 				e.setCancelled(true);
 	}
 	
@@ -65,15 +63,15 @@ public class WorldEventsListener implements Listener{
 		e.setCancelled(true);
 	}
 
-	@EventHandler //cancel pose block si route
+	@EventHandler //cancel pose block si route ou plot non défini
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
-		if (plugin.getPlot(e.getBlockPlaced().getLocation()) == null)
+		if (plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation()) == null)
 			e.setCancelled(true);
 	}
 	
 	@EventHandler //cancel pose block si route & annule tout loot d'item possible
 	public void onBreakBlockEvent(BlockBreakEvent e) {
-		if (plugin.getPlot(e.getBlock().getLocation()) == null)
+		if (plugin.getPlotsManager().getPlot(e.getBlock().getLocation()) == null)
 			e.setCancelled(true);
 		
 		e.setDropItems(false);

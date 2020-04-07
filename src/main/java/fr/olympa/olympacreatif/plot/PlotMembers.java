@@ -9,36 +9,33 @@ import org.bukkit.entity.Player;
 import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.olympacreatif.data.DatabaseSerializable;
+import fr.olympa.olympacreatif.OlympaCreatifMain;
 
-public class PlotMembers implements DatabaseSerializable{
+public class PlotMembers{
 
+	private OlympaCreatifMain plugin;
+	private Plot plot;
 	private Map<OlympaPlayerInformations, PlotRank> members = new HashMap<OlympaPlayerInformations, PlotRank>();
-	
-	@Override
-	public String toDbFormat() {
-		String s = "";
-		for (Entry<OlympaPlayerInformations, PlotRank> e : members.entrySet())
-			s += e.getKey().getID() + ":" + e.getValue().getRankName() + " ";
-		
-		return s;
-	}
 
-	public static PlotMembers fromDbFormat(String data) {
-		PlotMembers pm = new PlotMembers();
-		for (String s : data.split(" "))
-			if (s.contains(":"))
-				pm.set(AccountProvider.getPlayerInformations(Long.valueOf(s.split(":")[0])), PlotRank.getPlotRank(s.split(":")[1]));
-		
-		return pm;
+	public PlotMembers(OlympaCreatifMain plugin, Plot plot) {
+		this.plugin = plugin;
+		this.plot = plot;
 	}
 
 	public void set(Player p, PlotRank rank) {
-		members.put(AccountProvider.get(p.getUniqueId()).getInformation(), rank);
+		set(AccountProvider.get(p.getUniqueId()).getInformation(), rank);
 	}
 	
 	public void set(OlympaPlayerInformations p, PlotRank rank) {
 		members.put(p, rank);
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				plugin.getDataManager().setPlayerRank(plot.getPlotId(), p.getID());
+			}
+			
+		}).start();
 	}
 
 	public PlotRank getPlayerRank(Player p) {
@@ -53,6 +50,47 @@ public class PlotMembers implements DatabaseSerializable{
 			return members.get(AccountProvider.get(p.getUniqueId()).getInformation()).getLevel();
 		
 		else return PlotRank.VISITOR.getLevel();
+	}
+
+	public enum PlotRank {
+
+		VISITOR("visitor_level", 0, "Visiteur"),
+		MEMBER("member_level", 1, "Membre"),
+		TRUSTED("trusted_level", 2, "Contremaître"),
+		CO_OWNER("coowner_level", 3, "Co-propriétaire"),
+		OWNER("owner_level", 4, "Propriétaire");
+		
+		
+		private String s;
+		private int level;
+		private String rankName;
+		
+		PlotRank(String s, int lvl, String desc){
+			this.s = s;
+			this.level = lvl;
+			this.rankName = desc;
+		}
+		
+		@Override
+		public String toString() {
+			return s;
+		}
+		
+		public int getLevel() {
+			return level;
+		}
+		
+		public String getRankName() {
+			return rankName;
+		}
+		
+		public static PlotRank getPlotRank(String plotRankString) {
+			for (PlotRank pr : PlotRank.values())
+				if (pr.toString().equals(plotRankString))
+					return pr;
+			
+			return null;
+		}
 	}
 
 }

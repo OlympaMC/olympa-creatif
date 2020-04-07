@@ -6,10 +6,14 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.generator.ChunkGenerator;
 
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.olympacreatif.data.DataManager;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotsManager;
+import fr.olympa.olympacreatif.world.CustomChunkGenerator;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.WorldEditManager;
 
@@ -18,18 +22,22 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private WorldManager creativeWorldManager;
 	private WorldEditManager worldEditManager;
 	private DataManager dataManager;
-
-	private List<Plot> plots = new ArrayList<Plot>();
+	private PlotsManager plotsManager;
+	
+	@Override //retourne le générateur de chunks custom
+	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+		return new CustomChunkGenerator(this);
+	}
 	
 	//private OlympaStatement statement = new OlympaStatement("SELECT * FROM xxx WHERE xx = ?");
 	public void onEnable() {
 		//génération de la config de base
 		super.onEnable();
-		saveDefaultConfig();
+		//saveDefaultConfig();
+		dataManager = new DataManager(this);
 		creativeWorldManager = new WorldManager(this);
 		worldEditManager = new WorldEditManager(this);
-		dataManager = new DataManager(this);
-		
+		plotsManager = new PlotsManager(this);
 		/*try {
 			//OlympaCore.getInstance().getDatabase();
 			PreparedStatement preparedStatement = statement.getStatement();
@@ -49,18 +57,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		return worldEditManager;
 	}
 	
-	public void addPlot(Plot plot) {
-		plots.add(plot);
+	public PlotsManager getPlotsManager() {
+		return plotsManager;
 	}
 	
-	public List<Plot> getPlots(){
-		return Collections.unmodifiableList(plots);
-	}
-	
-	public Plot getPlot(Location loc) {
-		for (Plot p : getPlots())
-			if (p.getArea().isInPlot(loc))
-				return p;
-		return null;
+	public DataManager getDataManager() {
+		return dataManager;
 	}
 }

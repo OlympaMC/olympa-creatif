@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.worldedit;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,7 @@ import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
 
 public class WorldEditInstance {
@@ -40,7 +41,7 @@ public class WorldEditInstance {
 
 	//définit la position 1 de copie si elle est dans la même zone que l'autre (retourne vrai si le joueur a la perm worldedit, false sinon)
 	public boolean setPos1(Location loc) {
-		if (plugin.getPlot(loc).getMembers().getPlayerLevel(p) > 1) {
+		if (plugin.getPlotsManager().getPlot(loc).getMembers().getPlayerLevel(p) > 1) {
 			this.pos1 = loc;
 			return true;
 		}
@@ -49,7 +50,7 @@ public class WorldEditInstance {
 	
 	//définit la position 2 de copie si elle est dans la même zone que l'autre (retourne vrai si le joueur a la perm worldedit, false sinon)
 	public boolean setPos2(Location loc) {
-		if (plugin.getPlot(loc).getMembers().getPlayerLevel(p) > 1) {
+		if (plugin.getPlotsManager().getPlot(loc).getMembers().getPlayerLevel(p) > 1) {
 			this.pos2 = loc;
 			return true;
 		}
@@ -64,7 +65,7 @@ public class WorldEditInstance {
 				> Integer.valueOf(Message.PARAM_WORLDEDIT_BPS.getValue()))
 			return false;
 		
-		clipboardPlot = plugin.getPlot(pos1);
+		clipboardPlot = plugin.getPlotsManager().getPlot(pos1);
 		
 		for (int x = Math.min(pos1.getBlockX(), pos2.getBlockX()) ; x >= Math.max(pos1.getBlockX(), pos2.getBlockX()) ; x++)
 			for (int y = Math.min(pos1.getBlockY(), pos2.getBlockY()) ; y >= Math.max(pos1.getBlockY(), pos2.getBlockY()) ; y++)
@@ -90,9 +91,8 @@ public class WorldEditInstance {
 	public boolean executeUndo() {
 		if (undoList.size() == 0)
 			return false;
-		for (Entry<Location, BlockData> e : undoList.get(undoList.size()-1).getUndoData().entrySet()) {
-			plugin.getWorldEditManager().addToBuildWaitingList(e.getKey(), e.getValue());
-		}
+
+		plugin.getWorldEditManager().addToBuildingList(p, undoList.get(undoList.size()-1).getUndoData());
 		
 		undoList.remove(undoList.size()-1);
 		return true;
@@ -101,20 +101,25 @@ public class WorldEditInstance {
 	//retourne vrai si les deux points de la sélection sont dans le même plot, faux sinon (à appeler avant copySelection() )
 	public boolean isSelectionValid() {
 		if (pos1 != null && pos2 != null)
-			if (plugin.getPlot(pos1) != null && plugin.getPlot(pos2) != null)
-				if (plugin.getPlot(pos1).equals(plugin.getPlot(pos2)))
+			if (plugin.getPlotsManager().getPlot(pos1) != null && plugin.getPlotsManager().getPlot(pos2) != null)
+				if (plugin.getPlotsManager().getPlot(pos1).equals(plugin.getPlotsManager().getPlot(pos2)))
 					return true;
 		
 		return false;
 	}
 	
-	//colle la sélection à l'endroit souhaité (true si paste complètement effectué, false sinon)
 	public boolean pasteSelection() {
+		return buildBlocks(clipboard);
+	}
+	
+	//colle la sélection à l'endroit souhaité (true si paste complètement effectué, false sinon)
+	private boolean buildBlocks(Map<Location, BlockData> blocksList) {
 		Undo undo = new Undo(plugin);
 		Plot targetPlot = null;
+		List<SimpleEntry<Location, BlockData>> toBuild = new ArrayList<SimpleEntry<Location,BlockData>>();
 		
-		for (Entry<Location, BlockData> entry : clipboard.entrySet()) {
-			targetPlot = plugin.getPlot(entry.getKey());
+		for (Entry<Location, BlockData> entry : blocksList.entrySet()) {
+			targetPlot = plugin.getPlotsManager().getPlot(entry.getKey());
 			
 			//si le plot cible n'est pas nul
 			if (targetPlot != null) {
@@ -124,7 +129,7 @@ public class WorldEditInstance {
 					//paste du block
 					Location loc = entry.getKey().clone().add(p.getPlayer().getLocation());
 					undo.addBlock(loc, loc.getBlock().getBlockData().clone());
-					plugin.getWorldEditManager().addToBuildWaitingList(loc, entry.getValue());
+					toBuild.add(new SimpleEntry<Location, BlockData>(loc, entry.getValue()));
 					
 				}else {//si le plot cible est pas égal à celui de départ
 					//si le propriétaire est le même dans les 2 plots
@@ -133,20 +138,26 @@ public class WorldEditInstance {
 						//paste du block
 						Location loc = entry.getKey().clone().add(p.getPlayer().getLocation());
 						undo.addBlock(loc, loc.getBlock().getBlockData().clone());
-						plugin.getWorldEditManager().addToBuildWaitingList(loc, entry.getValue());
+						toBuild.add(new SimpleEntry<Location, BlockData>(loc, entry.getValue()));
 						
 					}else {//si le joueur n'est pas propriétaire des 2 plots
-						undoList.add(undo);
+						plugin.getWorldEditManager().addToBuildingList(p, toBuild);
+						if (undo.getUndoData().size() > 0)
+							undoList.add(undo);
 						return false;	
 					}
 				}
 			}else {//si le plot cible est nul
-				undoList.add(undo);
+				plugin.getWorldEditManager().addToBuildingList(p, toBuild);
+				if (undo.getUndoData().size() > 0)
+					undoList.add(undo);
 				return false;
 			}
 		}
-		
-		undoList.add(undo);
+
+		plugin.getWorldEditManager().addToBuildingList(p, toBuild);
+		if (undo.getUndoData().size() > 0)
+			undoList.add(undo);
 		return true;
 	}
 }
