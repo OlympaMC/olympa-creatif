@@ -1,26 +1,23 @@
 package fr.olympa.olympacreatif.command;
 
-import java.util.function.Predicate;
-
+import java.util.List;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.entity.Player;
 
+import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
-import fr.olympa.api.command.complex.ComplexCommand;
-import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.datas.Message;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.Plot;
 
-public class OcCommand extends ComplexCommand {
+public class OcCommand extends OlympaCommand {
 
 	private OlympaCreatifMain plugin;
 	
-	public OcCommand(OlympaCreatifMain plugin) {
-		
-		super(null, plugin, "olympacreative", "&2Commande principale du plugin. Tapez /oc help pour afficher l'aide.", null, new String[] {"oc"});
-		
+	public OcCommand(OlympaCreatifMain plugin, String command, String[] alias) {
+		super(plugin, command, alias);
 		this.plugin = plugin;
 	}
 
@@ -43,5 +40,39 @@ public class OcCommand extends ComplexCommand {
 				cmd.player.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
 			}
 		}
+	}
+
+
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		switch (args.length) {
+		case 0:
+			sender.sendMessage(Message.COMMAND_BASIC.getValue());
+			break;
+		case 1:
+			switch(args[0]) {
+			case "help": 
+				sender.sendMessage(Message.COMMAND_HELP.getValue());
+				break;
+			case "find":
+				if (!(sender instanceof Player))
+					break;
+				Plot plot = plugin.getPlotsManager().createPlot((Player) sender);
+				((Player) sender).teleport(plot.getArea().getFirstCorner());
+			}
+			break;
+		case 2:
+			break;
+		}
+		return false;
+	}
+
+
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

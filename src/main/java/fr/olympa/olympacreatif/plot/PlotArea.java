@@ -3,7 +3,7 @@ package fr.olympa.olympacreatif.plot;
 import org.bukkit.Location;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.datas.Message;
+import fr.olympa.olympacreatif.data.Message;
 
 public class PlotArea {
 

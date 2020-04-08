@@ -25,7 +25,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.datas.Message;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class PlotListener implements Listener {

@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.world;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
@@ -17,7 +18,7 @@ import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.datas.Message;
+import fr.olympa.olympacreatif.data.Message;
 
 public class WorldEventsListener implements Listener{
 
@@ -40,7 +41,7 @@ public class WorldEventsListener implements Listener{
 		if (e.getBlock() != null && e.getBlock().getType() == Material.DRAGON_EGG)
 			e.setCancelled(true);
 		
-		if (!plugin.getPlotsManager().getPlot(e.getBlock().getLocation()).equals(plugin.getPlotsManager().getPlot(e.getToBlock().getLocation())))
+		if (plugin.getPlotsManager().getPlot(e.getToBlock().getLocation())  == null)
 				e.setCancelled(true);
 	}
 	
@@ -65,6 +66,9 @@ public class WorldEventsListener implements Listener{
 
 	@EventHandler //cancel pose block si route ou plot non défini
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
+		plugin.getPlotsManager();
+		e.getBlockPlaced().getLocation();
+		plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
 		if (plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation()) == null)
 			e.setCancelled(true);
 	}

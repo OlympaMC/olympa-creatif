@@ -1,14 +1,10 @@
-package fr.olympa.olympacreatif.datas;
+package fr.olympa.olympacreatif.data;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 
 import fr.olympa.api.objects.OlympaPlayer;
-import fr.olympa.api.sql.OlympaStatement;
-import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -29,9 +25,9 @@ public class DataManager {
 		plugin.getPlotsManager().addAsyncPlot(plot, plotId);			
 	}
 
-	public List<SimpleEntry<PlotId, PlotRank>> loadPlayerPlots(OlympaPlayer p) {
+	public void loadPlayerPlots(OlympaPlayer p) {
 		// TODO Auto-generated method stub
-		return null;
+		return;
 	}
 	
 	public void updatePlayerPlotRank(long playerId, PlotId plotId, PlotRank rank) {
@@ -40,7 +36,7 @@ public class DataManager {
 
 	private ResultSet executeRequest(String request) {
 		ResultSet resultSet = null;
-		
+		/*
 		try {
 			OlympaCore.getInstance().getDatabase();
 			//table  
@@ -52,7 +48,7 @@ public class DataManager {
 		}catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+		*/
 		return resultSet;
 	}
 
@@ -60,11 +56,5 @@ public class DataManager {
 	public int getTotalPlotsCount() {
 		// TODO Auto-generated method stub
 		return 0;
-	}
-
-
-	public void setPlayerRank(PlotId plotId, long id) {
-		// TODO Auto-generated method stub
-		
 	}
 }

@@ -32,7 +32,7 @@ public class PlotMembers{
 
 			@Override
 			public void run() {
-				plugin.getDataManager().setPlayerRank(plotId, p.getID());
+				plugin.getDataManager().updatePlayerPlotRank(p.getID(), plotId, rank);
 			}
 			
 		}).start();

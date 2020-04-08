@@ -1,9 +1,12 @@
-package fr.olympa.olympacreatif.datas;
+package fr.olympa.olympacreatif.data;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public enum Message {
+
+	COMMAND_HELP("command_help"),
+	COMMAND_BASIC("command_basic"),
 	
 	PLOT_CREATED("plot_created"),
 	PLOT_RANK_LOW("plot_rank_low"),
@@ -60,7 +63,7 @@ public enum Message {
 	public static void initialize() {
 		messagesList.put(PARAM_PLOT_X_SIZE.getKey(), "10");
 		messagesList.put(PARAM_PLOT_Z_SIZE.getKey(), "15");
-		messagesList.put(PARAM_ROAD_SIZE.getKey(), "4");
+		messagesList.put(PARAM_ROAD_SIZE.getKey(), "6");
 		messagesList.put(PARAM_PREFIX.getKey(), "[prefix] ");
 		messagesList.put(PARAM_WORLDEDIT_BPS.getKey(), "1000");
 		messagesList.put(PARAM_WORLD_LEVEL.getKey(), "60");

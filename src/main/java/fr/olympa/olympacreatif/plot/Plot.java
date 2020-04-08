@@ -12,7 +12,7 @@ import org.bukkit.event.HandlerList;
 
 import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.datas.Message;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class Plot {

@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.datas.Message;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class PlotsManager {
@@ -25,10 +25,13 @@ public class PlotsManager {
 	private List<PlotId> emptyPlots = new ArrayList<PlotId>();
 	private List<AsyncPlot> asyncPlots = new ArrayList<AsyncPlot>();
 	
-	private int plotCount = plugin.getDataManager().getTotalPlotsCount();
+	private List<Player> loadedPlayers = new ArrayList<Player>();
+	
+	private int plotCount; 
 	
 	public PlotsManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		plotCount = plugin.getDataManager().getTotalPlotsCount();
 		
 		//construit les objets Plot chargés depuis la bdd de manière synchrone avec le serveur
 		new BukkitRunnable() {
@@ -136,6 +139,18 @@ public class PlotsManager {
 
 	public void loadPlotsFor(OlympaPlayer olympaPlayer) {
 		// TODO Auto-generated method stub
-		
+		plugin.getDataManager().loadPlayerPlots(olympaPlayer);
+	}
+	
+	public void removeLoadedPlayer(Player p) {
+		loadedPlayers.remove(p);
+	}
+	
+	public void addLoadedPlayer(Player p) {
+		loadedPlayers.add(p);
+	}
+	
+	public boolean isPlayerLoaded(Player p) {
+		return loadedPlayers.contains(p);
 	}
 }

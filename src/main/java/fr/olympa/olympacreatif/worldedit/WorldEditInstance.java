@@ -12,10 +12,11 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.datas.*;
+import fr.olympa.olympacreatif.data.*;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.worldedit.*;
+import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
 
 public class WorldEditInstance {
 

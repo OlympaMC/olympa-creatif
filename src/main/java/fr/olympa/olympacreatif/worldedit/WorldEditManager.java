@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.datas.Message;
+import fr.olympa.olympacreatif.data.Message;
 
 public class WorldEditManager {
 
@@ -29,8 +29,9 @@ public class WorldEditManager {
 		//runnable de setblock délayé
 		new BukkitRunnable() {
 			
-			Player p = blocksToBuild.get(0).getKey();
-			List<SimpleEntry<Location, BlockData>> toPlace = new ArrayList<SimpleEntry<Location,BlockData>>();
+			Player p = null;
+			List<SimpleEntry<Location, BlockData>> toPlace = new ArrayList<AbstractMap.SimpleEntry<Location,BlockData>>();
+			
 			public void run() {
 				int i = 0;
 				
@@ -63,7 +64,7 @@ public class WorldEditManager {
 					i++;
 				}
 			}
-		}.runTaskTimer(plugin, 20, 4);
+		}.runTaskTimer(plugin, 0, 1);
 		
 	}
 	

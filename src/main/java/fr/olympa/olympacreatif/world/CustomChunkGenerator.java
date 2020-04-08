@@ -9,7 +9,7 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.util.noise.SimplexOctaveGenerator;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.datas.Message;
+import fr.olympa.olympacreatif.data.Message;
 
 public class CustomChunkGenerator extends ChunkGenerator {
 
@@ -25,9 +25,9 @@ public class CustomChunkGenerator extends ChunkGenerator {
 
 	@Override
     public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biome) {
-    	SimplexOctaveGenerator generator = new SimplexOctaveGenerator(new Random(world.getSeed()), 8);
+
         ChunkData chunk = createChunkData(world);
-        generator.setScale(0.005D);
+
         for (int x = 0; x < 16; x++)
             for (int z = 0; z < 16; z++) {
             	
@@ -40,10 +40,10 @@ public class CustomChunkGenerator extends ChunkGenerator {
         		
         		//set couches hautes
         		//si route, set stone
-    			if ((Math.floorMod(chunkX*16+x, plotXwidth + roadWidth + 1) >= plotXwidth && 
-    					Math.floorMod(chunkX*16+x, plotXwidth + roadWidth + 1) <= plotXwidth + roadWidth) || 
-    					(Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth + 1) >= plotZwidth && 
-    					Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth + 1) <= plotZwidth + roadWidth)) {
+    			if ((Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) >= plotXwidth && 
+    					Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) < plotXwidth + roadWidth) || 
+    					(Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) >= plotZwidth && 
+    					Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) < plotZwidth + roadWidth)) {
     				
     				//set stone pour les routes
             		for (int y = 1 ; y <= worldLevel ; y++) {
@@ -58,16 +58,20 @@ public class CustomChunkGenerator extends ChunkGenerator {
     			}
     			
     			//si bord de plot, set demies dalles
-        		if (((Math.floorMod(chunkX*16+x, plotXwidth + roadWidth + 1) == plotXwidth || 
-        				Math.floorMod(chunkX*16+x, plotXwidth + roadWidth + 1) == plotXwidth + roadWidth) && 
-    					!(Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth + 1) > plotZwidth && 
-    					Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth + 1) < plotZwidth + roadWidth)) || 
-        				((Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth + 1) == plotZwidth || 
-        				Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth + 1) == plotZwidth + roadWidth) && 
-    					!(Math.floorMod(chunkX*16+x, plotXwidth + roadWidth + 1) > plotXwidth && 
-    					Math.floorMod(chunkX*16+x, plotXwidth + roadWidth + 1) < plotXwidth + roadWidth))) {
+    			
+    			
+        		if (((Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) == plotXwidth || 
+        				Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) == plotXwidth + roadWidth - 1) && 
+    					!(Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) > plotZwidth && 
+    					Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) < plotZwidth + roadWidth)) || 
+        				((Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) == plotZwidth || 
+        				Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) == plotZwidth + roadWidth - 1) && 
+    					!(Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) > plotXwidth && 
+    					Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) < plotXwidth + roadWidth)) ||
+    					(Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) == plotXwidth + roadWidth - 1 && 
+    					Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) == plotZwidth + roadWidth - 1)) {
             		
-        			chunk.setBlock(x, worldLevel, z, Material.GRANITE_SLAB);
+        			chunk.setBlock(x, worldLevel+1, z, Material.GRANITE_SLAB);
         		}
         		
             }
