@@ -42,7 +42,7 @@ public class PlotListener implements Listener {
 	
 	@EventHandler //test place block
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
-		if (e.isCancelled() || !plot.getArea().isInPlot(e.getBlockPlaced().getLocation()))
+		if (e.isCancelled() || !plot.getId().isInPlot(e.getBlockPlaced().getLocation()))
 			return;
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
@@ -53,7 +53,7 @@ public class PlotListener implements Listener {
 	
 	@EventHandler //test break block
 	public void onBreakBlockEvent(BlockBreakEvent e) {
-		if (e.isCancelled() || !plot.getArea().isInPlot(e.getBlock().getLocation()))
+		if (e.isCancelled() || !plot.getId().isInPlot(e.getBlock().getLocation()))
 			return;
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
@@ -65,9 +65,9 @@ public class PlotListener implements Listener {
 	@SuppressWarnings("unchecked")
 	@EventHandler //test interract block
 	public void onInterractEvent(PlayerInteractEvent e) {
-		if (!plot.getArea().isInPlot(e.getClickedBlock().getLocation()))
-			return;
 		if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock() == null)
+			return;
+		if (!plot.getId().isInPlot(e.getClickedBlock().getLocation()))
 			return;
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && 
@@ -79,7 +79,7 @@ public class PlotListener implements Listener {
 	
 	@EventHandler //test print TNT
 	public void onPrintTnt(BlockIgniteEvent e) {
-		if (!plot.getArea().isInPlot(e.getBlock().getLocation()))
+		if (!plot.getId().isInPlot(e.getBlock().getLocation()))
 			return;
 		if (e.getPlayer() == null || (e.getCause() != IgniteCause.ARROW && e.getCause() != IgniteCause.FLINT_AND_STEEL)) {
 			e.setCancelled(true);
@@ -95,7 +95,7 @@ public class PlotListener implements Listener {
 	@EventHandler //actions à effectuer lors de la sortie/entrée d'un joueur
 	public void onPlayerMove(PlayerMoveEvent e) {
 		//détection entrée dans plot
-		if (!plot.getArea().isInPlot(e.getFrom()) && plot.getArea().isInPlot(e.getTo())) {
+		if (!plot.getId().isInPlot(e.getFrom()) && plot.getId().isInPlot(e.getTo())) {
 
 			//expulse les joueurs bannis
 			if (((List<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(e.getPlayer().getUniqueId()).getId())) {
@@ -108,7 +108,7 @@ public class PlotListener implements Listener {
 			executeEntryActions(e.getPlayer());
 			
 		//détection sortie du plot
-		}else if (plot.getArea().isInPlot(e.getFrom()) && !plot.getArea().isInPlot(e.getTo())) {
+		}else if (plot.getId().isInPlot(e.getFrom()) && !plot.getId().isInPlot(e.getTo())) {
 			
 			plot.removePlayer(e.getPlayer());
 			
@@ -170,7 +170,7 @@ public class PlotListener implements Listener {
 	
 	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
 	public void onQuitEvent(PlayerQuitEvent e) {
-		if (!plot.getArea().isInPlot(e.getPlayer().getLocation()))
+		if (!plot.getId().isInPlot(e.getPlayer().getLocation()))
 			return;
 
 		plot.removePlayer(e.getPlayer());

@@ -18,7 +18,7 @@ public class PlotParameters {
 	private Map <PlotParamType, Object> parameters = new HashMap<PlotParamType, Object>();
 	
 	@SuppressWarnings("unchecked")
-	public PlotParameters(OlympaCreatifMain plugin, PlotArea area, boolean useDefaultProhibitedBlocks) {
+	public PlotParameters(OlympaCreatifMain plugin, PlotId id, boolean useDefaultProhibitedBlocks) {
 		this.plugin = plugin;
 		for (PlotParamType param : PlotParamType.values())
 			switch (param) {
@@ -44,8 +44,8 @@ public class PlotParameters {
 				parameters.put(param, -1);
 				break;
 			case SPAWN_LOC:
-				if (area != null)
-					parameters.put(param, area.getFirstCorner());
+				if (id != null)
+					parameters.put(param, id.getLocation());
 				else
 					parameters.put(param, new Location(plugin.getWorldManager().getWorld(), 0, 100, 0));
 				break;

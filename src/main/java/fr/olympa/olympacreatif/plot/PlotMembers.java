@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.objects.OlympaPlayer;
@@ -27,7 +28,9 @@ public class PlotMembers{
 	}
 	
 	public void set(OlympaPlayerInformations p, PlotRank rank) {
+		//TODO
 		members.put(p, rank);
+		
 		new Thread(new Runnable() {
 
 			@Override

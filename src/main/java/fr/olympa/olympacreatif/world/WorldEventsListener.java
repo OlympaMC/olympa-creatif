@@ -16,6 +16,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.entity.LingeringPotionSplashEvent;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
@@ -30,7 +31,11 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler //cancel spawn créatures, sauf si spawn par un plugin 
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
-		if (!(e.getEntityType() == EntityType.PLAYER) && !(e.getSpawnReason() == SpawnReason.CUSTOM))
+		if (e.getEntityType() == EntityType.PLAYER)
+			return;
+		if (plugin.getPlotsManager().getPlot(e.getLocation()) != null)
+			return;
+		if (e.getSpawnReason() == SpawnReason.CUSTOM)
 			return;
 		
 		e.setCancelled(true);
@@ -66,22 +71,23 @@ public class WorldEventsListener implements Listener{
 
 	@EventHandler //cancel pose block si route ou plot non défini
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
-		plugin.getPlotsManager();
-		e.getBlockPlaced().getLocation();
-		plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
-		if (plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation()) == null)
+		if (plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation()) == null) {
 			e.setCancelled(true);
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
+		}
 	}
 	
 	@EventHandler //cancel pose block si route & annule tout loot d'item possible
 	public void onBreakBlockEvent(BlockBreakEvent e) {
-		if (plugin.getPlotsManager().getPlot(e.getBlock().getLocation()) == null)
+		if (plugin.getPlotsManager().getPlot(e.getBlock().getLocation()) == null) {
 			e.setCancelled(true);
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
+		}
 		
 		e.setDropItems(false);
 	}
 	
-	@EventHandler //détruit tous les items 5s après leur spawn
+	//@EventHandler //détruit tous les items 5s après leur spawn
 	public void onSpawnItem(final ItemSpawnEvent e) {
 		
 		new BukkitRunnable() {
@@ -99,5 +105,10 @@ public class WorldEventsListener implements Listener{
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PROHIBITED_BLOCK_PLACED.getValue());
 		}
+	}
+	
+	@EventHandler //cancel potions persistantes
+	public void onLingeringPotion(LingeringPotionSplashEvent e) {
+		e.setCancelled(true);
 	}
 }

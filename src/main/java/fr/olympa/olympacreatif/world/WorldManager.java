@@ -32,10 +32,11 @@ import fr.olympa.olympacreatif.plot.Plot;
 public class WorldManager {
 
 	private World world = null;
+	
+	//TODO remplir la liste
 	private List<Material> prohibitedBlocks = new ArrayList<Material>();
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
-		prohibitedBlocks.add(Material.DISPENSER);
 		
 		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
 		

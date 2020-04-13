@@ -41,8 +41,8 @@ public class PlotsManager {
 				synchronized (asyncPlots) {
 					for (AsyncPlot ap : asyncPlots) {
 						Plot plot = new Plot(ap);
-						loadedPlots.put(plot.getPlotId(), plot);
-						emptyPlots.remove(plot.getPlotId());
+						loadedPlots.put(plot.getId(), plot);
+						emptyPlots.remove(plot.getId());
 					}
 					asyncPlots.clear();	
 				}
@@ -85,8 +85,8 @@ public class PlotsManager {
 	public Plot createPlot(Player p) {
 		Plot plot = new Plot(plugin, AccountProvider.get(p.getUniqueId()).getInformation());
 		
-		emptyPlots.remove(plot.getPlotId());		
-		loadedPlots.put(plot.getPlotId(), plot);
+		emptyPlots.remove(plot.getId());		
+		loadedPlots.put(plot.getId(), plot);
 		return plot;
 	}
 	
@@ -100,7 +100,7 @@ public class PlotsManager {
 	
 	public Plot getPlot(int x, int z) {
 		for (Plot p : getPlots())
-			if (p.getArea().isInPlot(x, z))
+			if (p.getId().isInPlot(x, z))
 				return p;
 		return null;
 	}
@@ -120,7 +120,7 @@ public class PlotsManager {
 		return null;
 	}
 	
-	public void incrementTotalPlotsCount() {
+	public void incrementTotalPlotCount() {
 		plotCount++;
 	}
 	
@@ -138,7 +138,6 @@ public class PlotsManager {
 	}
 
 	public void loadPlotsFor(OlympaPlayer olympaPlayer) {
-		// TODO Auto-generated method stub
 		plugin.getDataManager().loadPlayerPlots(olympaPlayer);
 	}
 	

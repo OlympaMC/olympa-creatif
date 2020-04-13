@@ -20,7 +20,6 @@ public class Plot {
 	private OlympaCreatifMain plugin;
 	
 	private PlotMembers members;
-	private PlotArea area;
 	private PlotParameters parameters;
 	private PlotId plotId;
 	
@@ -33,9 +32,8 @@ public class Plot {
 	//constructeur pour un plot n'existant pas encore
 	Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
 		this.plugin = plugin;
-		area = new PlotArea(plugin);
-		parameters = new PlotParameters(plugin, area, true);
-		plotId = new PlotId(plugin, area);
+		plotId = new PlotId(plugin);
+		parameters = new PlotParameters(plugin, plotId, true);
 		members = new PlotMembers(plugin, plotId);
 		listener = new PlotListener(plugin, this);
 
@@ -45,7 +43,6 @@ public class Plot {
 	
 	public Plot(AsyncPlot ap) {
 		this.plugin = ap.getPlugin();
-		this.area = ap.getArea();
 		this.parameters = ap.getParameters();
 		this.members = ap.getMembers();
 		this.plotId = ap.getId();
@@ -56,12 +53,8 @@ public class Plot {
 
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
-			if (area.isInPlot(p.getLocation()))
+			if (plotId.isInPlot(p.getLocation()))
 				listener.executeEntryActions(p);
-	}
-
-	public PlotArea getArea() {
-		return area;
 	}
 	
 	public PlotParameters getParameters() {
@@ -72,7 +65,7 @@ public class Plot {
 		return members;
 	}
 	
-	public PlotId getPlotId() {
+	public PlotId getId() {
 		return plotId;
 	}
 	public void unregisterListener() {
@@ -100,6 +93,6 @@ public class Plot {
 	}
 	
 	public void teleportOut(Player p) {
-		p.teleport(area.getFirstCorner().clone().add(-3, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue()), -3));
+		p.teleport(plotId.getLocation().clone().add(-3, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue()), -3));
 	}
 }

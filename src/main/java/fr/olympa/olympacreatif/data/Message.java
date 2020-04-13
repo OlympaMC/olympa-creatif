@@ -28,6 +28,8 @@ public enum Message {
 	
 	PROHIBITED_BLOCK_PLACED("prohibited_block_placed"), 
 	TELEPORTED_TO_PLOT_SPAWN("teleport_to_plot_spawn"),
+	TELEPORT_IN_PROGRESS("teleport_in_progress"),
+	INVALID_PLID_ID("invalid_plot_id"),
 	
 	WE_ACTION_ENDED("world_edit_action_terminated"),
 	WE_ACTION_QUEUED("worldedit_action_queued"),
@@ -40,7 +42,11 @@ public enum Message {
 	PARAM_PLOT_X_SIZE("parameter_x_plot_size"),
 	PARAM_PLOT_Z_SIZE("parameter_z_plot_size"),
 	PARAM_ROAD_SIZE("parameter_road_size"),
-	PARAM_PREFIX("parameter_chat_prefix"),  
+	PARAM_PREFIX("parameter_chat_prefix"), 
+	
+	GUI_MAIN_NAME("main_gui_name"),
+	GUI_MAIN_MEMBERS_LIST("main_gui_members"), 
+	GUI_MAIN_MEMBERS_LIST_LORE("main_gui_members_lore"),
 	;
 	
 	private String id;
