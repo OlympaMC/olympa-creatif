@@ -1,20 +1,12 @@
 package fr.olympa.olympacreatif;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Random;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.generator.ChunkGenerator;
 
-import exemple.ExampleComplexCommand;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.data.DataManager;
-import fr.olympa.olympacreatif.data.Message;
-import fr.olympa.olympacreatif.gui.GuiList;
-import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.CustomChunkGenerator;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -26,7 +18,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private WorldEditManager worldEditManager;
 	private DataManager dataManager;
 	private PlotsManager plotsManager;
-	private GuiList guiList;
+	
+	public Random random = new Random();
 	
 	@Override //retourne le générateur de chunks custom
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
@@ -44,7 +37,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		plotsManager = new PlotsManager(this);
 		creativeWorldManager = new WorldManager(this);
 		worldEditManager = new WorldEditManager(this);
-		guiList = new GuiList(this);
 		
 		/*try {
 			//OlympaCore.getInstance().getDatabase();
@@ -71,9 +63,5 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	
 	public DataManager getDataManager() {
 		return dataManager;
-	}
-	
-	public GuiList getGuiList() {
-		return guiList;
 	}
 }

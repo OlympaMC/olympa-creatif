@@ -30,15 +30,7 @@ public class PlotMembers{
 	public void set(OlympaPlayerInformations p, PlotRank rank) {
 		//TODO
 		members.put(p, rank);
-		
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				plugin.getDataManager().updatePlayerPlotRank(p.getID(), plotId, rank);
-			}
-			
-		}).start();
+		plugin.getTask().runTaskAsynchronously(() -> plugin.getDataManager().updatePlayerPlotRank(p.getID(), plotId, rank));
 	}
 
 	public PlotRank getPlayerRank(Player p) {
@@ -53,6 +45,10 @@ public class PlotMembers{
 			return members.get(AccountProvider.get(p.getUniqueId()).getInformation()).getLevel();
 		
 		else return PlotRank.VISITOR.getLevel();
+	}
+
+	public int getCount() {
+		return members.size(); 
 	}
 
 	public enum PlotRank {

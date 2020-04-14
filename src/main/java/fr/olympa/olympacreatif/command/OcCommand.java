@@ -1,27 +1,17 @@
 package fr.olympa.olympacreatif.command;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import fr.olympa.api.command.OlympaCommand;
-import fr.olympa.api.command.complex.Cmd;
-import fr.olympa.api.command.complex.CommandContext;
-import fr.olympa.api.scoreboard.FixedLine;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
-import me.bullobily.GUIcreator.GuiInventory;
-import me.bullobily.GUIcreator.GuiItem;
-import me.bullobily.ItemCreator.ItemCreator;
 
 public class OcCommand extends OlympaCommand {
 
@@ -37,7 +27,7 @@ public class OcCommand extends OlympaCommand {
 		switch (args.length) {
 		case 1:
 			switch(args[0]) {
-			case "help": 
+			case "help":
 				sender.sendMessage(Message.COMMAND_HELP.getValue());
 				break;
 			case "find":
@@ -48,7 +38,7 @@ public class OcCommand extends OlympaCommand {
 				break;
 			case "menu":
 				if (sender instanceof Player)
-					plugin.getGuiList().openMainInterface((Player) sender);
+					new MainGui(plugin, (Player) sender).create((Player) sender);
 				else
 					sender.sendMessage(Message.COMMAND_HELP.getValue());
 			default:
@@ -80,7 +70,13 @@ public class OcCommand extends OlympaCommand {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> list = new ArrayList<String>();
+		
+		if (args.length == 1) {
+			list.add("help");
+			list.add("find");
+			list.add("menu");
+		}
+		return list;
 	}
 }

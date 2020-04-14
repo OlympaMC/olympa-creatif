@@ -1,5 +1,8 @@
 package fr.olympa.olympacreatif.world;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,13 +20,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.gui.MainGui;
 
 public class WorldEventsListener implements Listener{
 
 	OlympaCreatifMain plugin;
+	Map<String, Long> sneakHistory = new HashMap<String, Long>(); 
 	
 	public WorldEventsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;		
@@ -110,5 +117,22 @@ public class WorldEventsListener implements Listener{
 	@EventHandler //cancel potions persistantes
 	public void onLingeringPotion(LingeringPotionSplashEvent e) {
 		e.setCancelled(true);
+	}
+	
+	@EventHandler //ouvre le menu si joueur a sneak deux fois rapidement (délai : 0.8s)
+	public void onOpenMenu(PlayerToggleSneakEvent e) {
+		if (e.isSneaking())
+			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
+				if (sneakHistory.get(e.getPlayer().getName()) + 800 > System.currentTimeMillis())
+					new MainGui(plugin, e.getPlayer()).create(e.getPlayer());
+				else
+					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
+			else
+				sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
+	}
+	
+	@EventHandler //clear l'historique de sneak de ce joueur
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		sneakHistory.remove(e.getPlayer().getName());
 	}
 }

@@ -29,6 +29,7 @@ public enum Message {
 	PROHIBITED_BLOCK_PLACED("prohibited_block_placed"), 
 	TELEPORTED_TO_PLOT_SPAWN("teleport_to_plot_spawn"),
 	TELEPORT_IN_PROGRESS("teleport_in_progress"),
+	TELEPORT_TO_RANDOM_PLOT("teleport_to_random_plot"),
 	INVALID_PLID_ID("invalid_plot_id"),
 	
 	WE_ACTION_ENDED("world_edit_action_terminated"),
@@ -44,9 +45,21 @@ public enum Message {
 	PARAM_ROAD_SIZE("parameter_road_size"),
 	PARAM_PREFIX("parameter_chat_prefix"), 
 	
-	GUI_MAIN_NAME("main_gui_name"),
 	GUI_MAIN_MEMBERS_LIST("main_gui_members"), 
 	GUI_MAIN_MEMBERS_LIST_LORE("main_gui_members_lore"),
+	GUI_MAIN_PLOT_INFO("main_gui_plot_info"),
+	GUI_MAIN_PLOT_INFO_LORE("main_gui_plot_info_lore"), 
+	GUI_MAIN_TELEPORT_PLOT_SPAWN("main_gui_teleport_plot_zone"),
+	GUI_MAIN_TELEPORT_PLOT_SPAWN_LORE("main_gui_teleport_plot_zone_lore"), 
+	GUI_MAIN_TELEPORT_RANDOM_PLOT("main_gui_teleport_random_plot"), 
+	GUI_MAIN_TELEPORT_RANDOM_PLOT_LORE("main_gui_teleport_random_plot_lore"), 
+	GUI_MAIN_INTERACTION_PARAMETERS("main_gui_interaction_parameters"), 
+	GUI_MAIN_INTERACTION_PARAMETERS_LORE("main_gui_interaction_parameters_lore"), 
+	GUI_MAIN_PLOT_PARAMETERS("main_gui_plot_parameters"), 
+	GUI_MAIN_PLOT_PARAMETERS_LORE("main_gui_plot_parameters_lore"),
+	GUI_MAIN_PLOTS_LIST("main_gui_plots_list"), 
+	GUI_MAIN_PLOTS_LIST_LORE("main_gui_plots_list_lore"), 
+	
 	;
 	
 	private String id;
@@ -62,7 +75,8 @@ public enum Message {
 	
 	public String getValue() {
 		if (messagesList.containsKey(getKey()))
-			return messagesList.get(getKey());
+			return messagesList.get(getKey()).replace("&", "§");
+		
 		return "§cMissing message : " + getKey();
 	}
 	
