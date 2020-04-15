@@ -6,10 +6,14 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Dispenser;
+import org.bukkit.block.Dropper;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -119,11 +123,11 @@ public class WorldEventsListener implements Listener{
 		e.setCancelled(true);
 	}
 	
-	@EventHandler //ouvre le menu si joueur a sneak deux fois rapidement (délai : 0.8s)
+	@EventHandler //ouvre le menu si joueur a sneak deux fois rapidement (délai : 0.5s)
 	public void onOpenMenu(PlayerToggleSneakEvent e) {
 		if (e.isSneaking())
 			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
-				if (sneakHistory.get(e.getPlayer().getName()) + 800 > System.currentTimeMillis())
+				if (sneakHistory.get(e.getPlayer().getName()) + 500 > System.currentTimeMillis())
 					new MainGui(plugin, e.getPlayer()).create(e.getPlayer());
 				else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
@@ -134,5 +138,19 @@ public class WorldEventsListener implements Listener{
 	@EventHandler //clear l'historique de sneak de ce joueur
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		sneakHistory.remove(e.getPlayer().getName());
+	}
+	
+	@EventHandler //remplir le dispenser au fur et à mesure qu'il se vide (pour toujours garder les mêmes objets à l'intérieur)
+	public void onDispense(BlockDispenseEvent e) {
+		if (e.getItem() == null) 
+			return;
+		
+		if (e.getBlock().getState() instanceof Dispenser) {
+			((Dispenser) e.getBlock().getState()).getInventory().addItem(e.getItem());
+		}
+		if (e.getBlock().getState() instanceof Dropper) {
+			((Dropper) e.getBlock().getState()).getInventory().addItem(e.getItem());
+		}
+		
 	}
 }

@@ -71,7 +71,7 @@ public class PlotListener implements Listener {
 			return;
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && 
-				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_PROHIBITED_INTERRACTION)).contains(e.getClickedBlock().getType())) {
+				!((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType())) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 		}

@@ -12,12 +12,14 @@ public enum PlotParamType {
 	SPAWN_LOC("spawn_location"),
 	FORCE_SPAWN_LOC("force_spawn_location"),
 	
-	LIST_PROHIBITED_INTERRACTION("allowed_block_interraction"),
+	LIST_ALLOWED_INTERRACTION("allowed_block_interraction"),
 	ALLOW_PRINT_TNT("allow_print_tnt"),
 	
 	CLEAR_INCOMING_PLAYERS("clear_incoming_players"),
 	GAMEMODE_INCOMING_PLAYERS("gamemode_incomings_players"),
 	ALLOW_FLY_INCOMING_PLAYERS("flymode_incomings_players"),
+	
+	PLOT_BIOME("plot_biome"),
 	
 	;
 	

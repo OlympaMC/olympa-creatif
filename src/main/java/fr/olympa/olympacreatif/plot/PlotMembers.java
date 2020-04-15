@@ -29,7 +29,14 @@ public class PlotMembers{
 	
 	public void set(OlympaPlayerInformations p, PlotRank rank) {
 		//TODO
-		members.put(p, rank);
+		if (members.size() >= 18)
+			return;
+		
+		if (rank != PlotRank.VISITOR)
+			members.put(p, rank);
+		else
+			members.remove(p);
+		
 		plugin.getTask().runTaskAsynchronously(() -> plugin.getDataManager().updatePlayerPlotRank(p.getID(), plotId, rank));
 	}
 
@@ -45,6 +52,10 @@ public class PlotMembers{
 			return members.get(AccountProvider.get(p.getUniqueId()).getInformation()).getLevel();
 		
 		else return PlotRank.VISITOR.getLevel();
+	}
+	
+	public Map<OlympaPlayerInformations, PlotRank> getList(){
+		return members;
 	}
 
 	public int getCount() {
@@ -90,6 +101,13 @@ public class PlotMembers{
 			
 			return null;
 		}
+		
+		public static PlotRank getPlotRank(int plotRank) {
+			for (PlotRank pr : PlotRank.values())
+				if (pr.getLevel() == plotRank)
+					return pr;
+			
+			return null;
+		}
 	}
-
 }

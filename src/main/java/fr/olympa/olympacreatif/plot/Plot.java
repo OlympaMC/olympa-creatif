@@ -33,7 +33,7 @@ public class Plot {
 	Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
 		this.plugin = plugin;
 		plotId = new PlotId(plugin);
-		parameters = new PlotParameters(plugin, plotId, true);
+		parameters = new PlotParameters(plugin, plotId);
 		members = new PlotMembers(plugin, plotId);
 		listener = new PlotListener(plugin, this);
 

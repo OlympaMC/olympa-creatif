@@ -41,6 +41,7 @@ public class OcCommand extends OlympaCommand {
 					new MainGui(plugin, (Player) sender).create((Player) sender);
 				else
 					sender.sendMessage(Message.COMMAND_HELP.getValue());
+				break;
 			default:
 				sender.sendMessage(Message.COMMAND_HELP.getValue());
 				break;

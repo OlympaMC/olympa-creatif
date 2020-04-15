@@ -24,15 +24,21 @@ public class MainGui extends OlympaGUI {
 		
 		this.plugin = plugin;
 		this.p = p;
-		plot = plugin.getPlotsManager().getPlot(p.getLocation().clone());
+		plot = plugin.getPlotsManager().getPlot(p.getLocation());
 		
-		inv.setItem(0, ItemUtils.item(Material.GRASS_BLOCK, Message.GUI_MAIN_PLOT_INFO.getValue().replace("%plot%", plot.getId().getAsString()), Message.GUI_MAIN_PLOT_INFO_LORE.getValue().replace("%membersCount%", ""+plot.getMembers().getCount()).split(",") ));
-		inv.setItem(1, ItemUtils.item(Material.ENDER_PEARL, Message.GUI_MAIN_TELEPORT_PLOT_SPAWN.getValue(), Message.GUI_MAIN_TELEPORT_PLOT_SPAWN_LORE.getValue().split(",")));
-		inv.setItem(2, ItemUtils.item(Material.PLAYER_HEAD, Message.GUI_MAIN_MEMBERS_LIST.getValue(), Message.GUI_MAIN_MEMBERS_LIST_LORE.getValue().split(",")));
-		inv.setItem(4, ItemUtils.item(Material.COMPARATOR, Message.GUI_MAIN_INTERACTION_PARAMETERS.getValue(), Message.GUI_MAIN_INTERACTION_PARAMETERS_LORE.getValue().split(",")));
-		inv.setItem(5, ItemUtils.item(Material.REPEATER, Message.GUI_MAIN_PLOT_PARAMETERS.getValue(), Message.GUI_MAIN_PLOT_PARAMETERS_LORE.getValue().split(",")));
-		inv.setItem(7, ItemUtils.item(Material.BOOK, Message.GUI_MAIN_PLOTS_LIST.getValue(), Message.GUI_MAIN_PLOTS_LIST_LORE.getValue().split(",")));
-		inv.setItem(8, ItemUtils.item(Material.ENDER_EYE, Message.GUI_MAIN_TELEPORT_RANDOM_PLOT.getValue(), Message.GUI_MAIN_TELEPORT_RANDOM_PLOT_LORE.getValue().split(",")));
+		if (plot != null) {
+			inv.setItem(0, ItemUtils.item(Material.GRASS_BLOCK, Message.GUI_MAIN_PLOT_INFO.getValue().replace("%plot%", plot.getId().getAsString()), Message.GUI_MAIN_PLOT_INFO_LORE.getValue().replace("%membersCount%", ""+plot.getMembers().getCount()).split(",") ));
+			inv.setItem(1, ItemUtils.item(Material.ENDER_PEARL, Message.GUI_MAIN_TELEPORT_PLOT_SPAWN.getValue(), Message.GUI_MAIN_TELEPORT_PLOT_SPAWN_LORE.getValue().split(",")));
+			inv.setItem(2, ItemUtils.item(Material.PLAYER_HEAD, Message.GUI_MAIN_MEMBERS_LIST.getValue(), Message.GUI_MAIN_MEMBERS_LIST_LORE.getValue().split(",")));
+			inv.setItem(4, ItemUtils.item(Material.COMPARATOR, Message.GUI_MAIN_INTERACTION_PARAMETERS.getValue(), Message.GUI_MAIN_INTERACTION_PARAMETERS_LORE.getValue().split(",")));
+			inv.setItem(5, ItemUtils.item(Material.REPEATER, Message.GUI_MAIN_PLOT_PARAMETERS.getValue(), Message.GUI_MAIN_PLOT_PARAMETERS_LORE.getValue().split(",")));
+			inv.setItem(7, ItemUtils.item(Material.BOOK, Message.GUI_MAIN_PLOTS_LIST.getValue(), Message.GUI_MAIN_PLOTS_LIST_LORE.getValue().split(",")));
+			inv.setItem(8, ItemUtils.item(Material.ENDER_EYE, Message.GUI_MAIN_TELEPORT_RANDOM_PLOT.getValue(), Message.GUI_MAIN_TELEPORT_RANDOM_PLOT_LORE.getValue().split(",")));	
+		}else {
+			inv.setItem(0, ItemUtils.item(Material.GRASS_BLOCK, Message.GUI_MAIN_PLOT_INFO.getValue().replace("%plot%", "§caucun§r"), Message.GUI_MAIN_PLOT_INFO_LORE.getValue().replace("%membersCount%", "0").split(",") ));
+			inv.setItem(7, ItemUtils.item(Material.BOOK, Message.GUI_MAIN_PLOTS_LIST.getValue(), Message.GUI_MAIN_PLOTS_LIST_LORE.getValue().split(",")));
+			inv.setItem(8, ItemUtils.item(Material.ENDER_EYE, Message.GUI_MAIN_TELEPORT_RANDOM_PLOT.getValue(), Message.GUI_MAIN_TELEPORT_RANDOM_PLOT_LORE.getValue().split(",")));
+		}
 		/*Options à intégrer au menu :
 		 * Infos générales parcelle
 		 * TP spawn parcelle
@@ -85,7 +91,12 @@ public class MainGui extends OlympaGUI {
 			}
 			break;
 		}
-		return false;
+		return true;
+	}
+
+	@Override
+	public boolean onClickCursor(Player p, ItemStack current, ItemStack cursor, int slot) {
+		return true;
 	}
 
 }

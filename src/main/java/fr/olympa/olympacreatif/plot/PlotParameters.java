@@ -2,12 +2,14 @@ package fr.olympa.olympacreatif.plot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -17,11 +19,12 @@ public class PlotParameters {
 	private OlympaCreatifMain plugin;
 	private Map <PlotParamType, Object> parameters = new HashMap<PlotParamType, Object>();
 	
-	@SuppressWarnings("unchecked")
-	public PlotParameters(OlympaCreatifMain plugin, PlotId id, boolean useDefaultProhibitedBlocks) {
+	public PlotParameters(OlympaCreatifMain plugin, PlotId id) {
 		this.plugin = plugin;
 		for (PlotParamType param : PlotParamType.values())
 			switch (param) {
+			case PLOT_BIOME:
+				parameters.put(param, Biome.PLAINS);
 			case ALLOW_FLY_INCOMING_PLAYERS:
 				parameters.put(param, true);
 				break;
@@ -49,10 +52,8 @@ public class PlotParameters {
 				else
 					parameters.put(param, new Location(plugin.getWorldManager().getWorld(), 0, 100, 0));
 				break;
-			case LIST_PROHIBITED_INTERRACTION:
+			case LIST_ALLOWED_INTERRACTION:
 				parameters.put(param, new ArrayList<Material>());
-				if (useDefaultProhibitedBlocks)
-					((ArrayList<Material>) parameters.get(param)).addAll(getAllPossibleProhibitedBlocks());
 				break;
 			default:
 				break;
@@ -71,7 +72,7 @@ public class PlotParameters {
 		return null;
 	}
 	
-	public static ArrayList<Material> getAllPossibleProhibitedBlocks(){
+	public static ArrayList<Material> getAllPossibleAllowedBlocks(){
 		ArrayList<Material> list = new ArrayList<Material>();
 		list.add(Material.ACACIA_FENCE_GATE);
 		list.add(Material.BIRCH_FENCE_GATE);
@@ -112,7 +113,6 @@ public class PlotParameters {
 		list.add(Material.HOPPER);
 		
 		list.add(Material.FURNACE);
-		list.add(Material.CRAFTING_TABLE);
 		list.add(Material.BREWING_STAND);
 		list.add(Material.ENCHANTING_TABLE);
 		list.add(Material.ANVIL);
@@ -128,6 +128,17 @@ public class PlotParameters {
 		list.add(Material.STONECUTTER);
 		list.add(Material.BELL);
 		
+		
+		return list;
+	}
+
+	public static List<Biome> getAllPossibleBiomes() {
+		List<Biome> list = new ArrayList<Biome>();
+
+		list.add(Biome.PLAINS);
+		list.add(Biome.NETHER);
+		list.add(Biome.THE_END);
+		list.add(Biome.MUSHROOM_FIELDS);
 		
 		return list;
 	}
