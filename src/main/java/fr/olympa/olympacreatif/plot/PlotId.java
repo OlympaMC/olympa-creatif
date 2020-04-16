@@ -72,6 +72,18 @@ public class PlotId{
 		return indexX + "." + indexZ;
 	}
 	
+	public static PlotId fromString(OlympaCreatifMain plugin, String id) {
+		if (id.split(".").length == 2)
+			try {
+				Integer.valueOf(id.split(".")[0]);
+				Integer.valueOf(id.split(".")[1]);
+				return new PlotId(plugin, id);
+			}catch(NumberFormatException e) {
+				return null;
+			}
+		return null;
+	}
+	
 	public Location getLocation() {
 		return new Location(plugin.getWorldManager().getWorld(), indexX * (Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue())) + 0.5, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue()) + 1, indexZ * (Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue())) + 0.5);
 	}
@@ -89,17 +101,6 @@ public class PlotId{
 				x < indexX * (plotX + plotRoad) + plotX && 
 				z >= indexZ * (plotZ + plotRoad) && 
 				z < indexZ * (plotZ + plotRoad) + plotZ; 
-	}
-	
-	public static boolean isIdValid(String id) {
-		if (id.split(".").length == 2)
-			try {
-				Integer.valueOf(id.split(".")[0]);
-				Integer.valueOf(id.split(".")[1]);	
-			}catch(NumberFormatException e) {
-				return false;
-			}
-		return true;
 	}
 	
 	@Override

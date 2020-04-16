@@ -1,5 +1,9 @@
 package fr.olympa.olympacreatif.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -41,9 +45,9 @@ public class PlotParametersGui extends OlympaGUI {
 		inv.setItem(8, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 		
 		if (plot.getMembers().getPlayerLevel(p) >= 3)
-			 clickToChange = new String[] {" ", "§8Cliquez pour changer la valeur"};
+			 clickToChange = new String[] {" ", "§8Ne concerne que les visiteurs", "§8Cliquez pour changer la valeur"};
 		else
-			 clickToChange = new String[] {""};
+			 clickToChange = new String[] {" ", "§8Ne concerne que les visiteurs"};
 		
 		//ajout des options
 		ItemStack it = null;
@@ -51,77 +55,63 @@ public class PlotParametersGui extends OlympaGUI {
 		
 		//0 : Gamemode par défaut
 		it = ItemUtils.item(Material.ACACIA_SIGN, "§6Gamemode par défaut", "§eMode actuel : " + plot.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS).toString());
-		it = ItemUtils.loreAdd(it, clickToChange);
-		it.setAmount(((GameMode) plot.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS)).getValue());
 		
+		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(0,it);
 		
 		//1 : Autorisation fly
-		it = ItemUtils.item(Material.FEATHER, Message.GUI_PARAMS_ALLOW_FLIGHT.getValue(), Message.GUI_PARAMS_ALLOW_FLIGHT_LORE.getValue());
-		it = ItemUtils.loreAdd(it, clickToChange);
-		im = it.getItemMeta();
-		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		it.setItemMeta(im);
+		it = ItemUtils.item(Material.FEATHER, "§6Vol des visiteurs");
 		
-		if ((boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS))
-			it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
 
+		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(1,it);
 
 		//2 : Forcer spawn zone
-		it = ItemUtils.item(Material.ACACIA_FENCE_GATE, Message.GUI_PARAMS_FORCE_SPAWN_LOC.getValue(), Message.GUI_PARAMS_FORCE_SPAWN_LOC_LORE.getValue());
-		it = ItemUtils.loreAdd(it, clickToChange);
-		im = it.getItemMeta();
-		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		it.setItemMeta(im);
-		
-		if ((boolean) plot.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC))
-			it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
+		it = ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Forcer le spawn parcelle");
 
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(2,it);
 
 		//3 : Autorisation allumer tnt
-		it = ItemUtils.item(Material.TNT, Message.GUI_PARAMS_ALLOW_TNT.getValue(), Message.GUI_PARAMS_ALLOW_TNT_LORE.getValue());
-		it = ItemUtils.loreAdd(it, clickToChange);
-		im = it.getItemMeta();
-		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		it.setItemMeta(im);
-		
-		if ((boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT))
-			it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
+		it = ItemUtils.item(Material.TNT, "§6Amorçage de la TNT");
 
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(3,it);
 
 		//4 : Heure du plot
-		it = ItemUtils.item(Material.CLOCK, Message.GUI_PARAMS_PLOT_TIME.getValue(), Message.GUI_PARAMS_PLOT_TIME_LORE.getValue());
+		it = ItemUtils.item(Material.SUNFLOWER, "§6Heure de la parcelle");
+		it = ItemUtils.lore(it, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME))/1000 + "h");
+		
 		it = ItemUtils.loreAdd(it, clickToChange);
-		it.setAmount((int) plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT) / 1000);
 		
 		inv.setItem(4,it);
 
 		//5 : Clear inventaire joueur
-		it = ItemUtils.item(Material.CAULDRON, Message.GUI_PARAMS_CLEAR_PLAYERS.getValue(), Message.GUI_PARAMS_CLEAR_PLAYERS_LORE.getValue());
-		it = ItemUtils.loreAdd(it, clickToChange);
-		im = it.getItemMeta();
-		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		it.setItemMeta(im);
-		
-		if ((boolean) plot.getParameters().getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS))
-			it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
+		it = ItemUtils.item(Material.CAULDRON, "§6Clear des visiteurs");
 
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(5,it);
 
 		//6 : Sélection du biome
-		it = ItemUtils.item(Material.GRASS_PATH, "§2Biome : ");
-		it = ItemUtils.loreAdd(it, clickToChange);
+		it = ItemUtils.item(Material.BOOKSHELF, "§6Biome de la parcelle");
 		for (Biome biome : PlotParameters.getAllPossibleBiomes())
 			if (biome == plot.getParameters().getParameter(PlotParamType.PLOT_BIOME))
 				it = ItemUtils.loreAdd(it, "§aActuel : " + biome.toString());
 			else
 				it = ItemUtils.loreAdd(it, "§2Disponible : " + biome.toString());
+		
+		if (plot.getMembers().getPlayerRank(p) == PlotRank.OWNER)
+			it = ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(6,it);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		if (slot == 8) {
@@ -135,69 +125,62 @@ public class PlotParametersGui extends OlympaGUI {
 		//modification des options
 		switch (slot) {
 		case 0:
-			current.setAmount((current.getAmount()+1)%3);
-			plot.getParameters().setParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS, GameMode.getByValue(current.getAmount()));
-			current = ItemUtils.lore(current, "§eMode actuel : " + GameMode.getByValue(current.getAmount()));
+			GameMode gm = GameMode.valueOf(ItemUtils.getLore(current)[0].split(" : ")[1]);
+			switch (gm) {
+			case ADVENTURE:
+				gm = GameMode.SURVIVAL;
+				break;
+			case CREATIVE:
+				gm = GameMode.ADVENTURE;
+				break;
+			case SURVIVAL:
+				gm = GameMode.CREATIVE;
+				break;
+			
+			}
+			plot.getParameters().setParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS, gm);
+			current = ItemUtils.lore(current, "§eMode actuel : " + gm.toString());
 			current = ItemUtils.loreAdd(current, clickToChange);
 			break;
 		case 1:
-			if (current.containsEnchantment(Enchantment.DURABILITY)) {
-				current.removeEnchantment(Enchantment.DURABILITY);
-				plot.getParameters().setParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS, false);
-			}else {
-				current.addEnchantment(Enchantment.DURABILITY, 1);
-				plot.getParameters().setParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS, true);
-			}				
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS, getSwitchState(current));
 			break;
 		case 2:
-			if (current.containsEnchantment(Enchantment.DURABILITY)) {
-				current.removeEnchantment(Enchantment.DURABILITY);
-				plot.getParameters().setParameter(PlotParamType.FORCE_SPAWN_LOC, false);
-			}else {
-				current.addEnchantment(Enchantment.DURABILITY, 1);
-				plot.getParameters().setParameter(PlotParamType.FORCE_SPAWN_LOC, true);
-			}
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.FORCE_SPAWN_LOC, getSwitchState(current));
 			break;
 		case 3:
-			if (current.containsEnchantment(Enchantment.DURABILITY)) {
-				current.removeEnchantment(Enchantment.DURABILITY);
-				plot.getParameters().setParameter(PlotParamType.ALLOW_PRINT_TNT, false);
-			}else {
-				current.addEnchantment(Enchantment.DURABILITY, 1);
-				plot.getParameters().setParameter(PlotParamType.ALLOW_PRINT_TNT, true);
-			}
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.ALLOW_PRINT_TNT, getSwitchState(current));
 			break;
 		case 4:
-			current.setAmount((current.getAmount()+1)%25);
-			plot.getParameters().setParameter(PlotParamType.PLOT_TIME, current.getAmount() * 1000);
-			current = ItemUtils.lore(current, "§eHeure actuelle : " + current.getAmount() + "h");
+			plot.getParameters().setParameter(PlotParamType.PLOT_TIME, ((int) plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
+			current = ItemUtils.lore(current, "§eHeure actuelle : " + (int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME)/1000 + "h");
 			current = ItemUtils.loreAdd(current, clickToChange);
 			for (Player pp : plot.getPlayers())
 				pp.setPlayerTime(current.getAmount()*1000, true);
 			break;
 		case 5:
-			if (current.containsEnchantment(Enchantment.DURABILITY)) {
-				current.removeEnchantment(Enchantment.DURABILITY);
-				plot.getParameters().setParameter(PlotParamType.CLEAR_INCOMING_PLAYERS, false);
-			}else {
-				current.addEnchantment(Enchantment.DURABILITY, 1);
-				plot.getParameters().setParameter(PlotParamType.CLEAR_INCOMING_PLAYERS, true);
-			}
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.CLEAR_INCOMING_PLAYERS, getSwitchState(current));
 			break;
 		case 6:
 			//édition du biome réservée au propriétaire
 			if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER)
 				return true;
 			
-			int biomeRank = PlotParameters.getAllPossibleBiomes().indexOf(plot.getParameters().getParameter(PlotParamType.PLOT_BIOME));
+			int biomeRank = PlotParameters.getAllPossibleBiomes().indexOf(newBiome);
 			newBiome = PlotParameters.getAllPossibleBiomes().get((biomeRank+1) % PlotParameters.getAllPossibleBiomes().size());
 			
-			current = ItemUtils.name(current, newBiome.toString());
+			current = ItemUtils.lore(current, "");
 			for (Biome biome : PlotParameters.getAllPossibleBiomes())
 				if (biome == newBiome)
 					current = ItemUtils.loreAdd(current, "§aActuel : " + biome.toString());
 				else
-					current = ItemUtils.loreAdd(current, "§2Disponible : " + biome.toString());			
+					current = ItemUtils.loreAdd(current, "§2Disponible : " + biome.toString());
+			
+			current = ItemUtils.loreAdd(current, clickToChange);			
 			break;
 		}
 		
@@ -212,16 +195,47 @@ public class PlotParametersGui extends OlympaGUI {
 	@Override
 	public boolean onClose(Player p) {
 		//MAJ biome
-		if (plot.getParameters().getParameter(PlotParamType.PLOT_BIOME) != newBiome) {
+		if (!plot.getParameters().getParameter(PlotParamType.PLOT_BIOME).equals(newBiome)) {
 			for (int x = plot.getId().getLocation().getBlockX() ; x < plot.getId().getLocation().getBlockX() + Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) ; x++)
 				for (int z = plot.getId().getLocation().getBlockZ() ; z < plot.getId().getLocation().getBlockZ() + Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) ; z++)
-					for (int y = 1 ; y < 255 ; y++)
+					for (int y = 1 ; y < 255 ; y++) 
 						plugin.getWorldManager().getWorld().getBlockAt(x, y, z).setBiome(newBiome);
-			
+
 			plot.getParameters().setParameter(PlotParamType.PLOT_BIOME, newBiome);	
 		}
 		
 		return true;
 	}
 
+	public ItemStack setSwitchState(ItemStack it, boolean newState) {
+		List<String> list = it.getItemMeta().getLore();
+		if (list == null)
+			list = new ArrayList<String>();
+		
+		if (newState) {
+			list.add(0, "§eEtat : §aautorisé");
+			ItemMeta im = it.getItemMeta();
+			im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			it.setItemMeta(im);
+			it.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+		}
+		else {
+			list.add(0, "§eEtat : §cinterdit");
+			it.removeEnchantment(Enchantment.DURABILITY);
+		}
+		if (list.size() >= 2)
+			list.remove(1);
+		
+		return ItemUtils.lore(it,  list.toArray(new String[list.size()]));
+	}
+	
+	public boolean getSwitchState(ItemStack it) {
+		if (it.getItemMeta().getLore() == null)
+			return false;
+		
+		if (it.getItemMeta().getLore().get(0).equals("§eEtat : §aautorisé"))
+			return true;
+		else
+			return false;
+	}
 }

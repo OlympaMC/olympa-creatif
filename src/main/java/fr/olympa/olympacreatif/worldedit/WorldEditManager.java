@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -25,23 +26,35 @@ public class WorldEditManager {
 	
 	public WorldEditManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-
+		
+		plugin.getServer().getPluginManager().registerEvents(new WorldEditListener(plugin), plugin);
+		
 		//runnable de setblock délayé
 		new BukkitRunnable() {
 			
 			Player p = null;
 			List<SimpleEntry<Location, BlockData>> toPlace = new ArrayList<AbstractMap.SimpleEntry<Location,BlockData>>();
-			
+
+			//variables permettant de déterminer le nombre de blocks à placer par seconde
+			int tickDuration = 0;
+			long oldTime = System.currentTimeMillis()-1;
+			double tps = 0;
+			int bps = 0;
 			public void run() {
 				int i = 0;
 				
 				//MAJ de la liste des blocs à placer si la précédente est vide
-				 if (blocksToBuild.size() > 0) {
+				 if (blocksToBuild.size() > 0 && toPlace.size() == 0) {
 					 p = blocksToBuild.get(0).getKey();
 					 toPlace = blocksToBuild.get(0).getValue();
 				 }
 				 
-				while (i < Integer.valueOf(Message.PARAM_WORLDEDIT_BPS.getValue())/5 && toPlace.size() > 0) {
+				 //placement synchrone des blocks
+				 tps = Math.min(1.0/(double)(System.currentTimeMillis() - oldTime), 20);
+				 bps = (int) ((Integer.valueOf(Message.PARAM_WORLDEDIT_BPS.getValue()) / 20) * Math.max(tps-18.5, 0));
+				 
+				//place des blocs si tps>18.5 (proportion de blocs placés dépendant du tps)				 
+				while (i < bps && toPlace.size() > 0) {
 					plugin.getWorldManager().getWorld().loadChunk(toPlace.get(0).getKey().getChunk());
 					toPlace.get(0).getKey().getBlock().setBlockData(toPlace.get(0).getValue());
 					toPlace.remove(0);
@@ -93,6 +106,10 @@ public class WorldEditManager {
 		}else {
 			p.sendMessage(Message.WE_NOTHING_TO_DO.getValue());
 		}
+	}
+	
+	public WorldEditInstance getPlayerInstance(Player p) {
+		return playersWorldEdit.get(p);
 	}
 	
 }

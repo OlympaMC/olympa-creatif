@@ -48,8 +48,7 @@ public class WorldManager {
 		
 		//création du monde s'il n'existe pas
 		if (world == null) {
-			Bukkit.getServer().setDefaultGameMode(GameMode.CREATIVE);
-			
+			Bukkit.setDefaultGameMode(GameMode.CREATIVE);
 			WorldCreator worldCreator = new WorldCreator(Message.PARAM_WORLD_NAME.getValue());
 			worldCreator.generateStructures(false);
 			worldCreator.generator(new CustomChunkGenerator(plugin));

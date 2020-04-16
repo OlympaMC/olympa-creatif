@@ -60,18 +60,16 @@ public enum Message {
 	GUI_MAIN_PLOTS_LIST("main_gui_plots_list"), 
 	GUI_MAIN_PLOTS_LIST_LORE("main_gui_plots_list_lore"), 
 
-	GUI_PARAMS_ALLOW_FLIGHT("gui_params_allow_flight"),
-	GUI_PARAMS_ALLOW_FLIGHT_LORE("gui_params_allow_flight_lore"), 
-	GUI_PARAMS_DEFAULT_GAMEMODE("gui_params_default_gamemode"), 
-	GUI_PARAMS_DEFAULT_GAMEMODE_LORE("gui_params_default_gamemode_lore"), 
-	GUI_PARAMS_FORCE_SPAWN_LOC("gui_params_spawn_loc"), 
-	GUI_PARAMS_FORCE_SPAWN_LOC_LORE("gui_params_spawn_loc_lore"), 
-	GUI_PARAMS_ALLOW_TNT("gui_params_allow_tnt"), 
-	GUI_PARAMS_ALLOW_TNT_LORE("gui_params_allow_tnt_lore"), 
-	GUI_PARAMS_PLOT_TIME("gui_param_plot_time"), 
-	GUI_PARAMS_PLOT_TIME_LORE("gui_param_plot_time_lore"), 
-	GUI_PARAMS_CLEAR_PLAYERS("gui_param_clear_incoming_players"),
-	GUI_PARAMS_CLEAR_PLAYERS_LORE("gui_param_clear_incoming_players_lore"),
+	PLOT_RECIEVE_INVITATION("plot_recieve_invitation"), 
+	PLOT_INVITATION_TARGET_ALREADY_MEMBER("plot_invitation_target_already_member"), 
+	PLOT_SEND_INVITATION("plot_send_invitation"), 
+	PLAYER_TARGET_OFFLINE("plot_target_offline"), 
+	PLOT_INSUFFICIENT_PERMISSION("plot_insufficient_permission"), 
+	PLOT_NULL_PLOT("plot_null_plot"), 
+	PLOT_ACCEPTED_INVITATION("plot_accept_invitation"), 
+	PLOT_NO_PENDING_INVITATION("plot_no_pending_invitation"), 
+	WE_POS_SET("we_pos_set"), 
+	WE_INSUFFICIENT_PLOT_PERMISSION("we_insufficient_plot_permission"),
 	
 	;
 	

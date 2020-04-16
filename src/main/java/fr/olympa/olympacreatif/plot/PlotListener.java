@@ -69,6 +69,8 @@ public class PlotListener implements Listener {
 			return;
 		if (!plot.getId().isInPlot(e.getClickedBlock().getLocation()))
 			return;
+		if (!PlotParameters.getAllPossibleAllowedBlocks().contains(e.getClickedBlock().getType()))
+			return;
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && 
 				!((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType())) {
@@ -82,6 +84,10 @@ public class PlotListener implements Listener {
 		if (!plot.getId().isInPlot(e.getBlock().getLocation()))
 			return;
 		if (e.getPlayer() == null || (e.getCause() != IgniteCause.ARROW && e.getCause() != IgniteCause.FLINT_AND_STEEL)) {
+			e.setCancelled(true);
+			return;
+		}
+		if (e.getBlock().getType() != Material.TNT && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
 			e.setCancelled(true);
 			return;
 		}
@@ -121,7 +127,7 @@ public class PlotListener implements Listener {
 			
 			//gamemode 1
 			e.getPlayer().setGameMode(GameMode.CREATIVE);			
-			
+			e.getPlayer().setAllowFlight(true);
 			//réinitialisation heure joueur
 			e.getPlayer().resetPlayerTime();
 		}
@@ -157,15 +163,13 @@ public class PlotListener implements Listener {
 		}
 		
 		//définition de l'heure du joueur
-		if ((int) plot.getParameters().getParameter(PlotParamType.PLOT_TIME) != -1) {
-			p.setPlayerTime((int) plot.getParameters().getParameter(PlotParamType.PLOT_TIME), false);
-		}
+		p.setPlayerTime((int) plot.getParameters().getParameter(PlotParamType.PLOT_TIME), true);
 		
 		//définition du gamemode
 		p.setGameMode((GameMode) plot.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
 		
 		//définition du flymode
-		p.setFlying((boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
+		p.setAllowFlight((boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
 	}
 	
 	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn

@@ -41,17 +41,18 @@ public class PlotMembers{
 	}
 
 	public PlotRank getPlayerRank(Player p) {
-		if (members.containsKey(AccountProvider.get(p.getUniqueId()).getInformation()))
-			return members.get(AccountProvider.get(p.getUniqueId()).getInformation());
-		
-		else return PlotRank.VISITOR;
+		return getPlayerRank(AccountProvider.get(p.getUniqueId()).getInformation());
 	}
 
 	public int getPlayerLevel(Player p) {
-		if (members.containsKey(AccountProvider.get(p.getUniqueId()).getInformation()))
-			return members.get(AccountProvider.get(p.getUniqueId()).getInformation()).getLevel();
+		return getPlayerRank(AccountProvider.get(p.getUniqueId()).getInformation()).getLevel();
+	}
+	
+	public PlotRank getPlayerRank(OlympaPlayerInformations p) {
+		if (members.containsKey(p))
+			return members.get(p);
 		
-		else return PlotRank.VISITOR.getLevel();
+		else return PlotRank.VISITOR;
 	}
 	
 	public Map<OlympaPlayerInformations, PlotRank> getList(){
@@ -107,7 +108,7 @@ public class PlotMembers{
 				if (pr.getLevel() == plotRank)
 					return pr;
 			
-			return null;
+			return VISITOR;
 		}
 	}
 }

@@ -25,6 +25,7 @@ public class PlotParameters {
 			switch (param) {
 			case PLOT_BIOME:
 				parameters.put(param, Biome.PLAINS);
+				break;
 			case ALLOW_FLY_INCOMING_PLAYERS:
 				parameters.put(param, true);
 				break;
@@ -44,7 +45,7 @@ public class PlotParameters {
 				parameters.put(param, GameMode.CREATIVE);
 				break;
 			case PLOT_TIME:
-				parameters.put(param, -1);
+				parameters.put(param, (int)plugin.getWorldManager().getWorld().getTime()%24001);
 				break;
 			case SPAWN_LOC:
 				if (id != null)
@@ -87,23 +88,22 @@ public class PlotParameters {
 		list.add(Material.JUNGLE_DOOR);
 		list.add(Material.SPRUCE_DOOR);
 
+		list.add(Material.ACACIA_TRAPDOOR);
+		list.add(Material.BIRCH_TRAPDOOR);
+		list.add(Material.DARK_OAK_TRAPDOOR);
+		list.add(Material.JUNGLE_TRAPDOOR);
+		list.add(Material.SPRUCE_TRAPDOOR);
+
+		list.add(Material.STONE_BUTTON);
 		list.add(Material.ACACIA_BUTTON);
 		list.add(Material.BIRCH_BUTTON);
 		list.add(Material.DARK_OAK_BUTTON);
 		list.add(Material.JUNGLE_BUTTON);
 		list.add(Material.SPRUCE_BUTTON);
 
-		list.add(Material.STONE_BUTTON);
-
+		list.add(Material.LEVER);
 		list.add(Material.REPEATER);
 		list.add(Material.COMPARATOR);
-		list.add(Material.LEVER);
-
-		list.add(Material.ACACIA_TRAPDOOR);
-		list.add(Material.BIRCH_TRAPDOOR);
-		list.add(Material.DARK_OAK_TRAPDOOR);
-		list.add(Material.JUNGLE_TRAPDOOR);
-		list.add(Material.SPRUCE_TRAPDOOR);
 
 		list.add(Material.CHEST);
 		list.add(Material.TRAPPED_CHEST);
@@ -116,6 +116,7 @@ public class PlotParameters {
 		list.add(Material.BREWING_STAND);
 		list.add(Material.ENCHANTING_TABLE);
 		list.add(Material.ANVIL);
+		list.add(Material.CRAFTING_TABLE);
 
 		list.add(Material.CARTOGRAPHY_TABLE);
 		list.add(Material.SMOKER);
@@ -124,7 +125,6 @@ public class PlotParameters {
 		list.add(Material.LOOM);
 		list.add(Material.GRINDSTONE);
 		list.add(Material.LECTERN);
-		list.add(Material.GRINDSTONE);
 		list.add(Material.STONECUTTER);
 		list.add(Material.BELL);
 		

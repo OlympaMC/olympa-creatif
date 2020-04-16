@@ -26,6 +26,8 @@ public class PlayerPlotsGui extends OlympaGUI {
 		this.plugin = plugin;
 		this.p = p;
 
+		inv.setItem(26, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
+		
 		//recherche des plots du joueur
 		for (Plot plot : plugin.getPlotsManager().getPlots()) {
 			Material mat = null;
