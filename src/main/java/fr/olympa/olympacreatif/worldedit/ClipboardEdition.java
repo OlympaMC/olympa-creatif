@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -12,32 +13,33 @@ import org.bukkit.entity.Player;
 
 public abstract class ClipboardEdition {
 
-	public static void rotateSelection(Map<Location, BlockData> clipboard, int rotX, int rotY, int rotZ) {
+	public static Map<Location, BlockData> rotateSelection(Map<Location, BlockData> clipboard, int rotX, int rotY, int rotZ) {
 		rotX = rotX % 360;
 		rotY = rotY % 360;
 		rotZ = rotZ % 360;
 
-		//rotation sur X
-		for (int i = 1 ; i <= (int) (rotX+1)/90 ; i++) {
-			Map<Location, BlockData> newClipboard = new HashMap<Location, BlockData>();
-			for ( Entry<Location, BlockData> entry : clipboard.entrySet()) {
+		Map<Location, BlockData> newClipboard = new HashMap<Location, BlockData>();
+
+		//rotation sur Y
+		for (int i = 1 ; i <= (int) (rotY+1)/90 ; i++) {
+			newClipboard.clear();
+			for (Entry<Location, BlockData> entry : clipboard.entrySet()) {
 				
 				//détermination de la nouvelle position relative du bloc
 				double newX = entry.getKey().getZ();
 				double newZ = - entry.getKey().getX();
 				
 				BlockData data = entry.getValue().clone();
-				rotateOnX(data);
+				rotateOnY(data);
 				
 				newClipboard.put(new Location(entry.getKey().getWorld(), newX, entry.getKey().getY(), newZ), data);
 			}
-			
-			clipboard = newClipboard;
+			clipboard = new HashMap<Location, BlockData>(newClipboard);
 		}
 		
-		//rotation sur Y
-		for (int i = 1 ; i <= (int) (rotY+1)/90 ; i++) {
-			Map<Location, BlockData> newClipboard = new HashMap<Location, BlockData>();
+		//rotation sur X
+		for (int i = 1 ; i <= (int) (rotX+1)/90 ; i++) {
+			newClipboard.clear();
 			for ( Entry<Location, BlockData> entry : clipboard.entrySet()) {
 				
 				//détermination de la nouvelle position relative du bloc
@@ -45,17 +47,16 @@ public abstract class ClipboardEdition {
 				double newY = - entry.getKey().getZ();
 				
 				BlockData data = entry.getValue().clone();
-				rotateOnY(data);
+				rotateOnX(data);
 				
 				newClipboard.put(new Location(entry.getKey().getWorld(), entry.getKey().getX(), newY, newZ), data);
 			}
-			
-			clipboard = newClipboard;
+			clipboard = new HashMap<Location, BlockData>(newClipboard);
 		}
 		
 		//rotation sur Z
 		for (int i = 1 ; i <= (int) (rotZ+1)/90 ; i++) {
-			Map<Location, BlockData> newClipboard = new HashMap<Location, BlockData>();
+			newClipboard.clear();
 			for ( Entry<Location, BlockData> entry : clipboard.entrySet()) {
 				
 				//détermination de la nouvelle position relative du bloc
@@ -67,9 +68,9 @@ public abstract class ClipboardEdition {
 				
 				newClipboard.put(new Location(entry.getKey().getWorld(), newX, newY, entry.getKey().getZ()), data);
 			}
-			
-			clipboard = newClipboard;
+			clipboard = new HashMap<Location, BlockData>(newClipboard);
 		}
+		return newClipboard;
 	}
 	
 
@@ -205,7 +206,7 @@ public abstract class ClipboardEdition {
 		}
 	}
 	
-	public static void symmetrySelection(Map<Location, BlockData> clipboard, SymmetryPlan plan) {
+	public static Map<Location, BlockData> symmetrySelection(Map<Location, BlockData> clipboard, SymmetryPlan plan) {
 		Map<Location, BlockData> newClipboard = new HashMap<Location, BlockData>();
 
 			for (Entry<Location, BlockData> entry : clipboard.entrySet()) {
@@ -232,7 +233,7 @@ public abstract class ClipboardEdition {
 				
 				}
 			}
-		clipboard = newClipboard;
+		return newClipboard;
 	}
 	
 	public enum SymmetryPlan{

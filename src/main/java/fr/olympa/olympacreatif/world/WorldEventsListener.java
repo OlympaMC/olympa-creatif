@@ -130,7 +130,7 @@ public class WorldEventsListener implements Listener{
 	public void onOpenMenu(PlayerToggleSneakEvent e) {
 		if (e.isSneaking())
 			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
-				if (sneakHistory.get(e.getPlayer().getName()) + 500 > System.currentTimeMillis())
+				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis())
 					new MainGui(plugin, e.getPlayer()).create(e.getPlayer());
 				else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
@@ -165,10 +165,10 @@ public class WorldEventsListener implements Listener{
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		
 		if (e.getMessage().startsWith("@") || plot == null)
-			e.getMessage().replaceFirst("@", "");
+			e.setMessage(e.getMessage().replaceFirst("@", ""));
 		else {
 			e.getRecipients().clear();
-			e.setFormat("§7[Plot] §r" + e.getPlayer().getDisplayName() + " : ");
+			e.setFormat("§7[Plot] §r" + e.getPlayer().getDisplayName() + " : " + e.getMessage());
 			for (Player p : plot.getPlayers())
 				e.getRecipients().add(p);
 		}

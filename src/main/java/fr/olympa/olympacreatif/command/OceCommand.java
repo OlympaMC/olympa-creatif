@@ -32,10 +32,13 @@ public class OceCommand extends OlympaCommand{
 		case 1:
 			switch(args[0]) {
 			case "copy":
-				if (plugin.getWorldEditManager().getPlayerInstance(p).copySelection())
-					p.sendMessage(Message.WE_CMD_CLIPBOARD_COPIED.getValue());
+				if (plugin.getWorldEditManager().getPlayerInstance(p).isSelectionValid())
+					if (plugin.getWorldEditManager().getPlayerInstance(p).copySelection())
+						p.sendMessage(Message.WE_CMD_CLIPBOARD_COPIED.getValue());
+					else
+						p.sendMessage(Message.WE_ACTION_TOO_BIG.getValue());
 				else
-					p.sendMessage(Message.WE_ACTION_TOO_BIG.getValue());
+					p.sendMessage(Message.WE_CMD_INVALID_SELECTION.getValue());
 				break;
 			case "paste":
 				if (!plugin.getWorldEditManager().getPlayerInstance(p).pasteSelection())
@@ -65,12 +68,12 @@ public class OceCommand extends OlympaCommand{
 		case 3:
 			switch (args[0]) {
 			case "rotate":
-				if (!StringUtils.isNumeric(args[2]) || Integer.valueOf(args[2]) % 90 != 0) {
+				SymmetryPlan plan = SymmetryPlan.getPlan(args[1]);
+				if (!StringUtils.isNumeric(args[2]) || Integer.valueOf(args[2]) % 90 != 0 || plan == null) {
 					sender.sendMessage(Message.WE_CMD_HELP.getValue());
 					return false;	
 				}
 				
-				SymmetryPlan plan = SymmetryPlan.getPlan(args[1]);
 				switch (plan) {
 				case AXE_X:
 					plugin.getWorldEditManager().getPlayerInstance(p).rotateSelection(Integer.valueOf(args[2]), 0, 0);

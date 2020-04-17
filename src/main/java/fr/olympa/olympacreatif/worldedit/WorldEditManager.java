@@ -36,7 +36,6 @@ public class WorldEditManager {
 			List<SimpleEntry<Location, BlockData>> toPlace = new ArrayList<AbstractMap.SimpleEntry<Location,BlockData>>();
 
 			//variables permettant de déterminer le nombre de blocks à placer par seconde
-			int tickDuration = 0;
 			long oldTime = System.currentTimeMillis()-1;
 			double tps = 0;
 			int bps = 0;
@@ -50,7 +49,8 @@ public class WorldEditManager {
 				 }
 				 
 				 //placement synchrone des blocks
-				 tps = Math.min(1.0/(double)(System.currentTimeMillis() - oldTime), 20);
+				 tps = Math.min(1000.0/(double)(System.currentTimeMillis() - oldTime), 20);
+				 oldTime = System.currentTimeMillis();
 				 bps = (int) ((Integer.valueOf(Message.PARAM_WORLDEDIT_BPS.getValue()) / 20) * Math.max(tps-18.5, 0));
 				 
 				//place des blocs si tps>18.5 (proportion de blocs placés dépendant du tps)				 
@@ -62,7 +62,9 @@ public class WorldEditManager {
 					//MAJ liste des blocs en attente et envoi du message de fin au joueur
 					if (toPlace.size() == 0) {
 						 blocksToBuild.remove(0);
-						 toPlace = blocksToBuild.get(0).getValue();
+						 
+						 if (blocksToBuild.size() > 0)
+							 toPlace = blocksToBuild.get(0).getValue();
 						 
 						 if (p != null && p.isOnline())
 							 p.sendMessage(Message.WE_ACTION_ENDED.getValue());
@@ -81,8 +83,10 @@ public class WorldEditManager {
 		
 	}
 	
-	public void addPlayer(Player p) {
-		playersWorldEdit.put(p, new WorldEditInstance(plugin, p));
+	public WorldEditInstance addPlayer(Player p) {
+		WorldEditInstance ins = new WorldEditInstance(plugin, p);
+		playersWorldEdit.put(p, ins);
+		return ins;
 	}
 	
 	public void removePlayer(Player p) {
@@ -100,12 +104,12 @@ public class WorldEditManager {
 	}
 	
 	public void addToBuildingList(Player p, List<SimpleEntry<Location, BlockData>> blocks) {
-		if (blocks.size() > 0) {
-			blocksToBuild.add(new SimpleEntry<Player, List<SimpleEntry<Location,BlockData>>>(p, blocks));
-			p.sendMessage(Message.WE_ACTION_QUEUED.getValue());	
-		}else {
-			p.sendMessage(Message.WE_NOTHING_TO_DO.getValue());
-		}
+		if (blocks.size() == 0)
+			return;
+		
+		blocksToBuild.add(new SimpleEntry<Player, List<SimpleEntry<Location,BlockData>>>(p, blocks));
+		p.sendMessage(Message.WE_ACTION_QUEUED.getValue());	
+		
 	}
 	
 	public WorldEditInstance getPlayerInstance(Player p) {

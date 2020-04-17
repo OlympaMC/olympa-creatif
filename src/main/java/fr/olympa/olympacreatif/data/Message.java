@@ -35,7 +35,6 @@ public enum Message {
 	WE_ACTION_ENDED("world_edit_action_terminated"),
 	WE_ACTION_QUEUED("worldedit_action_queued"),
 	WE_ANOTHER_ACTION_ALREADY_QUEUED("worldedit_another_action_already_queued"),
-	WE_NOTHING_TO_DO("worldedit_invalid_selection"),
 	
 	PARAM_WORLDEDIT_BPS("parameter_worldedit_blocks_per_second"),
 	PARAM_WORLD_NAME("parameter_world_name"),
@@ -77,7 +76,8 @@ public enum Message {
 	WE_CMD_CLIPBOARD_COPIED("we_cmd_clipboard_copied"), 
 	WE_CMD_PASTE_ERROR("we_cmd_paste_error"), 
 	WE_CMD_CLIPBOARD_MIROR("we_cmd_clipboard_miror"), 
-	WE_CMD_CLIPBOARD_ROTATE("we_cmd_clipboard_rotate"),
+	WE_CMD_CLIPBOARD_ROTATE("we_cmd_clipboard_rotate"), 
+	WE_CMD_INVALID_SELECTION("we_cmd_invalid_selection"),
 	
 	;
 	
@@ -107,6 +107,7 @@ public enum Message {
 		messagesList.put(PARAM_WORLDEDIT_BPS.getKey(), "1000");
 		messagesList.put(PARAM_WORLD_LEVEL.getKey(), "60");
 		messagesList.put(PARAM_WORLD_NAME.getKey(), "CREATIF");
+		messagesList.put(PARAM_WE_MAX_BLOCKS_PER_CMD.getKey(), "10000");
 	}
 	
 	public void setValue(Object s) {
