@@ -69,7 +69,15 @@ public enum Message {
 	PLOT_ACCEPTED_INVITATION("plot_accept_invitation"), 
 	PLOT_NO_PENDING_INVITATION("plot_no_pending_invitation"), 
 	WE_POS_SET("we_pos_set"), 
-	WE_INSUFFICIENT_PLOT_PERMISSION("we_insufficient_plot_permission"),
+	WE_INSUFFICIENT_PLOT_PERMISSION("we_insufficient_plot_permission"), 
+	
+	WE_CMD_HELP("we_cmd_help"), 
+	PARAM_WE_MAX_BLOCKS_PER_CMD("we_max_blocks_per_cmd"), 
+	WE_ACTION_TOO_BIG("we_cmd_action_too_big"), 
+	WE_CMD_CLIPBOARD_COPIED("we_cmd_clipboard_copied"), 
+	WE_CMD_PASTE_ERROR("we_cmd_paste_error"), 
+	WE_CMD_CLIPBOARD_MIROR("we_cmd_clipboard_miror"), 
+	WE_CMD_CLIPBOARD_ROTATE("we_cmd_clipboard_rotate"),
 	
 	;
 	

@@ -30,7 +30,6 @@ public class OcCommand extends OlympaCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		Bukkit.broadcastMessage("" + AccountProvider.get(((Player)sender).getUniqueId()).getInformation().getID());
 		switch (args.length) {
 		case 1:
 			switch(args[0]) {
@@ -127,7 +126,7 @@ public class OcCommand extends OlympaCommand {
 		else
 			for (Player p : Bukkit.getOnlinePlayers())
 				response.add(p.getName());
-		
+
 		return response;
 	}
 }

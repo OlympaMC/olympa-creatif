@@ -6,6 +6,7 @@ import org.bukkit.generator.ChunkGenerator;
 
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.olympacreatif.command.OcCommand;
+import fr.olympa.olympacreatif.command.OceCommand;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.CustomChunkGenerator;
@@ -32,6 +33,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		super.onEnable();
 		//saveDefaultConfig();
 		new OcCommand(this, "olympacreatif", new String[] {"oc"}).register();
+		new OceCommand(this, "olympacreatifedit", new String[] {"oce"}).register();
 		
 		dataManager = new DataManager(this);
 		plotsManager = new PlotsManager(this);

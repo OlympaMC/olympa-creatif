@@ -60,7 +60,7 @@ public class WorldEditInstance {
 	public boolean copySelection() {
 		//cancel si zone trop grande
 		if ((Math.abs(pos1.getBlockX()-pos2.getBlockX())+1) * (Math.abs(pos1.getBlockY()-pos2.getBlockY())+1) * (Math.abs(pos1.getBlockZ()-pos2.getBlockZ())+1) 
-				> Integer.valueOf(Message.PARAM_WORLDEDIT_BPS.getValue()))
+				> Integer.valueOf(Message.PARAM_WE_MAX_BLOCKS_PER_CMD.getValue()))
 			return false;
 		
 		clipboardPlot = plugin.getPlotsManager().getPlot(pos1);

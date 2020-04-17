@@ -11,6 +11,7 @@ import org.bukkit.block.Dropper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
@@ -24,12 +25,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.gui.MainGui;
+import fr.olympa.olympacreatif.plot.Plot;
 
 public class WorldEventsListener implements Listener{
 
@@ -152,5 +155,22 @@ public class WorldEventsListener implements Listener{
 			((Dropper) e.getBlock().getState()).getInventory().addItem(e.getItem());
 		}
 		
+	}
+	
+	@EventHandler //chat de plot
+	public void inChat(AsyncPlayerChatEvent e) {
+		if (e.isCancelled())
+			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (e.getMessage().startsWith("@") || plot == null)
+			e.getMessage().replaceFirst("@", "");
+		else {
+			e.getRecipients().clear();
+			e.setFormat("§7[Plot] §r" + e.getPlayer().getDisplayName() + " : ");
+			for (Player p : plot.getPlayers())
+				e.getRecipients().add(p);
+		}
 	}
 }
