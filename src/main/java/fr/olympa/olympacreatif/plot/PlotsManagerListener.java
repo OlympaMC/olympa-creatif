@@ -1,16 +1,10 @@
 package fr.olympa.olympacreatif.plot;
 
-import java.util.ArrayList;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
-import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class PlotsManagerListener implements Listener {

@@ -213,14 +213,14 @@ public class PlotParametersGui extends OlympaGUI {
 			list = new ArrayList<String>();
 		
 		if (newState) {
-			list.add(0, "§eEtat : §aautorisé");
+			list.add(0, "§eEtat : §aactif");
 			ItemMeta im = it.getItemMeta();
 			im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 			it.setItemMeta(im);
 			it.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
 		}
 		else {
-			list.add(0, "§eEtat : §cinterdit");
+			list.add(0, "§eEtat : §cinactif");
 			it.removeEnchantment(Enchantment.DURABILITY);
 		}
 		if (list.size() >= 2)
@@ -233,7 +233,7 @@ public class PlotParametersGui extends OlympaGUI {
 		if (it.getItemMeta().getLore() == null)
 			return false;
 		
-		if (it.getItemMeta().getLore().get(0).equals("§eEtat : §aautorisé"))
+		if (it.getItemMeta().getLore().get(0).equals("§eEtat : §aactif"))
 			return true;
 		else
 			return false;

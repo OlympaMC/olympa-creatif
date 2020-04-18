@@ -253,7 +253,7 @@ public abstract class ClipboardEdition {
 		
 		public static SymmetryPlan getPlan(String s) {
 			for (SymmetryPlan plan : SymmetryPlan.values())
-				if (plan.getId().equals(s))
+				if (plan.getId().equals(s.toUpperCase()))
 					return plan;
 			return null;
 		}

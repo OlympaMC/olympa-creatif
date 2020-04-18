@@ -6,16 +6,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import fr.olympa.api.command.OlympaCommand;
+import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
+import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class OcCommand extends OlympaCommand {
@@ -28,6 +31,7 @@ public class OcCommand extends OlympaCommand {
 		this.plugin = plugin;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		switch (args.length) {
@@ -93,7 +97,61 @@ public class OcCommand extends OlympaCommand {
 						sender.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
 				else
 					sender.sendMessage(Message.PLOT_NULL_PLOT.getValue());
-						
+				break;
+			case "kick":
+				if (!(sender instanceof Player))
+					return false;
+				Plot plot2 = plugin.getPlotsManager().getPlot(((Player) sender).getLocation());
+				Player target2 = Bukkit.getPlayer(args[1]);
+				
+				Bukkit.broadcastMessage(plot2.getId().getAsString() + " ; " + target2.toString());
+				
+				if (plot2 != null)
+					if (plot2.getMembers().getPlayerLevel((Player) sender) >= 3)
+						if (target2 != null)
+							if (plot2.getMembers().getPlayerRank(target2) == PlotRank.VISITOR && plot2.getPlayers().contains(target2)) {
+								plot2.teleportOut(target2);
+								target2.sendMessage(Message.PLOT_HAVE_BEEN_KICKED.getValue());
+								sender.sendMessage(Message.PLOT_KICK_PLAYER.getValue().replace("%player%", target2.getDisplayName()));
+								return false;
+							}
+				sender.sendMessage(Message.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.getValue().replace("%player%", target2.getDisplayName()));
+				break;
+			case "ban":
+				if (!(sender instanceof Player))
+					return false;
+				Plot plot3 = plugin.getPlotsManager().getPlot(((Player) sender).getLocation());
+				Player target3 = Bukkit.getPlayer(args[1]);
+				if (plot3 != null)
+					if (plot3.getMembers().getPlayerLevel((Player) sender) >= 3) {
+						if (target3 != null) {
+							if (plot3.getMembers().getPlayerRank(target3) == PlotRank.VISITOR && plot3.getPlayers().contains(target3)) {
+								((ArrayList<Long>) plot3.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).add(AccountProvider.get(target3.getUniqueId()).getId());
+								plot3.teleportOut(target3);
+								target3.sendMessage(Message.PLOT_HAVE_BEEN_BANNED.getValue());
+								sender.sendMessage(Message.PLOT_BAN_PLAYER.getValue().replace("%player%", target3.getDisplayName()));
+								return false;
+							}
+						}
+					}else {
+						sender.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+						return false;
+					}
+				sender.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue().replace("%player%", target3.getDisplayName()));
+				break;
+			case "unban":
+				if (!(sender instanceof Player))
+					return false;
+				Plot plot4 = plugin.getPlotsManager().getPlot(((Player) sender).getLocation());
+				Player target4 = Bukkit.getPlayer(args[1]);
+				if (plot4 != null && target4 != null)
+					if (plot4.getMembers().getPlayerLevel((Player) sender) >= 3)
+						if (((ArrayList<Long>) plot4.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).remove(AccountProvider.get(target4.getUniqueId()).getId()))
+							sender.sendMessage(Message.PLOT_UNBAN_PLAYER.getValue());
+						else
+							sender.sendMessage(Message.PLOT_CANT_UNBAN_PLAYER.getValue());
+					else
+						sender.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
 				break;
 			default:
 				sender.sendMessage(Message.COMMAND_HELP.getValue());
@@ -119,6 +177,9 @@ public class OcCommand extends OlympaCommand {
 			list.add("invite");
 			list.add("accept");
 			list.add("tp");
+			list.add("kick");
+			list.add("ban");
+			list.add("unban");
 			for (String s : list)
 				if (s.startsWith(args[0]))
 					response.add(s);

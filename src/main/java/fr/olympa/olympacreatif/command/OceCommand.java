@@ -44,6 +44,12 @@ public class OceCommand extends OlympaCommand{
 				if (!plugin.getWorldEditManager().getPlayerInstance(p).pasteSelection())
 					p.sendMessage(Message.WE_CMD_PASTE_ERROR.getValue());
 				break;
+			case "undo":
+				if (plugin.getWorldEditManager().getPlayerInstance(p).executeUndo())
+					p.sendMessage(Message.WE_UNDO_QUEUED.getValue());
+				else
+					p.sendMessage(Message.WE_NO_UNDO_AVAILABLE.getValue());
+				break;
 			default:
 				sender.sendMessage(Message.WE_CMD_HELP.getValue());
 				break;
@@ -96,6 +102,7 @@ public class OceCommand extends OlympaCommand{
 				sender.sendMessage(Message.WE_CMD_HELP.getValue());
 				break;
 			}
+			break;
 		default:
 			sender.sendMessage(Message.WE_CMD_HELP.getValue());
 			break;
@@ -112,6 +119,7 @@ public class OceCommand extends OlympaCommand{
 			list.add("paste");
 			list.add("miror");
 			list.add("rotate");
+			list.add("undo");
 			for (String s : list)
 				if (s.startsWith(args[0]))
 					response.add(s);

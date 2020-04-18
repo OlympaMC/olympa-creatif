@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,7 +34,7 @@ public class PlotListener implements Listener {
 	private OlympaCreatifMain plugin;
 	private Plot plot;
 	
-	private Map<Player, ItemStack[]> inventoryStorage = new HashMap<Player, ItemStack[]>();
+	private Map<Player, List<ItemStack>> inventoryStorage = new HashMap<Player, List<ItemStack>>();
 	
 	public PlotListener(OlympaCreatifMain plugin, Plot plot) {
 		this.plugin = plugin;
@@ -121,7 +122,8 @@ public class PlotListener implements Listener {
 			//rendu inventaire avant entrée dans zone
 			if (inventoryStorage.containsKey(e.getPlayer())) {
 				e.getPlayer().getInventory().clear();
-				e.getPlayer().getInventory().addItem(inventoryStorage.get(e.getPlayer()));
+				for (ItemStack it : inventoryStorage.get(e.getPlayer()))
+					e.getPlayer().getInventory().addItem(it);
 				inventoryStorage.remove(e.getPlayer());
 			}
 			
@@ -143,16 +145,22 @@ public class PlotListener implements Listener {
 			plot.teleportOut(p);
 			return;
 		}
-		
+
 		plot.addPlayerInPlot(p);
 		
 		//les actions suivantes ne sont effectuées que si le joueur n'appartient pas au plot
 		if (plot.getMembers().getPlayerRank(p) != PlotRank.VISITOR)
 			return;
 		
-		//clear les visiteurs en entrée
+		//clear les visiteurs en entrée & stockage de leur inventaire
 		if ((boolean)plot.getParameters().getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS)) {
-			inventoryStorage.put(p, p.getInventory().getContents().clone());
+			List<ItemStack> list = new ArrayList<ItemStack>();
+			for (ItemStack it : p.getInventory().getContents()) {
+				if (it != null && it.getType() != Material.AIR)
+				list.add(it);
+			}
+				
+			inventoryStorage.put(p, list);
 			p.getInventory().clear();	
 		}
 		
@@ -181,7 +189,8 @@ public class PlotListener implements Listener {
 		
 		if (inventoryStorage.containsKey(e.getPlayer())) {
 			e.getPlayer().getInventory().clear();
-			e.getPlayer().getInventory().addItem(inventoryStorage.get(e.getPlayer()));
+			for (ItemStack it : inventoryStorage.get(e.getPlayer()))
+				e.getPlayer().getInventory().addItem(it);
 			inventoryStorage.remove(e.getPlayer());
 		}
 		

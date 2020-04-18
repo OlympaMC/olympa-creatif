@@ -103,13 +103,24 @@ public class WorldEditManager {
 		return false;
 	}
 	
+	//renvoie vrai si le les blocs ont bien été ajoutés à la liste, false si le joueur avait déjà trop de travail en attente
 	public void addToBuildingList(Player p, List<SimpleEntry<Location, BlockData>> blocks) {
+		int queued = 0;
+		for (SimpleEntry<Player, List<SimpleEntry<Location, BlockData>>> e : blocksToBuild)
+			if (e.getKey().equals(p))
+				queued++;
+		
+		if (queued >= Integer.valueOf(Message.PARAM_WE_MAX_QUEUED_ACTIONS_PER_PLAYER.getValue())) {
+			p.sendMessage(Message.WE_TOO_MANY_ACTIONS.getValue());
+			return;	
+		}
+		
 		if (blocks.size() == 0)
 			return;
 		
 		blocksToBuild.add(new SimpleEntry<Player, List<SimpleEntry<Location,BlockData>>>(p, blocks));
 		p.sendMessage(Message.WE_ACTION_QUEUED.getValue());	
-		
+		return;
 	}
 	
 	public WorldEditInstance getPlayerInstance(Player p) {
