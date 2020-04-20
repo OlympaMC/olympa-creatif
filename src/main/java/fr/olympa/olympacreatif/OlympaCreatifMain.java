@@ -4,10 +4,13 @@ import java.util.Random;
 
 import org.bukkit.generator.ChunkGenerator;
 
+import exemple.OlympaAPIPermission;
+import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.command.OceCommand;
 import fr.olympa.olympacreatif.data.DataManager;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.CustomChunkGenerator;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -31,6 +34,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	public void onEnable() {
 		//génération de la config de base
 		super.onEnable();
+		
+		OlympaPermission.registerPermissions(PermissionsList.class);
+		
 		//saveDefaultConfig();
 		new OcCommand(this, "olympacreatif", new String[] {"oc"}).register();
 		new OceCommand(this, "olympacreatifedit", new String[] {"oce"}).register();

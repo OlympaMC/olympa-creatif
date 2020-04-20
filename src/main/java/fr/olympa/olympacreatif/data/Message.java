@@ -87,8 +87,11 @@ public enum Message {
 	WE_CMD_INVALID_SELECTION("we_cmd_invalid_selection"), 
 	WE_TOO_MANY_ACTIONS("we_too_many_queued_actions"), 
 	WE_UNDO_QUEUED("we_undo_queued"), 
-	WE_NO_UNDO_AVAILABLE("we_no_undo_available"),   
+	WE_NO_UNDO_AVAILABLE("we_no_undo_available"), 
 	
+	INSUFFICENT_PERMISSION_NEW("insufficient_permission"),   
+	ITEM_INSUFFICIENT_PERMISSION("item_insufficient_permission"),
+	ITEM_PROHIBITED("otem_prohibited"),
 	;
 	
 	private String id;
