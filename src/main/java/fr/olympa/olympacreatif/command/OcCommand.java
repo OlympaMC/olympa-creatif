@@ -34,6 +34,14 @@ public class OcCommand extends OlympaCommand {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (sender instanceof Player)
+			if (!plugin.getPlotsManager().isPlayerLoaded((Player) sender)) {
+				sender.sendMessage("§4Chargement des données en cours, commande annulée...");
+				return false;	
+			}
+		
+		Player p = (Player) sender;
+		
 		switch (args.length) {
 		case 1:
 			switch(args[0]) {
@@ -43,22 +51,39 @@ public class OcCommand extends OlympaCommand {
 			case "find":
 				if (!(sender instanceof Player))
 					break;
-				Plot plot = plugin.getPlotsManager().createPlot((Player) sender);
-				((Player) sender).teleport(plot.getId().getLocation());
-				sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue());
+				//teste si le joueur a encore des plots dispo
+				if (plugin.getPlotsManager().getAvailablePlotSlotsLeft(p) > 0) {
+					Plot plot = plugin.getPlotsManager().createPlot(p);
+					(p).teleport(plot.getId().getLocation());
+					sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue());	
+				}else
+					sender.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
 				break;
 			case "menu":
 				if (sender instanceof Player)
-					new MainGui(plugin, (Player) sender).create((Player) sender);
+					new MainGui(plugin, p).create(p);
 				else
 					sender.sendMessage(Message.COMMAND_HELP.getValue());
 				break;
 			case "accept":
 				if (pendingInvitations.containsKey(sender)) {
 					sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue());
-					pendingInvitations.get(sender).getMembers().set((Player) sender, PlotRank.MEMBER);
+					pendingInvitations.get(sender).getMembers().set(p, PlotRank.MEMBER);
 				}else
 					sender.sendMessage(Message.PLOT_NO_PENDING_INVITATION.getValue());
+				break;
+			case "center":
+				Plot plot = plugin.getPlotsManager().getPlot(p.getLocation());
+				if (plot == null || plot.getMembers().getPlayerLevel(p) > 0)
+					p.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+				else {
+					p.sendMessage(Message.TELEPORT_PLOT_CENTER.getValue());
+					double x = plot.getId().getLocation().getX() + (double)Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue())/2.0;
+					double z = plot.getId().getLocation().getZ() + (double)Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue())/2.0;
+					
+					p.teleport(new Location(plugin.getWorldManager().getWorld(), 
+							x, plugin.getWorldManager().getWorld().getHighestBlockYAt((int)x, (int)z), z));
+				}
 					
 				break;
 			default:
@@ -71,7 +96,7 @@ public class OcCommand extends OlympaCommand {
 			case "tp":
 				PlotId id = PlotId.fromString(plugin, args[1]);
 				if (id != null) {
-					((Player) sender).teleport(id.getLocation());
+					(p).teleport(id.getLocation());
 					sender.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
 				}else {
 					sender.sendMessage(Message.INVALID_PLID_ID.getValue());
@@ -80,10 +105,10 @@ public class OcCommand extends OlympaCommand {
 			case "invite":
 				if (!(sender instanceof Player))
 					return false;
-				Plot plot = plugin.getPlotsManager().getPlot(((Player) sender).getLocation());
+				Plot plot = plugin.getPlotsManager().getPlot((p).getLocation());
 				Player target = Bukkit.getPlayer(args[1]);
 				if (plot != null)
-					if (plot.getMembers().getPlayerLevel((Player) sender) >= 3)
+					if (plot.getMembers().getPlayerLevel(p) >= 3)
 						if (target != null)
 							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR) {
 								pendingInvitations.put(target, plot);
@@ -101,13 +126,13 @@ public class OcCommand extends OlympaCommand {
 			case "kick":
 				if (!(sender instanceof Player))
 					return false;
-				Plot plot2 = plugin.getPlotsManager().getPlot(((Player) sender).getLocation());
+				Plot plot2 = plugin.getPlotsManager().getPlot((p).getLocation());
 				Player target2 = Bukkit.getPlayer(args[1]);
 				
 				Bukkit.broadcastMessage(plot2.getId().getAsString() + " ; " + target2.toString());
 				
 				if (plot2 != null)
-					if (plot2.getMembers().getPlayerLevel((Player) sender) >= 3)
+					if (plot2.getMembers().getPlayerLevel(p) >= 3)
 						if (target2 != null)
 							if (plot2.getMembers().getPlayerRank(target2) == PlotRank.VISITOR && plot2.getPlayers().contains(target2)) {
 								plot2.teleportOut(target2);
@@ -120,10 +145,10 @@ public class OcCommand extends OlympaCommand {
 			case "ban":
 				if (!(sender instanceof Player))
 					return false;
-				Plot plot3 = plugin.getPlotsManager().getPlot(((Player) sender).getLocation());
+				Plot plot3 = plugin.getPlotsManager().getPlot((p).getLocation());
 				Player target3 = Bukkit.getPlayer(args[1]);
 				if (plot3 != null)
-					if (plot3.getMembers().getPlayerLevel((Player) sender) >= 3) {
+					if (plot3.getMembers().getPlayerLevel(p) >= 3) {
 						if (target3 != null) {
 							if (plot3.getMembers().getPlayerRank(target3) == PlotRank.VISITOR && plot3.getPlayers().contains(target3)) {
 								((ArrayList<Long>) plot3.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).add(AccountProvider.get(target3.getUniqueId()).getId());
@@ -142,10 +167,10 @@ public class OcCommand extends OlympaCommand {
 			case "unban":
 				if (!(sender instanceof Player))
 					return false;
-				Plot plot4 = plugin.getPlotsManager().getPlot(((Player) sender).getLocation());
+				Plot plot4 = plugin.getPlotsManager().getPlot((p).getLocation());
 				Player target4 = Bukkit.getPlayer(args[1]);
 				if (plot4 != null && target4 != null)
-					if (plot4.getMembers().getPlayerLevel((Player) sender) >= 3)
+					if (plot4.getMembers().getPlayerLevel(p) >= 3)
 						if (((ArrayList<Long>) plot4.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).remove(AccountProvider.get(target4.getUniqueId()).getId()))
 							sender.sendMessage(Message.PLOT_UNBAN_PLAYER.getValue());
 						else
@@ -174,6 +199,7 @@ public class OcCommand extends OlympaCommand {
 			list.add("help");
 			list.add("find");
 			list.add("menu");
+			list.add("center");
 			list.add("invite");
 			list.add("accept");
 			list.add("tp");

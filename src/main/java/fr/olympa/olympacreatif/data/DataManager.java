@@ -27,6 +27,7 @@ public class DataManager {
 
 	public void loadPlayerPlots(OlympaPlayer p) {
 		// TODO Auto-generated method stub
+		plugin.getPlotsManager().addLoadedPlayer(p.getPlayer());
 		return;
 	}
 	

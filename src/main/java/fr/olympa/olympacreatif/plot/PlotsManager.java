@@ -16,6 +16,7 @@ import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class PlotsManager {
@@ -26,11 +27,16 @@ public class PlotsManager {
 	private List<AsyncPlot> asyncPlots = new ArrayList<AsyncPlot>();
 	
 	private List<Player> loadedPlayers = new ArrayList<Player>();
+	private Map<Player, Integer> bonusPlots = new HashMap<Player, Integer>();
 	
 	private int plotCount; 
 	
 	public PlotsManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+
+		plugin.getServer().getPluginManager().registerEvents(new PlotsManagerListener(plugin), plugin);
+		plugin.getServer().getPluginManager().registerEvents(new PlotsInstancesListener(plugin), plugin);
+		
 		plotCount = plugin.getDataManager().getTotalPlotsCount();
 		
 		//construit les objets Plot chargés depuis la bdd de manière synchrone avec le serveur
@@ -67,7 +73,7 @@ public class PlotsManager {
 							}
 						}
 						if (!hasMemberOnline) {
-							e.getValue().unregisterListener();
+							//e.getValue().unregisterListener();
 							loadedPlots.remove(e.getKey());
 						}
 					}
@@ -152,5 +158,34 @@ public class PlotsManager {
 	
 	public boolean isPlayerLoaded(Player p) {
 		return loadedPlayers.contains(p);
+	}
+	
+	public void setBonusPlots(Player p, int i) {
+		bonusPlots.put(p, i);
+	}
+	
+	public int getAvailablePlotSlotsLeft(Player p) {
+		OlympaPlayer pp = AccountProvider.get(p.getUniqueId());
+		//modificator : plots bonus - plots possédés
+		int modificator = 0;
+		
+		//ajoute le bonus de plots éventuel
+		if (bonusPlots.containsKey(p))
+			modificator = bonusPlots.get(p);
+		
+		//retire 1 pour chaque plot possédé par le joueur
+		for (Plot plot : loadedPlots.values())
+			if (plot.getMembers().getPlayerRank(pp.getInformation()) == PlotRank.OWNER)
+				modificator--;
+		
+		//retourne le nombre de plots restants
+		if (pp.hasPermission(PermissionsList.PLOTS_COUNT_CREATOR))
+			return 10 + modificator;
+		else if (pp.hasPermission(PermissionsList.PLOTS_COUNT_ARCHITECT))
+			return 6 + modificator;
+		else if (pp.hasPermission(PermissionsList.PLOTS_COUNT_CONSTRUCTOR))
+			return 3 + modificator;
+		
+		return 1 + modificator;
 	}
 }

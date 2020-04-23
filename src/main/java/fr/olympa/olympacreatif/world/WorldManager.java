@@ -85,7 +85,11 @@ public class WorldManager {
 	}
 
 	private void generateRestrictedItems() {
+		restrictedItems.put(Material.LINGERING_POTION, PermissionsList.KIT_ADMIN);
 		restrictedItems.put(Material.DEBUG_STICK, PermissionsList.KIT_ADMIN);
+		restrictedItems.put(Material.STRUCTURE_BLOCK, PermissionsList.KIT_ADMIN);
+		restrictedItems.put(Material.STRUCTURE_VOID, PermissionsList.KIT_ADMIN);
+		
 		restrictedItems.put(Material.BEE_SPAWN_EGG, PermissionsList.KIT_ANIMALS);
 		restrictedItems.put(Material.CAT_SPAWN_EGG, PermissionsList.KIT_ANIMALS);
 		restrictedItems.put(Material.CHICKEN_SPAWN_EGG, PermissionsList.KIT_ANIMALS);
@@ -113,6 +117,7 @@ public class WorldManager {
 		restrictedItems.put(Material.VILLAGER_SPAWN_EGG, PermissionsList.KIT_ANIMALS);
 		restrictedItems.put(Material.WANDERING_TRADER_SPAWN_EGG, PermissionsList.KIT_ANIMALS);
 		restrictedItems.put(Material.WOLF_SPAWN_EGG, PermissionsList.KIT_ANIMALS);
+		
 		restrictedItems.put(Material.BAT_SPAWN_EGG, PermissionsList.KIT_MOBS);
 		restrictedItems.put(Material.BLAZE_SPAWN_EGG, PermissionsList.KIT_MOBS);
 		restrictedItems.put(Material.CAVE_SPIDER_SPAWN_EGG, PermissionsList.KIT_MOBS);
@@ -145,6 +150,7 @@ public class WorldManager {
 		restrictedItems.put(Material.ZOMBIE_PIGMAN_SPAWN_EGG, PermissionsList.KIT_MOBS);
 		restrictedItems.put(Material.ZOMBIE_SPAWN_EGG, PermissionsList.KIT_MOBS);
 		restrictedItems.put(Material.ZOMBIE_VILLAGER_SPAWN_EGG, PermissionsList.KIT_MOBS);
+		
 		restrictedItems.put(Material.DROPPER, PermissionsList.KIT_REDSTONE);
 		restrictedItems.put(Material.DISPENSER, PermissionsList.KIT_REDSTONE);
 		restrictedItems.put(Material.REPEATER, PermissionsList.KIT_REDSTONE);
@@ -153,5 +159,9 @@ public class WorldManager {
 		restrictedItems.put(Material.STICKY_PISTON, PermissionsList.KIT_REDSTONE);
 		restrictedItems.put(Material.COMPARATOR, PermissionsList.KIT_REDSTONE);
 		restrictedItems.put(Material.DAYLIGHT_DETECTOR, PermissionsList.KIT_REDSTONE);
+		
+		restrictedItems.put(Material.LAVA, PermissionsList.KIT_LAVA);
+		restrictedItems.put(Material.LAVA_BUCKET, PermissionsList.KIT_LAVA);
+
 	}
 }

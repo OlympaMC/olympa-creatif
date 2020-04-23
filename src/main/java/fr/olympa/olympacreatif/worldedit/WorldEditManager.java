@@ -104,27 +104,51 @@ public class WorldEditManager {
 	}
 	
 	//renvoie vrai si le les blocs ont bien été ajoutés à la liste, false si le joueur avait déjà trop de travail en attente
-	public void addToBuildingList(Player p, List<SimpleEntry<Location, BlockData>> blocks) {
+	public WorldEditError addToBuildingList(Player p, List<SimpleEntry<Location, BlockData>> blocks) {
 		int queued = 0;
 		for (SimpleEntry<Player, List<SimpleEntry<Location, BlockData>>> e : blocksToBuild)
 			if (e.getKey().equals(p))
 				queued++;
 		
 		if (queued >= Integer.valueOf(Message.PARAM_WE_MAX_QUEUED_ACTIONS_PER_PLAYER.getValue())) {
-			p.sendMessage(Message.WE_TOO_MANY_ACTIONS.getValue());
-			return;	
+			return WorldEditError.ERR_TOO_MANY_ACTIONS_QUEUED;
 		}
 		
 		if (blocks.size() == 0)
-			return;
+			return WorldEditError.NO_ERROR;
 		
-		blocksToBuild.add(new SimpleEntry<Player, List<SimpleEntry<Location,BlockData>>>(p, blocks));
-		p.sendMessage(Message.WE_ACTION_QUEUED.getValue());	
-		return;
+		blocksToBuild.add(new SimpleEntry<Player, List<SimpleEntry<Location,BlockData>>>(p, blocks));	
+		return WorldEditError.NO_ERROR;
 	}
 	
 	public WorldEditInstance getPlayerInstance(Player p) {
 		return playersWorldEdit.get(p);
 	}
 	
+	public enum WorldEditError{
+		ERR_NULL_PLOT(Message.PLOT_NULL_PLOT),
+		ERR_INSUFFICIENT_PLOT_PERMISSION(Message.PLOT_INSUFFICIENT_PERMISSION),
+		ERR_OPERATION_CROSS_PLOT(Message.WE_CMD_INVALID_SELECTION),
+		ERR_COPY_TOO_BIG(Message.WE_ERR_SELECTION_TOO_BIG),
+		ERR_UNDO_LIST_EMPTY(Message.WE_NO_UNDO_AVAILABLE),
+		ERR_TOO_MANY_ACTIONS_QUEUED(Message.WE_TOO_MANY_ACTIONS),
+		ERR_PASTE_NULL_CLIPBOARD(Message.WE_ERR_NULL_CLIPBOARD),
+		ERR_PASTE_PART_ON_NULL_TARGET(Message.WE_ERR_PASTE_PART_ON_NULL_TARGET),
+		ERR_PASTE_NOT_OWNER_OF_2_PLOTS(Message.WE_ERR_NOT_OWNER_OF_2_PLOTS),
+		ERR_NULL_PLAN(Message.WE_ERR_NULL_PLAN),
+		ERR_COPY_INCORRECT_DEGREES(Message.WE_ERR_COPY_INCORRECT_DEGREES),
+		ERR_SET_INVALID_BLOCKDATA(Message.WE_ERR_SET_INVALID_BLOCKDATA),
+		NO_ERROR(null), 
+		;
+		
+		private Message errMessage;
+		
+		WorldEditError(Message m){
+			errMessage = m; 
+		}
+		
+		public Message getErrorMessage() {
+			return errMessage;
+		}
+	}
 }

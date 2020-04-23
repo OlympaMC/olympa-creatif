@@ -35,19 +35,19 @@ public class PlotParametersGui extends OlympaGUI {
 	
 	@SuppressWarnings("deprecation")
 	public PlotParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("§6Paramètres du plot : " + plot.getId().getAsString(), 1);
+		super("§6Paramètres du plot : " + plot.getId().getAsString(), 2);
 		this.plugin = plugin;
 		this.p = p;
 		this.plot = plot;
 
 		newBiome = (Biome) plot.getParameters().getParameter(PlotParamType.PLOT_BIOME);
 		
-		inv.setItem(8, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
+		inv.setItem(17, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 		
 		if (plot.getMembers().getPlayerLevel(p) >= 3)
-			 clickToChange = new String[] {" ", "§8Ne concerne que les visiteurs", "§8Cliquez pour changer la valeur"};
+			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs", "§8Cliquez pour changer la valeur"};
 		else
-			 clickToChange = new String[] {" ", "§8Ne concerne que les visiteurs"};
+			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs"};
 		
 		//ajout des options
 		ItemStack it = null;
@@ -101,7 +101,7 @@ public class PlotParametersGui extends OlympaGUI {
 
 		//6 : Sélection du biome
 		it = ItemUtils.item(Material.BOOKSHELF, "§6Biome de la parcelle");
-		for (Biome biome : PlotParameters.getAllPossibleBiomes())
+		for (Biome biome : PlotParamType.getAllPossibleBiomes())
 			if (biome == plot.getParameters().getParameter(PlotParamType.PLOT_BIOME))
 				it = ItemUtils.loreAdd(it, "§aActuel : " + biome.toString());
 			else
@@ -110,11 +110,35 @@ public class PlotParametersGui extends OlympaGUI {
 		if (plot.getMembers().getPlayerRank(p) == PlotRank.OWNER)
 			it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(6,it);
+
+		//7 : Autoriser les potions splash
+		it = ItemUtils.item(Material.SPLASH_POTION, "§6Utilisation des potions jetables");
+
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_SPLASH_POTIONS));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(7,it);
+
+		//8 : Autoriser le pvp
+		it = ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du pvp");
+
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVP));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(8,it);
+
+		//9 : Autoriser le pvp
+		it = ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux");
+
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_ENVIRONMENT_DAMAGE));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(9,it);
 	}
 
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		if (slot == 8) {
+		if (slot == 17) {
 			new MainGui(plugin, p).create(p);
 			return true;
 		}
@@ -170,17 +194,29 @@ public class PlotParametersGui extends OlympaGUI {
 			if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER)
 				return true;
 			
-			int biomeRank = PlotParameters.getAllPossibleBiomes().indexOf(newBiome);
-			newBiome = PlotParameters.getAllPossibleBiomes().get((biomeRank+1) % PlotParameters.getAllPossibleBiomes().size());
+			int biomeRank = PlotParamType.getAllPossibleBiomes().indexOf(newBiome);
+			newBiome = PlotParamType.getAllPossibleBiomes().get((biomeRank+1) % PlotParamType.getAllPossibleBiomes().size());
 			
 			current = ItemUtils.lore(current, "");
-			for (Biome biome : PlotParameters.getAllPossibleBiomes())
+			for (Biome biome : PlotParamType.getAllPossibleBiomes())
 				if (biome == newBiome)
 					current = ItemUtils.loreAdd(current, "§aActuel : " + biome.toString());
 				else
 					current = ItemUtils.loreAdd(current, "§2Disponible : " + biome.toString());
 			
 			current = ItemUtils.loreAdd(current, clickToChange);			
+			break;
+		case 7:
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.ALLOW_SPLASH_POTIONS, getSwitchState(current));
+			break;
+		case 8:
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.ALLOW_PVP, getSwitchState(current));
+			break;
+		case 9:
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.ALLOW_ENVIRONMENT_DAMAGE, getSwitchState(current));
 			break;
 		}
 		

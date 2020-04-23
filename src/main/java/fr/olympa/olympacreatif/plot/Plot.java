@@ -23,7 +23,7 @@ public class Plot {
 	private PlotParameters parameters;
 	private PlotId plotId;
 	
-	private PlotListener listener;
+	//private PlotListener listener;
 
 	private List<Player> playersInPlot = new ArrayList<Player>();
 	
@@ -35,10 +35,10 @@ public class Plot {
 		plotId = new PlotId(plugin);
 		parameters = new PlotParameters(plugin, plotId);
 		members = new PlotMembers(plugin, plotId);
-		listener = new PlotListener(plugin, this);
+		//listener = new PlotListener(plugin, this);
 
 		members.set(p, PlotRank.OWNER);
-		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+		//plugin.getServer().getPluginManager().registerEvents(listener, plugin);
 	}
 	
 	public Plot(AsyncPlot ap) {
@@ -47,14 +47,15 @@ public class Plot {
 		this.members = ap.getMembers();
 		this.plotId = ap.getId();
 		
-		this.listener = new PlotListener(plugin, this);
+		//this.listener = new PlotListener(plugin, this);
 		
-		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+		//plugin.getServer().getPluginManager().registerEvents(listener, plugin);
 
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
-				listener.executeEntryActions(p);
+				PlotsInstancesListener.executeEntryActions(p, this);
+				//listener.executeEntryActions(p);
 	}
 	
 	public PlotParameters getParameters() {
@@ -68,9 +69,10 @@ public class Plot {
 	public PlotId getId() {
 		return plotId;
 	}
+	/*
 	public void unregisterListener() {
 		HandlerList.unregisterAll(listener);
-	}
+	}*/
 	
 	public boolean isActive() {
 		return isActive;

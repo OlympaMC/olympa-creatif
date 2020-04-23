@@ -9,9 +9,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.command.OlympaCommand;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
+import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
 
 public class OceCommand extends OlympaCommand{
 
@@ -27,29 +30,46 @@ public class OceCommand extends OlympaCommand{
 		if (!(sender instanceof Player))
 			return false;
 		Player p = (Player) sender;
+
+		if (!plugin.getPlotsManager().isPlayerLoaded(p)) {
+			p.sendMessage("§4Chargement des données en cours, commande annulée...");
+			return false;	
+		}
+		
+		if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.USE_WORLD_EDIT)) {
+			p.sendMessage(Message.WE_INSUFFICIENT_PERMISSION.getValue());
+			return false;
+		}
+		
+		WorldEditError err = null;
 		
 		switch(args.length) {
 		case 1:
 			switch(args[0]) {
 			case "copy":
-				if (plugin.getWorldEditManager().getPlayerInstance(p).isSelectionValid())
-					if (plugin.getWorldEditManager().getPlayerInstance(p).copySelection())
-						p.sendMessage(Message.WE_CMD_CLIPBOARD_COPIED.getValue());
-					else
-						p.sendMessage(Message.WE_ACTION_TOO_BIG.getValue());
+				err = plugin.getWorldEditManager().getPlayerInstance(p).copySelection();
+				if (err == WorldEditError.NO_ERROR)
+					p.sendMessage(Message.WE_CMD_COPY_SUCCESS.getValue());
 				else
-					p.sendMessage(Message.WE_CMD_INVALID_SELECTION.getValue());
-				break;
+					p.sendMessage(err.getErrorMessage().getValue());
 			case "paste":
-				if (!plugin.getWorldEditManager().getPlayerInstance(p).pasteSelection())
-					p.sendMessage(Message.WE_CMD_PASTE_ERROR.getValue());
-				break;
-			case "undo":
-				if (plugin.getWorldEditManager().getPlayerInstance(p).executeUndo())
-					p.sendMessage(Message.WE_UNDO_QUEUED.getValue());
+				err = plugin.getWorldEditManager().getPlayerInstance(p).pasteSelection();
+				if (err == WorldEditError.NO_ERROR)
+					p.sendMessage(Message.WE_CMD_PASTE_SUCCESS.getValue());
 				else
-					p.sendMessage(Message.WE_NO_UNDO_AVAILABLE.getValue());
-				break;
+					p.sendMessage(err.getErrorMessage().getValue());
+			case "undo":
+				err = plugin.getWorldEditManager().getPlayerInstance(p).executeUndo();
+				if (err == WorldEditError.NO_ERROR)
+					p.sendMessage(Message.WE_UNDO_SUCCESS.getValue());
+				else
+					p.sendMessage(err.getErrorMessage().getValue());
+			case "cut":
+				err = plugin.getWorldEditManager().getPlayerInstance(p).cutBlocks();
+				if (err == WorldEditError.NO_ERROR)
+					p.sendMessage(Message.WE_CUT_SUCCESS.getValue());
+				else
+					p.sendMessage(err.getErrorMessage().getValue());
 			default:
 				sender.sendMessage(Message.WE_CMD_HELP.getValue());
 				break;
@@ -57,15 +77,19 @@ public class OceCommand extends OlympaCommand{
 			break;
 		case 2:
 			switch (args[0]) {
-			case "miror":
-				SymmetryPlan plan = SymmetryPlan.getPlan(args[1]);
-				if (plan != null) {
-					plugin.getWorldEditManager().getPlayerInstance(p).symetricSelection(plan);
-					p.sendMessage(Message.WE_CMD_CLIPBOARD_MIROR.getValue());
-				}
+			case "set":
+				err = plugin.getWorldEditManager().getPlayerInstance(p).setRandomBlocks(args[1]);
+				if (err == WorldEditError.NO_ERROR)
+					p.sendMessage(Message.WE_CMD_SET_SUCCESS.getValue());
 				else
-					p.sendMessage(Message.WE_CMD_HELP.getValue());
+					p.sendMessage(err.getErrorMessage().getValue());
 				break;
+			case "miror":
+				err = plugin.getWorldEditManager().getPlayerInstance(p).symetricSelection(args[1]);
+				if (err == WorldEditError.NO_ERROR)
+					p.sendMessage(Message.WE_CMD_MIROR_SUCCESS.getValue());
+				else
+					p.sendMessage(err.getErrorMessage().getValue());
 			default:
 				sender.sendMessage(Message.WE_CMD_HELP.getValue());
 				break;
@@ -74,29 +98,11 @@ public class OceCommand extends OlympaCommand{
 		case 3:
 			switch (args[0]) {
 			case "rotate":
-				SymmetryPlan plan = SymmetryPlan.getPlan(args[1]);
-				if (!StringUtils.isNumeric(args[2]) || Integer.valueOf(args[2]) % 90 != 0 || plan == null) {
-					sender.sendMessage(Message.WE_CMD_HELP.getValue());
-					return false;	
-				}
-				
-				switch (plan) {
-				case AXE_X:
-					plugin.getWorldEditManager().getPlayerInstance(p).rotateSelection(Integer.valueOf(args[2]), 0, 0);
-					p.sendMessage(Message.WE_CMD_CLIPBOARD_ROTATE.getValue());
-					break;
-				case AXE_Y:
-					plugin.getWorldEditManager().getPlayerInstance(p).rotateSelection(0, Integer.valueOf(args[2]), 0);
-					p.sendMessage(Message.WE_CMD_CLIPBOARD_ROTATE.getValue());
-					break;
-				case AXE_Z:
-					plugin.getWorldEditManager().getPlayerInstance(p).rotateSelection(0, 0, Integer.valueOf(args[2]));
-					p.sendMessage(Message.WE_CMD_CLIPBOARD_ROTATE.getValue());
-					break;
-				default:
-					sender.sendMessage(Message.WE_CMD_HELP.getValue());
-					break;
-				}
+				err = plugin.getWorldEditManager().getPlayerInstance(p).rotateSelection(args[1], args[2]);
+				if (err == WorldEditError.NO_ERROR)
+					p.sendMessage(Message.WE_CMD_ROTATE_SUCCESS.getValue());
+				else
+					p.sendMessage(err.getErrorMessage().getValue());
 				break;
 			default:
 				sender.sendMessage(Message.WE_CMD_HELP.getValue());
@@ -120,6 +126,8 @@ public class OceCommand extends OlympaCommand{
 			list.add("miror");
 			list.add("rotate");
 			list.add("undo");
+			list.add("cut");
+			list.add("set");
 			for (String s : list)
 				if (s.startsWith(args[0]))
 					response.add(s);

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
@@ -23,25 +24,34 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
 
 import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 
@@ -55,10 +65,11 @@ public class WorldEventsListener implements Listener{
 	public WorldEventsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
-		//gestion des entités (remove si plot null)
+		//gestion des entités (remove si plot null ou si nb par plot > 100)
 		new BukkitRunnable() {
 			
 			Thread asyncEntityCheckup = null;
+			int maxEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_PLOT.getValue());
 			
 			@Override
 			public void run() {
@@ -76,16 +87,30 @@ public class WorldEventsListener implements Listener{
 				//lancement du thread de test
 				asyncEntityCheckup = new Thread(new Runnable() {
 
+					Map<Plot, Integer> entitiesPerPlot = new HashMap<Plot, Integer>(); 
+					
 					@Override
 					public void run() {
-						for (Entity e : entities)
-							if (plugin.getPlotsManager().getPlot(e.getLocation()) == null)
+						for (Entity e : entities) {
+							Plot p = plugin.getPlotsManager().getPlot(e.getLocation());
+
+							//supprime l'entité si en dehors d'un plot ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
+							if (p == null)
 								entitiesToRemove.add(e);
+							else
+								if (entitiesPerPlot.keySet().contains(p))
+									if (entitiesPerPlot.get(p) >= maxEntitiesPerPlot)
+										entitiesToRemove.add(e);
+									else
+									entitiesPerPlot.put(p, entitiesPerPlot.get(p)+1);
+								else
+									entitiesPerPlot.put(p, 1);
+						}
 					}
 				});
 				asyncEntityCheckup.start();
 			}
-		}.runTaskTimer(plugin, 0, 40);
+		}.runTaskTimer(plugin, 0, 60);
 	}
 	
 	@EventHandler //n'autorise que les spawn à partir d'oeufs 
@@ -103,9 +128,6 @@ public class WorldEventsListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-		
-		if (plugin.getPlotsManager().getPlot(e.getToBlock().getLocation())  == null)
-			e.setCancelled(true);
 	}
 	
 	@EventHandler //cancel rétractation piston si un bloc affecté se trouve sur une route
@@ -123,8 +145,8 @@ public class WorldEventsListener implements Listener{
 	}
 	
 	@EventHandler //cancel explosion TNT
-	public void onTntExplodeEvent(ExplosionPrimeEvent e) {
-		e.setCancelled(true);
+	public void onEntityExplodeEvent(EntityExplodeEvent e) {
+		e.blockList().clear();
 	}
 
 	@EventHandler //cancel pose block si route ou plot non défini
@@ -159,23 +181,19 @@ public class WorldEventsListener implements Listener{
 	
 	//Gestion des items restreints
 	@EventHandler //test dans inventaires
-	public void onProhibitedItemInventory(InventoryClickEvent e) {
+	public void onLimitedItemInventory(InventoryClickEvent e) {
 		if (!(e.getWhoClicked() instanceof Player))
 			return;
 		
 		OlympaPlayer p = AccountProvider.get(e.getWhoClicked().getUniqueId());
-
-		if (e.getCurrentItem() != null && plugin.getWorldManager().getRestrictedItems().keySet().contains(e.getCurrentItem().getType()))
-			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(e.getCurrentItem().getType()))) {
-				e.setCancelled(true);
-				p.getPlayer().sendMessage(Message.INSUFFICENT_PERMISSION_NEW.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(e.getCurrentItem().getType()).toString().toLowerCase().replace("_", " ")));
-			}
 		
-		if (e.getCursor() != null && plugin.getWorldManager().getRestrictedItems().keySet().contains(e.getCursor().getType()))
-			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(e.getCursor().getType()))) {
+		if (e.getCursor() != null)
+			if (!hasPlayerPermissionFor(p, e.getCursor().getType(), true))
 				e.setCancelled(true);
-				p.getPlayer().sendMessage(Message.INSUFFICENT_PERMISSION_NEW.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(e.getCursor().getType()).toString().toLowerCase().replace("_", " ")));
-			}
+		
+		if (e.getCurrentItem() != null)
+			if (!hasPlayerPermissionFor(p, e.getCurrentItem().getType(), true))
+				e.setCancelled(true);
 	}
 	
 	@EventHandler //cancel pickup item restreint
@@ -183,34 +201,57 @@ public class WorldEventsListener implements Listener{
 		if (e.getEntityType() != EntityType.PLAYER)
 			return;
 
-		OlympaPlayer p = AccountProvider.get(e.getEntity().getUniqueId());
-
-		if (e.getItem().getItemStack() != null && plugin.getWorldManager().getRestrictedItems().keySet().contains(e.getItem().getItemStack().getType()))
-			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(e.getItem().getItemStack().getType()))) {
-				e.setCancelled(true);
-				p.getPlayer().sendMessage(Message.INSUFFICENT_PERMISSION_NEW.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(e.getItem().getItemStack().getType()).toString().toLowerCase().replace("_", " ")));
-			}
+		if (!hasPlayerPermissionFor(AccountProvider.get(e.getEntity().getUniqueId()), e.getItem().getItemStack().getType(), false))
+			e.setCancelled(true);
 	}
 	
-	@EventHandler //cancel interact si objet restreint
+	@EventHandler //cancel interact item restreint
 	public void onInterract(PlayerInteractEvent e) {
-		OlympaPlayer p = AccountProvider.get(e.getPlayer().getUniqueId());
-
-		if (e.getItem() != null && plugin.getWorldManager().getRestrictedItems().keySet().contains(e.getItem().getType()))
-			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(e.getItem().getType()))) {
+		if (e.getItem() == null)
+			return;
+		
+		if (!hasPlayerPermissionFor(AccountProvider.get(e.getPlayer().getUniqueId()), e.getItem().getType(), true))
+			e.setCancelled(true);
+	}
+	
+	
+	
+	@EventHandler //cancel potions jetables si effet >5
+	public void onSplashPotionEvent(PotionSplashEvent e) {
+		for (PotionEffect effect : e.getPotion().getEffects())
+			if (effect.getAmplifier() >= 5)
 				e.setCancelled(true);
-				p.getPlayer().sendMessage(Message.INSUFFICENT_PERMISSION_NEW.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(e.getItem().getType()).toString().toLowerCase().replace("_", " ")));
-			}	
+	}
+	@EventHandler //cancel potions persistantes si effet >5
+	public void onLingeringPotionEvent(LingeringPotionSplashEvent e) {
+		for (PotionEffect effect : e.getAreaEffectCloud().getCustomEffects())
+			if (effect.getAmplifier() >= 5)
+				e.setCancelled(true);
 	}
 	
-	
-	
-	@EventHandler //cancel potions persistantes
-	public void onLingeringPotion(LingeringPotionSplashEvent e) {
-		e.setCancelled(true);
+	@EventHandler //cancel potion avec effet >5
+	public void onPotionConsume(PlayerItemConsumeEvent e) {
+		if (e.getItem().getType() != Material.POTION)
+			return;
+			
+		PotionMeta im = (PotionMeta) e.getItem().getItemMeta();
+		for (PotionEffect effect : im.getCustomEffects())
+			if (effect.getAmplifier() >= 5)
+				e.setCancelled(true);
 	}
 	
-	@EventHandler //ouvre le menu si joueur a sneak deux fois rapidement (délai : 0.5s)
+	//true si le joueur a la permission d'utiliser l'objet désigné
+	public boolean hasPlayerPermissionFor(OlympaPlayer p, Material mat, boolean sendMessage) {
+		if (plugin.getWorldManager().getRestrictedItems().keySet().contains(mat))
+			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(mat))) {
+				if (sendMessage)
+					p.getPlayer().sendMessage(Message.INSUFFICENT_PERMISSION_NEW.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
+				return false;
+			}
+		return true;
+	}
+	
+	@EventHandler //ouvre le menu si joueur a sneak deux fois rapidement (délai : 0.2s)
 	public void onOpenMenu(PlayerToggleSneakEvent e) {
 		if (e.isSneaking())
 			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
@@ -234,10 +275,10 @@ public class WorldEventsListener implements Listener{
 			return;
 		
 		if (e.getBlock().getState() instanceof Dispenser) {
-			((Dispenser) e.getBlock().getState()).getInventory().addItem(e.getItem());
+			((Dispenser) e.getBlock().getState()).getInventory().addItem(e.getItem().clone());
 		}
 		if (e.getBlock().getState() instanceof Dropper) {
-			((Dropper) e.getBlock().getState()).getInventory().addItem(e.getItem());
+			((Dropper) e.getBlock().getState()).getInventory().addItem(e.getItem().clone());
 		}
 		
 	}
@@ -256,6 +297,18 @@ public class WorldEventsListener implements Listener{
 			e.setFormat("§7[Plot] §r" + e.getPlayer().getDisplayName() + " : " + e.getMessage());
 			for (Player p : plot.getPlayers())
 				e.getRecipients().add(p);
+		}
+	}
+	
+	@EventHandler //color sur pancartes
+	public void onSignColor(SignChangeEvent e) {
+		if (!AccountProvider.get(e.getPlayer().getUniqueId()).hasPermission(PermissionsList.USE_COLORED_TEXT))
+			return;
+		
+		int i = 0;
+		for (String s : e.getLines()) {
+			e.setLine(i, ChatColor.translateAlternateColorCodes('&', s));
+			i++;
 		}
 	}
 }

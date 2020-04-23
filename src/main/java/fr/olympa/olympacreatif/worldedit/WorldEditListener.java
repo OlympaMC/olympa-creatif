@@ -11,6 +11,7 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
 
 public class WorldEditListener implements Listener{
 
@@ -32,12 +33,12 @@ public class WorldEditListener implements Listener{
 		
 		//définition des pos
 		if (e.getAction() == Action.LEFT_CLICK_BLOCK)
-			if (plugin.getWorldEditManager().getPlayerInstance(e.getPlayer()).setPos1(e.getClickedBlock().getLocation()))
+			if (plugin.getWorldEditManager().getPlayerInstance(e.getPlayer()).setPos1(e.getClickedBlock().getLocation()) == WorldEditError.ERR_INSUFFICIENT_PLOT_PERMISSION)
 				e.getPlayer().sendMessage(Message.WE_POS_SET.getValue().replace("%pos%", "1"));
 			else
 				e.getPlayer().sendMessage(Message.WE_INSUFFICIENT_PLOT_PERMISSION.getValue());
 		else if (e.getAction() == Action.RIGHT_CLICK_BLOCK)
-			if (plugin.getWorldEditManager().getPlayerInstance(e.getPlayer()).setPos2(e.getClickedBlock().getLocation()))
+			if (plugin.getWorldEditManager().getPlayerInstance(e.getPlayer()).setPos2(e.getClickedBlock().getLocation()) == WorldEditError.ERR_INSUFFICIENT_PLOT_PERMISSION)
 				e.getPlayer().sendMessage(Message.WE_POS_SET.getValue().replace("%pos%", "2"));
 			else
 				e.getPlayer().sendMessage(Message.WE_INSUFFICIENT_PLOT_PERMISSION.getValue());

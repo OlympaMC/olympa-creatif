@@ -7,9 +7,13 @@ import fr.olympa.olympacreatif.data.Message;
 
 public class PlotId{
 
-	int indexX;
-	int indexZ;
+	private int indexX;
+	private int indexZ;
 	private OlympaCreatifMain plugin;
+
+	private int plotXsize = Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue());;
+	private int plotZsize = Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue());;
+	private int plotRoadSize = Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue());
 	
 	public PlotId(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -93,14 +97,11 @@ public class PlotId{
 	}
 	
 	public boolean isInPlot(int x, int z) {
-		int plotX = Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue());
-		int plotZ = Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue());
-		int plotRoad = Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue());
 		
-		return x >= indexX * (plotX + plotRoad) && 
-				x < indexX * (plotX + plotRoad) + plotX && 
-				z >= indexZ * (plotZ + plotRoad) && 
-				z < indexZ * (plotZ + plotRoad) + plotZ; 
+		return x >= indexX * (plotXsize + plotRoadSize) && 
+				x < indexX * (plotXsize + plotRoadSize) + plotXsize && 
+				z >= indexZ * (plotZsize + plotRoadSize) && 
+				z < indexZ * (plotZsize + plotRoadSize) + plotZsize; 
 	}
 	
 	@Override

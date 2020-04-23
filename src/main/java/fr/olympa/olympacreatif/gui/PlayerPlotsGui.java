@@ -22,11 +22,11 @@ public class PlayerPlotsGui extends OlympaGUI {
 	private List<Plot> playerPlots = new ArrayList<Plot>();
 	
 	public PlayerPlotsGui(OlympaCreatifMain plugin, Player p) {
-		super("§6Plots du joueur " + p.getDisplayName(), 3);
+		super("§6Plots du joueur " + p.getDisplayName(), 4);
 		this.plugin = plugin;
 		this.p = p;
 
-		inv.setItem(26, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
+		inv.setItem(35, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 		
 		//recherche des plots du joueur
 		for (Plot plot : plugin.getPlotsManager().getPlots()) {
@@ -56,7 +56,7 @@ public class PlayerPlotsGui extends OlympaGUI {
 
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		if (slot == 26) {
+		if (slot == 35) {
 			new MainGui(plugin, p).create(p);
 			return true;
 		}
