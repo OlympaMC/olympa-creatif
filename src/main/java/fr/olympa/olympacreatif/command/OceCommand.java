@@ -77,6 +77,13 @@ public class OceCommand extends OlympaCommand{
 			break;
 		case 2:
 			switch (args[0]) {
+			case "rotate":
+				err = plugin.getWorldEditManager().getPlayerInstance(p).rotateSelection(args[1], "Y");
+				if (err == WorldEditError.NO_ERROR)
+					p.sendMessage(Message.WE_CMD_ROTATE_SUCCESS.getValue());
+				else
+					p.sendMessage(err.getErrorMessage().getValue());
+				break;
 			case "set":
 				err = plugin.getWorldEditManager().getPlayerInstance(p).setRandomBlocks(args[1]);
 				if (err == WorldEditError.NO_ERROR)

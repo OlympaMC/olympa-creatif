@@ -139,7 +139,10 @@ public class PlotParametersGui extends OlympaGUI {
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		if (slot == 17) {
-			new MainGui(plugin, p).create(p);
+			if (plot == null)
+				new MainGui(plugin, p, plot, "§9Menu").create(p);
+			else
+				new MainGui(plugin, p, plot, "§9Menu >> " + plot.getId().getAsString()).create(p);
 			return true;
 		}
 		

@@ -11,10 +11,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import fr.olympa.api.command.OlympaCommand;
+import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -60,8 +63,15 @@ public class OcCommand extends OlympaCommand {
 					sender.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
 				break;
 			case "menu":
-				if (sender instanceof Player)
-					new MainGui(plugin, p).create(p);
+				if (sender instanceof Player) {
+					Plot plot = plugin.getPlotsManager().getPlot(p.getLocation());
+					if (plot == null)
+						new MainGui(plugin, p, plot, "§9Menu").create(p);
+					else
+						new MainGui(plugin, p, plot, "§9Menu >> " + plot.getId().getAsString()).create(p);
+					
+				}
+					
 				else
 					sender.sendMessage(Message.COMMAND_HELP.getValue());
 				break;
@@ -206,6 +216,7 @@ public class OcCommand extends OlympaCommand {
 			list.add("kick");
 			list.add("ban");
 			list.add("unban");
+			list.add("skull");
 			for (String s : list)
 				if (s.startsWith(args[0]))
 					response.add(s);

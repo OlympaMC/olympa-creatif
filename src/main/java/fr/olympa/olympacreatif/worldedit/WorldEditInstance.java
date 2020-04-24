@@ -65,10 +65,6 @@ public class WorldEditInstance {
 	
 	//copie les blocs de la sélection dans la mémoire (ATTENTION coordonnées relatives par rapport à la position actuelle du joueur)
 	public WorldEditError copySelection() {
-		//cancel si zone trop grande
-		if ((Math.abs(pos1.getBlockX()-pos2.getBlockX())+1) * (Math.abs(pos1.getBlockY()-pos2.getBlockY())+1) * (Math.abs(pos1.getBlockZ()-pos2.getBlockZ())+1) 
-				> Integer.valueOf(Message.PARAM_WE_MAX_BLOCKS_PER_CMD.getValue()))
-			return WorldEditError.ERR_COPY_TOO_BIG;
 		
 		WorldEditError err = isSelectionValid();
 		if (err != WorldEditError.NO_ERROR)
@@ -89,8 +85,13 @@ public class WorldEditInstance {
 		return WorldEditError.NO_ERROR;
 	}
 	
-	//vérifie la validité de la sélection
-	public WorldEditError isSelectionValid() {
+	//vérifie la validité de la sélection (en terme de nombre de blocs et d'unicité dans le plot)
+public WorldEditError isSelectionValid() {
+		//vérification taille zone
+		if ((Math.abs(pos1.getBlockX()-pos2.getBlockX())+1) * (Math.abs(pos1.getBlockY()-pos2.getBlockY())+1) * (Math.abs(pos1.getBlockZ()-pos2.getBlockZ())+1) 
+				> Integer.valueOf(Message.PARAM_WE_MAX_BLOCKS_PER_CMD.getValue()))
+			return WorldEditError.ERR_OPERATION_TOO_BIG;
+		
 		//vérification que les deux points sont bien dans le même plot
 		if (pos1 != null && pos2 != null)
 			if (plugin.getPlotsManager().getPlot(pos1) != null && plugin.getPlotsManager().getPlot(pos2) != null)
@@ -203,10 +204,6 @@ public class WorldEditInstance {
 	
 	//remplace les blocs par de l'air dans la zone sélectionnée
 	public WorldEditError cutBlocks() {
-		WorldEditError err = isSelectionValid();
-		if (err != WorldEditError.NO_ERROR)
-			return err;
-
 		Map<Location, BlockData> toBuild = new HashMap<Location, BlockData>();
 		
 		for (int x = Math.min(pos1.getBlockX(), pos2.getBlockX()) ; x <= Math.max(pos1.getBlockX(), pos2.getBlockX()) ; x++)
@@ -218,8 +215,7 @@ public class WorldEditInstance {
 	}
 	
 	public WorldEditError pasteSelection() {
-		return buildBlocks(clipboard);
-		
+		return buildBlocks(clipboard);		
 	}
 	
 	//colle la sélection à l'endroit souhaité (erreur si paste en dehors du plot ou si le joeur n'est pas proprio des 2 plots)

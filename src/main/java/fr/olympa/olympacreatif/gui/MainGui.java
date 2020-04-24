@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.gui;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,36 +10,80 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.objects.OlympaPlayer;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
+import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class MainGui extends OlympaGUI {
 
 	private OlympaCreatifMain plugin;
-	private Player p;
+	private OlympaPlayer p;
 	private Plot plot;
-	public MainGui(OlympaCreatifMain plugin, Player p) {
-		super("§6Menu principal",1);
+	public MainGui(OlympaCreatifMain plugin, Player player, Plot plot, String inventoryName) {
+		super(inventoryName, 6
+				
+				
+				
+				);
+
+		if (!plugin.getPlotsManager().isPlayerLoaded(player))
+			return;
 		
 		this.plugin = plugin;
-		this.p = p;
-		plot = plugin.getPlotsManager().getPlot(p.getLocation());
+		this.p = AccountProvider.get(player.getUniqueId());
+		this.plot = plot;
+		
+		String clickToOpenMenu = "§9Cliquez pour ouvrir le menu";
+		int totalPlayerPlots = 0;
+		int totalPlayerOwnedPlots = 0;
+		
+		//comptage du nombre de plots du joueur
+		for (Plot plot2 : plugin.getPlotsManager().getPlots())
+			if (plot2.getMembers().getPlayerRank(p.getInformation()) != PlotRank.VISITOR)
+				if (plot2.getMembers().getPlayerRank(p.getInformation()) == PlotRank.OWNER)
+					totalPlayerOwnedPlots++;
+				else
+					totalPlayerPlots++;
+		
+		//création de l'interface Olympa
+		for (int i = 0 ; i < 9*6 ; i++) {
+			if ((i+1)%9 >= 2 && (i+1)%9 <= 6)
+				inv.setItem(i, ItemUtils.item(Material.YELLOW_STAINED_GLASS_PANE, " "));
+			else
+				inv.setItem(i, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
+		}
+		inv.setItem(2, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
+		inv.setItem(6, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
+		inv.setItem(37, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
+		inv.setItem(41, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
+		
+		
+		//génération de l'interface
+		inv.setItem(12, ItemUtils.skull(player.getDisplayName(), player.getName(), 
+				"§eGrade : " + p.getGroupNameColored(), " ", 
+				"§eParcelles totales : " + totalPlayerPlots + "/36", 
+				"§eParcelles propriétaire : " + totalPlayerOwnedPlots + "/" + totalPlayerOwnedPlots + plugin.getPlotsManager().getAvailablePlotSlotsLeft(player)));
+
+		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes plots", clickToOpenMenu));
+		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", "§eVotre monnaie : TODO", clickToOpenMenu));
 		
 		if (plot != null) {
-			inv.setItem(0, ItemUtils.item(Material.GRASS_BLOCK, Message.GUI_MAIN_PLOT_INFO.getValue().replace("%plot%", plot.getId().getAsString()), Message.GUI_MAIN_PLOT_INFO_LORE.getValue().replace("%membersCount%", ""+plot.getMembers().getCount()).split(",") ));
-			inv.setItem(1, ItemUtils.item(Material.ENDER_PEARL, Message.GUI_MAIN_TELEPORT_PLOT_SPAWN.getValue(), Message.GUI_MAIN_TELEPORT_PLOT_SPAWN_LORE.getValue().split(",")));
-			inv.setItem(2, ItemUtils.item(Material.PLAYER_HEAD, Message.GUI_MAIN_MEMBERS_LIST.getValue(), Message.GUI_MAIN_MEMBERS_LIST_LORE.getValue().split(",")));
-			inv.setItem(4, ItemUtils.item(Material.COMPARATOR, Message.GUI_MAIN_INTERACTION_PARAMETERS.getValue(), Message.GUI_MAIN_INTERACTION_PARAMETERS_LORE.getValue().split(",")));
-			inv.setItem(5, ItemUtils.item(Material.REPEATER, Message.GUI_MAIN_PLOT_PARAMETERS.getValue(), Message.GUI_MAIN_PLOT_PARAMETERS_LORE.getValue().split(",")));
-			inv.setItem(7, ItemUtils.item(Material.BOOK, Message.GUI_MAIN_PLOTS_LIST.getValue(), Message.GUI_MAIN_PLOTS_LIST_LORE.getValue().split(",")));
-			inv.setItem(8, ItemUtils.item(Material.ENDER_EYE, Message.GUI_MAIN_TELEPORT_RANDOM_PLOT.getValue(), Message.GUI_MAIN_TELEPORT_RANDOM_PLOT_LORE.getValue().split(",")));	
-		}else {
-			inv.setItem(0, ItemUtils.item(Material.GRASS_BLOCK, Message.GUI_MAIN_PLOT_INFO.getValue().replace("%plot%", "§caucun§r"), Message.GUI_MAIN_PLOT_INFO_LORE.getValue().replace("%membersCount%", "0").split(",") ));
-			inv.setItem(7, ItemUtils.item(Material.BOOK, Message.GUI_MAIN_PLOTS_LIST.getValue(), Message.GUI_MAIN_PLOTS_LIST_LORE.getValue().split(",")));
-			inv.setItem(8, ItemUtils.item(Material.ENDER_EYE, Message.GUI_MAIN_TELEPORT_RANDOM_PLOT.getValue(), Message.GUI_MAIN_TELEPORT_RANDOM_PLOT_LORE.getValue().split(",")));
+			inv.setItem(21, ItemUtils.item(Material.PAINTING, "§6Membres parcelle", "§eNombre de membres : " + plot.getMembers().getCount(), clickToOpenMenu));
+			inv.setItem(22, ItemUtils.item(Material.COMPARATOR, "§6Paramètres généraux parcelle", clickToOpenMenu));
+			inv.setItem(23, ItemUtils.item(Material.REPEATER, "§6Paramètres d'interraction parcelle", clickToOpenMenu));
+
+			inv.setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle"));	
 		}
+		inv.setItem(30, ItemUtils.item(Material.RED_BED, "§6Téléportation au spawn"));
+		inv.setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"));
+
+		inv.setItem(40, ItemUtils.item(Material.COMPASS, "§6Trouver une nouvelle parcelle"));
+		inv.setItem(49, ItemUtils.item(Material.PAPER, "§6Ouvrir l'aide"));
+		
 		/*Options à intégrer au menu :
 		 * Infos générales parcelle
 		 * TP spawn parcelle
@@ -47,6 +92,8 @@ public class MainGui extends OlympaGUI {
 		 * Paramètres : setspawn, fly, gamemode, vider l'inventaire, forcespawn, biome
 		 * Liste zones où le joueur est membre
 		 * TP sur parcelle aléatoire
+		 * Infos joueur (parcelles totales, parcelles owner, grade)
+		 * 
 		 * 
 		 * pas dans le gui mais par commande : 
 		 * option de chat (général et/ou plot)
@@ -61,34 +108,40 @@ public class MainGui extends OlympaGUI {
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		switch (slot) {
-		case 1:
+		case 31:
 			if (plot != null) {
 				p.closeInventory();
 				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
 				p.teleport((Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC));	
 			}
 			break;
-		case 2:
+		case 21:
 			if (plot != null)
 				new MembersGui(plugin, p, plot).create(p);
 			break;
-		case 4:
+		case 23:
 			if (plot != null)
 				new InteractionParametersGui(plugin, p, plot).create(p);
 			break;
-		case 5:
+		case 22:
 			if (plot != null)
 				new PlotParametersGui(plugin, p, plot).create(p);
 			break;
-		case 7:
+		case 13:
 			new PlayerPlotsGui(plugin, p).create(p);
 			break;
-		case 8:
+		case 30 :
+			p.teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
+			break;
+		case 32:
 			if (plugin.getPlotsManager().getPlots().size()>0) {
 				Plot pl = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
 				p.teleport(pl.getId().getLocation());
 				p.sendMessage(Message.TELEPORT_TO_RANDOM_PLOT.getValue());	
 			}
+			break;
+		case 40:
+			Bukkit.dispatchCommand(p, "oc find");
 			break;
 		}
 		return true;
@@ -98,5 +151,4 @@ public class MainGui extends OlympaGUI {
 	public boolean onClickCursor(Player p, ItemStack current, ItemStack cursor, int slot) {
 		return true;
 	}
-
 }

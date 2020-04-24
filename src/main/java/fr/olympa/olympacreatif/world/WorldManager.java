@@ -1,9 +1,6 @@
 package fr.olympa.olympacreatif.world;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -11,27 +8,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
-import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.EntityType;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
-import fr.olympa.olympacreatif.plot.Plot;
 
 public class WorldManager {
 

@@ -87,30 +87,35 @@ public class WorldEventsListener implements Listener{
 				//lancement du thread de test
 				asyncEntityCheckup = new Thread(new Runnable() {
 
-					Map<Plot, Integer> entitiesPerPlot = new HashMap<Plot, Integer>(); 
+					Map<Plot, Map<EntityType, Integer>> entitiesPerPlot = new HashMap<Plot, Map<EntityType,Integer>>(); 
 					
 					@Override
 					public void run() {
-						for (Entity e : entities) {
-							Plot p = plugin.getPlotsManager().getPlot(e.getLocation());
-
+						for (Entity entity : entities) {
+							Plot plot = plugin.getPlotsManager().getPlot(entity.getLocation());
+							
+							if (entity.getType() == EntityType.PLAYER)
+								continue;
+							
 							//supprime l'entité si en dehors d'un plot ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
-							if (p == null)
-								entitiesToRemove.add(e);
+							if (plot == null)
+								entitiesToRemove.add(entity);
 							else
-								if (entitiesPerPlot.keySet().contains(p))
-									if (entitiesPerPlot.get(p) >= maxEntitiesPerPlot)
-										entitiesToRemove.add(e);
-									else
-									entitiesPerPlot.put(p, entitiesPerPlot.get(p)+1);
+								if (entitiesPerPlot.keySet().contains(plot))
+									if (entitiesPerPlot.get(plot).containsKey(entity.getType())) {
+										entitiesPerPlot.get(plot).put(entity.getType(), entitiesPerPlot.get(plot).get(entity.getType()) + 1);
+										if (entitiesPerPlot.get(plot).get(entity.getType()) > maxEntitiesPerPlot)
+											entitiesToRemove.add(entity);
+									}else
+										entitiesPerPlot.get(plot).put(entity.getType(), 1);
 								else
-									entitiesPerPlot.put(p, 1);
+									entitiesPerPlot.put(plot, new HashMap<EntityType, Integer>());
 						}
 					}
 				});
 				asyncEntityCheckup.start();
 			}
-		}.runTaskTimer(plugin, 0, 60);
+		}.runTaskTimer(plugin, 0, 40);
 	}
 	
 	@EventHandler //n'autorise que les spawn à partir d'oeufs 
@@ -118,13 +123,16 @@ public class WorldEventsListener implements Listener{
 		if (plugin.getPlotsManager().getPlot(e.getLocation()) == null)
 			e.setCancelled(true);
 		
-		if (e.getSpawnReason() != SpawnReason.EGG && e.getSpawnReason() != SpawnReason.DISPENSE_EGG)
+		
+		if (e.getSpawnReason() != SpawnReason.EGG && e.getSpawnReason() != SpawnReason.DISPENSE_EGG && 
+				e.getSpawnReason() != SpawnReason.CUSTOM && e.getSpawnReason() != SpawnReason.ENDER_PEARL && 
+				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG)
 			e.setCancelled(true);
 	}
 
 	@EventHandler //cancel lava/water flow en dehors du plot. Cancel aussi toute téléportation d'un oeuf de dragon
 	public void onLiquidFlow(BlockFromToEvent e) {
-		if (e.getBlock() != null && e.getBlock().getType() == Material.DRAGON_EGG || e.getBlock().getType() == Material.WATER || e.getBlock().getType() == Material.LAVA) {
+		if (e.getBlock() != null && (e.getBlock().getType() == Material.DRAGON_EGG || e.getBlock().getType() == Material.WATER || e.getBlock().getType() == Material.LAVA)) {
 			e.setCancelled(true);
 			return;
 		}
@@ -188,12 +196,16 @@ public class WorldEventsListener implements Listener{
 		OlympaPlayer p = AccountProvider.get(e.getWhoClicked().getUniqueId());
 		
 		if (e.getCursor() != null)
-			if (!hasPlayerPermissionFor(p, e.getCursor().getType(), true))
+			if (!hasPlayerPermissionFor(p, e.getCursor().getType(), true)) {
 				e.setCancelled(true);
+				e.getCursor().setType(Material.STONE);
+			}
 		
 		if (e.getCurrentItem() != null)
-			if (!hasPlayerPermissionFor(p, e.getCurrentItem().getType(), true))
+			if (!hasPlayerPermissionFor(p, e.getCurrentItem().getType(), true)){
 				e.setCancelled(true);
+				e.getCursor().setType(Material.STONE);
+			}
 	}
 	
 	@EventHandler //cancel pickup item restreint
@@ -210,8 +222,21 @@ public class WorldEventsListener implements Listener{
 		if (e.getItem() == null)
 			return;
 		
-		if (!hasPlayerPermissionFor(AccountProvider.get(e.getPlayer().getUniqueId()), e.getItem().getType(), true))
+		if (!hasPlayerPermissionFor(AccountProvider.get(e.getPlayer().getUniqueId()), e.getItem().getType(), true)){
 			e.setCancelled(true);
+			e.getItem().setType(Material.STONE);
+		}
+	}
+
+	//true si le joueur a la permission d'utiliser l'objet désigné
+	public boolean hasPlayerPermissionFor(OlympaPlayer p, Material mat, boolean sendMessage) {
+		if (plugin.getWorldManager().getRestrictedItems().keySet().contains(mat))
+			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(mat))) {
+				if (sendMessage)
+					p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
+				return false;
+			}
+		return true;
 	}
 	
 	
@@ -240,24 +265,17 @@ public class WorldEventsListener implements Listener{
 				e.setCancelled(true);
 	}
 	
-	//true si le joueur a la permission d'utiliser l'objet désigné
-	public boolean hasPlayerPermissionFor(OlympaPlayer p, Material mat, boolean sendMessage) {
-		if (plugin.getWorldManager().getRestrictedItems().keySet().contains(mat))
-			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(mat))) {
-				if (sendMessage)
-					p.getPlayer().sendMessage(Message.INSUFFICENT_PERMISSION_NEW.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
-				return false;
-			}
-		return true;
-	}
-	
 	@EventHandler //ouvre le menu si joueur a sneak deux fois rapidement (délai : 0.2s)
 	public void onOpenMenu(PlayerToggleSneakEvent e) {
 		if (e.isSneaking())
 			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
-				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis())
-					new MainGui(plugin, e.getPlayer()).create(e.getPlayer());
-				else
+				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis()) {
+					Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+					if (plot == null)
+						new MainGui(plugin, e.getPlayer(), plot, "§9Menu").create(e.getPlayer());
+					else
+						new MainGui(plugin, e.getPlayer(), plot, "§9Menu >> " + plot.getId().getAsString()).create(e.getPlayer());	
+				}else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
 			else
 				sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
