@@ -109,7 +109,8 @@ public enum Message {
 	WE_ERR_SET_INVALID_BLOCKDATA, 
 	
 	OCO_COMMAND_HELP,
-	
+	OCO_BLOCK_GIVED,
+	OCO_UNKNOWN_MB,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();

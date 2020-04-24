@@ -7,21 +7,17 @@ import java.util.Map;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.WeatherType;
 import org.bukkit.block.Biome;
 
 public enum PlotParamType {
 
-	PLOT_TIME("plot_time", 6000),
 	
-	BANNED_PLAYERS("banned_players", new ArrayList<Long>()),
 	
 	SPAWN_LOC("spawn_location", null),
 	FORCE_SPAWN_LOC("force_spawn_location", false),
 	
-	LIST_ALLOWED_INTERRACTION("allowed_block_interraction", new ArrayList<Material>()),
-	
 	CLEAR_INCOMING_PLAYERS("clear_incoming_players", false),
-	GAMEMODE_INCOMING_PLAYERS("gamemode_incomings_players", GameMode.CREATIVE),
 	
 	ALLOW_FLY_INCOMING_PLAYERS("flymode_incomings_players", true),
 	ALLOW_SPLASH_POTIONS("allow_splash_potions", false),
@@ -30,6 +26,11 @@ public enum PlotParamType {
 	ALLOW_ENVIRONMENT_DAMAGE("allow_environment_damage", false),
 	
 	PLOT_BIOME("plot_biome", Biome.PLAINS),
+	PLOT_WEATHER("plot_weather", WeatherType.CLEAR),
+	GAMEMODE_INCOMING_PLAYERS("gamemode_incomings_players", GameMode.CREATIVE),
+	LIST_ALLOWED_INTERRACTION("allowed_block_interraction", new ArrayList<Material>()),
+	BANNED_PLAYERS("banned_players", new ArrayList<Long>()),
+	PLOT_TIME("plot_time", 6000),
 		
 	;
 	

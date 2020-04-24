@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -19,8 +20,11 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 
 public class OcoCommand extends OlympaCommand {
 
+	private OlympaCreatifMain plugin;
+	
 	public OcoCommand(OlympaCreatifMain plugin, String cmd, String[] aliases) {
 		super(plugin, cmd, aliases);
+		this.plugin = plugin;
 	}
 
 	@Override
@@ -40,6 +44,13 @@ public class OcoCommand extends OlympaCommand {
 				}
 				p.getPlayer().getInventory().setHelmet(new ItemStack(p.getPlayer().getInventory().getItemInMainHand().getType()));
 				break;
+			case "mb":
+				if (!p.hasPermission(PermissionsList.USE_MICRO_BLOCKS)) {
+					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_MICRO_BLOCKS.getGroup().getName(p.getGender())));
+					return false;
+				}
+				plugin.getPerksManager().getMicroBlocks().openGui(p.getPlayer());
+				break;
 			default:
 				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
 				break;
@@ -47,12 +58,25 @@ public class OcoCommand extends OlympaCommand {
 			break;
 		case 1:
 			switch(args[0]) {
+			case "mb":
+				if (!p.hasPermission(PermissionsList.USE_MICRO_BLOCKS)) {
+					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_MICRO_BLOCKS.getGroup().getName(p.getGender())));
+					return false;
+				}
+				ItemStack item = plugin.getPerksManager().getMicroBlocks().getMb(args[1]);
+				if (item != null) {
+					p.getPlayer().getInventory().addItem(item);
+					p.getPlayer().sendMessage(Message.OCO_BLOCK_GIVED.getValue());	
+				}else
+					p.getPlayer().sendMessage(Message.OCO_UNKNOWN_MB.getValue());
+				break;
 			case "skull":
 				if (!p.hasPermission(PermissionsList.USE_SKULL_COMMAND)) {
 					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_SKULL_COMMAND.getGroup().getName(p.getGender())));
 					return false;
 				}
 				p.getPlayer().getInventory().addItem(ItemUtils.skull("", args[1]));
+				p.getPlayer().sendMessage(Message.OCO_BLOCK_GIVED.getValue());
 				break;
 			default:
 				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
@@ -74,14 +98,18 @@ public class OcoCommand extends OlympaCommand {
 		if (args.length == 1) {
 			list.add("skull");
 			list.add("hat");
-			for (String s : list)
-				if (s.startsWith(args[0]))
-					response.add(s);
 		}
-		else
+		else if (args.length == 2 && args[0].equals("mb")) {
+			for (Entry<String, ItemStack> e : plugin.getPerksManager().getMicroBlocks().getAllMbs().entrySet())
+				list.add(e.getKey());
+		}else
 			for (Player p : Bukkit.getOnlinePlayers())
-				response.add(p.getName());
+				list.add(p.getName());
 
+		for (String s : list)
+			if (s.startsWith(args[args.length-1]))
+				response.add(s);
+		
 		return response;
 	}
 }

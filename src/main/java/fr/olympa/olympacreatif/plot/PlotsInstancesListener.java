@@ -8,6 +8,7 @@ import java.util.Map;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.WeatherType;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -177,6 +178,7 @@ public class PlotsInstancesListener implements Listener{
 			e.getPlayer().setAllowFlight(true);
 			//réinitialisation heure joueur
 			e.getPlayer().resetPlayerTime();
+			e.getPlayer().resetPlayerWeather();
 		}
 	}
 
@@ -229,6 +231,9 @@ public class PlotsInstancesListener implements Listener{
 		
 		//définition du flymode
 		p.setAllowFlight((boolean) plotTo.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
+		
+		//définition de la météo
+		p.setPlayerWeather((WeatherType) plotTo.getParameters().getParameter(PlotParamType.PLOT_WEATHER));
 	}
 	
 	
@@ -252,6 +257,7 @@ public class PlotsInstancesListener implements Listener{
 		e.getPlayer().setAllowFlight(true);
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 		e.getPlayer().resetPlayerTime();
+		e.getPlayer().resetPlayerWeather();
 	}
 
 	@EventHandler //gestion autorisation pvp

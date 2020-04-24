@@ -47,6 +47,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 
+import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -185,6 +186,24 @@ public class WorldEventsListener implements Listener{
 					e.getEntity().remove();
 			}
 		}.runTaskLater(plugin, 100);
+	}
+	
+	//Gestion renommage en couleur des items
+	@EventHandler
+	public void onItemRename(InventoryClickEvent e) {
+		if (!(e.getWhoClicked() instanceof Player))
+			return;
+		
+		if (e.getClickedInventory() == null)
+			return;
+		
+		if (e.getCurrentItem() == null)
+			return;
+		
+		if (!AccountProvider.get(e.getWhoClicked().getUniqueId()).hasPermission(PermissionsList.USE_COLORED_TEXT))
+			return;
+		
+		e.setCurrentItem(ItemUtils.name(e.getCurrentItem(), ChatColor.translateAlternateColorCodes('&',	e.getCurrentItem().getItemMeta().getDisplayName())));
 	}
 	
 	//Gestion des items restreints

@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.WeatherType;
 import org.bukkit.block.Biome;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -33,7 +34,9 @@ public class PlotParametersGui extends OlympaGUI {
 	private Biome newBiome;
 	private String[] clickToChange = null;
 	
-	@SuppressWarnings("deprecation")
+	private String clearWeather = "§eMétéo actuelle : ensoleillée";
+	private String rainyWeather = "§eMétéo actuelle : pluvieuse";
+	
 	public PlotParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
 		super("§6Paramètres du plot : " + plot.getId().getAsString(), 2);
 		this.plugin = plugin;
@@ -51,7 +54,6 @@ public class PlotParametersGui extends OlympaGUI {
 		
 		//ajout des options
 		ItemStack it = null;
-		ItemMeta im = null;
 		
 		//0 : Gamemode par défaut
 		it = ItemUtils.item(Material.ACACIA_SIGN, "§6Gamemode par défaut", "§eMode actuel : " + plot.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS).toString());
@@ -134,6 +136,16 @@ public class PlotParametersGui extends OlympaGUI {
 
 		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(9,it);
+
+		//10 : Définir la météo
+		it = ItemUtils.item(Material.SUNFLOWER, "§6Météo de la parcelle");
+		if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR)
+			it = ItemUtils.lore(it, clearWeather);
+		else
+			it = ItemUtils.lore(it, rainyWeather);
+		
+		it = ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(10,it);
 	}
 
 	@Override
@@ -221,6 +233,17 @@ public class PlotParametersGui extends OlympaGUI {
 			current = setSwitchState(current, !getSwitchState(current));
 			plot.getParameters().setParameter(PlotParamType.ALLOW_ENVIRONMENT_DAMAGE, getSwitchState(current));
 			break;
+		case 10:
+			if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR) {
+				plot.getParameters().setParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS, WeatherType.DOWNFALL);
+				current = ItemUtils.lore(current, rainyWeather);	
+			}
+			else {
+				plot.getParameters().setParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS, WeatherType.CLEAR);
+				current = ItemUtils.lore(current, clearWeather);	
+			}
+			current = ItemUtils.loreAdd(current, clickToChange);
+			break;
 		}
 		
 		return true;
@@ -265,7 +288,7 @@ public class PlotParametersGui extends OlympaGUI {
 		if (list.size() >= 2)
 			list.remove(1);
 		
-		return ItemUtils.lore(it,  list.toArray(new String[list.size()]));
+		return ItemUtils.lore(it, list.toArray(new String[list.size()]));
 	}
 	
 	public boolean getSwitchState(ItemStack it) {
