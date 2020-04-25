@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
+import fr.olympa.api.item.OlympaItemBuild;
 import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
@@ -110,5 +110,12 @@ public class PlotMembers{
 			
 			return VISITOR;
 		}
+	}
+
+	public OlympaPlayerInformations getOwner() {
+		for (Entry<OlympaPlayerInformations, PlotRank> e : members.entrySet())
+			if (e.getValue() == PlotRank.OWNER)
+				return e.getKey();
+		return null;
 	}
 }

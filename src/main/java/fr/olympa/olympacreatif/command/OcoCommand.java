@@ -51,6 +51,9 @@ public class OcoCommand extends OlympaCommand {
 				}
 				plugin.getPerksManager().getMicroBlocks().openGui(p.getPlayer());
 				break;
+			case "export":
+				plugin.getPerksManager().getSchematicCreator().export(plugin.getPlotsManager().createPlot(p.getPlayer()));
+				break;
 			default:
 				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
 				break;
