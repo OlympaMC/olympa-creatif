@@ -55,12 +55,17 @@ public class OcCommand extends OlympaCommand {
 				if (!(sender instanceof Player))
 					break;
 				//teste si le joueur a encore des plots dispo
-				if (plugin.getPlotsManager().getAvailablePlotSlotsLeft(p) > 0) {
-					Plot plot = plugin.getPlotsManager().createPlot(p);
-					(p).teleport(plot.getId().getLocation());
-					sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue());	
+				if (plugin.getPlotsManager().getAvailablePlotSlotsLeftOwner(p) > 0) {
+					if (plugin.getPlotsManager().getAvailablePlotSlotsLeftTotal(p) > 0) {
+						
+						Plot plot = plugin.getPlotsManager().createPlot(p);
+						p.teleport(plot.getId().getLocation());
+						sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue());	
+						
+					}else
+						sender.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
 				}else
-					sender.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
+					sender.sendMessage(Message.MAX_PLOT_COUNT_OWNER_REACHED.getValue());
 				break;
 			case "menu":
 				if (sender instanceof Player) {
@@ -69,16 +74,17 @@ public class OcCommand extends OlympaCommand {
 						new MainGui(plugin, p, plot, "§9Menu").create(p);
 					else
 						new MainGui(plugin, p, plot, "§9Menu >> " + plot.getId().getAsString()).create(p);
-					
 				}
-					
-				else
-					sender.sendMessage(Message.COMMAND_HELP.getValue());
 				break;
 			case "accept":
 				if (pendingInvitations.containsKey(sender)) {
-					sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue());
-					pendingInvitations.get(sender).getMembers().set(p, PlotRank.MEMBER);
+					if (plugin.getPlotsManager().getAvailablePlotSlotsLeftTotal(p) > 0) {
+						sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue());
+						pendingInvitations.get(sender).getMembers().set(p, PlotRank.MEMBER);
+						pendingInvitations.remove(sender);
+					}else {
+						sender.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
+					}
 				}else
 					sender.sendMessage(Message.PLOT_NO_PENDING_INVITATION.getValue());
 				break;

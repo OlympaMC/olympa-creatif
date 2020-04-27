@@ -116,7 +116,9 @@ public enum Message {
 	OCO_EXPORT_FAILED, 
 	OCO_HAT_SUCCESS, 
 	
-	PARAM_MAX_TOTAL_ENTITIES_PER_PLOT,
+	PARAM_MAX_TOTAL_ENTITIES_PER_PLOT, 
+	
+	MAX_PLOT_COUNT_OWNER_REACHED,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();
@@ -132,7 +134,7 @@ public enum Message {
 		messagesList.put(PARAM_PLOT_X_SIZE, "10");
 		messagesList.put(PARAM_PLOT_Z_SIZE, "15");
 		messagesList.put(PARAM_ROAD_SIZE, "6");
-		messagesList.put(PARAM_PREFIX, "[prefix] ");
+		messagesList.put(PARAM_PREFIX, "[A SUPPRIMER : Message.PARAM_PREFIX] ");
 		messagesList.put(PARAM_WORLDEDIT_BPS, "1000");
 		messagesList.put(PARAM_WORLD_LEVEL, "60");
 		messagesList.put(PARAM_WORLD_NAME, "CREATIF");

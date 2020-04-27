@@ -62,7 +62,7 @@ public class MainGui extends OlympaGUI {
 		inv.setItem(12, ItemUtils.skull("§6Profil de " + player.getDisplayName(), player.getName(), 
 				"§eGrade : " + p.getGroupNameColored(), " ", 
 				"§eParcelles totales : " + totalPlayerPlots + "/36", 
-				"§eParcelles propriétaire : " + totalPlayerOwnedPlots + "/" + totalPlayerOwnedPlots + plugin.getPlotsManager().getAvailablePlotSlotsLeft(player)));
+				"§eParcelles propriétaire : " + totalPlayerOwnedPlots + "/" + (totalPlayerOwnedPlots + plugin.getPlotsManager().getAvailablePlotSlotsLeftOwner(player))));
 
 		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes plots", clickToOpenMenu));
 		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", "§eVotre monnaie : TODO", clickToOpenMenu));

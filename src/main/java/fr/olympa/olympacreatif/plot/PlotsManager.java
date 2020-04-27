@@ -164,7 +164,7 @@ public class PlotsManager {
 		bonusPlots.put(p, i);
 	}
 	
-	public int getAvailablePlotSlotsLeft(Player p) {
+	public int getAvailablePlotSlotsLeftOwner(Player p) {
 		OlympaPlayer pp = AccountProvider.get(p.getUniqueId());
 		//modificator : plots bonus - plots possédés
 		int modificator = 0;
@@ -187,5 +187,18 @@ public class PlotsManager {
 			return 3 + modificator;
 		
 		return 1 + modificator;
+	}
+	
+	public int getAvailablePlotSlotsLeftTotal(Player p) {
+		
+		//36 : équivalent à 4 lignes d'inventaire
+		int totalPlayerPlotsLeft = 36;
+		OlympaPlayer pp = AccountProvider.get(p.getUniqueId());
+		//comptage du nombre de plots du joueur
+		for (Plot plot2 : plugin.getPlotsManager().getPlots())
+			if (plot2.getMembers().getPlayerRank(pp.getInformation()) != PlotRank.VISITOR)
+				totalPlayerPlotsLeft--;
+		
+		return totalPlayerPlotsLeft;
 	}
 }
