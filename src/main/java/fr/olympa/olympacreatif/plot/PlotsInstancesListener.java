@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -279,5 +280,20 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (!(boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_ENVIRONMENT_DAMAGE))
 			e.setCancelled(true);			
+	}
+	
+	@EventHandler //empêche le placement de liquides en dehors du plot
+	public void onPlaceLiquid(PlayerInteractEvent e){
+		if (e.getClickedBlock() == null)
+			return;
+		
+		plot = plugin.getPlotsManager().getPlot(e.getClickedBlock().getLocation());
+		if (plot == null) {
+			e.setUseItemInHand(Result.DENY);
+		}else {
+			if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR)
+				e.setUseItemInHand(Result.DENY);	
+		}
+		
 	}
 }

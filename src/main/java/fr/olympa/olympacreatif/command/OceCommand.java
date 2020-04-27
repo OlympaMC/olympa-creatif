@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,16 +31,17 @@ public class OceCommand extends OlympaCommand{
 		if (!(sender instanceof Player))
 			return false;
 		Player p = (Player) sender;
-
+		
 		if (!plugin.getPlotsManager().isPlayerLoaded(p)) {
 			p.sendMessage("§4Chargement des données en cours, commande annulée...");
 			return false;	
 		}
 		
+		/*
 		if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.USE_WORLD_EDIT)) {
 			p.sendMessage(Message.WE_INSUFFICIENT_PERMISSION.getValue());
 			return false;
-		}
+		}*/
 		
 		WorldEditError err = null;
 		
@@ -52,24 +54,28 @@ public class OceCommand extends OlympaCommand{
 					p.sendMessage(Message.WE_CMD_COPY_SUCCESS.getValue());
 				else
 					p.sendMessage(err.getErrorMessage().getValue());
+				break;
 			case "paste":
 				err = plugin.getWorldEditManager().getPlayerInstance(p).pasteSelection();
 				if (err == WorldEditError.NO_ERROR)
 					p.sendMessage(Message.WE_CMD_PASTE_SUCCESS.getValue());
 				else
 					p.sendMessage(err.getErrorMessage().getValue());
+				break;
 			case "undo":
 				err = plugin.getWorldEditManager().getPlayerInstance(p).executeUndo();
 				if (err == WorldEditError.NO_ERROR)
 					p.sendMessage(Message.WE_UNDO_SUCCESS.getValue());
 				else
 					p.sendMessage(err.getErrorMessage().getValue());
+				break;
 			case "cut":
 				err = plugin.getWorldEditManager().getPlayerInstance(p).cutBlocks();
 				if (err == WorldEditError.NO_ERROR)
 					p.sendMessage(Message.WE_CUT_SUCCESS.getValue());
 				else
 					p.sendMessage(err.getErrorMessage().getValue());
+				break;
 			default:
 				sender.sendMessage(Message.WE_CMD_HELP.getValue());
 				break;
@@ -97,6 +103,7 @@ public class OceCommand extends OlympaCommand{
 					p.sendMessage(Message.WE_CMD_MIROR_SUCCESS.getValue());
 				else
 					p.sendMessage(err.getErrorMessage().getValue());
+				break;
 			default:
 				sender.sendMessage(Message.WE_CMD_HELP.getValue());
 				break;
@@ -127,7 +134,9 @@ public class OceCommand extends OlympaCommand{
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
 		List<String> list = new ArrayList<String>();
 		List<String> response = new ArrayList<String>();
-		if (args.length == 1) {
+
+		switch (args.length) {
+		case 1:
 			list.add("copy");
 			list.add("paste");
 			list.add("miror");
@@ -135,12 +144,41 @@ public class OceCommand extends OlympaCommand{
 			list.add("undo");
 			list.add("cut");
 			list.add("set");
-			for (String s : list)
-				if (s.startsWith(args[0]))
-					response.add(s);
-			return response;
+			break;
+		case 2:
+			switch (args[0]) {
+			case "rotate":
+				list.add("90");
+				list.add("180");
+				list.add("270");
+				break;
+			case "miror":
+				list.add("X");
+				list.add("Y");
+				list.add("Z");
+				break;
+			case "set":
+				for (Material mat : Material.values())
+					list.add(mat.toString().toLowerCase().replace("minecraft:", ""));
+				break;
+			}
+			break;
+		case 3:
+			switch (args[0]) {
+			case "rotate":
+				list.add("X");
+				list.add("Y");
+				list.add("Z");
+				break;
+			}
+			break;
 		}
-		return null;
+		
+		for (String s : list)
+			if (s.startsWith(args[args.length-1]))
+				response.add(s);
+		
+		return response;
 	}
 
 	

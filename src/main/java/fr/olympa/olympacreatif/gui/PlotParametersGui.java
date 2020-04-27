@@ -235,11 +235,11 @@ public class PlotParametersGui extends OlympaGUI {
 			break;
 		case 10:
 			if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR) {
-				plot.getParameters().setParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS, WeatherType.DOWNFALL);
+				plot.getParameters().setParameter(PlotParamType.PLOT_WEATHER, WeatherType.DOWNFALL);
 				current = ItemUtils.lore(current, rainyWeather);	
 			}
 			else {
-				plot.getParameters().setParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS, WeatherType.CLEAR);
+				plot.getParameters().setParameter(PlotParamType.PLOT_WEATHER, WeatherType.CLEAR);
 				current = ItemUtils.lore(current, clearWeather);	
 			}
 			current = ItemUtils.loreAdd(current, clickToChange);

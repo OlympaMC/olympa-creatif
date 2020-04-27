@@ -11,6 +11,8 @@ import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
+
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
@@ -19,6 +21,7 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 public class WorldManager {
 
 	private World world = null;
+	private net.minecraft.server.v1_15_R1.World nmsWorld = null;
 	
 	//TODO remplir la liste
 	private Map<Material, OlympaPermission> restrictedItems = new HashMap<Material, OlympaPermission>();
@@ -30,8 +33,10 @@ public class WorldManager {
 		
 		//chargement du monde s'il existe
 		for (World w : Bukkit.getWorlds())
-			if (w.getName().equals(Message.PARAM_WORLD_NAME.getValue()))
+			if (w.getName().equals(Message.PARAM_WORLD_NAME.getValue())) {
 				world = w;
+				nmsWorld = ((CraftWorld) w).getHandle();
+			}
 		
 		
 		//création du monde s'il n'existe pas
@@ -61,6 +66,10 @@ public class WorldManager {
 
 	public World getWorld() {
 		return world;
+	}
+	
+	public net.minecraft.server.v1_15_R1.World getNmsWorld(){
+		return nmsWorld;
 	}
 	
 	public Map<Material, OlympaPermission> getRestrictedItems(){

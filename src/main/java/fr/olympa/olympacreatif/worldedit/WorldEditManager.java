@@ -15,6 +15,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.TileEntity;
 
 public class WorldEditManager {
 
@@ -22,7 +25,7 @@ public class WorldEditManager {
 	private Map<Player, WorldEditInstance> playersWorldEdit = new HashMap<Player, WorldEditInstance>();
 	
 	//liste d'entrées comprenant : un joueur et une liste d'entrées de blocks à placer
-	private List<SimpleEntry<Player, List<SimpleEntry<Location, BlockData>>>> blocksToBuild = new ArrayList<AbstractMap.SimpleEntry<Player,List<SimpleEntry<Location,BlockData>>>>();
+	private List<SimpleEntry<Player, List<SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>>>> blocksToBuild = new ArrayList<SimpleEntry<Player,List<SimpleEntry<Location,SimpleEntry<BlockData,TileEntity>>>>>();
 	
 	public WorldEditManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -33,7 +36,7 @@ public class WorldEditManager {
 		new BukkitRunnable() {
 			
 			Player p = null;
-			List<SimpleEntry<Location, BlockData>> toPlace = new ArrayList<AbstractMap.SimpleEntry<Location,BlockData>>();
+			List<SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>> toPlace = new ArrayList<AbstractMap.SimpleEntry<Location,SimpleEntry<BlockData,TileEntity>>>();
 
 			//variables permettant de déterminer le nombre de blocks à placer par seconde
 			long oldTime = System.currentTimeMillis()-1;
@@ -56,7 +59,25 @@ public class WorldEditManager {
 				//place des blocs si tps>18.5 (proportion de blocs placés dépendant du tps)				 
 				while (i < bps && toPlace.size() > 0) {
 					plugin.getWorldManager().getWorld().loadChunk(toPlace.get(0).getKey().getChunk());
-					toPlace.get(0).getKey().getBlock().setBlockData(toPlace.get(0).getValue());
+					
+					//place le blockdata et le tileentity, si elle existe
+					toPlace.get(0).getKey().getBlock().setBlockData(toPlace.get(0).getValue().getKey());
+					
+					if (toPlace.get(0).getValue().getValue() != null) {
+						NBTTagCompound tag = new NBTTagCompound();
+						
+						toPlace.get(0).getValue().getValue().save(tag);
+
+						tag.setInt("x", toPlace.get(0).getKey().getBlockX());
+						tag.setInt("y", toPlace.get(0).getKey().getBlockY());
+						tag.setInt("z", toPlace.get(0).getKey().getBlockZ());
+						
+						plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(toPlace.get(0).getKey().getBlockX(), toPlace.get(0).getKey().getBlockY(), toPlace.get(0).getKey().getBlockZ())).load(tag);
+						//plugin.getWorldManager().getNmsWorld().setTileEntity(new BlockPosition(toPlace.get(0).getKey().getBlockX(), 
+							//	toPlace.get(0).getKey().getBlockY(), toPlace.get(0).getKey().getBlockZ()), toPlace.get(0).getValue().getValue());
+					}
+					
+					//supprime le bloc une fois placé
 					toPlace.remove(0);
 					
 					//MAJ liste des blocs en attente et envoi du message de fin au joueur
@@ -94,7 +115,7 @@ public class WorldEditManager {
 	}
 	
 	public boolean hasPlayerPendingPastes(Player p) {
-		for (SimpleEntry<Player, List<SimpleEntry<Location, BlockData>>> e : blocksToBuild) {
+		for (SimpleEntry<Player, List<SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>>> e : blocksToBuild) {
 			if (e.getKey().equals(p)) {
 				p.sendMessage(Message.WE_ANOTHER_ACTION_ALREADY_QUEUED.getValue());
 				return true;
@@ -104,9 +125,9 @@ public class WorldEditManager {
 	}
 	
 	//renvoie vrai si le les blocs ont bien été ajoutés à la liste, false si le joueur avait déjà trop de travail en attente
-	public WorldEditError addToBuildingList(Player p, List<SimpleEntry<Location, BlockData>> blocks) {
+	public WorldEditError addToBuildingList(Player p, List<SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>> toBuild) {
 		int queued = 0;
-		for (SimpleEntry<Player, List<SimpleEntry<Location, BlockData>>> e : blocksToBuild)
+		for (SimpleEntry<Player, List<SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>>> e : blocksToBuild)
 			if (e.getKey().equals(p))
 				queued++;
 		
@@ -114,10 +135,10 @@ public class WorldEditManager {
 			return WorldEditError.ERR_TOO_MANY_ACTIONS_QUEUED;
 		}
 		
-		if (blocks.size() == 0)
+		if (toBuild.size() == 0)
 			return WorldEditError.NO_ERROR;
 		
-		blocksToBuild.add(new SimpleEntry<Player, List<SimpleEntry<Location,BlockData>>>(p, blocks));	
+		blocksToBuild.add(new SimpleEntry<Player, List<SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>>>(p, toBuild));	
 		return WorldEditError.NO_ERROR;
 	}
 	
@@ -132,7 +153,7 @@ public class WorldEditManager {
 		ERR_OPERATION_TOO_BIG(Message.WE_ERR_SELECTION_TOO_BIG),
 		ERR_UNDO_LIST_EMPTY(Message.WE_NO_UNDO_AVAILABLE),
 		ERR_TOO_MANY_ACTIONS_QUEUED(Message.WE_TOO_MANY_ACTIONS),
-		ERR_PASTE_NULL_CLIPBOARD(Message.WE_ERR_NULL_CLIPBOARD),
+		ERR_PASTE_NULL_BLOCK_LIST(Message.WE_ERR_NULL_CLIPBOARD),
 		ERR_PASTE_PART_ON_NULL_TARGET(Message.WE_ERR_PASTE_PART_ON_NULL_TARGET),
 		ERR_PASTE_NOT_OWNER_OF_2_PLOTS(Message.WE_ERR_NOT_OWNER_OF_2_PLOTS),
 		ERR_NULL_PLAN(Message.WE_ERR_NULL_PLAN),

@@ -1,10 +1,14 @@
 package fr.olympa.olympacreatif.plot;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
+import fr.olympa.api.groups.OlympaGroup;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class PlotsManagerListener implements Listener {
@@ -22,8 +26,8 @@ public class PlotsManagerListener implements Listener {
 	}
 	
 	@EventHandler 
-	public void onJoinEvent(OlympaPlayerLoadEvent e) {
-		plugin.getPlotsManager().loadPlotsFor(e.getOlympaPlayer());
+	public void onJoinEvent(PlayerJoinEvent e) {
+		plugin.getPlotsManager().loadPlotsFor(AccountProvider.get(e.getPlayer().getUniqueId()));
 	}
 	
 	@EventHandler 

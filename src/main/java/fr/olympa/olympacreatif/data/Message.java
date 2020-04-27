@@ -42,7 +42,7 @@ public enum Message {
 	WE_ACTION_QUEUED,
 	WE_ANOTHER_ACTION_ALREADY_QUEUED,
 
-	PARAM_MAX_ENTITIES_PER_PLOT,
+	PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT,
 	PARAM_WORLDEDIT_BPS,
 	PARAM_WORLD_NAME,
 	PARAM_WORLD_LEVEL,
@@ -110,7 +110,13 @@ public enum Message {
 	
 	OCO_COMMAND_HELP,
 	OCO_BLOCK_GIVED,
-	OCO_UNKNOWN_MB,
+	OCO_UNKNOWN_MB, 
+	
+	OCO_EXPORT_SUCCESS, 
+	OCO_EXPORT_FAILED, 
+	OCO_HAT_SUCCESS, 
+	
+	PARAM_MAX_TOTAL_ENTITIES_PER_PLOT,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();
@@ -132,7 +138,8 @@ public enum Message {
 		messagesList.put(PARAM_WORLD_NAME, "CREATIF");
 		messagesList.put(PARAM_WE_MAX_BLOCKS_PER_CMD, "10000");
 		messagesList.put(PARAM_WE_MAX_QUEUED_ACTIONS_PER_PLAYER, "4");
-		messagesList.put(PARAM_MAX_ENTITIES_PER_PLOT, "100");
+		messagesList.put(PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT, "5");
+		messagesList.put(PARAM_MAX_TOTAL_ENTITIES_PER_PLOT, "10");
 	}
 	
 	public void setValue(Object s) {

@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.world;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -69,8 +70,18 @@ public class WorldEventsListener implements Listener{
 		//gestion des entités (remove si plot null ou si nb par plot > 100)
 		new BukkitRunnable() {
 			
+			
 			Thread asyncEntityCheckup = null;
-			int maxEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_PLOT.getValue());
+			int maxEntitiesPerTypePerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue());
+			int maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
+			
+			private int getTotalEntities(Map<EntityType, Integer> map) {
+				int i = 0;
+				for (Entry<EntityType, Integer> e : map.entrySet())
+					i += e.getValue();
+					
+				return i;
+			}
 			
 			@Override
 			public void run() {
@@ -92,7 +103,13 @@ public class WorldEventsListener implements Listener{
 					
 					@Override
 					public void run() {
-						for (Entity entity : entities) {
+						ListIterator<Entity> iterator = entities.listIterator(entities.size());
+						Entity entity = null;
+						
+						//parcours de la liste en sens inverse pour supprimer les plus anciennes entités
+						while (iterator.hasPrevious()) {
+							entity = iterator.previous();
+							
 							Plot plot = plugin.getPlotsManager().getPlot(entity.getLocation());
 							
 							if (entity.getType() == EntityType.PLAYER)
@@ -101,11 +118,14 @@ public class WorldEventsListener implements Listener{
 							//supprime l'entité si en dehors d'un plot ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
 							if (plot == null)
 								entitiesToRemove.add(entity);
-							else
+							else //si le plot n'existe pas, on le crée
 								if (entitiesPerPlot.keySet().contains(plot))
+									//si l'entité n'est pas référencée, on le fait
 									if (entitiesPerPlot.get(plot).containsKey(entity.getType())) {
 										entitiesPerPlot.get(plot).put(entity.getType(), entitiesPerPlot.get(plot).get(entity.getType()) + 1);
-										if (entitiesPerPlot.get(plot).get(entity.getType()) > maxEntitiesPerPlot)
+										//si le nb d'entités pour ce type ou si le nb total d'entités est dépassé, on la supprime
+										if (entitiesPerPlot.get(plot).get(entity.getType()) >= maxEntitiesPerTypePerPlot 
+												|| getTotalEntities(entitiesPerPlot.get(plot)) >= maxTotalEntitiesPerPlot)
 											entitiesToRemove.add(entity);
 									}else
 										entitiesPerPlot.get(plot).put(entity.getType(), 1);
@@ -207,6 +227,7 @@ public class WorldEventsListener implements Listener{
 	}
 	
 	//Gestion des items restreints
+	/*
 	@EventHandler //test dans inventaires
 	public void onLimitedItemInventory(InventoryClickEvent e) {
 		if (!(e.getWhoClicked() instanceof Player))
@@ -226,6 +247,7 @@ public class WorldEventsListener implements Listener{
 				e.getCursor().setType(Material.STONE);
 			}
 	}
+	*/
 	
 	@EventHandler //cancel pickup item restreint
 	public void onPickup(EntityPickupItemEvent e) {

@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.worldedit;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,64 +12,66 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 
+import net.minecraft.server.v1_15_R1.TileEntity;
+
 public abstract class ClipboardEdition {
 
-	public static Map<Location, BlockData> rotateSelection(Map<Location, BlockData> clipboard, int rotX, int rotY, int rotZ) {
+	public static Map<Location, SimpleEntry<BlockData, TileEntity>> rotateSelection(Map<Location, SimpleEntry<BlockData, TileEntity>> clipboard, int rotX, int rotY, int rotZ) {
 		rotX = rotX % 360;
 		rotY = rotY % 360;
 		rotZ = rotZ % 360;
 
-		Map<Location, BlockData> newClipboard = new HashMap<Location, BlockData>();
+		Map<Location, SimpleEntry<BlockData, TileEntity>> newClipboard = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 
 		//rotation sur Y
 		for (int i = 1 ; i <= (int) (rotY+1)/90 ; i++) {
 			newClipboard.clear();
-			for (Entry<Location, BlockData> entry : clipboard.entrySet()) {
+			for (Entry<Location, SimpleEntry<BlockData, TileEntity>> entry : clipboard.entrySet()) {
 				
 				//détermination de la nouvelle position relative du bloc
-				double newX = entry.getKey().getZ();
-				double newZ = - entry.getKey().getX();
+				double newX = - entry.getKey().getZ();
+				double newZ = entry.getKey().getX();
 				
-				BlockData data = entry.getValue().clone();
+				BlockData data = entry.getValue().getKey().clone();
 				rotateOnY(data);
 				
-				newClipboard.put(new Location(entry.getKey().getWorld(), newX, entry.getKey().getY(), newZ), data);
+				newClipboard.put(new Location(entry.getKey().getWorld(), newX, entry.getKey().getY(), newZ), new SimpleEntry<BlockData, TileEntity>(data, entry.getValue().getValue()));
 			}
-			clipboard = new HashMap<Location, BlockData>(newClipboard);
+			clipboard = new HashMap<Location, SimpleEntry<BlockData, TileEntity>> (newClipboard);
 		}
 		
 		//rotation sur X
 		for (int i = 1 ; i <= (int) (rotX+1)/90 ; i++) {
 			newClipboard.clear();
-			for ( Entry<Location, BlockData> entry : clipboard.entrySet()) {
+			for (Entry<Location, SimpleEntry<BlockData, TileEntity>> entry : clipboard.entrySet()) {
 				
 				//détermination de la nouvelle position relative du bloc
-				double newZ = entry.getKey().getY();
-				double newY = - entry.getKey().getZ();
-				
-				BlockData data = entry.getValue().clone();
+				double newZ = - entry.getKey().getY();
+				double newY = entry.getKey().getZ();
+
+				BlockData data = entry.getValue().getKey().clone();
 				rotateOnX(data);
 				
-				newClipboard.put(new Location(entry.getKey().getWorld(), entry.getKey().getX(), newY, newZ), data);
+				newClipboard.put(new Location(entry.getKey().getWorld(), entry.getKey().getX(), newY, newZ), new SimpleEntry<BlockData, TileEntity>(data, entry.getValue().getValue()));
 			}
-			clipboard = new HashMap<Location, BlockData>(newClipboard);
+			clipboard = new HashMap<Location, SimpleEntry<BlockData, TileEntity>> (newClipboard);
 		}
 		
 		//rotation sur Z
 		for (int i = 1 ; i <= (int) (rotZ+1)/90 ; i++) {
 			newClipboard.clear();
-			for ( Entry<Location, BlockData> entry : clipboard.entrySet()) {
+			for (Entry<Location, SimpleEntry<BlockData, TileEntity>> entry : clipboard.entrySet()) {
 				
 				//détermination de la nouvelle position relative du bloc
-				double newY = entry.getKey().getX();
-				double newX = - entry.getKey().getY();
-				
-				BlockData data = entry.getValue().clone();
+				double newY = - entry.getKey().getX();
+				double newX = entry.getKey().getY();
+
+				BlockData data = entry.getValue().getKey().clone();
 				rotateOnZ(data);
 				
-				newClipboard.put(new Location(entry.getKey().getWorld(), newX, newY, entry.getKey().getZ()), data);
+				newClipboard.put(new Location(entry.getKey().getWorld(), newX, newY, entry.getKey().getZ()), new SimpleEntry<BlockData, TileEntity>(data, entry.getValue().getValue()));
 			}
-			clipboard = new HashMap<Location, BlockData>(newClipboard);
+			clipboard = new HashMap<Location, SimpleEntry<BlockData, TileEntity>> (newClipboard);
 		}
 		return newClipboard;
 	}
@@ -206,11 +209,11 @@ public abstract class ClipboardEdition {
 		}
 	}
 	
-	public static Map<Location, BlockData> symmetrySelection(Map<Location, BlockData> clipboard, SymmetryPlan plan) {
-		Map<Location, BlockData> newClipboard = new HashMap<Location, BlockData>();
+	public static Map<Location, SimpleEntry<BlockData, TileEntity>> symmetrySelection(Map<Location, SimpleEntry<BlockData, TileEntity>> clipboard, SymmetryPlan plan) {
+		Map<Location, SimpleEntry<BlockData, TileEntity>> newClipboard = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 
-			for (Entry<Location, BlockData> entry : clipboard.entrySet()) {
-				BlockData data = entry.getValue();
+			for (Entry<Location, SimpleEntry<BlockData, TileEntity>> entry : clipboard.entrySet()) {
+				BlockData data = entry.getValue().getKey();
 				
 				//changement de l'orientation du bloc
 				if (data instanceof Directional)
@@ -220,13 +223,13 @@ public abstract class ClipboardEdition {
 				//changement de la localisation du bloc dans le clipboard selon l'axe choisi
 				switch(plan) {
 				case AXE_X:
-					newClipboard.put(new Location(entry.getKey().getWorld(), -entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ()), data);
+					newClipboard.put(new Location(entry.getKey().getWorld(), -entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ()), new SimpleEntry<BlockData, TileEntity>(data, entry.getValue().getValue()));
 					break;
 				case AXE_Y:
-					newClipboard.put(new Location(entry.getKey().getWorld(), entry.getKey().getX(), -entry.getKey().getY(), entry.getKey().getZ()), data);
+					newClipboard.put(new Location(entry.getKey().getWorld(), entry.getKey().getX(), -entry.getKey().getY(), entry.getKey().getZ()), new SimpleEntry<BlockData, TileEntity>(data, entry.getValue().getValue()));
 					break;
 				case AXE_Z:
-					newClipboard.put(new Location(entry.getKey().getWorld(), entry.getKey().getX(), entry.getKey().getY(), -entry.getKey().getZ()), data);
+					newClipboard.put(new Location(entry.getKey().getWorld(), entry.getKey().getX(), entry.getKey().getY(), -entry.getKey().getZ()), new SimpleEntry<BlockData, TileEntity>(data, entry.getValue().getValue()));
 					break;
 				default:
 					break;

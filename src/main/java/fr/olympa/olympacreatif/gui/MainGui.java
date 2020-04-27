@@ -24,11 +24,7 @@ public class MainGui extends OlympaGUI {
 	private OlympaPlayer p;
 	private Plot plot;
 	public MainGui(OlympaCreatifMain plugin, Player player, Plot plot, String inventoryName) {
-		super(inventoryName, 6
-				
-				
-				
-				);
+		super(inventoryName, 6);
 
 		if (!plugin.getPlotsManager().isPlayerLoaded(player))
 			return;
@@ -51,19 +47,19 @@ public class MainGui extends OlympaGUI {
 		
 		//création de l'interface Olympa
 		for (int i = 0 ; i < 9*6 ; i++) {
-			if ((i+1)%9 >= 2 && (i+1)%9 <= 6)
-				inv.setItem(i, ItemUtils.item(Material.YELLOW_STAINED_GLASS_PANE, " "));
+			if ((i+1)%9 >= 3 && (i+1)%9 <= 7)
+				inv.setItem(i, ItemUtils.item(Material.ORANGE_STAINED_GLASS_PANE, " "));
 			else
 				inv.setItem(i, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		}
 		inv.setItem(2, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		inv.setItem(6, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
-		inv.setItem(37, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
-		inv.setItem(41, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
+		inv.setItem(38, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
+		inv.setItem(42, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		
 		
 		//génération de l'interface
-		inv.setItem(12, ItemUtils.skull(player.getDisplayName(), player.getName(), 
+		inv.setItem(12, ItemUtils.skull("§6Profil de " + player.getDisplayName(), player.getName(), 
 				"§eGrade : " + p.getGroupNameColored(), " ", 
 				"§eParcelles totales : " + totalPlayerPlots + "/36", 
 				"§eParcelles propriétaire : " + totalPlayerOwnedPlots + "/" + totalPlayerOwnedPlots + plugin.getPlotsManager().getAvailablePlotSlotsLeft(player)));

@@ -22,6 +22,8 @@ import fr.olympa.olympacreatif.worldedit.*;
 import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
 import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
 import io.netty.util.internal.StringUtil;
+import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.TileEntity;
 
 public class WorldEditInstance {
 
@@ -30,7 +32,7 @@ public class WorldEditInstance {
 	
 	private List<Undo> undoList = new ArrayList<Undo>();
 	
-	private Map<Location, BlockData> clipboard = new HashMap<Location, BlockData>();
+	private Map<Location, SimpleEntry<BlockData, TileEntity>> clipboard = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
 	private Plot clipboardPlot;
 	
@@ -79,7 +81,7 @@ public class WorldEditInstance {
 				for (int z = Math.min(pos1.getBlockZ(), pos2.getBlockZ()) ; z <= Math.max(pos1.getBlockZ(), pos2.getBlockZ()) ; z++) {
 					Location loc = new Location(plugin.getWorldManager().getWorld(), x, y, z);
 					clipboard.put(loc.clone().subtract(p.getPlayer().getLocation().getBlockX(), p.getPlayer().getLocation().getBlockY(), p.getPlayer().getLocation().getBlockZ()), 
-							plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData());
+							new SimpleEntry<BlockData, TileEntity>(plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData(), plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(x, y, z))));
 				}
 		
 		return WorldEditError.NO_ERROR;
@@ -95,14 +97,14 @@ public WorldEditError isSelectionValid() {
 		//vérification que les deux points sont bien dans le même plot
 		if (pos1 != null && pos2 != null)
 			if (plugin.getPlotsManager().getPlot(pos1) != null && plugin.getPlotsManager().getPlot(pos2) != null)
-				if (plugin.getPlotsManager().getPlot(pos1).equals(plugin.getPlotsManager().getPlot(pos2)))
+				if (!plugin.getPlotsManager().getPlot(pos1).equals(plugin.getPlotsManager().getPlot(pos2)))
 					return WorldEditError.ERR_OPERATION_CROSS_PLOT;
 		
 		return WorldEditError.NO_ERROR;
 	}
 	
 	//rotation de la sélection
-	public WorldEditError rotateSelection(String planS, String degrees) {
+	public WorldEditError rotateSelection(String degrees, String planS) {
 		int rotX = 0;
 		int rotY = 0;
 		int rotZ = 0;
@@ -153,6 +155,8 @@ public WorldEditError isSelectionValid() {
 	
 	public WorldEditError setRandomBlocks(String listBlocks) {
 		WorldEditError err = WorldEditError.NO_ERROR;
+
+		clipboardPlot = plugin.getPlotsManager().getPlot(pos1);
 		
 		//sortie si la sélection n'est pas valide
 		err = isSelectionValid();
@@ -160,7 +164,7 @@ public WorldEditError isSelectionValid() {
 			return err;
 
 		Map<BlockData, Integer> probaList = new HashMap<BlockData, Integer>();
-		Map<Location, BlockData> toBuild = new HashMap<Location, BlockData>();
+		Map<Location, SimpleEntry<BlockData, TileEntity>> toBuild = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 		BlockData data = null;
 		int totalProba = 0; 
 		
@@ -196,7 +200,8 @@ public WorldEditError isSelectionValid() {
 							break;
 						}
 					//ajout du bloc à la file d'attente
-					toBuild.put(new Location(plugin.getWorldManager().getWorld(), x, y, z), data);
+					toBuild.put(new Location(plugin.getWorldManager().getWorld(), x, y, z).subtract(p.getLocation()), 
+							new SimpleEntry<BlockData, TileEntity>(data, null));
 				}
 		
 		return buildBlocks(toBuild);
@@ -204,32 +209,36 @@ public WorldEditError isSelectionValid() {
 	
 	//remplace les blocs par de l'air dans la zone sélectionnée
 	public WorldEditError cutBlocks() {
-		Map<Location, BlockData> toBuild = new HashMap<Location, BlockData>();
+		Map<Location, SimpleEntry<BlockData, TileEntity>> toBuild = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
+		
+		clipboardPlot = plugin.getPlotsManager().getPlot(pos1);
 		
 		for (int x = Math.min(pos1.getBlockX(), pos2.getBlockX()) ; x <= Math.max(pos1.getBlockX(), pos2.getBlockX()) ; x++)
 			for (int y = Math.min(pos1.getBlockY(), pos2.getBlockY()) ; y <= Math.max(pos1.getBlockY(), pos2.getBlockY()) ; y++)
 				for (int z = Math.min(pos1.getBlockZ(), pos2.getBlockZ()) ; z <= Math.max(pos1.getBlockZ(), pos2.getBlockZ()) ; z++) 
-					toBuild.put(new Location(plugin.getWorldManager().getWorld(), x, y, z), Bukkit.createBlockData(Material.AIR));
+					toBuild.put(new Location(plugin.getWorldManager().getWorld(), x, y, z).subtract(p.getLocation()), 
+							new SimpleEntry<BlockData, TileEntity>(Bukkit.createBlockData(Material.AIR), null));
 		
 		return buildBlocks(toBuild);
 	}
 	
 	public WorldEditError pasteSelection() {
-		return buildBlocks(clipboard);		
+		return buildBlocks(clipboard);
 	}
 	
 	//colle la sélection à l'endroit souhaité (erreur si paste en dehors du plot ou si le joeur n'est pas proprio des 2 plots)
-	private WorldEditError buildBlocks(Map<Location, BlockData> blocksList) {
+	//ATTENTION les données de localisation doivent être relatives au joueur !!>
+	private WorldEditError buildBlocks(Map<Location, SimpleEntry<BlockData, TileEntity>> clipboard2) {
 		Undo undo = new Undo(plugin);
 		Plot targetPlot = null;
-		List<SimpleEntry<Location, BlockData>> toBuild = new ArrayList<SimpleEntry<Location,BlockData>>();
+		List<SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>> toBuild = new ArrayList<SimpleEntry<Location,SimpleEntry<BlockData,TileEntity>>>();
 		
 		WorldEditError err = WorldEditError.NO_ERROR;
 		
-		if (clipboardPlot == null)
-			return WorldEditError.ERR_PASTE_NULL_CLIPBOARD;
+		if (clipboard2 == null)
+			return WorldEditError.ERR_PASTE_NULL_BLOCK_LIST;
 		
-		for (Entry<Location, BlockData> entry : blocksList.entrySet()) {
+		for (Entry<Location, SimpleEntry<BlockData, TileEntity>> entry : clipboard2.entrySet()) {
 			targetPlot = plugin.getPlotsManager().getPlot(entry.getKey().clone().add(p.getLocation()));
 
 			//si le plot cible n'est pas nul
@@ -239,8 +248,8 @@ public WorldEditError isSelectionValid() {
 					
 					//paste du block
 					Location loc = entry.getKey().clone().add(p.getLocation());
-					undo.addBlock(loc, loc.getBlock().getBlockData().clone());
-					toBuild.add(new SimpleEntry<Location, BlockData>(loc, entry.getValue()));
+					undo.addBlock(loc, new SimpleEntry<BlockData, TileEntity>(loc.getBlock().getBlockData().clone(), plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))));
+					toBuild.add(new SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>(loc, entry.getValue()));
 					
 				}else {//si le plot cible est pas égal à celui de départ
 					//si le propriétaire est le même dans les 2 plots
@@ -248,8 +257,8 @@ public WorldEditError isSelectionValid() {
 						
 						//paste du block
 						Location loc = entry.getKey().clone().add(p.getLocation());
-						undo.addBlock(loc, loc.getBlock().getBlockData().clone());
-						toBuild.add(new SimpleEntry<Location, BlockData>(loc, entry.getValue()));
+						undo.addBlock(loc, new SimpleEntry<BlockData, TileEntity>(loc.getBlock().getBlockData().clone(), plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))));
+						toBuild.add(new SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>(loc, entry.getValue()));
 						
 					}else {//si le joueur n'est pas propriétaire des 2 plots
 						return WorldEditError.ERR_PASTE_NOT_OWNER_OF_2_PLOTS;
