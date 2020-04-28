@@ -59,6 +59,9 @@ public class WorldManager {
 			world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
 			world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
 			world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
+			world.setGameRule(GameRule.DISABLE_RAIDS, true);
+			world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
+			world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
 			
 			Bukkit.getLogger().info(Message.PARAM_PREFIX.getValue() + "World fully generated !");
 		}

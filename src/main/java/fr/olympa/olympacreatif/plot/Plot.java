@@ -1,12 +1,16 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
@@ -14,6 +18,7 @@ import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import net.minecraft.server.v1_15_R1.TileEntity;
 
 public class Plot {
 
@@ -26,6 +31,7 @@ public class Plot {
 	//private PlotListener listener;
 
 	private List<Player> playersInPlot = new ArrayList<Player>();
+	private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
 	private boolean isActive = true; //sert à détecter quand un chunk est inactif
 	
@@ -96,5 +102,9 @@ public class Plot {
 	
 	public void teleportOut(Player p) {
 		p.teleport(plotId.getLocation().clone().add(-3, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue()), -3));
+	}
+
+	public Map<Location, SimpleEntry<BlockData, TileEntity>> getProtectedZoneData() {
+		return protectedZoneData;
 	}
 }

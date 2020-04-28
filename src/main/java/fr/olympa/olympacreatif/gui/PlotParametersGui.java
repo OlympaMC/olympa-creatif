@@ -146,6 +146,22 @@ public class PlotParametersGui extends OlympaGUI {
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(10,it);
+
+		//11 : Autoriser le pvp
+		it = ItemUtils.item(Material.DROPPER, "§6Drop des items");
+
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(11,it);
+
+		//12 : Autoriser le pvp
+		it = ItemUtils.item(Material.COOKED_BEEF, "§6Satiété maximale permanente");
+
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(12,it);
 	}
 
 	@Override
@@ -243,6 +259,14 @@ public class PlotParametersGui extends OlympaGUI {
 				current = ItemUtils.lore(current, clearWeather);	
 			}
 			current = ItemUtils.loreAdd(current, clickToChange);
+			break;
+		case 11:
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.ALLOW_DROP_ITEMS, getSwitchState(current));
+			break;
+		case 12:
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL, getSwitchState(current));
 			break;
 		}
 		

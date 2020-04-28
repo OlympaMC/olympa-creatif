@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.worldedit;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,15 +34,9 @@ public class WorldEditListener implements Listener{
 		
 		//définition des pos
 		if (e.getAction() == Action.LEFT_CLICK_BLOCK)
-			if (plugin.getWorldEditManager().getPlayerInstance(e.getPlayer()).setPos1(e.getClickedBlock().getLocation()) == WorldEditError.NO_ERROR)
-				e.getPlayer().sendMessage(Message.WE_POS_SET.getValue().replace("%pos%", "1"));
-			else
-				e.getPlayer().sendMessage(Message.WE_INSUFFICIENT_PLOT_PERMISSION.getValue());
+			Bukkit.dispatchCommand(e.getPlayer(), "oce pos1");
 		else if (e.getAction() == Action.RIGHT_CLICK_BLOCK)
-			if (plugin.getWorldEditManager().getPlayerInstance(e.getPlayer()).setPos2(e.getClickedBlock().getLocation()) == WorldEditError.NO_ERROR)
-				e.getPlayer().sendMessage(Message.WE_POS_SET.getValue().replace("%pos%", "2"));
-			else
-				e.getPlayer().sendMessage(Message.WE_INSUFFICIENT_PLOT_PERMISSION.getValue());
+			Bukkit.dispatchCommand(e.getPlayer(), "oce pos2");
 	}
 	
 	@EventHandler //ajout de l'instance pour chaque joueur qui rejoint le serveur

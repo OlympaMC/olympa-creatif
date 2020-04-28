@@ -37,8 +37,27 @@ public class OceCommand extends OlympaCommand{
 			return false;	
 		}
 		
-		/*
-		if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.USE_WORLD_EDIT)) {
+		//définition de pos1 et pos2 ne nécessitant pas de permission
+		if (args.length == 1)
+			if (args[0].equals("pos1") || args[0].equals("pos2")) {switch(args[0]) {
+			case "pos1":
+				if (plugin.getWorldEditManager().getPlayerInstance(p.getPlayer()).setPos1(p.getPlayer().getLocation()) == WorldEditError.NO_ERROR)
+					p.getPlayer().sendMessage(Message.WE_POS_SET.getValue().replace("%pos%", "1"));
+				else
+					p.getPlayer().sendMessage(Message.WE_INSUFFICIENT_PLOT_PERMISSION.getValue());
+				break;
+			case "pos2":
+				if (plugin.getWorldEditManager().getPlayerInstance(p.getPlayer()).setPos2(p.getPlayer().getLocation()) == WorldEditError.NO_ERROR)
+					p.getPlayer().sendMessage(Message.WE_POS_SET.getValue().replace("%pos%", "2"));
+				else
+					p.getPlayer().sendMessage(Message.WE_INSUFFICIENT_PLOT_PERMISSION.getValue());
+				break;
+			}
+			return false;
+			}
+				
+		//teste si le joueur a la permission we
+		/*if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.USE_WORLD_EDIT)) {
 			p.sendMessage(Message.WE_INSUFFICIENT_PERMISSION.getValue());
 			return false;
 		}*/
@@ -137,6 +156,8 @@ public class OceCommand extends OlympaCommand{
 
 		switch (args.length) {
 		case 1:
+			list.add("pos1");
+			list.add("pos2");
 			list.add("copy");
 			list.add("paste");
 			list.add("miror");

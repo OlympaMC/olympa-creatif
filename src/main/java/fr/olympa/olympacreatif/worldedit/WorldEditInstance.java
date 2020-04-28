@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.*;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.worldedit.*;
 import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
@@ -154,14 +155,15 @@ public WorldEditError isSelectionValid() {
 	}
 	
 	public WorldEditError setRandomBlocks(String listBlocks) {
+		//vérification validité sélection
 		WorldEditError err = WorldEditError.NO_ERROR;
-
-		clipboardPlot = plugin.getPlotsManager().getPlot(pos1);
 		
 		//sortie si la sélection n'est pas valide
 		err = isSelectionValid();
 		if (err != WorldEditError.NO_ERROR)
 			return err;
+
+		clipboardPlot = plugin.getPlotsManager().getPlot(pos1);
 
 		Map<BlockData, Integer> probaList = new HashMap<BlockData, Integer>();
 		Map<Location, SimpleEntry<BlockData, TileEntity>> toBuild = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
@@ -200,35 +202,84 @@ public WorldEditError isSelectionValid() {
 							break;
 						}
 					//ajout du bloc à la file d'attente
-					toBuild.put(new Location(plugin.getWorldManager().getWorld(), x, y, z).subtract(p.getLocation()), 
+					toBuild.put(new Location(plugin.getWorldManager().getWorld(), x, y, z), 
 							new SimpleEntry<BlockData, TileEntity>(data, null));
 				}
 		
-		return buildBlocks(toBuild);
+		return buildBlocks(toBuild, false, true);
 	}
 	
 	//remplace les blocs par de l'air dans la zone sélectionnée
 	public WorldEditError cutBlocks() {
-		Map<Location, SimpleEntry<BlockData, TileEntity>> toBuild = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
+		//vérification validité sélection
+		WorldEditError err = WorldEditError.NO_ERROR;
 		
+		//sortie si la sélection n'est pas valide
+		err = isSelectionValid();
+		if (err != WorldEditError.NO_ERROR)
+			return err;
+
 		clipboardPlot = plugin.getPlotsManager().getPlot(pos1);
+		
+		Map<Location, SimpleEntry<BlockData, TileEntity>> toBuild = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 		
 		for (int x = Math.min(pos1.getBlockX(), pos2.getBlockX()) ; x <= Math.max(pos1.getBlockX(), pos2.getBlockX()) ; x++)
 			for (int y = Math.min(pos1.getBlockY(), pos2.getBlockY()) ; y <= Math.max(pos1.getBlockY(), pos2.getBlockY()) ; y++)
 				for (int z = Math.min(pos1.getBlockZ(), pos2.getBlockZ()) ; z <= Math.max(pos1.getBlockZ(), pos2.getBlockZ()) ; z++) 
-					toBuild.put(new Location(plugin.getWorldManager().getWorld(), x, y, z).subtract(p.getLocation()), 
+					toBuild.put(new Location(plugin.getWorldManager().getWorld(), x, y, z), 
 							new SimpleEntry<BlockData, TileEntity>(Bukkit.createBlockData(Material.AIR), null));
 		
-		return buildBlocks(toBuild);
+		return buildBlocks(toBuild, false, true);
 	}
 	
+	//enregistre la zone protégée d'un plot
+	public WorldEditError saveProtectedZone(Plot plot) {
+		
+		if (plot.getProtectedZoneData().size() > 0)
+			return WorldEditError.ERR_PROTECTED_ZONE_ALREADY_SAVED;
+
+		Location loc;
+		Location loc1;
+		Location loc2;
+		
+		if (plot.getParameters().getParameter(PlotParamType.PROTECTED_ZONE_POS1) != null && plot.getParameters().getParameter(PlotParamType.PROTECTED_ZONE_POS2) != null) {
+			loc1 = (Location) plot.getParameters().getParameter(PlotParamType.PROTECTED_ZONE_POS1);
+			loc2 = (Location) plot.getParameters().getParameter(PlotParamType.PROTECTED_ZONE_POS2);	
+		}else {
+			return WorldEditError.ERR_PROTECTED_ZONE_NOT_DEFINED;
+		}
+		
+		
+		for (int x = Math.min(loc1.getBlockX(), loc2.getBlockX()) ; x <= Math.max(loc1.getBlockX(), loc2.getBlockX()) ; x++)
+			for (int y = Math.min(loc1.getBlockY(), loc2.getBlockY()) ; y <= Math.max(loc1.getBlockY(), loc2.getBlockY()) ; y++)
+				for (int z = Math.min(loc1.getBlockZ(), loc2.getBlockZ()) ; z <= Math.max(loc1.getBlockZ(), loc2.getBlockZ()) ; z++) {
+					loc = new Location(plugin.getWorldManager().getWorld(), x, y, z);
+					plot.getProtectedZoneData().put(loc, new SimpleEntry<BlockData, TileEntity>(plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData(), plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(x, y, z))));	
+				}
+		
+		return WorldEditError.NO_ERROR;	
+	}
+	
+	//restaure la zone protégée d'un plot
+	public WorldEditError restaureProtectedZone(Plot plot) {
+		if (plot.getProtectedZoneData().size() == 0)
+			return WorldEditError.ERR_PROTECTED_ZONE_EMPTY;
+		
+		Map<Location, SimpleEntry<BlockData, TileEntity>> map = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>(plot.getProtectedZoneData());
+		
+		plot.getProtectedZoneData().clear();
+		
+		return buildBlocks(map, false, false);
+	}
+	
+	//colle le clipboard du joueur
 	public WorldEditError pasteSelection() {
-		return buildBlocks(clipboard);
+		return buildBlocks(clipboard, true, true);
 	}
 	
 	//colle la sélection à l'endroit souhaité (erreur si paste en dehors du plot ou si le joeur n'est pas proprio des 2 plots)
-	//ATTENTION les données de localisation doivent être relatives au joueur !!>
-	private WorldEditError buildBlocks(Map<Location, SimpleEntry<BlockData, TileEntity>> clipboard2) {
+	//ATTENTION les données de localisation doivent être relatives au joueur !!
+	private WorldEditError buildBlocks(Map<Location, SimpleEntry<BlockData, TileEntity>> clipboard2, boolean useRelativeLocation, boolean saveUndo) {
 		Undo undo = new Undo(plugin);
 		Plot targetPlot = null;
 		List<SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>> toBuild = new ArrayList<SimpleEntry<Location,SimpleEntry<BlockData,TileEntity>>>();
@@ -238,16 +289,24 @@ public WorldEditError isSelectionValid() {
 		if (clipboard2 == null)
 			return WorldEditError.ERR_PASTE_NULL_BLOCK_LIST;
 		
+		//localisation du bloc à poser
+		Location loc;
+		
 		for (Entry<Location, SimpleEntry<BlockData, TileEntity>> entry : clipboard2.entrySet()) {
-			targetPlot = plugin.getPlotsManager().getPlot(entry.getKey().clone().add(p.getLocation()));
+			if (useRelativeLocation)
+				targetPlot = plugin.getPlotsManager().getPlot(entry.getKey().clone().add(p.getLocation()));
 
-			//si le plot cible n'est pas nul
-			if (targetPlot != null) {
-				//si le plot cible est égal à celui de départ
-				if (clipboardPlot.equals(targetPlot)) {
+			//si le plot cible n'est pas nul ou si les coordonnées sont absolues
+			if (targetPlot != null || !useRelativeLocation) {
+				//si le plot cible est égal à celui de départ ou si les coordonnées sont absolues
+				if (!useRelativeLocation || clipboardPlot.equals(targetPlot)) {
 					
 					//paste du block
-					Location loc = entry.getKey().clone().add(p.getLocation());
+					if (useRelativeLocation)
+						loc = entry.getKey().clone().add(p.getLocation());
+					else
+						loc = entry.getKey().clone();
+					
 					undo.addBlock(loc, new SimpleEntry<BlockData, TileEntity>(loc.getBlock().getBlockData().clone(), plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))));
 					toBuild.add(new SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>(loc, entry.getValue()));
 					
@@ -256,7 +315,11 @@ public WorldEditError isSelectionValid() {
 					if (targetPlot.getMembers().getPlayerRank(p)  == PlotRank.OWNER && clipboardPlot.getMembers().getPlayerRank(p)  == PlotRank.OWNER ) {
 						
 						//paste du block
-						Location loc = entry.getKey().clone().add(p.getLocation());
+						if (useRelativeLocation)
+							loc = entry.getKey().clone().add(p.getLocation());
+						else
+							loc = entry.getKey().clone();
+						
 						undo.addBlock(loc, new SimpleEntry<BlockData, TileEntity>(loc.getBlock().getBlockData().clone(), plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))));
 						toBuild.add(new SimpleEntry<Location, SimpleEntry<BlockData, TileEntity>>(loc, entry.getValue()));
 						
@@ -270,10 +333,18 @@ public WorldEditError isSelectionValid() {
 		}
 		err = plugin.getWorldEditManager().addToBuildingList(p, toBuild);
 		if (err == WorldEditError.NO_ERROR)
-		if (undo.getUndoData().size() > 0)
-			undoList.add(undo);
+			if (saveUndo && undo.getUndoData().size() > 0)
+				undoList.add(undo);
 		
 		return err;
+	}
+
+	public Location getPos1() {
+		return pos1;
+	}
+	
+	public Location getPos2() {
+		return pos2;
 	}
 }
 

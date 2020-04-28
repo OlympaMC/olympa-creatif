@@ -93,7 +93,7 @@ public class PlotListener implements Listener {
 			return;
 		if (!plot.getId().isInPlot(e.getClickedBlock().getLocation()))
 			return;
-		if (!PlotParamType.getAllPossibleAllowedBlocks().contains(e.getClickedBlock().getType()))
+		if (!PlotParamType.getAllPossibleBlocksWithInteractions().contains(e.getClickedBlock().getType()))
 			return;
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && 

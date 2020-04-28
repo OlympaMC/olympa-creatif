@@ -23,6 +23,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
 
 public class OcCommand extends OlympaCommand {
 
@@ -44,6 +45,8 @@ public class OcCommand extends OlympaCommand {
 			}
 		
 		Player p = (Player) sender;
+		Plot plot;
+		WorldEditError err;
 		
 		switch (args.length) {
 		case 1:
@@ -58,7 +61,7 @@ public class OcCommand extends OlympaCommand {
 				if (plugin.getPlotsManager().getAvailablePlotSlotsLeftOwner(p) > 0) {
 					if (plugin.getPlotsManager().getAvailablePlotSlotsLeftTotal(p) > 0) {
 						
-						Plot plot = plugin.getPlotsManager().createPlot(p);
+						plot = plugin.getPlotsManager().createPlot(p);
 						p.teleport(plot.getId().getLocation());
 						sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue());	
 						
@@ -69,7 +72,7 @@ public class OcCommand extends OlympaCommand {
 				break;
 			case "menu":
 				if (sender instanceof Player) {
-					Plot plot = plugin.getPlotsManager().getPlot(p.getLocation());
+					plot = plugin.getPlotsManager().getPlot(p.getLocation());
 					if (plot == null)
 						new MainGui(plugin, p, plot, "§9Menu").create(p);
 					else
@@ -89,7 +92,7 @@ public class OcCommand extends OlympaCommand {
 					sender.sendMessage(Message.PLOT_NO_PENDING_INVITATION.getValue());
 				break;
 			case "center":
-				Plot plot = plugin.getPlotsManager().getPlot(p.getLocation());
+				plot = plugin.getPlotsManager().getPlot(p.getLocation());
 				if (plot == null || plot.getMembers().getPlayerLevel(p) > 0)
 					p.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
 				else {
@@ -109,6 +112,55 @@ public class OcCommand extends OlympaCommand {
 			break;
 		case 2:
 			switch(args[0]) {
+			case "protectedarea":
+				plot = plugin.getPlotsManager().getPlot(p.getLocation());
+				if (plot == null) {
+					p.sendMessage(Message.PLOT_NULL_PLOT.getValue());
+					return false;
+				}
+				if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER) {
+					p.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+					return false;
+				}
+				/*if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.USE_PROTECTED_AREA)) {
+					p.sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", 
+							PermissionsList.USE_PROTECTED_AREA.getGroup().getName(AccountProvider.get(p.getUniqueId()).getGender())));
+					return false;
+				}*/
+				
+				switch (args[1]) {
+				case "create":
+					err = plugin.getWorldEditManager().getPlayerInstance(p).isSelectionValid();
+					if (err == WorldEditError.NO_ERROR) {
+						p.sendMessage(Message.WE_CMD_PROTECTED_AREA_CREATION_SUCCESS.getValue());
+						plot.getParameters().setParameter(PlotParamType.PROTECTED_ZONE_POS1, plugin.getWorldEditManager().getPlayerInstance(p).getPos1());
+						plot.getParameters().setParameter(PlotParamType.PROTECTED_ZONE_POS2, plugin.getWorldEditManager().getPlayerInstance(p).getPos2());
+					}else
+						p.sendMessage(err.getErrorMessage().getValue());
+					break;
+					
+				case "save":
+					err = plugin.getWorldEditManager().getPlayerInstance(p).saveProtectedZone(plot);
+					if (err == WorldEditError.NO_ERROR)
+						p.sendMessage(Message.PLOT_PROTECTED_ZONE_SAVED.getValue());
+					else
+						p.sendMessage(err.getErrorMessage().getValue());
+					break;
+					
+				case "restore":
+					err = plugin.getWorldEditManager().getPlayerInstance(p).restaureProtectedZone(plot);
+					if (err == WorldEditError.NO_ERROR)
+						p.sendMessage(Message.PLOT_PROTECTED_ZONE_RESTORED.getValue());
+					else
+						p.sendMessage(err.getErrorMessage().getValue());
+					break;
+
+				default:
+					sender.sendMessage(Message.COMMAND_HELP.getValue());
+					break;
+				}
+				break;
+				
 			case "tp":
 				PlotId id = PlotId.fromString(plugin, args[1]);
 				if (id != null) {
@@ -118,11 +170,14 @@ public class OcCommand extends OlympaCommand {
 					sender.sendMessage(Message.INVALID_PLID_ID.getValue());
 				}
 				break;
+				
 			case "invite":
 				if (!(sender instanceof Player))
 					return false;
-				Plot plot = plugin.getPlotsManager().getPlot((p).getLocation());
+				
+				plot = plugin.getPlotsManager().getPlot((p).getLocation());
 				Player target = Bukkit.getPlayer(args[1]);
+				
 				if (plot != null)
 					if (plot.getMembers().getPlayerLevel(p) >= 3)
 						if (target != null)
@@ -139,6 +194,7 @@ public class OcCommand extends OlympaCommand {
 				else
 					sender.sendMessage(Message.PLOT_NULL_PLOT.getValue());
 				break;
+				
 			case "kick":
 				if (!(sender instanceof Player))
 					return false;
@@ -158,6 +214,7 @@ public class OcCommand extends OlympaCommand {
 							}
 				sender.sendMessage(Message.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.getValue().replace("%player%", target2.getDisplayName()));
 				break;
+				
 			case "ban":
 				if (!(sender instanceof Player))
 					return false;
@@ -180,6 +237,7 @@ public class OcCommand extends OlympaCommand {
 					}
 				sender.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue().replace("%player%", target3.getDisplayName()));
 				break;
+				
 			case "unban":
 				if (!(sender instanceof Player))
 					return false;
@@ -199,6 +257,7 @@ public class OcCommand extends OlympaCommand {
 				break;
 			}
 			break;
+			
 		default:
 			sender.sendMessage(Message.COMMAND_HELP.getValue());
 			break;
@@ -211,7 +270,8 @@ public class OcCommand extends OlympaCommand {
 		List<String> list = new ArrayList<String>();
 		List<String> response = new ArrayList<String>();
 		
-		if (args.length == 1) {
+		switch (args.length) {
+		case 1:
 			list.add("help");
 			list.add("find");
 			list.add("menu");
@@ -222,15 +282,37 @@ public class OcCommand extends OlympaCommand {
 			list.add("kick");
 			list.add("ban");
 			list.add("unban");
-			list.add("skull");
-			for (String s : list)
-				if (s.startsWith(args[0]))
-					response.add(s);
-		}
-		else
-			for (Player p : Bukkit.getOnlinePlayers())
-				response.add(p.getName());
+			list.add("protectedarea");
+			break;
+		case 2:
+			switch(args[0]) {
+			case "ban":
+				for (Player p : Bukkit.getOnlinePlayers())
+					list.add(p.getName());
+				break;
+				
+			case "unban":
+				for (Player p : Bukkit.getOnlinePlayers())
+					list.add(p.getName());
+				break;
 
+			case "invite":
+				for (Player p : Bukkit.getOnlinePlayers())
+					list.add(p.getName());
+				break;
+
+			case "protectedarea":
+				list.add("create");
+				list.add("save");
+				list.add("restore");
+				break;
+			}
+		}
+
+		for (String s : list)
+			if (s.startsWith(args[0]))
+				response.add(s);
+		
 		return response;
 	}
 }
