@@ -37,7 +37,7 @@ public class MicroBlocks {
 	
 	public ItemStack getMb(String name) {
 		if (microBlocks.containsKey(name))
-			return ItemUtils.name(microBlocks.get(name).clone(), "§9Microblock §6" + name);
+			return ItemUtils.name(microBlocks.get(name).clone(), "§9MicroBlock §6" + name);
 		else
 			return null;
 	}
@@ -64,7 +64,7 @@ public class MicroBlocks {
 
 		@Override
 		public void click(ItemStack existing, Player p) {
-			p.getInventory().addItem(ItemUtils.name(existing.clone(), "§9Microblock §6" + existing.getItemMeta().getDisplayName()));
+			p.getInventory().addItem(ItemUtils.name(existing.clone(), existing.getItemMeta().getDisplayName()));
 		}
 		
 	}

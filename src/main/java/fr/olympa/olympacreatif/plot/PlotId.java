@@ -76,6 +76,14 @@ public class PlotId{
 		return indexX + "." + indexZ;
 	}
 	
+	public int getX() {
+		return indexX;
+	}
+	
+	public int getZ() {
+		return indexZ;
+	}
+	
 	public static PlotId fromString(OlympaCreatifMain plugin, String id) {
 		if (id.split(".").length == 2)
 			try {
@@ -106,6 +114,6 @@ public class PlotId{
 	
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof PlotId && ((PlotId) obj).getAsString().equals(getAsString());	
+		return obj instanceof PlotId && indexX == ((PlotId)obj).getX() && indexZ == ((PlotId)obj).getZ();	
 	}
 }

@@ -28,7 +28,7 @@ public class PlotMembers{
 	}
 	
 	public void set(OlympaPlayerInformations p, PlotRank rank) {
-		//TODO
+		
 		if (members.size() >= 18)
 			return;
 		
@@ -37,7 +37,7 @@ public class PlotMembers{
 		else
 			members.remove(p);
 		
-		plugin.getTask().runTaskAsynchronously(() -> plugin.getDataManager().updatePlayerPlotRank(p.getID(), plotId, rank));
+		plugin.getTask().runTaskAsynchronously(() -> plugin.getDataManager().updatePlayerPlotRank(p.getId(), plotId, rank));
 	}
 
 	public PlotRank getPlayerRank(Player p) {

@@ -27,7 +27,7 @@ public class PlotsManager {
 	private List<AsyncPlot> asyncPlots = new ArrayList<AsyncPlot>();
 	
 	private List<Player> loadedPlayers = new ArrayList<Player>();
-	private Map<Player, Integer> bonusPlots = new HashMap<Player, Integer>();
+	private Map<Player, Integer> bonusPlotsCount = new HashMap<Player, Integer>();
 	
 	private int plotCount; 
 	
@@ -84,6 +84,9 @@ public class PlotsManager {
 	}
 
 	public void registerPlot(PlotId plotId) {
+		if (plotId == null)
+			return;
+		
 		//si le plot n'a pas encore été testé et déterminé non-existant et s'il n'est pas déjà chargé
 		if (!emptyPlots.contains(plotId) && !loadedPlots.keySet().contains(plotId))
 			plugin.getDataManager().loadPlot(plotId);
@@ -106,9 +109,9 @@ public class PlotsManager {
 	}
 	
 	public Plot getPlot(int x, int z) {
-		for (Plot p : getPlots())
-			if (p.getId().isInPlot(x, z))
-				return p;
+		for (Plot plot : getPlots())
+			if (plot.getId().isInPlot(x, z))
+				return plot;
 		return null;
 	}
 	
@@ -124,6 +127,13 @@ public class PlotsManager {
 		if (xb <  + Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) && zb <  + Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()))
 			return new PlotId(plugin, xb, zb);
 		
+
+		int xId = x / (Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
+		int zId = x / (Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
+		
+		if (xId < Math.floorMod(x, Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue())) && zId < Math.floorMod(z, Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue())))
+			return new PlotId(plugin, xId, zId);
+
 		return null;
 	}
 	
@@ -161,7 +171,7 @@ public class PlotsManager {
 	}
 	
 	public void setBonusPlots(Player p, int i) {
-		bonusPlots.put(p, i);
+		bonusPlotsCount.put(p, i);
 	}
 	
 	public int getAvailablePlotSlotsLeftOwner(Player p) {
@@ -170,8 +180,8 @@ public class PlotsManager {
 		int modificator = 0;
 		
 		//ajoute le bonus de plots éventuel
-		if (bonusPlots.containsKey(p))
-			modificator = bonusPlots.get(p);
+		if (bonusPlotsCount.containsKey(p))
+			modificator = bonusPlotsCount.get(p);
 		
 		//retire 1 pour chaque plot possédé par le joueur
 		for (Plot plot : loadedPlots.values())

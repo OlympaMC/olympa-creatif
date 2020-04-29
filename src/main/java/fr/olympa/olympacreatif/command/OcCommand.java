@@ -133,8 +133,8 @@ public class OcCommand extends OlympaCommand {
 					err = plugin.getWorldEditManager().getPlayerInstance(p).isSelectionValid();
 					if (err == WorldEditError.NO_ERROR) {
 						p.sendMessage(Message.WE_CMD_PROTECTED_AREA_CREATION_SUCCESS.getValue());
-						plot.getParameters().setParameter(PlotParamType.PROTECTED_ZONE_POS1, plugin.getWorldEditManager().getPlayerInstance(p).getPos1());
-						plot.getParameters().setParameter(PlotParamType.PROTECTED_ZONE_POS2, plugin.getWorldEditManager().getPlayerInstance(p).getPos2());
+						plot.getParameters().setParameter(PlotParamType.PROTECTED_ZONE_POS1, plugin.getWorldEditManager().getPlayerInstance(p).getPos1().clone());
+						plot.getParameters().setParameter(PlotParamType.PROTECTED_ZONE_POS2, plugin.getWorldEditManager().getPlayerInstance(p).getPos2().clone());
 					}else
 						p.sendMessage(err.getErrorMessage().getValue());
 					break;
@@ -307,10 +307,11 @@ public class OcCommand extends OlympaCommand {
 				list.add("restore");
 				break;
 			}
+			break;
 		}
 
 		for (String s : list)
-			if (s.startsWith(args[0]))
+			if (s.startsWith(args[args.length-1]))
 				response.add(s);
 		
 		return response;

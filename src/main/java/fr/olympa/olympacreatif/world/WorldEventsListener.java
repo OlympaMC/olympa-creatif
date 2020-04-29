@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -171,24 +172,6 @@ public class WorldEventsListener implements Listener{
 	public void onEntityExplodeEvent(EntityExplodeEvent e) {
 		e.blockList().clear();
 	}
-
-	@EventHandler //cancel pose block si route ou plot non défini
-	public void onPlaceBlockEvent(BlockPlaceEvent e) {
-		if (plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation()) == null) {
-			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
-		}
-	}
-	
-	@EventHandler //cancel pose block si route & annule tout loot d'item possible
-	public void onBreakBlockEvent(BlockBreakEvent e) {
-		if (plugin.getPlotsManager().getPlot(e.getBlock().getLocation()) == null) {
-			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
-		}
-		
-		e.setDropItems(false);
-	}
 	
 	//Gestion renommage en couleur des items
 	@EventHandler
@@ -209,7 +192,7 @@ public class WorldEventsListener implements Listener{
 	}
 	
 	//Gestion des items restreints
-	/*
+	
 	@EventHandler //test dans inventaires
 	public void onLimitedItemInventory(InventoryClickEvent e) {
 		if (!(e.getWhoClicked() instanceof Player))
@@ -217,19 +200,13 @@ public class WorldEventsListener implements Listener{
 		
 		OlympaPlayer p = AccountProvider.get(e.getWhoClicked().getUniqueId());
 		
-		if (e.getCursor() != null)
-			if (!hasPlayerPermissionFor(p, e.getCursor().getType(), true)) {
-				e.setCancelled(true);
-				e.getCursor().setType(Material.STONE);
-			}
-		
 		if (e.getCurrentItem() != null)
 			if (!hasPlayerPermissionFor(p, e.getCurrentItem().getType(), true)){
 				e.setCancelled(true);
 				e.getCursor().setType(Material.STONE);
 			}
 	}
-	*/
+	
 	
 	@EventHandler //cancel pickup item restreint
 	public void onPickup(EntityPickupItemEvent e) {
@@ -312,7 +289,7 @@ public class WorldEventsListener implements Listener{
 
 	@EventHandler //mise du GM 1
 	public void onJoinEvent(PlayerJoinEvent e) {
-		e.getPlayer().setGameMode(GameMode.CREATIVE);
+		Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> e.getPlayer().setGameMode(GameMode.CREATIVE), 1);
 	}
 	
 	@EventHandler //remplir le dispenser au fur et à mesure qu'il se vide (pour toujours garder les mêmes objets à l'intérieur)
@@ -330,7 +307,7 @@ public class WorldEventsListener implements Listener{
 	}
 	
 	@EventHandler //chat de plot
-	public void inChat(AsyncPlayerChatEvent e) {
+	public void onChat(AsyncPlayerChatEvent e) {
 		if (e.isCancelled())
 			return;
 		

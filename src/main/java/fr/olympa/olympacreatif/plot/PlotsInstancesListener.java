@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,6 +24,7 @@ import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -51,8 +53,11 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //test place block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
-		if (plot == null)
-			return;
+		if (plot == null) {
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
+			e.setCancelled(true);
+			return;	
+		}
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !plot.getProtectedZoneData().keySet().contains(e.getBlock().getLocation())) {
 			e.setCancelled(true);
@@ -63,8 +68,11 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //test break block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onBreakBlockEvent(BlockBreakEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-		if (plot == null)
-			return;
+		if (plot == null) {
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
+			e.setCancelled(true);
+			return;	
+		}
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !plot.getProtectedZoneData().keySet().contains(e.getBlock().getLocation())) {
 			e.setCancelled(true);
@@ -90,30 +98,31 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	@SuppressWarnings("unchecked")
-	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & tes 
+	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
 		if (e.getClickedBlock() == null)
 			return;
-
-		plot = plugin.getPlotsManager().getPlot(e.getClickedBlock().getLocation());
 		
+		plot = plugin.getPlotsManager().getPlot(e.getClickedBlock().getLocation());
+
 		if (plot == null) {
-			e.setUseItemInHand(Result.DENY);
+			e.setCancelled(true);
+			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 			return;
 		}
 		
 		//test si permission d'interagir avec le bloc donné
 		if (PlotParamType.getAllPossibleBlocksWithInteractions().contains(e.getClickedBlock().getType()))		
 			if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && 
-					!((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType())) {
+					!((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType()) &&
+					!plot.getProtectedZoneData().keySet().contains(e.getClickedBlock().getLocation())) {
 				e.setCancelled(true);
 				e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
+				
+				return;
 			}
-		
-		//test si possibilité de placer l'objet, cancel si objet placé n'est pas un bloc (contre la route par exemple)
-		if (!(e.getItem() != null && e.getItem().getType().isSolid()))
-			e.setUseItemInHand(Result.DENY);
 	}
+	
 	
 	@EventHandler //cancel interraction avec un itemframe
 	public void onInterractEntityEvent(PlayerInteractEntityEvent e) {
@@ -316,33 +325,39 @@ public class PlotsInstancesListener implements Listener{
 		}
 	}
 	
+	
 	@EventHandler //empêche le placement de liquides en dehors du plot
-	public void onPlaceLiquid(PlayerInteractEvent e){
-		if (e.getClickedBlock() == null)
-			return;
-		
-		plot = plugin.getPlotsManager().getPlot(e.getClickedBlock().getLocation());
-		if (plot == null) {
-			e.setUseItemInHand(Result.DENY);
-		}else {
-			if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR)
-				//return si placement d'un bloc de construction sur le "mur" d'une route (action autorisée)
-				if (e.getItem() != null && e.getItem().getType().isSolid())
-					return;
-			
-				e.setUseItemInHand(Result.DENY);	
-		}		
+	public void onPlaceLiquid(PlayerInteractEvent e){		
 	}
+	
 	
 	@EventHandler //empêche le drop d'items si interdit sur le plot (et cancel si route)
 	public void onDropItem(PlayerDropItemEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot == null) {
+			e.setCancelled(true);
+			e.getPlayer().sendMessage(Message.PLOT_DENY_ITEM_DROP.getValue());
+			return;	
+		}
+		
+		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !((boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS))) {
+			e.setCancelled(true);
+			e.getPlayer().sendMessage(Message.PLOT_DENY_ITEM_DROP.getValue());
+			e.getPlayer().sendMessage("ICI");
+		}		
+	}
+	
+	@EventHandler //empêche la nourriture de descendre si paramètre du plot défini comme tel
+	public void onFoodChange(FoodLevelChangeEvent e) {
+		if (e.getEntityType() != EntityType.PLAYER)
+			return;
+		
+		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		if (plot == null)
 			return;
 		
-		if (!((boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS) && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR)) {
+		if ((boolean) plot.getParameters().getParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL))
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_DENY_ITEM_DROP.getValue());
-		}		
 	}
 }
