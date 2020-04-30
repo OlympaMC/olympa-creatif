@@ -49,6 +49,9 @@ public class PlotMembers{
 	}
 	
 	public PlotRank getPlayerRank(OlympaPlayerInformations p) {
+		if (plugin.getPlotsManager().isAdmin(p))
+			return PlotRank.OWNER;
+		
 		if (members.containsKey(p))
 			return members.get(p);
 		

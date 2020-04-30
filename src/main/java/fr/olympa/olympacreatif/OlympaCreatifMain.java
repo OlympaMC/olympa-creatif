@@ -7,6 +7,7 @@ import org.bukkit.generator.ChunkGenerator;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.olympacreatif.command.OcCommand;
+import fr.olympa.olympacreatif.command.OcaCommand;
 import fr.olympa.olympacreatif.command.OceCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
 import fr.olympa.olympacreatif.data.DataManager;
@@ -43,6 +44,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new OcCommand(this, "olympacreatif", new String[] {"oc"}).register();
 		new OceCommand(this, "olympacreatifedit", new String[] {"oce"}).register();
 		new OcoCommand(this, "olympacreatifother", new String[] {"oco"}).register();
+		new OcaCommand(this, "olympacreatifadmin", new String[] {"oca"}).register();
 		
 		dataManager = new DataManager(this);
 		plotsManager = new PlotsManager(this);

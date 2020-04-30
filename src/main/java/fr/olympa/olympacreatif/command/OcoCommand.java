@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,6 +21,8 @@ import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import net.minecraft.server.v1_15_R1.IMaterial;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public class OcoCommand extends OlympaCommand {
 
@@ -91,8 +95,51 @@ public class OcoCommand extends OlympaCommand {
 					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_SKULL_COMMAND.getGroup().getName(p.getGender())));
 					return false;
 				}*/
-				p.getPlayer().getInventory().addItem(ItemUtils.skull("", args[1]));
+				p.getPlayer().getInventory().addItem(ItemUtils.skull("§6Tête de " + args[1], args[1]));
 				p.getPlayer().sendMessage(Message.OCO_BLOCK_GIVED.getValue());
+				break;
+			case "give":
+				args[1] = args[1].toUpperCase();
+				if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])))
+					if (p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])))) {
+						p.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(args[1])));
+						p.getPlayer().sendMessage(Message.OCO_GIVE_SUCCESSFUL.getValue().replace("%item%", args[1].toLowerCase().replace("_", " ")));
+					}
+					else
+						p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", 
+								plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])).toString().toLowerCase()));
+				else
+					p.getPlayer().sendMessage(Message.OCO_GIVE_INDISPONIBLE_BLOCK.getValue());
+				break;
+			default:
+				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
+				break;
+			}
+			break;
+		case 3:
+			switch(args[0]) {
+			case "give"://give mob eggs with custom NBTtags
+				args[1] = args[1].toUpperCase();
+				
+				if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])) && args[1].toLowerCase().contains("_egg"))
+					if (true/*p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])))*/) {
+						
+						net.minecraft.server.v1_15_R1.ItemStack item = CraftItemStack.asNMSCopy(new ItemStack(Material.getMaterial(args[1])));
+						NBTTagCompound nbt = plugin.getPerksManager().getNbtEntityParser().getEntityNbtData(args[2]);
+						
+						if (nbt != null) {
+							item.setTag(nbt);
+							p.getPlayer().getInventory().addItem(CraftItemStack.asBukkitCopy(item));
+							
+							p.getPlayer().sendMessage(Message.OCO_GIVE_SUCCESSFUL.getValue().replace("%item%", args[1].toLowerCase().replace("_", " ")));	
+						}else
+							p.getPlayer().sendMessage(Message.OCO_INVALID_NBT_DATA.getValue());
+					}
+					else
+						p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", 
+								plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])).toString().toLowerCase()));
+				else
+					p.getPlayer().sendMessage(Message.OCO_GIVE_INDISPONIBLE_BLOCK.getValue());
 				break;
 			default:
 				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
@@ -117,10 +164,14 @@ public class OcoCommand extends OlympaCommand {
 			list.add("hat");
 			list.add("mb");
 			list.add("export");
+			list.add("give");
 		}
 		else if (args.length == 2 && args[0].equals("mb")) {
 			for (Entry<String, ItemStack> e : plugin.getPerksManager().getMicroBlocks().getAllMbs().entrySet())
 				list.add(e.getKey());
+		}else if (args.length == 2 && args[0].equals("give")) {
+			for (Material mat : Material.values())
+				list.add(mat.toString().toLowerCase());
 		}else
 			for (Player p : Bukkit.getOnlinePlayers())
 				list.add(p.getName());

@@ -36,6 +36,7 @@ public class PlotsManagerListener implements Listener {
 	@EventHandler //retire le joueur de la liste des joueurs chargés
 	public void onLeftEvent(PlayerQuitEvent e){
 		plugin.getPlotsManager().removeLoadedPlayer(e.getPlayer());
+		plugin.getPlotsManager().removeAdminPlayer(AccountProvider.get(e.getPlayer().getUniqueId()));
 	}
 	
 	@EventHandler //charge les plots non encore chargés sur lesquels les joueurs se rendent

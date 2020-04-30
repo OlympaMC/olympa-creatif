@@ -52,7 +52,7 @@ public class WorldManager {
 			world.setTime(6000);
 			world.setSpawnLocation(0, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue())+1, 0);
 
-			world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+			world.setGameRule(GameRule.DO_MOB_SPAWNING, true);
 			world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
 			world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
 			world.setGameRule(GameRule.MOB_GRIEFING, false);
@@ -62,6 +62,7 @@ public class WorldManager {
 			world.setGameRule(GameRule.DISABLE_RAIDS, true);
 			world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
 			world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+			world.setPVP(true);
 			
 			Bukkit.getLogger().info(Message.PARAM_PREFIX.getValue() + "World fully generated !");
 		}

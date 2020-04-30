@@ -11,12 +11,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -26,6 +26,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -37,7 +38,10 @@ import org.bukkit.potion.PotionEffect;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import net.minecraft.server.v1_15_R1.Entity;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public class PlotsInstancesListener implements Listener{
 
@@ -111,9 +115,11 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		}
 		
+		PlotRank playerRank = plot.getMembers().getPlayerRank(e.getPlayer());
+		
 		//test si permission d'interagir avec le bloc donné
 		if (PlotParamType.getAllPossibleBlocksWithInteractions().contains(e.getClickedBlock().getType()))		
-			if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && 
+			if (playerRank == PlotRank.VISITOR && 
 					!((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType()) &&
 					!plot.getProtectedZoneData().keySet().contains(e.getClickedBlock().getLocation())) {
 				e.setCancelled(true);
@@ -121,6 +127,16 @@ public class PlotsInstancesListener implements Listener{
 				
 				return;
 			}
+		
+		//cancel si usage d'autre chose qu'un oeuf, un arc, une arbalète ou une boule de neige
+		if (e.getItem() == null)
+			return;
+		
+		Material mat = e.getItem().getType(); 
+		
+		if (playerRank == PlotRank.VISITOR)
+			if (mat != Material.BOW && mat != Material.SPLASH_POTION && mat != Material.SNOWBALL && mat != Material.CROSSBOW && mat != Material.FLINT_AND_STEEL)
+				e.setUseItemInHand(Result.DENY);
 	}
 	
 	
@@ -135,6 +151,11 @@ public class PlotsInstancesListener implements Listener{
 			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 		}
 		
+		if ((e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE || 
+				e.getPlayer().getInventory().getItemInOffHand().getType() == Material.WOODEN_HOE) &&
+				plot.getMembers().getPlayerRank(e.getPlayer()) != PlotRank.VISITOR && !(e.getRightClicked() instanceof Player))
+			e.getRightClicked().remove();
+			
 	}
 	
 	@EventHandler //test print TNT
@@ -179,7 +200,7 @@ public class PlotsInstancesListener implements Listener{
 				e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
 				return;
 			}
-			executeEntryActions(e.getPlayer(), plotTo);	
+			executeEntryActions(plugin, e.getPlayer(), plotTo);	
 		}
 		
 		//actions de sortie de plot
@@ -205,13 +226,18 @@ public class PlotsInstancesListener implements Listener{
 
 	//actions à exécuter en entrée du plot (séparé du PlayerMoveEvent pour pouvoir être exécuté après le chargement du plot)
 	@SuppressWarnings("unchecked")
-	public static void executeEntryActions(Player p, Plot plotTo) {
+	public static void executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
+		
+		if (plugin.getPlotsManager().isAdmin(p))
+			return;
 		
 		//si le joueur est banni, téléportation en dehors du plot
 		if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId())) {
-			p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
-			plotTo.teleportOut(p);
-			return;
+			if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.STAFF_ADMIN_MODE_LOW)) {
+				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
+				plotTo.teleportOut(p);
+				return;	
+			}
 		}
 
 		plotTo.addPlayerInPlot(p);
@@ -245,7 +271,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		//définition de l'heure du joueur
-		p.setPlayerTime((int) plotTo.getParameters().getParameter(PlotParamType.PLOT_TIME), true);
+		p.setPlayerTime((int) plotTo.getParameters().getParameter(PlotParamType.PLOT_TIME), false);
 		
 		//définition du gamemode
 		p.setGameMode((GameMode) plotTo.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
@@ -281,18 +307,41 @@ public class PlotsInstancesListener implements Listener{
 		e.getPlayer().resetPlayerWeather();
 	}
 
-	@EventHandler //gestion autorisation pvp
-	public void onDamageByEntity(EntityDamageByEntityEvent e) {
-		if (e.getEntityType() != EntityType.PLAYER)
-			return;
-		
+	@EventHandler //cancel remove paintings et itemsframes
+	public void onItemFrameDestroy(HangingBreakByEntityEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		if (plot == null)
 			return;
 		
-		if (!(boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVP))
-			e.setCancelled(true);			
-
+		if (e.getRemover().getType() != EntityType.PLAYER && e.getEntity().getType() == EntityType.PAINTING && e.getEntity().getType() == EntityType.ITEM_FRAME) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		if (e.getRemover().getType() == EntityType.PLAYER && plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR) {
+			e.setCancelled(true);
+		}
+	}
+	
+	@EventHandler //gestion autorisation pvp
+	public void onDamageByEntity(EntityDamageByEntityEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		if (plot == null)
+			return;
+		
+		if (!(boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVP)) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		NBTTagCompound tag = new NBTTagCompound();
+		((CraftEntity)e.getEntity()).getHandle().c(tag);
+		Bukkit.broadcastMessage(tag.asString());
+		
+		if (tag.hasKey("EntityTag"))
+			if (tag.getCompound("EntityTag").hasKey("Invulnerable"))
+				e.setCancelled(true);
+		
 		tpPlayerToPlotSpawnOnDeath(e, plot);
 	}
 	

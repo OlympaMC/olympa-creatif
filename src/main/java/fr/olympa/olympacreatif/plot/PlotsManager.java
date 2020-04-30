@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.objects.OlympaPlayer;
+import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
@@ -30,6 +31,8 @@ public class PlotsManager {
 	private Map<Player, Integer> bonusPlotsCount = new HashMap<Player, Integer>();
 	
 	private int plotCount; 
+	
+	private List<Object> adminPlayers = new ArrayList<Object>();
 	
 	public PlotsManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -210,5 +213,25 @@ public class PlotsManager {
 				totalPlayerPlotsLeft--;
 		
 		return totalPlayerPlotsLeft;
+	}
+
+	public boolean isAdmin(OlympaPlayerInformations p) {
+		return adminPlayers.contains(p);
+	}
+	
+	public boolean isAdmin(Player p) {
+		return adminPlayers.contains(p);
+	}
+	
+	public void addAdminPlayer(OlympaPlayer p) {
+		if (!adminPlayers.contains(p.getPlayer())) {
+			adminPlayers.add(p.getPlayer());	
+			adminPlayers.add(p.getInformation());
+		}
+	}
+	
+	public void removeAdminPlayer(OlympaPlayer p) {
+		adminPlayers.remove(p.getPlayer());
+		adminPlayers.remove(p.getInformation());
 	}
 }

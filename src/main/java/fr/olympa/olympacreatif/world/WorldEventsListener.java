@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Dropper;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -136,13 +137,18 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler //n'autorise que les spawn à partir d'oeufs 
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
-		if (plugin.getPlotsManager().getPlot(e.getLocation()) == null)
+		if (plugin.getPlotsManager().getPlot(e.getLocation()) == null) {
 			e.setCancelled(true);
+			return;
+		}
 		
+		if (e.getEntityType() == EntityType.ARMOR_STAND)
+			return;
 		
 		if (e.getSpawnReason() != SpawnReason.EGG && e.getSpawnReason() != SpawnReason.DISPENSE_EGG && 
 				e.getSpawnReason() != SpawnReason.CUSTOM && e.getSpawnReason() != SpawnReason.ENDER_PEARL && 
-				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG)
+				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG &&
+				e.getSpawnReason() != SpawnReason.ENDER_PEARL)
 			e.setCancelled(true);
 	}
 
@@ -234,7 +240,7 @@ public class WorldEventsListener implements Listener{
 			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(mat))) {
 				if (sendMessage)
 					p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
-				return false;
+				return true;
 			}
 		return true;
 	}

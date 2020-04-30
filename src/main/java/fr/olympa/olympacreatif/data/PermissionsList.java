@@ -27,6 +27,10 @@ public class PermissionsList {
 	public static final OlympaPermission PLOTS_COUNT_ARCHITECT= new OlympaPermission(OlympaGroup.CREA_ARCHITECT);
 	public static final OlympaPermission PLOTS_COUNT_CONSTRUCTOR = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	
+
+	public static final OlympaPermission STAFF_ADMIN_MODE_LOW = new OlympaPermission(OlympaGroup.ASSISTANT);
+	public static final OlympaPermission STAFF_ADMIN_MODE_HIGH = new OlympaPermission(OlympaGroup.MOD);
+	
 	 
 	/*nb de plots propriétaire :
 	 * Joueur : 1
