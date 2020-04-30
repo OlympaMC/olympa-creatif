@@ -27,9 +27,8 @@ public class PermissionsList {
 	public static final OlympaPermission PLOTS_COUNT_ARCHITECT= new OlympaPermission(OlympaGroup.CREA_ARCHITECT);
 	public static final OlympaPermission PLOTS_COUNT_CONSTRUCTOR = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	
-
-	public static final OlympaPermission STAFF_ADMIN_MODE_LOW = new OlympaPermission(OlympaGroup.ASSISTANT);
-	public static final OlympaPermission STAFF_ADMIN_MODE_HIGH = new OlympaPermission(OlympaGroup.MOD);
+	public static final OlympaPermission STAFF_BYPASS_PLOT_BAN = new OlympaPermission(OlympaGroup.ASSISTANT);
+	public static final OlympaPermission STAFF_ENABLE_ADMIN_MODE = new OlympaPermission(OlympaGroup.MOD);
 	
 	 
 	/*nb de plots propriétaire :
@@ -37,6 +36,6 @@ public class PermissionsList {
 	 * Constructeur : 3
 	 * Architecte : 6
 	 * Créateur : 10
-	 * Plots proprio/membre max : 27
+	 * Plots proprio/membre max : 36
 	 */
 }

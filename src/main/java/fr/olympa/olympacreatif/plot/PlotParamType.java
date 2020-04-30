@@ -22,8 +22,10 @@ public enum PlotParamType {
 	ALLOW_SPLASH_POTIONS("allow_splash_potions", false),
 	ALLOW_PRINT_TNT("allow_print_tnt", false),
 	ALLOW_PVP("allow_pvp", false),
+	ALLOW_PVE("allow_pvp", false),
 	ALLOW_ENVIRONMENT_DAMAGE("allow_environment_damage", false),
 	ALLOW_DROP_ITEMS("allow_drop_items", false),
+	
 	KEEP_MAX_FOOD_LEVEL("keep_max_food_level", true),
 	
 	PLOT_BIOME("plot_biome", Biome.PLAINS),
@@ -34,7 +36,7 @@ public enum PlotParamType {
 	PLOT_TIME("plot_time", 6000),
 
 	PROTECTED_ZONE_POS1("protected_zone_pos1", null),
-	PROTECTED_ZONE_POS2("protected_zone_pos2", null),
+	PROTECTED_ZONE_POS2("protected_zone_pos2", null), 
 	;
 	
 	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();

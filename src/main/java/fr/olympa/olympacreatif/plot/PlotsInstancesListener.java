@@ -233,7 +233,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		//si le joueur est banni, téléportation en dehors du plot
 		if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId())) {
-			if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.STAFF_ADMIN_MODE_LOW)) {
+			if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.STAFF_BYPASS_PLOT_BAN)) {
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
 				plotTo.teleportOut(p);
 				return;	
@@ -329,7 +329,12 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 		
-		if (!(boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVP)) {
+		if (!(boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVP) && e.getEntityType() == EntityType.PLAYER && e.getDamager().getType() == EntityType.PLAYER) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		if (!(boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVE) && (e.getEntityType() != EntityType.PLAYER || e.getDamager().getType() != EntityType.PLAYER)) {
 			e.setCancelled(true);
 			return;
 		}

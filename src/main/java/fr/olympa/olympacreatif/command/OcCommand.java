@@ -208,7 +208,7 @@ public class OcCommand extends OlympaCommand {
 					if (plot.getMembers().getPlayerLevel(p) >= 3)
 						if (target != null)
 							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR && plot.getPlayers().contains(target) && 
-							!AccountProvider.get(target.getUniqueId()).hasPermission(PermissionsList.STAFF_ADMIN_MODE_LOW)) {
+							!AccountProvider.get(target.getUniqueId()).hasPermission(PermissionsList.STAFF_BYPASS_PLOT_BAN)) {
 								plot.teleportOut(target);
 								target.sendMessage(Message.PLOT_HAVE_BEEN_KICKED.getValue());
 								sender.sendMessage(Message.PLOT_KICK_PLAYER.getValue().replace("%player%", target.getDisplayName()));
@@ -227,7 +227,7 @@ public class OcCommand extends OlympaCommand {
 					if (plot.getMembers().getPlayerLevel(p) >= 3) {
 						if (target != null) {
 							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR && plot.getPlayers().contains(target) && 
-									!AccountProvider.get(target.getUniqueId()).hasPermission(PermissionsList.STAFF_ADMIN_MODE_LOW)) {
+									!AccountProvider.get(target.getUniqueId()).hasPermission(PermissionsList.STAFF_BYPASS_PLOT_BAN)) {
 								((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).add(AccountProvider.get(target.getUniqueId()).getId());
 								plot.teleportOut(target);
 								target.sendMessage(Message.PLOT_HAVE_BEEN_BANNED.getValue());

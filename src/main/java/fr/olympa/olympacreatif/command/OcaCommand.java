@@ -29,7 +29,7 @@ public class OcaCommand extends OlympaCommand {
 		
 		OlympaPlayer p = AccountProvider.get(((Player)sender).getUniqueId());
 		
-		if (!p.hasPermission(PermissionsList.STAFF_ADMIN_MODE_HIGH))
+		if (!p.hasPermission(PermissionsList.STAFF_ENABLE_ADMIN_MODE))
 			return false;
 		
 		if (args.length == 1)
@@ -37,16 +37,14 @@ public class OcaCommand extends OlympaCommand {
 			case "on":
 				plugin.getPlotsManager().addAdminPlayer(p);
 				sender.sendMessage("§cOlympaCréatif : mode admin activé.");
-				break;
+				return false;
 			case "off":
 				plugin.getPlotsManager().removeAdminPlayer(p);
 				sender.sendMessage("§aOlympaCréatif : mode admin désactivé.");
-				break;
-			default:
-				sender.sendMessage("§cUtilisation du mode admin : /oca <on|off>");
-				break;
+				return false;
 			}
-		
+
+		sender.sendMessage("§cUtilisation du mode admin : /oca <on|off>");
 		return false;
 	}
 

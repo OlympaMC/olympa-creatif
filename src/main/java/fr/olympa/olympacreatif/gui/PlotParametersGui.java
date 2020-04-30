@@ -122,7 +122,7 @@ public class PlotParametersGui extends OlympaGUI {
 		inv.setItem(7,it);
 
 		//8 : Autoriser le pvp
-		it = ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du pvp");
+		it = ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du PvP");
 
 		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVP));
 
@@ -162,6 +162,14 @@ public class PlotParametersGui extends OlympaGUI {
 
 		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(12,it);
+
+		//13 : Autoriser le pvp
+		it = ItemUtils.item(Material.CREEPER_HEAD, "§6Activation du PvE");
+
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVE));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(13,it);
 	}
 
 	@Override
@@ -267,6 +275,10 @@ public class PlotParametersGui extends OlympaGUI {
 		case 12:
 			current = setSwitchState(current, !getSwitchState(current));
 			plot.getParameters().setParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL, getSwitchState(current));
+			break;
+		case 13:
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.ALLOW_PVE, getSwitchState(current));
 			break;
 		}
 		
