@@ -24,8 +24,6 @@ import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
-import fr.olympa.olympacreatif.world.Properties.ServerProperty;
-import net.minecraft.server.v1_15_R1.MinecraftServer;
 
 public class WorldManager {
 
@@ -39,30 +37,6 @@ public class WorldManager {
 		
 		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
 		generateRestrictedItems();
-		
-
-		//édition server.properties
-        Path path = Paths.get(plugin.getDataFolder().getParentFile().getAbsolutePath()).getParent().resolve("server.properties");
-        try {
-            List<String> lines = Files.readAllLines(path);
-
-            for (String s : new ArrayList<String>(lines)) {
-            	if (s.contains("spawn-npcs") || s.contains("spawn-animals") || s.contains("spawn-monsters") || s.contains("spawn-protection") || s.contains("allow-nether") || s.contains("enable-command-block") || s.contains("difficulty"))
-            		lines.remove(s);
-            }
-            
-            lines.add("spawn-npcs=true");
-            lines.add("spawn-animals=true");
-            lines.add("spawn-monsters=true");
-            lines.add("spawn-protection=0");
-            lines.add("allow-nether=false");
-            lines.add("enable-command-block=false");
-            lines.add("difficulty=easy");
-            
-            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         
         
 		//chargement du monde s'il existe
@@ -99,8 +73,34 @@ public class WorldManager {
 			world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
 			world.setPVP(true);
 			
+
 			
-			Bukkit.getLogger().info(Message.PARAM_PREFIX.getValue() + "World fully generated !");
+
+			//édition server.properties
+	        Path path = Paths.get(plugin.getDataFolder().getParentFile().getAbsolutePath()).getParent().resolve("server.properties");
+	        try {
+	            List<String> lines = Files.readAllLines(path);
+
+	            for (String s : new ArrayList<String>(lines)) {
+	            	if (s.contains("spawn-npcs") || s.contains("spawn-animals") || s.contains("spawn-monsters") || s.contains("spawn-protection") || s.contains("allow-nether") || s.contains("enable-command-block") || s.contains("difficulty"))
+	            		lines.remove(s);
+	            }
+	            
+	            lines.add("spawn-npcs=true");
+	            lines.add("spawn-animals=true");
+	            lines.add("spawn-monsters=true");
+	            lines.add("spawn-protection=0");
+	            lines.add("allow-nether=false");
+	            lines.add("enable-command-block=false");
+	            lines.add("difficulty=easy");
+	            
+	            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	        
+	        
+			Bukkit.getLogger().info(Message.PARAM_PREFIX.getValue() + "World fully generated ! Server restart is now needed.");
 		}
 	}
 
@@ -196,6 +196,10 @@ public class WorldManager {
 		
 		restrictedItems.put(Material.LAVA, PermissionsList.KIT_LAVA);
 		restrictedItems.put(Material.LAVA_BUCKET, PermissionsList.KIT_LAVA);
+
+		restrictedItems.put(Material.COMMAND_BLOCK, PermissionsList.KIT_COMMAND_BLOCKS);
+		restrictedItems.put(Material.CHAIN_COMMAND_BLOCK, PermissionsList.KIT_COMMAND_BLOCKS);
+		restrictedItems.put(Material.REPEATING_COMMAND_BLOCK, PermissionsList.KIT_COMMAND_BLOCKS);
 
 	}
 }

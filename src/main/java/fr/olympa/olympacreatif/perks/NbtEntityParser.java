@@ -210,10 +210,11 @@ public class NbtEntityParser {
 					} catch (ParseException e) {
 						return null;
 					}
-					
-					tag2.setString("Name", "{\"text\":\"" + json.get("text") + "\"}");
-					tag1.set("display", tag2);
-					newTag.set("tag", tag1);
+					if (json.get("text") != null) {
+						tag2.setString("Name", "{\"text\":\"" + ChatColor.translateAlternateColorCodes('&', (String) json.get("text")) + "\"}");
+						tag1.set("display", tag2);
+						newTag.set("tag", tag1);	
+					}
 				}
 		
 		if (oldTag.hasKey("Enchantments")) {

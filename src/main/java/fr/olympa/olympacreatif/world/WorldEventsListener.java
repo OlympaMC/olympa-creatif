@@ -41,6 +41,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -304,6 +306,12 @@ public class WorldEventsListener implements Listener{
 		Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> e.getPlayer().setGameMode(GameMode.CREATIVE), 1);
 	}
 	*/
+	
+	@EventHandler //cancel téléportation par portail de l'end ou du nether
+	public void onChangeWorld(PlayerTeleportEvent e) {
+		if (e.getCause() == TeleportCause.END_PORTAL || e.getCause() == TeleportCause.NETHER_PORTAL)
+			e.setCancelled(true);
+	}
 	
 	@EventHandler //remplir le dispenser au fur et à mesure qu'il se vide (pour toujours garder les mêmes objets à l'intérieur)
 	public void onDispense(BlockDispenseEvent e) {
