@@ -164,7 +164,7 @@ public class PlotParametersGui extends OlympaGUI {
 		inv.setItem(12,it);
 
 		//13 : Autoriser le pvp
-		it = ItemUtils.item(Material.CREEPER_HEAD, "§6Activation du PvE");
+		it = ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE");
 
 		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVE));
 

@@ -36,6 +36,7 @@ import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -52,6 +53,7 @@ import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
+import net.minecraft.server.v1_15_R1.MinecraftServer;
 
 public class WorldEventsListener implements Listener{
 
@@ -111,8 +113,8 @@ public class WorldEventsListener implements Listener{
 							if (entity.getType() == EntityType.PLAYER)
 								continue;
 							
-							//supprime l'entité si en dehors d'un plot ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
-							if (plot == null)
+							//supprime l'entité si en dehors d'un plot (sauf si armorstand, peinture ou cadre) ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
+							if (plot == null && entity.getType() != EntityType.ARMOR_STAND && entity.getType() != EntityType.PAINTING && entity.getType() != EntityType.ITEM_FRAME)
 								entitiesToRemove.add(entity);
 							else //si le plot n'existe pas, on le crée
 								if (entitiesPerPlot.keySet().contains(plot))
@@ -132,7 +134,7 @@ public class WorldEventsListener implements Listener{
 				});
 				asyncEntityCheckup.start();
 			}
-		}.runTaskTimer(plugin, 0, 40);
+		}.runTaskTimer(plugin, 0, 30);
 	}
 	
 	@EventHandler //n'autorise que les spawn à partir d'oeufs 
@@ -145,10 +147,12 @@ public class WorldEventsListener implements Listener{
 		if (e.getEntityType() == EntityType.ARMOR_STAND)
 			return;
 		
-		if (e.getSpawnReason() != SpawnReason.EGG && e.getSpawnReason() != SpawnReason.DISPENSE_EGG && 
+		if (true)
+			return;
+		
+		if (e.getSpawnReason() != SpawnReason.DISPENSE_EGG && e.getSpawnReason() != SpawnReason.ENDER_PEARL &&
 				e.getSpawnReason() != SpawnReason.CUSTOM && e.getSpawnReason() != SpawnReason.ENDER_PEARL && 
-				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG &&
-				e.getSpawnReason() != SpawnReason.ENDER_PEARL)
+				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG)
 			e.setCancelled(true);
 	}
 
@@ -292,11 +296,14 @@ public class WorldEventsListener implements Listener{
 		sneakHistory.remove(e.getPlayer().getName());
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 	}
-
+	
+	/*
+	@Deprecated
 	@EventHandler //mise du GM 1
 	public void onJoinEvent(PlayerJoinEvent e) {
 		Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> e.getPlayer().setGameMode(GameMode.CREATIVE), 1);
 	}
+	*/
 	
 	@EventHandler //remplir le dispenser au fur et à mesure qu'il se vide (pour toujours garder les mêmes objets à l'intérieur)
 	public void onDispense(BlockDispenseEvent e) {

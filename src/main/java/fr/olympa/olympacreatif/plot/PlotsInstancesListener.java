@@ -12,9 +12,9 @@ import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -40,8 +40,9 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
-import net.minecraft.server.v1_15_R1.Entity;
+import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.TileEntity;
 
 public class PlotsInstancesListener implements Listener{
 
@@ -49,8 +50,25 @@ public class PlotsInstancesListener implements Listener{
 	private static Map<Plot, Map<Player, List<ItemStack>>> inventoryStorage = new HashMap<Plot, Map<Player, List<ItemStack>>>();
 	private Plot plot;
 	
+	private List<Material> prohibitedVisitorInteractItems = new ArrayList<Material>();
+	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		initializeProhibitemVisitorItems();
+	}
+
+
+	private void initializeProhibitemVisitorItems() {
+
+		prohibitedVisitorInteractItems.add(Material.ARMOR_STAND);
+		prohibitedVisitorInteractItems.add(Material.BONE_MEAL);
+		prohibitedVisitorInteractItems.add(Material.PAINTING);
+		prohibitedVisitorInteractItems.add(Material.ITEM_FRAME);
+		prohibitedVisitorInteractItems.add(Material.DEBUG_STICK);
+		
+		for (Material mat : Material.values())
+			if (mat.toString().contains("EGG") || mat.toString().contains("MINECART") || mat.toString().contains("BOAT"))
+				prohibitedVisitorInteractItems.add(mat);
 	}
 
 
@@ -66,6 +84,24 @@ public class PlotsInstancesListener implements Listener{
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !plot.getProtectedZoneData().keySet().contains(e.getBlock().getLocation())) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
+			return;
+		}
+		
+		//détection placement spawner
+		if (e.getBlock().getType() == Material.SPAWNER) {
+			Bukkit.broadcastMessage("Spawner placed :");
+			TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(e.getBlockPlaced().getLocation().getBlockX(), e.getBlockPlaced().getLocation().getBlockY(), e.getBlockPlaced().getLocation().getBlockZ()));
+			
+			if (tile != null) {
+				net.minecraft.server.v1_15_R1.ItemStack item = CraftItemStack.asNMSCopy(e.getItemInHand());
+				NBTTagCompound tag = new NBTTagCompound();
+				
+				if (item.hasTag())
+					item.save(tag);
+				
+				if (tag.hasKey("tag"))
+					tile.load(tag.getCompound("tag"));
+			}
 		}
 	}
 	
@@ -101,7 +137,7 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
 		if (e.getClickedBlock() == null)
@@ -129,14 +165,12 @@ public class PlotsInstancesListener implements Listener{
 			}
 		
 		//cancel si usage d'autre chose qu'un oeuf, un arc, une arbalète ou une boule de neige
-		if (e.getItem() == null)
-			return;
-		
-		Material mat = e.getItem().getType(); 
-		
-		if (playerRank == PlotRank.VISITOR)
-			if (mat != Material.BOW && mat != Material.SPLASH_POTION && mat != Material.SNOWBALL && mat != Material.CROSSBOW && mat != Material.FLINT_AND_STEEL)
-				e.setUseItemInHand(Result.DENY);
+		if (e.getItem() != null)
+			if (playerRank == PlotRank.VISITOR)
+				if (prohibitedVisitorInteractItems.contains(e.getItem().getType())) {
+					e.setCancelled(true);	
+					e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
+				}
 	}
 	
 	
@@ -313,7 +347,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 		
-		if (e.getRemover().getType() != EntityType.PLAYER && e.getEntity().getType() == EntityType.PAINTING && e.getEntity().getType() == EntityType.ITEM_FRAME) {
+		if (e.getRemover().getType() != EntityType.PLAYER /* && (e.getEntity().getType() == EntityType.PAINTING || e.getEntity().getType() == EntityType.ITEM_FRAME || e.getEntity().getType() == EntityType.ARMOR_STAND)*/) {
 			e.setCancelled(true);
 			return;
 		}
@@ -341,13 +375,13 @@ public class PlotsInstancesListener implements Listener{
 		
 		NBTTagCompound tag = new NBTTagCompound();
 		((CraftEntity)e.getEntity()).getHandle().c(tag);
-		Bukkit.broadcastMessage(tag.asString());
 		
 		if (tag.hasKey("EntityTag"))
 			if (tag.getCompound("EntityTag").hasKey("Invulnerable"))
 				e.setCancelled(true);
 		
-		tpPlayerToPlotSpawnOnDeath(e, plot);
+		if (e.getEntityType() == EntityType.PLAYER)
+			tpPlayerToPlotSpawnOnDeath(e, plot);
 	}
 	
 	
@@ -364,8 +398,9 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-		
-		tpPlayerToPlotSpawnOnDeath(e, plot);
+
+		if (e.getEntityType() == EntityType.PLAYER)
+			tpPlayerToPlotSpawnOnDeath(e, plot);
 	}
 	
 	
@@ -377,13 +412,7 @@ public class PlotsInstancesListener implements Listener{
 			p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
 			p.setFoodLevel(20);
 		}
-	}
-	
-	
-	@EventHandler //empêche le placement de liquides en dehors du plot
-	public void onPlaceLiquid(PlayerInteractEvent e){		
-	}
-	
+	}	
 	
 	@EventHandler //empêche le drop d'items si interdit sur le plot (et cancel si route)
 	public void onDropItem(PlayerDropItemEvent e) {
@@ -398,7 +427,6 @@ public class PlotsInstancesListener implements Listener{
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !((boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS))) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_DENY_ITEM_DROP.getValue());
-			e.getPlayer().sendMessage("ICI");
 		}		
 	}
 	

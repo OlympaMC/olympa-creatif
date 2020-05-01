@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -26,6 +29,7 @@ public class NbtEntityParser {
 		tagsCopyValue.add("Glowing");
 		tagsCopyValue.add("Health");
 		tagsCopyValue.add("HandDropChances");
+		tagsCopyValue.add("ArmorDropChances");
 		tagsCopyValue.add("Invulnerable");
 		tagsCopyValue.add("Silent");
 		tagsCopyValue.add("powered");
@@ -40,81 +44,116 @@ public class NbtEntityParser {
 		tagsCopyValue.add("generic.armorToughness");
 	}
 	
-	public NBTTagCompound getEntityNbtData(String data) {
+	public NBTTagCompound getEntityNbtData(String data, EntitySourceType sourceType) {
 		NBTTagCompound oldTag = new NBTTagCompound();
 		NBTTagCompound newTag = new NBTTagCompound();
 		
-		try {
-			oldTag = MojangsonParser.parse(data).getCompound("EntityTag");
-		} catch (CommandSyntaxException e) {
-			return null;
-		}
-		
-		//copie des tags qui n'ont pas à être modifiés
-		for (String s : tagsCopyValue)
-			if (oldTag.hasKey(s))
-				newTag.set(s, oldTag.get(s));
-		
-		//check customname
-		if (oldTag.hasKey("CustomName")) {
-			String name = "\"" + oldTag.getString("CustomName").replace("{", "").replace("}", "").replace("_", " ") + "\"";
+		try {			
+			//récupération tag nbt initial entré par le joueur
+			oldTag = MojangsonParser.parse(data);
 			
-			name = ChatColor.translateAlternateColorCodes('&', name);
+			if (oldTag.hasKey("EntityTag"))
+				oldTag = oldTag.getCompound("EntityTag");
+
+			if (oldTag.hasKey("SpawnData"))
+				oldTag = oldTag.getCompound("SpawnData");
 			
-			newTag.setString("CustomName", name);	
-		}
-		
-		//vérification des tags d'items
-		//items dans la main
-		if (oldTag.hasKey("HandItems")) {
-			NBTTagList list = new NBTTagList();
+			//copie des tags qui n'ont pas à être modifiés
+			for (String s : tagsCopyValue)
+				if (oldTag.hasKey(s))
+					newTag.set(s, oldTag.get(s));
 			
-			int iMax = oldTag.getList("HandItems", 10).size();
-			for (int i = 0 ; i < iMax ; i++) 
-				list.add(getValidItem(oldTag.getList("HandItems", 10).getCompound(i)));
-			
-			newTag.set("HandItems", list);
-		}
-		//items d'armure
-		if (oldTag.hasKey("ArmorItems")) {
-			NBTTagList list = new NBTTagList();
-			
-			int iMax = oldTag.getList("ArmorItems", 10).size();
-			for (int i = 0 ; i < iMax ; i++) 
-				list.add(getValidItem(oldTag.getList("ArmorItems", 10).getCompound(i)));
-			
-			newTag.set("ArmorItems", list);
-		}
-		
-		if (oldTag.hasKey("ActiveEffects")) {
-			NBTTagList list = new NBTTagList();
-			
-			int iMax = oldTag.getList("ActiveEffects", 10).size();
-			for (int i = 0 ; i < iMax ; i++) 
-				list.add(getValidEffect(oldTag.getList("ActiveEffects", 10).getCompound(i)));
-			
-			newTag.set("ActiveEffects", list);
-		}
-		
-		if (oldTag.hasKey("Attributes")) {
-			NBTTagList list = new NBTTagList();
-			
-			int iMax = oldTag.getList("Attributes", 10).size();
-			for (int i = 0 ; i < iMax ; i++) {
-				NBTTagCompound tag = new NBTTagCompound();
-				list.add(getValidAttribute(oldTag.getList("Attributes", 10).getCompound(i)));	
+			//check customname
+			if (oldTag.hasKey("CustomName")) {
+				String name = oldTag.getString("CustomName").replace("{", "").replace("}", "").replace("_", " ");
+				
+				if (!name.startsWith("\""))
+					name = "\"" + name;
+				
+				if (!name.endsWith("\""))
+					name = name + "\"";
+				
+				name = ChatColor.translateAlternateColorCodes('&', name);
+				
+				newTag.setString("CustomName", name);	
 			}
 			
-			newTag.set("Attributes", list);
-		}
-
-		Bukkit.broadcastMessage(oldTag.asString());
-		Bukkit.broadcastMessage(newTag.asString());
-		
-		NBTTagCompound finalTag = new NBTTagCompound();
-		finalTag.set("EntityTag", newTag);
+			//vérification des tags d'items
+			//items dans la main
+			if (oldTag.hasKey("HandItems")) {
+				NBTTagList list = new NBTTagList();
 				
-		return finalTag;
+				int iMax = oldTag.getList("HandItems", 10).size();
+				for (int i = 0 ; i < iMax ; i++) 
+					list.add(getValidItem(oldTag.getList("HandItems", 10).getCompound(i)));
+				
+				newTag.set("HandItems", list);
+			}
+			//items d'armure
+			if (oldTag.hasKey("ArmorItems")) {
+				NBTTagList list = new NBTTagList();
+				
+				int iMax = oldTag.getList("ArmorItems", 10).size();
+				for (int i = 0 ; i < iMax ; i++) 
+					list.add(getValidItem(oldTag.getList("ArmorItems", 10).getCompound(i)));
+				
+				newTag.set("ArmorItems", list);
+			}
+			
+			if (oldTag.hasKey("ActiveEffects")) {
+				NBTTagList list = new NBTTagList();
+				
+				int iMax = oldTag.getList("ActiveEffects", 10).size();
+				for (int i = 0 ; i < iMax ; i++) 
+					list.add(getValidEffect(oldTag.getList("ActiveEffects", 10).getCompound(i)));
+				
+				newTag.set("ActiveEffects", list);
+			}
+			
+			if (oldTag.hasKey("Attributes")) {
+				NBTTagList list = new NBTTagList();
+				
+				int iMax = oldTag.getList("Attributes", 10).size();
+				for (int i = 0 ; i < iMax ; i++) {
+					NBTTagCompound tag = new NBTTagCompound();
+					list.add(getValidAttribute(oldTag.getList("Attributes", 10).getCompound(i)));	
+				}
+				
+				newTag.set("Attributes", list);
+			}
+			
+			NBTTagCompound finalTag = new NBTTagCompound();
+			
+			switch (sourceType) {
+			case EGG:
+				finalTag.set("EntityTag", newTag);
+				break;
+			case SPAWNER:
+				if (oldTag.hasKey("id"))
+					newTag.set("id", oldTag.get("id"));
+				
+				finalTag.set("SpawnData", newTag);
+
+				finalTag.setInt("SpawnCount", 1);
+				finalTag.setInt("MaxNearbyEntities", 6);
+				finalTag.setInt("RequiredPlayerRange", 10);
+				finalTag.setInt("SpawnRange", 4);
+				finalTag.setInt("Delay", 20);
+				finalTag.setInt("MinSpawnDelay", 80);
+				finalTag.setInt("MaxSpawnDelay", 120);
+				break;
+			case SUMMON:
+				finalTag = newTag;
+				break;
+			}
+
+			//Bukkit.broadcastMessage("OLD TAG : " + oldTag.asString());
+			//Bukkit.broadcastMessage("FINAL TAG : " + finalTag.asString());
+			
+			return finalTag;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 	
 	private NBTTagCompound getValidAttribute(NBTTagCompound oldTag) {
@@ -146,23 +185,34 @@ public class NbtEntityParser {
 
 	private NBTTagCompound getValidItem(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
-		
+
 		if (oldTag.hasKey("id"))
 			newTag.set("id", oldTag.get("id"));
+		
+		if (oldTag.hasKey("Count"))
+			newTag.set("Count", oldTag.get("Count"));
+		
+		if (oldTag.hasKey("HideFlags"))
+			newTag.set("HideFlags", oldTag.get("HideFlags"));
 		
 		if (oldTag.hasKey("tag"))
 			if (oldTag.getCompound("tag").hasKey("display"))
 				if (oldTag.getCompound("tag").getCompound("display").hasKey("Name")) {
 					NBTTagCompound tag1 = new NBTTagCompound();
 					NBTTagCompound tag2 = new NBTTagCompound();
-					NBTTagCompound tag3 = new NBTTagCompound();
-
-					//Bukkit.broadcastMessage(oldTag.getCompound("tag").getCompound("display").get("Name").toString());
-					//Bukkit.broadcastMessage(oldTag.getCompound("tag").getCompound("display").getString("Name").toString());
 					
-					tag3.setString("Name", oldTag.getCompound("tag").getCompound("display").get("Name").toString().replace("'", "").replace("{", "").replace("}", ""));
-					tag2.set("display", tag3);
-					tag1.set("tag", tag2);
+					String nameTag = oldTag.getCompound("tag").getCompound("display").getString("Name");
+					
+					JSONObject json;
+					
+					try {
+						json = (JSONObject) new JSONParser().parse(nameTag);
+					} catch (ParseException e) {
+						return null;
+					}
+					
+					tag2.setString("Name", "{\"text\":\"" + json.get("text") + "\"}");
+					tag1.set("display", tag2);
 					newTag.set("tag", tag1);
 				}
 		
@@ -198,5 +248,11 @@ public class NbtEntityParser {
 			newTag.set("ShowParticles", oldTag.get("ShowParticles"));
 		
 		return newTag;
+	}
+	
+	public enum EntitySourceType{
+		SPAWNER,
+		EGG,
+		SUMMON;
 	}
 }

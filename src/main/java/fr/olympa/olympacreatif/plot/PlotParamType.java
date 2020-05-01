@@ -22,7 +22,7 @@ public enum PlotParamType {
 	ALLOW_SPLASH_POTIONS("allow_splash_potions", false),
 	ALLOW_PRINT_TNT("allow_print_tnt", false),
 	ALLOW_PVP("allow_pvp", false),
-	ALLOW_PVE("allow_pvp", false),
+	ALLOW_PVE("allow_pveez", false),
 	ALLOW_ENVIRONMENT_DAMAGE("allow_environment_damage", false),
 	ALLOW_DROP_ITEMS("allow_drop_items", false),
 	

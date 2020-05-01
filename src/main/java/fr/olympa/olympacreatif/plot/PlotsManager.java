@@ -28,7 +28,9 @@ public class PlotsManager {
 	private List<AsyncPlot> asyncPlots = new ArrayList<AsyncPlot>();
 	
 	private List<Player> loadedPlayers = new ArrayList<Player>();
-	private Map<Player, Integer> bonusPlotsCount = new HashMap<Player, Integer>();
+
+	private Map<Player, Integer> playerBonusPlots = new HashMap<Player, Integer>();
+	private Map<Player, Integer> playerMoney = new HashMap<Player, Integer>();
 	
 	private int plotCount; 
 	
@@ -174,7 +176,33 @@ public class PlotsManager {
 	}
 	
 	public void setBonusPlots(Player p, int i) {
-		bonusPlotsCount.put(p, i);
+		playerBonusPlots.put(p, i);
+	}
+	
+	public void addBonusPlot(Player p, int i) {
+		if (playerBonusPlots.containsKey(p))
+			playerBonusPlots.put(p, playerBonusPlots.get(p) + 1);
+		else
+			playerBonusPlots.put(p, 1);
+	}
+	
+	public int getMoney(Player p) {
+		if (playerMoney.containsKey(p))
+			return playerMoney.get(p);
+		else
+			return 0;
+	}
+	
+	public void addMoney(Player p, int amount) {
+		if (playerMoney.containsKey(p))
+			playerMoney.put(p, playerMoney.get(p) + amount);
+		else
+			playerMoney.put(p, amount);
+	}
+	
+	public void removeMoney(Player p, int amount) {
+		if (playerMoney.containsKey(p))
+			playerMoney.put(p, playerMoney.get(p) - amount);
 	}
 	
 	public int getAvailablePlotSlotsLeftOwner(Player p) {
@@ -183,8 +211,8 @@ public class PlotsManager {
 		int modificator = 0;
 		
 		//ajoute le bonus de plots éventuel
-		if (bonusPlotsCount.containsKey(p))
-			modificator = bonusPlotsCount.get(p);
+		if (playerBonusPlots.containsKey(p))
+			modificator = playerBonusPlots.get(p);
 		
 		//retire 1 pour chaque plot possédé par le joueur
 		for (Plot plot : loadedPlots.values())

@@ -19,6 +19,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.perks.NbtEntityParser.EntitySourceType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.IMaterial;
@@ -121,11 +122,18 @@ public class OcoCommand extends OlympaCommand {
 			case "give"://give mob eggs with custom NBTtags
 				args[1] = args[1].toUpperCase();
 				
-				if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])) && args[1].toLowerCase().contains("_egg"))
+				if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])) && 
+						(args[1].toLowerCase().contains("_egg") || args[1].toLowerCase().contains("spawner") || args[1].toLowerCase().contains("command_block")))
 					if (true/*p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])))*/) {
 						
 						net.minecraft.server.v1_15_R1.ItemStack item = CraftItemStack.asNMSCopy(new ItemStack(Material.getMaterial(args[1])));
-						NBTTagCompound nbt = plugin.getPerksManager().getNbtEntityParser().getEntityNbtData(args[2]);
+						
+						NBTTagCompound nbt = new NBTTagCompound();
+						
+						if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("EGG"))
+							nbt = plugin.getPerksManager().getNbtEntityParser().getEntityNbtData(args[2], EntitySourceType.EGG);
+						else if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("SPAWNER"))
+							nbt = plugin.getPerksManager().getNbtEntityParser().getEntityNbtData(args[2], EntitySourceType.SPAWNER);
 						
 						if (nbt != null) {
 							item.setTag(nbt);
@@ -170,8 +178,9 @@ public class OcoCommand extends OlympaCommand {
 			for (Entry<String, ItemStack> e : plugin.getPerksManager().getMicroBlocks().getAllMbs().entrySet())
 				list.add(e.getKey());
 		}else if (args.length == 2 && args[0].equals("give")) {
-			for (Material mat : Material.values())
-				list.add(mat.toString().toLowerCase());
+			for (Material mat : plugin.getWorldManager().getRestrictedItems().keySet())
+				if (mat.toString().contains("_EGG") || mat.toString().contains("COMMAND_BLOCK") || mat.toString().contains("SPAWNER"))
+					list.add(mat.toString().toLowerCase());
 		}else
 			for (Player p : Bukkit.getOnlinePlayers())
 				list.add(p.getName());
