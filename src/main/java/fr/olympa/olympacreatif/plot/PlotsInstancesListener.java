@@ -89,7 +89,6 @@ public class PlotsInstancesListener implements Listener{
 		
 		//détection placement spawner
 		if (e.getBlock().getType() == Material.SPAWNER) {
-			Bukkit.broadcastMessage("Spawner placed :");
 			TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(e.getBlockPlaced().getLocation().getBlockX(), e.getBlockPlaced().getLocation().getBlockY(), e.getBlockPlaced().getLocation().getBlockZ()));
 			
 			if (tile != null) {
@@ -240,7 +239,7 @@ public class PlotsInstancesListener implements Listener{
 		//actions de sortie de plot
 		if (plotFrom != null) {
 			plotFrom.removePlayer(e.getPlayer());
-			
+
 			//rendu inventaire si stocké
 			if (inventoryStorage.containsKey(plotFrom) && inventoryStorage.get(plotFrom).containsKey(e.getPlayer())) {
 				e.getPlayer().getInventory().clear();

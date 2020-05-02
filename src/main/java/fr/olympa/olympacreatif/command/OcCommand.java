@@ -94,7 +94,7 @@ public class OcCommand extends OlympaCommand {
 				break;
 			case "center":
 				plot = plugin.getPlotsManager().getPlot(p.getLocation());
-				if (plot == null || plot.getMembers().getPlayerLevel(p) > 0)
+				if (plot == null || plot.getMembers().getPlayerLevel(p) == 0)
 					p.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
 				else {
 					p.sendMessage(Message.TELEPORT_PLOT_CENTER.getValue());
@@ -104,8 +104,17 @@ public class OcCommand extends OlympaCommand {
 					p.teleport(new Location(plugin.getWorldManager().getWorld(), 
 							x, plugin.getWorldManager().getWorld().getHighestBlockYAt((int)x, (int)z), z));
 				}
-					
 				break;
+			case "setspawn":
+				plot = plugin.getPlotsManager().getPlot(p.getLocation());
+				if (plot == null || plot.getMembers().getPlayerLevel(p) < 3)
+					p.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+				else {
+					plot.getParameters().setParameter(PlotParamType.SPAWN_LOC, p.getLocation());
+					p.sendMessage(Message.PLOT_SPAWN_LOC_SET.getValue());
+				}
+				
+			break;
 			default:
 				sender.sendMessage(Message.COMMAND_HELP.getValue());
 				break;
@@ -281,6 +290,7 @@ public class OcCommand extends OlympaCommand {
 			list.add("find");
 			list.add("menu");
 			list.add("center");
+			list.add("setspawn");
 			list.add("invite");
 			list.add("accept");
 			list.add("tp");

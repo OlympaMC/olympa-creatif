@@ -35,6 +35,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -149,9 +150,6 @@ public class WorldEventsListener implements Listener{
 		if (e.getEntityType() == EntityType.ARMOR_STAND)
 			return;
 		
-		if (true)
-			return;
-		
 		if (e.getSpawnReason() != SpawnReason.DISPENSE_EGG && e.getSpawnReason() != SpawnReason.ENDER_PEARL &&
 				e.getSpawnReason() != SpawnReason.CUSTOM && e.getSpawnReason() != SpawnReason.ENDER_PEARL && 
 				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG)
@@ -191,7 +189,7 @@ public class WorldEventsListener implements Listener{
 		if (!(e.getWhoClicked() instanceof Player))
 			return;
 		
-		if (e.getClickedInventory() == null)
+		if (e.getClickedInventory() == null || e.getClickedInventory().getType() != InventoryType.ANVIL)
 			return;
 		
 		if (e.getCurrentItem() == null)
@@ -213,9 +211,8 @@ public class WorldEventsListener implements Listener{
 		OlympaPlayer p = AccountProvider.get(e.getWhoClicked().getUniqueId());
 		
 		if (e.getCurrentItem() != null)
-			if (!hasPlayerPermissionFor(p, e.getCurrentItem().getType(), true)){
+			if (!hasPlayerPermissionFor(p, e.getCurrentItem().getType(), false)){
 				e.setCancelled(true);
-				e.getCursor().setType(Material.STONE);
 			}
 	}
 	
@@ -241,11 +238,12 @@ public class WorldEventsListener implements Listener{
 	}
 
 	//true si le joueur a la permission d'utiliser l'objet désigné
-	public boolean hasPlayerPermissionFor(OlympaPlayer p, Material mat, boolean sendMessage) {
+	public boolean hasPlayerPermissionFor(OlympaPlayer p, Material mat, boolean setStoneInMainHand) {
 		if (plugin.getWorldManager().getRestrictedItems().keySet().contains(mat))
 			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(mat))) {
-				if (sendMessage)
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
+				if (setStoneInMainHand)
+					if (p.getPlayer().getInventory().getItemInMainHand() != null)
+						ItemUtils.name(p.getPlayer().getInventory().getItemInMainHand(), Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
 				return true;
 			}
 		return true;

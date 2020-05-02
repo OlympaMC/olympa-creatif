@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.worldedit;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -89,7 +90,11 @@ public class WorldEditInstance {
 	}
 	
 	//vérifie la validité de la sélection (en terme de nombre de blocs et d'unicité dans le plot)
-public WorldEditError isSelectionValid() {
+	public WorldEditError isSelectionValid() {
+		
+		if (pos1 == null || pos2 == null)
+			return WorldEditError.ERR_POS_NOT_DEFINED;
+		
 		//vérification taille zone
 		if ((Math.abs(pos1.getBlockX()-pos2.getBlockX())+1) * (Math.abs(pos1.getBlockY()-pos2.getBlockY())+1) * (Math.abs(pos1.getBlockZ()-pos2.getBlockZ())+1) 
 				> Integer.valueOf(Message.PARAM_WE_MAX_BLOCKS_PER_CMD.getValue()))
@@ -165,13 +170,13 @@ public WorldEditError isSelectionValid() {
 
 		clipboardPlot = plugin.getPlotsManager().getPlot(pos1);
 
-		Map<BlockData, Integer> probaList = new HashMap<BlockData, Integer>();
+		Map<BlockData, Integer> probaList = new LinkedHashMap<BlockData, Integer>();
 		Map<Location, SimpleEntry<BlockData, TileEntity>> toBuild = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 		BlockData data = null;
 		int totalProba = 0; 
 		
 		//définition de tous les blockdata possibles
-		for (String s : listBlocks.replace(" ", "").split(",")) {
+		for (String s : listBlocks.split(",")) {
 			try{
 				data = Bukkit.createBlockData(s.split("x")[0]);
 				if (data != null)
@@ -196,6 +201,7 @@ public WorldEditError isSelectionValid() {
 					
 					//recherche du bloc aléatoire à placer
 					int proba = plugin.random.nextInt(totalProba) + 1;
+
 					for (Entry<BlockData, Integer> e : probaList.entrySet())
 						if (e.getValue() >= proba) {
 							data = e.getKey();

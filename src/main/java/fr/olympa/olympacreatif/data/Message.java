@@ -113,7 +113,10 @@ public enum Message {
 	PLOT_PROTECTED_ZONE_RESTORED, 
 	OCO_GIVE_INDISPONIBLE_BLOCK, 
 	OCO_GIVE_SUCCESSFUL, 
-	OCO_INVALID_NBT_DATA,
+	OCO_INVALID_NBT_DATA, 
+	
+	WE_ERR_POS_NOT_DEFINED, 
+	PLOT_SPAWN_LOC_SET,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();
