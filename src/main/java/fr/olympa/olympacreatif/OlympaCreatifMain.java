@@ -10,6 +10,7 @@ import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.command.OcaCommand;
 import fr.olympa.olympacreatif.command.OceCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
+import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.PerksManager;
@@ -25,6 +26,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private DataManager dataManager;
 	private PlotsManager plotsManager;
 	private PerksManager perksManager;
+	private CommandBlocksManager cbManager;
 	
 	public Random random = new Random();
 	
@@ -51,6 +53,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		creativeWorldManager = new WorldManager(this);
 		worldEditManager = new WorldEditManager(this);
 		perksManager  = new PerksManager(this);
+		cbManager = new CommandBlocksManager(this);
 		
 		/*try {
 			//OlympaCore.getInstance().getDatabase();
@@ -81,5 +84,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	
 	public PerksManager getPerksManager() {
 		return perksManager;
+	}
+	
+	public CommandBlocksManager getCommandBlocksManager() {
+		return cbManager;
 	}
 }
