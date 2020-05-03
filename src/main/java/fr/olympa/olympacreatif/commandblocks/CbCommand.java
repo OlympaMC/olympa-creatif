@@ -18,16 +18,15 @@ public class CbCommand {
 	protected Plot plot;
 	protected List<Entity> targetEntities;
 	protected String[] args;
-	protected boolean isValid = false;
 	
 	public CbCommand(OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		this.plugin = plugin;
 		this.plot = plot;
 	}
 	
-	protected List<Entity> parseSelector(String s, boolean limitToPlayers){		
+	protected List<Entity> parseSelector(String s, boolean limitToPlayers){
 		List<Entity> list = new ArrayList<Entity>();
-		
+//TODO
 		return list;
 	}
 	
@@ -65,7 +64,7 @@ public class CbCommand {
 			cmd = new CmdClear(plugin, plot, args);
 			break;
 		case ENCHANT:
-			cmd = new CmdEnchant(plugin, args);
+			cmd = new CmdEnchant(plugin, plot, args);
 			break;
 		case EXECUTE:
 			cmd = new CmdExecute(plugin, args);
@@ -74,7 +73,7 @@ public class CbCommand {
 			cmd = new CmdExperience(plugin, plot, args);
 			break;
 		case GIVE:
-			cmd = new CmdGive(plugin, args);
+			cmd = new CmdGive(plugin, plot, args);
 			break;
 		case MSG:
 			cmd = new CmdMsg(plugin, plot, args);
@@ -114,10 +113,6 @@ public class CbCommand {
 					return cmd;
 			return null;
 		}
-	}
-	
-	public boolean isValid() {
-		return isValid;
 	}
 	
 	public int execute() {

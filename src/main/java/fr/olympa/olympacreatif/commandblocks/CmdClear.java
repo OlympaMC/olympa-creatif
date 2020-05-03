@@ -33,9 +33,6 @@ public class CmdClear extends CbCommand {
 			if (StringUtils.isNumeric(args[2]))
 				limit = (int) (double) Double.valueOf(args[2]);
 			break;
-		default:
-			isValid = false;
-			break;
 		}
 	}
 	

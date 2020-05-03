@@ -156,7 +156,7 @@ public class NbtEntityParser {
 		}
 	}
 	
-	private NBTTagCompound getValidAttribute(NBTTagCompound oldTag) {
+	public NBTTagCompound getValidAttribute(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
 		
 		if (!oldTag.hasKey("Base") || !oldTag.hasKey("Name"))
@@ -183,7 +183,7 @@ public class NbtEntityParser {
 	}
 	
 
-	private NBTTagCompound getValidItem(NBTTagCompound oldTag) {
+	public NBTTagCompound getValidItem(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
 
 		if (oldTag.hasKey("id"))
@@ -233,7 +233,7 @@ public class NbtEntityParser {
 		return newTag;
 	}
 	
-	private NBTTagCompound getValidEffect(NBTTagCompound oldTag) {
+	public NBTTagCompound getValidEffect(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
 
 		if (oldTag.hasKey("Id"))

@@ -50,9 +50,6 @@ public class CmdExperience extends CbCommand {
 			else
 				expType = Experience.POINTS;
 			break;
-		default:
-			isValid = false;
-			break;
 		}
 	}
 

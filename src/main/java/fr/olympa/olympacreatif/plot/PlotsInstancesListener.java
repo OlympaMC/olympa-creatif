@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
@@ -233,32 +234,28 @@ public class PlotsInstancesListener implements Listener{
 				e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
 				return;
 			}
+			
 			executeEntryActions(plugin, e.getPlayer(), plotTo);	
 		}
 		
 		//actions de sortie de plot
-		if (plotFrom != null) {
-			plotFrom.removePlayer(e.getPlayer());
-
-			//rendu inventaire si stocké
-			if (inventoryStorage.containsKey(plotFrom) && inventoryStorage.get(plotFrom).containsKey(e.getPlayer())) {
-				e.getPlayer().getInventory().clear();
-				for (ItemStack it : inventoryStorage.get(plotFrom).get(e.getPlayer()))
-					e.getPlayer().getInventory().addItem(it);
-				inventoryStorage.get(plotFrom).remove(e.getPlayer());
-			}
-			
-			//gamemode 1
-			e.getPlayer().setGameMode(GameMode.CREATIVE);			
-			e.getPlayer().setAllowFlight(true);
-			//réinitialisation heure joueur
-			e.getPlayer().resetPlayerTime();
-			e.getPlayer().resetPlayerWeather();
-		}
+		if (plotFrom != null) 
+			executeQuitActions(plugin, e.getPlayer(), plotFrom);
 	}
 
-	//actions à exécuter en entrée du plot (séparé du PlayerMoveEvent pour pouvoir être exécuté après le chargement du plot)
-	@SuppressWarnings("unchecked")
+	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
+	public void onQuitEvent(PlayerQuitEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		if (plot == null)
+			return;
+
+		executeQuitActions(plugin, e.getPlayer(), plot);
+	}
+
+
+	
+	
+	//actions à exécuter en entrée du plot 
 	public static void executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
 		
 		if (plugin.getPlotsManager().isAdmin(p))
@@ -274,6 +271,9 @@ public class PlotsInstancesListener implements Listener{
 		}
 
 		plotTo.addPlayerInPlot(p);
+		
+		//définition du scoreboard
+		plugin.getCommandBlocksManager().setCustomScoreboardFor(plotTo, p);
 		
 		//les actions suivantes ne sont effectuées que si le joueur n'appartient pas au plot
 		if (plotTo.getMembers().getPlayerRank(p) != PlotRank.VISITOR)
@@ -315,31 +315,30 @@ public class PlotsInstancesListener implements Listener{
 		//définition de la météo
 		p.setPlayerWeather((WeatherType) plotTo.getParameters().getParameter(PlotParamType.PLOT_WEATHER));
 	}
-	
-	
-	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
-	public void onQuitEvent(PlayerQuitEvent e) {
-		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
-		if (plot == null)
-			return;
 
-		plot.removePlayer(e.getPlayer());
+	public static void executeQuitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
+
+		plot.removePlayer(p);
 
 		//rendu inventaire si stocké
-		if (inventoryStorage.containsKey(plot) && inventoryStorage.get(plot).containsKey(e.getPlayer())) {
-			e.getPlayer().getInventory().clear();
-			for (ItemStack it : inventoryStorage.get(plot).get(e.getPlayer()))
-				e.getPlayer().getInventory().addItem(it);
-			inventoryStorage.get(plot).remove(e.getPlayer());
+		if (inventoryStorage.containsKey(plot) && inventoryStorage.get(plot).containsKey(p)) {
+			p.getInventory().clear();
+			for (ItemStack it : inventoryStorage.get(plot).get(p))
+				p.getInventory().addItem(it);
+			inventoryStorage.get(plot).remove(p);
 		}
 		
-		e.getPlayer().setGameMode(GameMode.CREATIVE);
-		e.getPlayer().setAllowFlight(true);
-		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
-		e.getPlayer().resetPlayerTime();
-		e.getPlayer().resetPlayerWeather();
+		p.setGameMode(GameMode.CREATIVE);
+		p.setAllowFlight(true);
+		p.teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
+		p.resetPlayerTime();
+		p.resetPlayerWeather();
 	}
-
+	
+	
+	
+	
+	
 	@EventHandler //cancel remove paintings et itemsframes
 	public void onItemFrameDestroy(HangingBreakByEntityEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
@@ -378,9 +377,6 @@ public class PlotsInstancesListener implements Listener{
 		if (tag.hasKey("EntityTag"))
 			if (tag.getCompound("EntityTag").hasKey("Invulnerable"))
 				e.setCancelled(true);
-		
-		if (e.getEntityType() == EntityType.PLAYER)
-			tpPlayerToPlotSpawnOnDeath(e, plot);
 	}
 	
 	
@@ -397,11 +393,17 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-
-		if (e.getEntityType() == EntityType.PLAYER)
-			tpPlayerToPlotSpawnOnDeath(e, plot);
 	}
 	
+	@EventHandler //force le respawn sur le spawn de la parcelle
+	public void onRespawn(PlayerRespawnEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		if (plot == null)
+			e.setRespawnLocation(plugin.getWorldManager().getWorld().getSpawnLocation());
+		else
+			e.setRespawnLocation((Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC));
+		
+	}
 	
 	private void tpPlayerToPlotSpawnOnDeath(EntityDamageEvent e, Plot plot) {
 		Player p =  (Player) e.getEntity();

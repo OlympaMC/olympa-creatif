@@ -29,9 +29,6 @@ public class CmdTeleport extends CbCommand {
 			if (loc != null)
 				tpPoints.add(loc);
 			break;
-		default:
-			isValid = false;
-			break;
 		}
 	}
 	

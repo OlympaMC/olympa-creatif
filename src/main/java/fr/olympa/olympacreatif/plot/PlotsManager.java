@@ -80,6 +80,7 @@ public class PlotsManager {
 						if (!hasMemberOnline) {
 							//e.getValue().unregisterListener();
 							loadedPlots.remove(e.getKey());
+							plugin.getCommandBlocksManager().removeScoreboard(e.getValue());
 						}
 					}
 					
