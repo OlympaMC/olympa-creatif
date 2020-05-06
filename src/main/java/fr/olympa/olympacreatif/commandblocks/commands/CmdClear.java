@@ -1,10 +1,11 @@
-package fr.olympa.olympacreatif.commandblocks;
+package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,8 +18,8 @@ public class CmdClear extends CbCommand {
 	private Material matToRemove = null;
 	int limit = 1000000;
 	
-	public CmdClear(OlympaCreatifMain plugin, Plot plot, String[] commandString) {
-		super(plugin, plot, commandString);
+	public CmdClear(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+		super(sender, plugin, plot, commandString);
 		
 		targetEntities = parseSelector(args[0], true);
 		

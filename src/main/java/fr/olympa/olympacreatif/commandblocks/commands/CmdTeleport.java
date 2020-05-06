@@ -1,9 +1,10 @@
-package fr.olympa.olympacreatif.commandblocks;
+package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -13,8 +14,8 @@ public class CmdTeleport extends CbCommand {
 	
 	private List<Location> tpPoints = new ArrayList<Location>();
 	
-	public CmdTeleport(OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(plugin, plot, args);
+	public CmdTeleport(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(sender, plugin, plot, args);
 		
 		switch(args.length) {
 		case 2:
@@ -25,7 +26,7 @@ public class CmdTeleport extends CbCommand {
 			
 		case 4:
 			targetEntities = parseSelector(args[0], false);
-			Location loc = getLocation(args[1], args[2], args[3]);
+			Location loc = getLocation(sender, args[1], args[2], args[3]);
 			if (loc != null)
 				tpPoints.add(loc);
 			break;

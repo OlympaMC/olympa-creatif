@@ -27,14 +27,14 @@ public class CbObjective {
 	private OlympaCreatifMain plugin;
 	private Plot plot;
 	
-	private ObjType type;
-	private Object typeParam; //contient éventuellement le second paramètre de l'objectif (par exemple, killed_by:minecraft.zombie
+	private ObjType type = null;
+	private Object typeParam =null; //contient éventuellement le second paramètre de l'objectif (par exemple, killed_by:minecraft.zombie
 	
 	private DisplaySlot displayLoc = null;
 	
 	private Map<String, Integer> values = new HashMap<String, Integer>();
 	
-	private String objName;
+	private String objName = "";
 	
 	public CbObjective(OlympaCreatifMain plugin, Plot plot, String objType, String name) {
 		this.plugin = plugin;
@@ -137,7 +137,7 @@ public class CbObjective {
 		values.put(name, value);
 		
 		if (displayLoc != null) {
-			Objective obj = plugin.getCommandBlocksManager().getObjective(plot, displayLoc);
+			Objective obj = plugin.getCommandBlocksManager().getObjectiveOnSlot(plot, displayLoc);
 			obj.getScore(name).setScore(value);
 		}
 	}
@@ -183,7 +183,7 @@ public class CbObjective {
 	
 	public void setDisplay(DisplaySlot loc) {
 		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
-			if (o.getPlot().equals(plot) && o.getDisplayLoc() == loc)
+			if (o.getPlot().equals(plot) && o.getDisplaySlot() == loc)
 				o.setDisplay(null);
 		
 		//clear l'emplacement si nécessaire
@@ -192,7 +192,7 @@ public class CbObjective {
 		
 		//affichage du score sur le slot indiqué
 		if (displayLoc != loc && loc != null) {
-			Objective obj = plugin.getCommandBlocksManager().getObjective(plot, loc);
+			Objective obj = plugin.getCommandBlocksManager().getObjectiveOnSlot(plot, loc);
 			obj.setDisplayName(objName);
 		}
 		
@@ -200,7 +200,7 @@ public class CbObjective {
 	}
 
 
-	private DisplaySlot getDisplayLoc() {
+	public DisplaySlot getDisplaySlot() {
 		return displayLoc;
 	}
 

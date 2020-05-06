@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CommandBlocksManager {
@@ -38,23 +40,39 @@ public class CommandBlocksManager {
 		queuedCommands.remove(plot);
 	}
 	
+	//gestion des scoreboards (affichage sidebar/belowname)
+	
 	//macimum 20 objectifs par plot
-	public void registerObjective(Plot plot, CbObjective obj) {
+	public boolean registerObjective(Plot plot, CbObjective obj) {
 		//n'enregistre pas le scoreboard si un autre avec le même nom existe déjà dans le plot
 		for (CbObjective o : plotObjectives)
 			if (o.getPlot().equals(plot) && o.getName().equals(obj.getName()))
-				return;
+				return false;
 		
 		plotObjectives.add(obj);
 		if (plotObjectives.size()>20)
 			plotObjectives.remove(0);
+		
+		return true;
 	}
 	
 	public List<CbObjective> getObjectives(){
 		return plotObjectives;
 	}
 	
-	public Objective getObjective(Plot p, DisplaySlot slot) {
+	public CbObjective getObjective(Plot plot, String name) {
+		
+		name = ChatColor.translateAlternateColorCodes('&', name);
+		
+		for (CbObjective o : getObjectives())
+			if (o.getPlot().equals(plot) && o.getName().equals(name))
+				return o;
+		
+		return null;
+	}
+	
+	//renvoie le scoreboard affiché sur le slot désigné du plot choisi
+	public Objective getObjectiveOnSlot(Plot p, DisplaySlot slot) {
 		if (!plotsScoreboards.containsKey(p))
 			createScoreboard(p);
 		
@@ -72,11 +90,12 @@ public class CommandBlocksManager {
 		plotsScoreboards.put(p, scb);
 	}
 	
+	@Deprecated
 	public void removeScoreboard(Plot p) {
 		plotsScoreboards.remove(p);
 	}
 
-	public boolean hasCustomScoreboard(Plot plotTo) {
+	private boolean hasCustomScoreboard(Plot plotTo) {
 		return plotsScoreboards.containsKey(plotTo);
 	}
 
@@ -85,7 +104,7 @@ public class CommandBlocksManager {
 			p.setScoreboard(plotsScoreboards.get(plot));
 	}
 
-	//public void clearScoreboardSlot(Plot plot, DisplaySlot displayLoc) {
+	public void clearScoreboardSlot(Plot plot, DisplaySlot displayLoc) {
 		if (displayLoc == null || !plotsScoreboards.containsKey(plot))
 			return;
 		
