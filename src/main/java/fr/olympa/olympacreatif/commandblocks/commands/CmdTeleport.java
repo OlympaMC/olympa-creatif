@@ -19,13 +19,13 @@ public class CmdTeleport extends CbCommand {
 		
 		switch(args.length) {
 		case 2:
-			targetEntities = parseSelector(args[0], false);
-			for (Entity e : parseSelector(args[1], false))
+			targetEntities = parseSelector(plot, args[0], false);
+			for (Entity e : parseSelector(plot, args[1], false))
 				tpPoints.add(e.getLocation());
 			break;
 			
 		case 4:
-			targetEntities = parseSelector(args[0], false);
+			targetEntities = parseSelector(plot, args[0], false);
 			Location loc = getLocation(sender, args[1], args[2], args[3]);
 			if (loc != null)
 				tpPoints.add(loc);

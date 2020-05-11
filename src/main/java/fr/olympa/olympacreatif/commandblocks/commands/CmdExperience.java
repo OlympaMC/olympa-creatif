@@ -20,7 +20,7 @@ public class CmdExperience extends CbCommand {
 		switch(args[0]) {
 		case "add":
 			if (args.length >= 3) {
-				targetEntities = parseSelector(args[1], true);
+				targetEntities = parseSelector(plot, args[1], true);
 				type = Type.ADD;
 
 				if (StringUtils.isNumeric(args[2]))
@@ -33,14 +33,14 @@ public class CmdExperience extends CbCommand {
 			break;
 		case "query":
 			if (args.length == 3) {
-				targetEntities = parseSelector(args[1], true);
+				targetEntities = parseSelector(plot, args[1], true);
 				type = Type.QUERY;
 				expType = Experience.getExperienceType(args[2]);
 			}
 			break;
 		case "set":
 			if (args.length >= 3) {
-				targetEntities = parseSelector(args[1], true);
+				targetEntities = parseSelector(plot, args[1], true);
 				type = Type.SET;
 				
 				if (StringUtils.isNumeric(args[2]))

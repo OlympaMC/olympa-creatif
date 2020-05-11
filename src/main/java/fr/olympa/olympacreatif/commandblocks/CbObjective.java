@@ -182,8 +182,8 @@ public class CbObjective {
 	}
 	
 	public void setDisplay(DisplaySlot loc) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
-			if (o.getPlot().equals(plot) && o.getDisplaySlot() == loc)
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
+			if (o.getDisplaySlot() == loc)
 				o.setDisplay(null);
 		
 		//clear l'emplacement si nécessaire

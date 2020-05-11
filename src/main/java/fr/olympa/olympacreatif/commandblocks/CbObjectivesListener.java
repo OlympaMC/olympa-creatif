@@ -29,7 +29,7 @@ public class CbObjectivesListener implements Listener {
 	
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getEntity().getLocation())))
 			switch(o.getType()) {
 			case health:
 				if (e.getEntityType() == EntityType.PLAYER)
@@ -44,7 +44,7 @@ public class CbObjectivesListener implements Listener {
 	@EventHandler
 	public void onEntityDeathEvent(EntityDeathEvent e) {
 
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getEntity().getLocation())))
 			switch(o.getType()) {
 			case deathCount:
 				if (e.getEntityType() == EntityType.PLAYER)
@@ -75,42 +75,42 @@ public class CbObjectivesListener implements Listener {
 	
 	@EventHandler
 	public void onDrop(PlayerDropItemEvent e) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getPlayer().getLocation())))
 			if (o.getType() == ObjType.minecraft_dropped && e.getItemDrop().getItemStack().getType() == o.getParamType())
 				o.add(e.getPlayer(), 1);		
 	}
 	
 	@EventHandler
 	public void onDrop(EntityPickupItemEvent e) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getEntity().getLocation())))
 			if (o.getType() == ObjType.minecraft_picked_up && e.getItem().getItemStack().getType() == o.getParamType())
 				o.add(e.getEntity(), 1);		
 	}
 	
 	@EventHandler
 	public void onFoodChange(FoodLevelChangeEvent e) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getEntity().getLocation())))
 			if (o.getType() == ObjType.food)
 				o.add(e.getEntity(), 1);
 	}
 	
 	@EventHandler
 	public void onCraft(CraftItemEvent e) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getWhoClicked().getLocation())))
 			if (o.getType() == ObjType.minecraft_crafted && e.getRecipe().getResult().getType() == o.getParamType())
 				o.add(e.getWhoClicked(), 1);
 	}
 	
 	@EventHandler
 	public void onItemUse(PlayerInteractEvent e) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getPlayer().getLocation())))
 			if (o.getType() == ObjType.minecraft_used && e.getItem() != null && e.getItem().getType() == o.getParamType())
 				o.add(e.getPlayer(), 1);
 	}
 	
 	@EventHandler
 	public void onItemBreak(PlayerItemBreakEvent e) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getPlayer().getLocation())))
 			if (o.getType() == ObjType.minecraft_broken && e.getBrokenItem().getType() == o.getParamType())
 				o.add(e.getPlayer(), 1);
 	}
@@ -120,7 +120,7 @@ public class CbObjectivesListener implements Listener {
 		if (e.isCancelled())
 			return;
 
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getPlayer().getLocation())))
 			if (o.getType() == ObjType.minecraft_mined && e.getBlock().getType() == o.getParamType())
 				o.add(e.getPlayer(), 1);		
 	}
@@ -130,14 +130,14 @@ public class CbObjectivesListener implements Listener {
 		if (e.getNewLevel() <= e.getOldLevel())
 			return;
 		
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getPlayer().getLocation())))
 			if (o.getType() == ObjType.level)
 				o.add(e.getPlayer(), e.getNewLevel() - e.getOldLevel());
 	}
 	
 	@EventHandler
 	public void onExpChange(PlayerExpChangeEvent e) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getPlayer().getLocation())))
 			if (o.getType() == ObjType.xp)
 				o.add(e.getPlayer(), e.getAmount());
 	}

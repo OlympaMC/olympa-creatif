@@ -22,7 +22,7 @@ public class CmdGive extends CbCommand {
 	public CmdGive(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(sender, plugin, plot, args);
 		
-		targetEntities = parseSelector(args[0], true);
+		targetEntities = parseSelector(plot, args[0], true);
 		
 		Material mat;
 		

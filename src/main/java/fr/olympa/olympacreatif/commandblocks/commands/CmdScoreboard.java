@@ -52,17 +52,16 @@ public class CmdScoreboard extends CbCommand {
 				
 			case LIST:
 				sender.sendMessage("§6  >>>  Objectifs du plot  <<<" + plot.getId().getAsString());
-				for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
-					if (o.getPlot().equals(plot))
-						sender.sendMessage("   §e> " + o.getName() + " : " + o.getType().toString());
+				for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
+					sender.sendMessage("   §e> " + o.getName() + " : " + o.getType().toString());
 				return 1;
 				
 			case REMOVE:
 				if (args.length >= 3) {
-					for (CbObjective o : new ArrayList<CbObjective>(plugin.getCommandBlocksManager().getObjectives())){
+					for (CbObjective o : new ArrayList<CbObjective>(plugin.getCommandBlocksManager().getObjectives(plot))){
 						if (o.getDisplaySlot() != null && o.getName().equals(args[2])) {
 							plugin.getCommandBlocksManager().clearScoreboardSlot(plot, o.getDisplaySlot());
-							plugin.getCommandBlocksManager().getObjectives().remove(o);
+							plugin.getCommandBlocksManager().getObjectives(plot).remove(o);
 							return 1;
 						}
 					}
@@ -71,13 +70,13 @@ public class CmdScoreboard extends CbCommand {
 					
 			case SETDISPLAY:
 				if (args.length >= 4) {
-					for (CbObjective o : plugin.getCommandBlocksManager().getObjectives()){
-						if (o.getPlot().equals(plot) && o.getName().equals(args[3])) {
+					for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot)){
+						if (o.getName().equals(args[3])) {
 							if (args[2].equals("belowName")) {
 								o.setDisplay(DisplaySlot.BELOW_NAME);
 								return 1;
 							}
-							if (args[2].equals("belowName")) {
+							if (args[2].equals("sidebar")) {
 								o.setDisplay(DisplaySlot.SIDEBAR);
 								return 1;
 							}
@@ -107,7 +106,7 @@ public class CmdScoreboard extends CbCommand {
 						
 						//ajout du score aux entités sélectionnées si un sélecteur a bien été utilisé
 						if (args[2].startsWith("@")) {
-							List<Entity> list = parseSelector(args[2], false);
+							List<Entity> list = parseSelector(plot, args[2], false);
 							
 							for (Entity e : list) {
 								obj.add(e, value);
@@ -135,9 +134,8 @@ public class CmdScoreboard extends CbCommand {
 			case LIST:
 				if (args.length >= 3) {
 					sender.sendMessage("§6  >>>  Objectifs pour" + args[2] + " <<<");
-					for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
-						if (o.getPlot().equals(plot))
-							sender.sendMessage("   §e> " + o.getName() + " : " + o.get(args[2]));
+					for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
+						sender.sendMessage("   §e> " + o.getName() + " : " + o.get(args[2]));
 					return 1;
 				}
 				break;
@@ -151,7 +149,7 @@ public class CmdScoreboard extends CbCommand {
 						String e1 = null;
 						
 						if (args[2].startsWith("@")) {
-							List<Entity> list = parseSelector(args[2], false);
+							List<Entity> list = parseSelector(plot, args[2], false);
 							if (list.size() != 1)
 								return 0;
 							
@@ -164,7 +162,7 @@ public class CmdScoreboard extends CbCommand {
 						List<String> e2 = new ArrayList<String>();
 						
 						if (args[5].startsWith("@")){
-							List<Entity> list = parseSelector(args[5], false);
+							List<Entity> list = parseSelector(plot, args[5], false);
 							for (Entity e : list)
 								e2.add(e.getCustomName());
 						}else {
@@ -191,7 +189,7 @@ public class CmdScoreboard extends CbCommand {
 						
 						//ajout du score aux entités sélectionnées si un sélecteur a bien été utilisé
 						if (args[2].startsWith("@")) {
-							List<Entity> list = parseSelector(args[2], false);
+							List<Entity> list = parseSelector(plot, args[2], false);
 							
 							for (Entity e : list) {
 								obj.add(e, value);
@@ -209,16 +207,14 @@ public class CmdScoreboard extends CbCommand {
 				if (args.length >= 3) {
 					
 					if (args[2].startsWith("@")) {
-						List<Entity> list = parseSelector(args[2], false);
+						List<Entity> list = parseSelector(plot, args[2], false);
 						
-						for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
-							if (plot.equals(o.getPlot()))
-								for (Entity e : list)
-									o.reset(e);
+						for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
+							for (Entity e : list)
+								o.reset(e);
 					}else {
-						for (CbObjective o : plugin.getCommandBlocksManager().getObjectives())
-							if (plot.equals(o.getPlot()))
-								o.reset(args[2]);
+						for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
+							o.reset(args[2]);
 					}
 					return 1;
 				}
@@ -236,7 +232,7 @@ public class CmdScoreboard extends CbCommand {
 						
 						//ajout du score aux entités sélectionnées si un sélecteur a bien été utilisé
 						if (args[2].startsWith("@")) {
-							List<Entity> list = parseSelector(args[2], false);
+							List<Entity> list = parseSelector(plot, args[2], false);
 							
 							for (Entity e : list) {
 								obj.set(e, value);

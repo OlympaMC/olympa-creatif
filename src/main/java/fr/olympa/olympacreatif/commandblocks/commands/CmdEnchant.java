@@ -20,7 +20,7 @@ public class CmdEnchant extends CbCommand {
 		super(sender, plugin, plot, commandString);
 		
 		if (args.length >= 2)
-			targetEntities = parseSelector(args[0], true);
+			targetEntities = parseSelector(plot, args[0], true);
 		
 		ench = Enchantment.getByKey(NamespacedKey.minecraft(args[1]));
 		

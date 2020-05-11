@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,23 +22,34 @@ public class CommandBlocksManager {
 
 	private OlympaCreatifMain plugin;
 	private Map<Plot, List<CbCommand>> queuedCommands = new LinkedHashMap<Plot, List<CbCommand>>(); 
-	private List<CbObjective> plotObjectives = new ArrayList<CbObjective>();
+
+	private Map<Plot, List<CbObjective>> plotObjectives = new HashMap<Plot, List<CbObjective>>();
+	private Map<Plot, List<CbTeam>> plotTeams = new HashMap<Plot, List<CbTeam>>();
 	
-	private HashMap<Plot, Scoreboard> plotsScoreboards = new HashMap<Plot, Scoreboard>();
+	private Map<Plot, Scoreboard> plotsScoreboards = new HashMap<Plot, Scoreboard>();
 	
 	public CommandBlocksManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-		
+
 		plugin.getServer().getPluginManager().registerEvents(new CbObjectivesListener(plugin), plugin);
+		plugin.getServer().getPluginManager().registerEvents(new CbTeamListener(plugin), plugin);
 	}
 	
 	public void registerPlot(Plot plot) {
 		if (!queuedCommands.containsKey(plot))
 			queuedCommands.put(plot, new ArrayList<CbCommand>());
+
+		if (!plotObjectives.containsKey(plot))
+			plotObjectives.put(plot, new ArrayList<CbObjective>());
+		
+		if (!plotTeams.containsKey(plot))
+			plotTeams.put(plot, new ArrayList<CbTeam>());
 	}
 	
 	public void unregisterPlot(Plot plot) {
 		queuedCommands.remove(plot);
+		plotObjectives.remove(plot);
+		plotTeams.remove(plot);
 	}
 	
 	//gestion des scoreboards (affichage sidebar/belowname)
@@ -45,27 +57,30 @@ public class CommandBlocksManager {
 	//macimum 20 objectifs par plot
 	public boolean registerObjective(Plot plot, CbObjective obj) {
 		//n'enregistre pas le scoreboard si un autre avec le même nom existe déjà dans le plot
-		for (CbObjective o : plotObjectives)
-			if (o.getPlot().equals(plot) && o.getName().equals(obj.getName()))
+		for (CbObjective o : plotObjectives.get(plot))
+			if (o.getName().equals(obj.getName()))
 				return false;
 		
-		plotObjectives.add(obj);
-		if (plotObjectives.size()>20)
-			plotObjectives.remove(0);
+		plotObjectives.get(plot).add(obj);
+		if (plotObjectives.get(plot).size()>20)
+			plotObjectives.get(plot).remove(0);
 		
 		return true;
 	}
 	
-	public List<CbObjective> getObjectives(){
-		return plotObjectives;
+	public List<CbObjective> getObjectives(Plot plot){
+		if (plot == null || !plotObjectives.containsKey(plot))
+			return new ArrayList<CbObjective>();
+		else
+			return plotObjectives.get(plot);
 	}
 	
-	public CbObjective getObjective(Plot plot, String name) {
+	public CbObjective getObjective(Plot plot, String objName) {
 		
-		name = ChatColor.translateAlternateColorCodes('&', name);
+		objName = ChatColor.translateAlternateColorCodes('&', objName);
 		
-		for (CbObjective o : getObjectives())
-			if (o.getPlot().equals(plot) && o.getName().equals(name))
+		for (CbObjective o : getObjectives(plot))
+			if (o.getName().equals(objName))
 				return o;
 		
 		return null;
@@ -116,5 +131,45 @@ public class CommandBlocksManager {
 			scb.registerNewObjective("belowName", "dummy", "belowName");
 		if (displayLoc == DisplaySlot.SIDEBAR)
 			scb.registerNewObjective("sidebar", "dummy", "sidebar");
+	}
+	
+
+	//gestion des équipes
+	public boolean registerTeam(Plot plot, CbTeam team) {
+		for (CbTeam t : getTeams(plot))
+			if (t.getId().equals(team.getId()))
+				return false;
+		
+		plotTeams.get(plot).add(team);
+		
+		if (plotTeams.get(plot).size() > 20)
+			plotTeams.get(plot).remove(0);
+		
+		return true;
+	}
+	public List<CbTeam> getTeams(Plot plot){
+		if (plot == null || !plotTeams.containsKey(plot))
+			return new ArrayList<CbTeam>();
+		else
+			return plotTeams.get(plot);
+	}
+	
+	public CbTeam getTeamOfPlayer(Plot plot, String memberName) {
+		
+		memberName = ChatColor.translateAlternateColorCodes('&', memberName);
+		
+		for (CbTeam t : getTeams(plot))
+			if (t.getMembers().contains(memberName)) 
+				return t;			
+				
+		return null;
+	}
+
+	public CbTeam getTeam(Plot plot, String teamId) {
+		for (CbTeam t : getTeams(plot))
+			if (t.getId().equals(teamId)) 
+				return t;			
+				
+		return null;
 	}
 }

@@ -55,7 +55,7 @@ public class CbCommand {
 		this.sender = sender;
 	}
 	
-	protected List<Entity> parseSelector(String s, boolean limitToPlayers){
+	protected List<Entity> parseSelector(Plot plot, String s, boolean limitToPlayers){
 		List<Entity> list = new ArrayList<Entity>();
 //TODO
 		
@@ -66,11 +66,28 @@ public class CbCommand {
 	//récupère une localisation dans le plot depuis 3 strings
 	protected Location getLocation(CommandSender sender, String x, String y, String z) {
 		Location loc = null;
+		Location locInit = null;
+		
+		if (sender instanceof CommandBlock)
+			locInit = ((CommandBlock)sender).getLocation();
+		else if (sender instanceof Player)
+			locInit = ((Player)sender).getLocation();
+			
+		if (locInit == null)
+			return null;
 		
 		if (StringUtils.isNumeric(x) && StringUtils.isNumeric(y) && StringUtils.isNumeric(z)){
 			loc = new Location(plugin.getWorldManager().getWorld(), Double.valueOf(x), Double.valueOf(y), Double.valueOf(z));
+			
 			if (plot.getId().isInPlot(loc))
 				return loc;
+			
+		}else if(StringUtils.isNumeric(x.replaceFirst("~", "")) && StringUtils.isNumeric(y.replaceFirst("~", "")) && StringUtils.isNumeric(z.replaceFirst("~", ""))){
+
+			loc = new Location(plugin.getWorldManager().getWorld(), Double.valueOf(x.replaceFirst("~", "")), Double.valueOf(y.replaceFirst("~", "")), Double.valueOf(z.replaceFirst("~", "")));
+			if (plot.getId().isInPlot(loc))
+				return loc;
+			
 		}
 		
 		return null;
@@ -106,25 +123,25 @@ public class CbCommand {
 			cmd = new CmdClear(sender, plugin, plot, args);
 			break;
 		case ENCHANT:
-			cmd = new CmdEnchant(plugin, plot, args);
+			cmd = new CmdEnchant(sender, plugin, plot, args);
 			break;
 		case EXECUTE:
 			cmd = new CmdExecute(plugin, args);
 			break;
 		case EXPERIENCE:
-			cmd = new CmdExperience(plugin, plot, args);
+			cmd = new CmdExperience(sender, plugin, plot, args);
 			break;
 		case GIVE:
-			cmd = new CmdGive(plugin, plot, args);
+			cmd = new CmdGive(sender, plugin, plot, args);
 			break;
 		case MSG:
-			cmd = new CmdMsg(plugin, plot, args);
+			cmd = new CmdTellraw(sender, plugin, plot, args);
 			break;
 		case SCOREBOARD:
-			cmd = new CmdScoreboard(plugin, args);
+			cmd = new CmdScoreboard(sender, plugin, plot, args);
 			break;
 		case TEAM:
-			cmd = new CmdTeam(plugin, plot, args);
+			cmd = new CmdTeam(sender, plugin, plot, args);
 			break;
 		case TELEPORT:
 			cmd = new CmdTeleport(sender, plugin, plot, args);
