@@ -32,7 +32,7 @@ public class CommandBlocksManager {
 		this.plugin = plugin;
 
 		plugin.getServer().getPluginManager().registerEvents(new CbObjectivesListener(plugin), plugin);
-		plugin.getServer().getPluginManager().registerEvents(new CbTeamListener(plugin), plugin);
+		plugin.getServer().getPluginManager().registerEvents(new CbTeamsListener(plugin), plugin);
 	}
 	
 	public void registerPlot(Plot plot) {

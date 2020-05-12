@@ -9,11 +9,11 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
 
-public class CbTeamListener implements Listener {
+public class CbTeamsListener implements Listener {
 
 	private OlympaCreatifMain plugin;
 	
-	public CbTeamListener(OlympaCreatifMain plugin) {
+	public CbTeamsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 	}
 	

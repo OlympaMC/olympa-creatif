@@ -116,9 +116,6 @@ public class CbCommand {
 		args = (String[]) list.toArray();
 		
 		switch (type) {
-		case BOSSBAR:
-			cmd = new CmdBossBar(plugin, args);
-			break;
 		case CLEAR:
 			cmd = new CmdClear(sender, plugin, plot, args);
 			break;
@@ -126,7 +123,7 @@ public class CbCommand {
 			cmd = new CmdEnchant(sender, plugin, plot, args);
 			break;
 		case EXECUTE:
-			cmd = new CmdExecute(plugin, args);
+			cmd = new CmdExecute(sender, plugin, plot, args);
 			break;
 		case EXPERIENCE:
 			cmd = new CmdExperience(sender, plugin, plot, args);

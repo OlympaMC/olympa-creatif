@@ -51,7 +51,7 @@ public class CmdScoreboard extends CbCommand {
 				break;
 				
 			case LIST:
-				sender.sendMessage("§6  >>>  Objectifs du plot  <<<" + plot.getId().getAsString());
+				sender.sendMessage("§6  >>>  Objectifs du plot " + plot.getId().getAsString() + " <<<");
 				for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
 					sender.sendMessage("   §e> " + o.getName() + " : " + o.getType().toString());
 				return 1;

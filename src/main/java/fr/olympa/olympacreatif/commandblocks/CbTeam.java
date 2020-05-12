@@ -32,6 +32,8 @@ public class CbTeam {
 	private String id;
 	private String name = "";
 	
+	private List<net.minecraft.server.v1_15_R1.Entity> teamNameHolders = new ArrayList<net.minecraft.server.v1_15_R1.Entity>();
+	
 	public CbTeam(OlympaCreatifMain plugin, Plot plot, String id, String name) {
 		this.plugin = plugin;
 		this.plot = plot;
@@ -49,6 +51,9 @@ public class CbTeam {
 	
 	public void setName(String n) {
 		name = ChatColor.translateAlternateColorCodes('&',n);
+		
+		if (name.equals(""))
+			removeTeamNameForAll();
 	}
 	
 	public Plot getPlot() {
@@ -91,6 +96,7 @@ public class CbTeam {
 	
 	public void removeMember(String s) {
 		members.remove(ChatColor.translateAlternateColorCodes('&', s));
+		
 	}
 
 	public List<String> getMembers(){
@@ -153,11 +159,20 @@ public class CbTeam {
 		eBee.spawnIn(plugin.getWorldManager().getNmsWorld());
 		
 		eBee.startRiding(((CraftPlayer)p).getHandle());
+		
+
+		teamNameHolders.add(eSlime);
+		teamNameHolders.add(eBee);
 	}
 	
 	public void removeTeamName(Player p) {
 		for (Entity e : p.getPassengers())
 			e.remove();
+	}
+	
+	public void removeTeamNameForAll() {//tue les entités chevauchant les joueurs de cette équipe
+		for (net.minecraft.server.v1_15_R1.Entity e : teamNameHolders)
+			e.getBukkitEntity().remove();
 	}
 	
 	public enum ColorType{

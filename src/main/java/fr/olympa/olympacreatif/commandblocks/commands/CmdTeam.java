@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.plot.Plot;
 
@@ -25,15 +26,23 @@ public class CmdTeam extends CbCommand {
 	@Override 
 	public int execute() {
 		switch (args[0]) {
+		case "list":
+			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getId().getAsString() + " <<<");
+			for (CbTeam t : plugin.getCommandBlocksManager().getTeams(plot))
+				sender.sendMessage("   §e> " + t.getId() + " (" + t.getName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
+			return 1;
+			
 		case "empty":
 			if (args.length >= 2) {
 				CbTeam t = plugin.getCommandBlocksManager().getTeam(plot, args[1]);
 				if (t != null) {
+					t.removeTeamNameForAll();
 					t.getMembers().clear();
 					return 1;
 				}
 			}
 			break;
+			
 		case "join":
 			if (args.length >= 2) {
 				CbTeam t = plugin.getCommandBlocksManager().getTeam(plot, args[1]);
@@ -55,6 +64,7 @@ public class CmdTeam extends CbCommand {
 				}
 			}
 			break;
+			
 		case "leave":
 			if (args.length >= 2) {
 				CbTeam t = plugin.getCommandBlocksManager().getTeam(plot, args[1]);
@@ -76,6 +86,7 @@ public class CmdTeam extends CbCommand {
 				}
 			}
 			break;
+			
 		case "add":
 			if (args.length >= 2) {
 				String display = "";
@@ -88,26 +99,29 @@ public class CmdTeam extends CbCommand {
 					return 1;
 			}
 			break;
+			
 		case "remove":
 			if (args.length >= 2) {
 				for (CbTeam t : new ArrayList<CbTeam>(plugin.getCommandBlocksManager().getTeams(plot)))
 					if (t.getId().equals(args[1])) {
+						t.removeTeamNameForAll();
 						plugin.getCommandBlocksManager().getTeams(plot).remove(t);
 						return 1;
 					}
 			}
 			break;
+			
 		case "modify"://ne modifie que le nom (prefix) de l'équipe, aucune autre personnalisation du menu "modify" n'est prise en compte.
-			if (args.length >= 4 && args[2].equals("prefix")) {
+			if (args.length >= 3 && args[2].equals("prefix")) {
 				CbTeam t = plugin.getCommandBlocksManager().getTeam(plot, args[1]);
 				
 				if (t == null)
 					break;
 				
-				if (args[2].equals("prefix")) {
-					t.setName(args[2]);
-					return 1;
-				}
+				if (args.length == 4)
+					t.setName(args[3]);
+				else
+					t.setName("");
 			}
 			break;
 		}
