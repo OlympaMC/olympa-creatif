@@ -26,11 +26,13 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -61,20 +63,27 @@ import net.minecraft.server.v1_15_R1.MinecraftServer;
 public class WorldEventsListener implements Listener{
 
 	OlympaCreatifMain plugin;
-	Map<String, Long> sneakHistory = new HashMap<String, Long>(); 
+	Map<String, Long> sneakHistory = new HashMap<String, Long>();
+	
 	List<Entity> entities = new ArrayList<Entity>(); 
 	List<Entity> entitiesToRemove = new ArrayList<Entity>();
+
+	Map<Plot, Integer> spawnEntities = new HashMap<Plot, Integer>();
+	
+	int maxEntitiesPerTypePerPlot = 0;
+	int maxTotalEntitiesPerPlot = 0;
 	
 	public WorldEventsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+
+		maxEntitiesPerTypePerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue());
+		maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
 		
 		//gestion des entités (remove si plot null ou si nb par plot > 100)
 		new BukkitRunnable() {
 			
 			
 			Thread asyncEntityCheckup = null;
-			int maxEntitiesPerTypePerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue());
-			int maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
 			
 			private int getTotalEntities(Map<EntityType, Integer> map) {
 				int i = 0;
@@ -138,24 +147,64 @@ public class WorldEventsListener implements Listener{
 				asyncEntityCheckup.start();
 			}
 		}.runTaskTimer(plugin, 0, 30);
+		
+		
+		//vide l'historique des entités spawnées
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				spawnEntities.clear();
+			}
+		}.runTaskTimer(plugin, 0, 20);
 	}
 	
-	@EventHandler //n'autorise que les spawn à partir d'oeufs 
+	@EventHandler //n'autorise que certaines sources de spawn de créatures 
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
+		if (e.isCancelled())
+			return;
+		
 		if (plugin.getPlotsManager().getPlot(e.getLocation()) == null) {
 			e.setCancelled(true);
 			return;
 		}
 		
+		/*
 		if (e.getEntityType() == EntityType.ARMOR_STAND)
-			return;
+			return;*/
 		
 		if (e.getSpawnReason() != SpawnReason.DISPENSE_EGG && e.getSpawnReason() != SpawnReason.ENDER_PEARL &&
 				e.getSpawnReason() != SpawnReason.CUSTOM && e.getSpawnReason() != SpawnReason.ENDER_PEARL && 
 				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG)
 			e.setCancelled(true);
 	}
+	
+	@EventHandler //cancel évent si trop grand nombre spawnées simultanément dans un plot donné
+	public void onEntitySpawn(EntitySpawnEvent e) {
+		if (e.isCancelled() || e.getEntityType() == EntityType.PLAYER)
+			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
+		
+		if (plot == null) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		if (spawnEntities.containsKey(plot)) {
+			spawnEntities.put(plot, spawnEntities.get(plot)+1);
+			if (spawnEntities.get(plot) > maxEntitiesPerTypePerPlot)
+				e.setCancelled(true);
+		}else
+			spawnEntities.put(plot, 1);
+		
+	}
 
+	@EventHandler
+	public void onFireSpread(BlockSpreadEvent e) {
+		e.setCancelled(true);
+	}
+	
 	@EventHandler //cancel lava/water flow en dehors du plot. Cancel aussi toute téléportation d'un oeuf de dragon
 	public void onLiquidFlow(BlockFromToEvent e) {
 		if (e.getBlock() != null && (e.getBlock().getType() == Material.DRAGON_EGG || e.getBlock().getType() == Material.WATER || e.getBlock().getType() == Material.LAVA)) {

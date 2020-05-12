@@ -3,12 +3,23 @@ package fr.olympa.olympacreatif.commandblocks;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
+import net.minecraft.server.v1_15_R1.ChatMessage;
+import net.minecraft.server.v1_15_R1.EntityBee;
+import net.minecraft.server.v1_15_R1.EntitySlime;
+import net.minecraft.server.v1_15_R1.EntityTypes;
+import net.minecraft.server.v1_15_R1.IChatBaseComponent;
+import net.minecraft.server.v1_15_R1.ItemStack;
+import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 
 public class CbTeam {
 
@@ -19,13 +30,13 @@ public class CbTeam {
 	private String color = "";
 
 	private String id;
-	private String name;
+	private String name = "";
 	
 	public CbTeam(OlympaCreatifMain plugin, Plot plot, String id, String name) {
 		this.plugin = plugin;
 		this.plot = plot;
 		this.id = id;
-		this.name = ChatColor.translateAlternateColorCodes('&',name);
+		setName(ChatColor.translateAlternateColorCodes('&',name));
 	}
 	
 	public String getName() {
@@ -52,9 +63,10 @@ public class CbTeam {
 	}
 	
 	public void addMember(Entity e) {
-		if (e instanceof Player)
-			addMember(((Player) e).getDisplayName());
-		else
+		if (e instanceof Player) {
+			addMember(((Player) e).getName());
+			showTeamName((Player) e);	
+		}else
 			addMember(e.getCustomName());
 	}
 	
@@ -70,9 +82,10 @@ public class CbTeam {
 	}
 	
 	public void removeMember(Entity e) {
-		if (e instanceof Player)
-			removeMember(((Player) e).getDisplayName());
-		else
+		if (e instanceof Player) {
+			removeMember(((Player) e).getName());
+			removeTeamName((Player) e);
+		}else
 			removeMember(e.getCustomName());
 	}
 	
@@ -109,6 +122,42 @@ public class CbTeam {
 	
 	public void setColor(String colorAsString) {
 		color = ColorType.getColor(colorAsString);
+	}
+	
+	public void showTeamName(Player p) {//summon des entités pour faire apparaître le nom de la team au dessus du pseudo du joueur
+		
+		removeTeamName(p);
+		
+		if (name.equals(""))
+			return;
+		
+		EntitySlime eSlime = new EntitySlime(EntityTypes.SLIME, plugin.getWorldManager().getNmsWorld());
+		eSlime.setSize(1, true);
+		eSlime.updateSize();
+		eSlime.setInvisible(true);
+		eSlime.setInvulnerable(true);
+		eSlime.setCustomNameVisible(true);
+		eSlime.setCustomName(new ChatMessage(color + name));
+		
+		eSlime.spawnIn(plugin.getWorldManager().getNmsWorld());
+		
+		eSlime.startRiding(((CraftPlayer)p).getHandle());
+		
+		EntityBee eBee = new EntityBee(EntityTypes.BEE, plugin.getWorldManager().getNmsWorld());
+		eBee.updateSize();
+		eBee.setInvisible(true);
+		eBee.setInvulnerable(true);
+		eBee.setCustomNameVisible(true);
+		eBee.setCustomName(new ChatMessage(p.getDisplayName()));
+		
+		eBee.spawnIn(plugin.getWorldManager().getNmsWorld());
+		
+		eBee.startRiding(((CraftPlayer)p).getHandle());
+	}
+	
+	public void removeTeamName(Player p) {
+		for (Entity e : p.getPassengers())
+			e.remove();
 	}
 	
 	public enum ColorType{
