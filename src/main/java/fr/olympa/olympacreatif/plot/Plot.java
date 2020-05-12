@@ -11,11 +11,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
 import fr.olympa.api.objects.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.TileEntity;
@@ -33,7 +35,9 @@ public class Plot {
 	private List<Player> playersInPlot = new ArrayList<Player>();
 	private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
-	private boolean isActive = true; //sert à détecter quand un chunk est inactif
+	private Map<String, BossBar> bossbarsList = new HashMap<String, BossBar>();
+	
+	//private boolean isActive = true; //sert à détecter quand un chunk est inactif
 	
 	//constructeur pour un plot n'existant pas encore
 	Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
@@ -73,14 +77,14 @@ public class Plot {
 	public void unregisterListener() {
 		HandlerList.unregisterAll(listener);
 	}*/
-	
+	/*
 	public boolean isActive() {
 		return isActive;
 	}
 	
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
-	}
+	}*/
 	
 	public void addPlayerInPlot(Player p) {
 		playersInPlot.add(p);
@@ -100,5 +104,28 @@ public class Plot {
 
 	public Map<Location, SimpleEntry<BlockData, TileEntity>> getProtectedZoneData() {
 		return protectedZoneData;
+	}
+	
+	public void addBossBar(String id, BossBar bar){
+		if (!bossbarsList.containsKey(id)) 
+			bossbarsList.put(id, bar);
+	}
+	
+	public BossBar getBossBar(String id) {
+		return bossbarsList.get(id);
+	}
+	
+	public boolean removeBossBar(String id) {
+		if (bossbarsList.containsKey(id)) {
+			bossbarsList.get(id).removeAll();
+			bossbarsList.remove(id);
+			return true;
+		}else
+			return false;
+			
+	}
+	
+	public Map<String, BossBar> getBossBars() {
+		return Collections.unmodifiableMap(bossbarsList);
 	}
 }

@@ -111,11 +111,14 @@ public class CbCommand {
 		
 		CommandType type = CommandType.get(args[0]);
 		
-		List list = new ArrayList<String>(Arrays.asList(args));
+		List<String> list = new ArrayList<String>(Arrays.asList(args));
 		list.remove(0);
 		args = (String[]) list.toArray();
 		
 		switch (type) {
+		case BOSSBAR:
+			cmd = new CmdBossBar(sender, plugin, plot, args);
+			break;
 		case CLEAR:
 			cmd = new CmdClear(sender, plugin, plot, args);
 			break;

@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
+import fr.olympa.olympacreatif.perks.NbtEntityParser;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -33,20 +34,7 @@ public class CmdTellraw extends CbCommand {
 				for (String key : tag.getKeys()) {
 					switch(key) {
 					case "text":
-						if (tag.hasKey("italic"))
-							text += ChatColor.ITALIC;
-						if (tag.hasKey("bold"))
-							text += ChatColor.BOLD;
-						if (tag.hasKey("strikethrough"))
-							text += ChatColor.STRIKETHROUGH;
-						if (tag.hasKey("underlined"))
-							text += ChatColor.UNDERLINE;
-						if (tag.hasKey("obfuscated"))
-							text += ChatColor.MAGIC;
-						if (tag.hasKey("color"))
-							text += CbTeam.ColorType.getColor(tag.getString(key));
-						
-						text += ChatColor.translateAlternateColorCodes('&', tag.getString(key));
+						text += NbtEntityParser.parseJsonText(tag);
 						break;
 						
 					case "selector":

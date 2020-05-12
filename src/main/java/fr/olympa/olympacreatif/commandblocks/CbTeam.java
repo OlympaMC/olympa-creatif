@@ -144,10 +144,9 @@ public class CbTeam {
 		eSlime.setInvulnerable(true);
 		eSlime.setCustomNameVisible(true);
 		eSlime.setCustomName(new ChatMessage(color + name));
+		eSlime.setNoAI(true);
 		
-		eSlime.spawnIn(plugin.getWorldManager().getNmsWorld());
 		
-		eSlime.startRiding(((CraftPlayer)p).getHandle());
 		
 		EntityBee eBee = new EntityBee(EntityTypes.BEE, plugin.getWorldManager().getNmsWorld());
 		eBee.updateSize();
@@ -155,9 +154,12 @@ public class CbTeam {
 		eBee.setInvulnerable(true);
 		eBee.setCustomNameVisible(true);
 		eBee.setCustomName(new ChatMessage(p.getDisplayName()));
+		eBee.setNoAI(true);
 		
+		eSlime.spawnIn(plugin.getWorldManager().getNmsWorld());
 		eBee.spawnIn(plugin.getWorldManager().getNmsWorld());
-		
+
+		eSlime.startRiding(((CraftPlayer)p).getHandle());
 		eBee.startRiding(((CraftPlayer)p).getHandle());
 		
 

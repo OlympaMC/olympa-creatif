@@ -12,6 +12,7 @@ import org.json.simple.parser.ParseException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
@@ -255,5 +256,35 @@ public class NbtEntityParser {
 		SPAWNER,
 		EGG,
 		SUMMON;
+	}
+	
+	public static String parseJsonText(String nbtText) {
+		try {
+			return parseJsonText(MojangsonParser.parse(nbtText));
+		} catch (CommandSyntaxException e) {
+			return "§Texte json invalide";
+		}
+	}
+	
+	public static String parseJsonText(NBTTagCompound nbtText) {
+		String text = "";
+
+		if (nbtText.hasKey("italic"))
+			text += ChatColor.ITALIC;
+		if (nbtText.hasKey("bold"))
+			text += ChatColor.BOLD;
+		if (nbtText.hasKey("strikethrough"))
+			text += ChatColor.STRIKETHROUGH;
+		if (nbtText.hasKey("underlined"))
+			text += ChatColor.UNDERLINE;
+		if (nbtText.hasKey("obfuscated"))
+			text += ChatColor.MAGIC;
+		if (nbtText.hasKey("color"))
+			text += CbTeam.ColorType.getColor(nbtText.getString("color"));
+		
+		if (nbtText.hasKey("text"))
+			text += nbtText.getString("text");
+		
+		return text;
 	}
 }
