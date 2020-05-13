@@ -89,7 +89,7 @@ public class CmdTellraw extends CbCommand {
 	@Override
 	public int execute() {
 		for (Entity e : targetEntities)
-			e.sendMessage(text);
+			e.sendMessage("§7[CB]§r " + text);
 		return targetEntities.size();
 	}
 }

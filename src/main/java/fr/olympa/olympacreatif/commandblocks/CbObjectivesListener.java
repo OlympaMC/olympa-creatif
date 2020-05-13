@@ -1,6 +1,8 @@
 package fr.olympa.olympacreatif.commandblocks;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -9,6 +11,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -27,16 +30,31 @@ public class CbObjectivesListener implements Listener {
 		this.plugin = plugin;
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onDamage(EntityDamageEvent e) {
+		if (e.isCancelled() || !(e instanceof LivingEntity))
+			return;
+		
 		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getEntity().getLocation())))
 			switch(o.getType()) {
 			case health:
-				if (e.getEntityType() == EntityType.PLAYER)
-					if (((Player) e).getHealth() - e.getDamage() >= 0)
-						o.set(((Player) e).getDisplayName(), (int) ((Player) e).getHealth());
-					else
-						o.set(((Player) e).getDisplayName(), 20);
+				if (((LivingEntity) e).getHealth() - e.getDamage() >= 0)
+					o.set(e.getEntity(), (int) ((LivingEntity) e).getHealth());
+				else
+					o.set(e.getEntity(), (int) ((LivingEntity)e).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()*2);
+				break;
+			}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onSpawn(EntitySpawnEvent e) {
+		if (e.isCancelled() || !(e instanceof LivingEntity))
+			return;
+		
+		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plugin.getPlotsManager().getPlot(e.getEntity().getLocation())))
+			switch(o.getType()) {
+			case health:
+				o.set(e.getEntity(), (int) ((LivingEntity)e).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()*2);
 				break;
 			}
 	}

@@ -79,6 +79,10 @@ public class NbtEntityParser {
 				newTag.setString("CustomName", name);	
 			}
 			
+			//vérification de la taille du slime
+			if (oldTag.hasKey("Size"))
+				newTag.setInt("Size", Math.min(oldTag.getInt("Size"), 10));
+			
 			//vérification des tags d'items
 			//items dans la main
 			if (oldTag.hasKey("HandItems")) {
@@ -90,6 +94,7 @@ public class NbtEntityParser {
 				
 				newTag.set("HandItems", list);
 			}
+			
 			//items d'armure
 			if (oldTag.hasKey("ArmorItems")) {
 				NBTTagList list = new NBTTagList();

@@ -16,7 +16,8 @@ import fr.olympa.olympacreatif.plot.Plot;
 public class CmdClear extends CbCommand {
 
 	private Material matToRemove = null;
-	int limit = 1000000;
+	int limitMax = 1000000;
+	int limit = limitMax;
 	
 	public CmdClear(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		super(sender, plugin, plot, commandString);
@@ -41,7 +42,9 @@ public class CmdClear extends CbCommand {
 	public int execute() {
 		List<Entity> concernedPlayers = new ArrayList<Entity>();
 		
-		for (Entity e : targetEntities)
+		int totalRemovedItems = 0;
+		
+		for (Entity e : targetEntities) {
 			for (ItemStack it : ((Player) e).getInventory().getContents())
 				if (it != null && (matToRemove == null || it.getType() == matToRemove)) {
 					if (it.getAmount() > limit) {
@@ -57,7 +60,9 @@ public class CmdClear extends CbCommand {
 						break;
 					}
 				}
-		return concernedPlayers.size();
+			totalRemovedItems += limitMax - limit;
+		}
+		return totalRemovedItems;
 	}
 
 }

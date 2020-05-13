@@ -65,13 +65,19 @@ public class CbCommand {
 	
 	//récupère une localisation dans le plot depuis 3 strings
 	protected Location getLocation(CommandSender sender, String x, String y, String z) {
-		Location loc = null;
 		Location locInit = null;
 		
 		if (sender instanceof CommandBlock)
 			locInit = ((CommandBlock)sender).getLocation();
 		else if (sender instanceof Player)
 			locInit = ((Player)sender).getLocation();
+		
+		return getLocation(locInit, x, y, z);
+	}
+	
+	protected Location getLocation (Location baseLocation, String x, String y, String z) {
+		Location loc = null;
+		Location locInit = baseLocation;
 			
 		if (locInit == null)
 			return null;
@@ -146,6 +152,9 @@ public class CbCommand {
 		case TELEPORT:
 			cmd = new CmdTeleport(sender, plugin, plot, args);
 			break;
+		case EFFECT:
+			cmd = new CmdEffect(sender, plugin, plot, args);
+			break;
 		default:
 			break;
 		}		
@@ -163,7 +172,8 @@ public class CbCommand {
 		CLEAR,
 		GIVE,
 		ENCHANT,
-		EXPERIENCE,
+		EXPERIENCE, 
+		EFFECT, 
 		;
 		
 		public static CommandType get(String s) {
