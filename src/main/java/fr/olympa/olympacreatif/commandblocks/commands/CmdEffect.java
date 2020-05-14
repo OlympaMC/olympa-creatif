@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -12,8 +13,8 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdEffect extends CbCommand {
 
-	public CmdEffect(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, plugin, plot, args);
+	public CmdEffect(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(sender, loc, plugin, plot, args);
 	}
 
 	@Override

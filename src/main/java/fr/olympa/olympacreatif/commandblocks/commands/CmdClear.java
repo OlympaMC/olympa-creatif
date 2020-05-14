@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -19,8 +20,8 @@ public class CmdClear extends CbCommand {
 	int limitMax = 1000000;
 	int limit = limitMax;
 	
-	public CmdClear(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
-		super(sender, plugin, plot, commandString);
+	public CmdClear(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+		super(sender, loc, plugin, plot, commandString);
 		
 		targetEntities = parseSelector(plot, args[0], true);
 		

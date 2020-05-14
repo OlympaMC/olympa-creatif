@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -18,8 +19,8 @@ public class CmdTellraw extends CbCommand {
 	
 	private String text = "";
 	
-	public CmdTellraw(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, plugin, plot, args);
+	public CmdTellraw(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(sender, loc, plugin, plot, args);
 		targetEntities = parseSelector(plot, args[0], true);
 		
 		//JSONObject json(JSONObject) new JSONParser().parse(args[1]);

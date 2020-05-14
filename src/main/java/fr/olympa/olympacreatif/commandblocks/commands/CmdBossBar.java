@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -16,8 +17,8 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdBossBar extends CbCommand {
 	
-	public CmdBossBar(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, plugin, plot, args);
+	public CmdBossBar(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(sender, loc, plugin, plot, args);
 	}
 	
 	@Override

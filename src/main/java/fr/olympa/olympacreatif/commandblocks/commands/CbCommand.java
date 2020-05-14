@@ -41,7 +41,7 @@ import org.bukkit.util.Vector;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
 
-public class CbCommand {
+public abstract class CbCommand {
 
 	protected OlympaCreatifMain plugin;
 	protected Plot plot;
@@ -49,57 +49,58 @@ public class CbCommand {
 	protected String[] args;
 	protected CommandSender sender;
 	
-	public CbCommand(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+	protected Location sendingLoc;
+	
+	//la commande comprend un commandsender, une localisation (imposée par le execute at), le plugin, le plot à la commande est exécutée et les arguments de la commande
+	public CbCommand(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		this.plugin = plugin;
 		this.plot = plot;
 		this.sender = sender;
+		this.args = commandString;
+		this.sendingLoc = sendingLoc;
 	}
 	
 	protected List<Entity> parseSelector(Plot plot, String s, boolean limitToPlayers){
 		List<Entity> list = new ArrayList<Entity>();
-//TODO
+		
+
+		//TODO
+		//TODO
 		
 		
 		return list;
 	}
 	
-	//récupère une localisation dans le plot depuis 3 strings
-	protected Location getLocation(CommandSender sender, String x, String y, String z) {
-		Location locInit = null;
+	protected Location getLocation (String x, String y, String z) {
+		Location locFinal = null;
+		Location locInit = sendingLoc;
 		
-		if (sender instanceof CommandBlock)
-			locInit = ((CommandBlock)sender).getLocation();
-		else if (sender instanceof Player)
-			locInit = ((Player)sender).getLocation();
-		
-		return getLocation(locInit, x, y, z);
+		Double xF = getUnverifiedPoint(x, sendingLoc.getX());
+		Double yF = getUnverifiedPoint(y, sendingLoc.getY());
+		Double zF = getUnverifiedPoint(z, sendingLoc.getZ());		
+		 
+		if (xF != null && yF != null && zF != null) {
+			Location loc = new Location(plugin.getWorldManager().getWorld(), xF, yF, zF); 
+			if (plot.getId().isInPlot(loc))
+				return loc;
+			else
+				return null;
+		}else
+			return null;
 	}
 	
-	protected Location getLocation (Location baseLocation, String x, String y, String z) {
-		Location loc = null;
-		Location locInit = baseLocation;
-			
-		if (locInit == null)
-			return null;
+	private Double getUnverifiedPoint(String s, double potentialVectorValueToAdd) {
 		
-		if (StringUtils.isNumeric(x) && StringUtils.isNumeric(y) && StringUtils.isNumeric(z)){
-			loc = new Location(plugin.getWorldManager().getWorld(), Double.valueOf(x), Double.valueOf(y), Double.valueOf(z));
-			
-			if (plot.getId().isInPlot(loc))
-				return loc;
-			
-		}else if(StringUtils.isNumeric(x.replaceFirst("~", "")) && StringUtils.isNumeric(y.replaceFirst("~", "")) && StringUtils.isNumeric(z.replaceFirst("~", ""))){
-
-			loc = new Location(plugin.getWorldManager().getWorld(), Double.valueOf(x.replaceFirst("~", "")), Double.valueOf(y.replaceFirst("~", "")), Double.valueOf(z.replaceFirst("~", "")));
-			if (plot.getId().isInPlot(loc))
-				return loc;
-			
-		}
+		if (StringUtils.isNumeric(s))
+			return Double.valueOf(s);
+		
+		if (StringUtils.isNumeric(s.replaceFirst("~", "")))
+			return Double.valueOf(s.replaceFirst("~", "")) + potentialVectorValueToAdd;
 		
 		return null;
 	}
 	
-	public static CbCommand getCommand(OlympaCreatifMain plugin, CommandSender sender, String fullCommand) {
+	public static CbCommand getCommand(OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {
 		Plot plot = null;
 		String[] args = fullCommand.split(" ");
 
@@ -123,37 +124,40 @@ public class CbCommand {
 		
 		switch (type) {
 		case BOSSBAR:
-			cmd = new CmdBossBar(sender, plugin, plot, args);
+			cmd = new CmdBossBar(sender, loc, plugin, plot, args);
 			break;
 		case CLEAR:
-			cmd = new CmdClear(sender, plugin, plot, args);
+			cmd = new CmdClear(sender, loc, plugin, plot, args);
 			break;
 		case ENCHANT:
-			cmd = new CmdEnchant(sender, plugin, plot, args);
+			cmd = new CmdEnchant(sender, loc, plugin, plot, args);
 			break;
 		case EXECUTE:
-			cmd = new CmdExecute(sender, plugin, plot, args);
+			cmd = new CmdExecute(sender, loc, plugin, plot, args);
 			break;
 		case EXPERIENCE:
-			cmd = new CmdExperience(sender, plugin, plot, args);
+			cmd = new CmdExperience(sender, loc, plugin, plot, args);
 			break;
 		case GIVE:
-			cmd = new CmdGive(sender, plugin, plot, args);
+			cmd = new CmdGive(sender, loc, plugin, plot, args);
 			break;
 		case MSG:
-			cmd = new CmdTellraw(sender, plugin, plot, args);
+			cmd = new CmdTellraw(sender, loc, plugin, plot, args);
 			break;
 		case SCOREBOARD:
-			cmd = new CmdScoreboard(sender, plugin, plot, args);
+			cmd = new CmdScoreboard(sender, loc, plugin, plot, args);
 			break;
 		case TEAM:
-			cmd = new CmdTeam(sender, plugin, plot, args);
+			cmd = new CmdTeam(sender, loc, plugin, plot, args);
 			break;
 		case TELEPORT:
-			cmd = new CmdTeleport(sender, plugin, plot, args);
+			cmd = new CmdTeleport(sender, loc, plugin, plot, args);
 			break;
 		case EFFECT:
-			cmd = new CmdEffect(sender, plugin, plot, args);
+			cmd = new CmdEffect(sender, loc, plugin, plot, args);
+			break;
+		case SUMMON:
+			cmd = new CmdSummon(sender, loc, plugin, plot, args);
 			break;
 		default:
 			break;
@@ -174,6 +178,7 @@ public class CbCommand {
 		ENCHANT,
 		EXPERIENCE, 
 		EFFECT, 
+		SUMMON, 
 		;
 		
 		public static CommandType get(String s) {

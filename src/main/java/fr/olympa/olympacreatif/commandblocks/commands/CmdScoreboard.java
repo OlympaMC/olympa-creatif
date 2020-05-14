@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -22,8 +23,8 @@ public class CmdScoreboard extends CbCommand {
 	
 	String[] args;
 	
-	public CmdScoreboard(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
-		super(sender, plugin, plot, commandString);
+	public CmdScoreboard(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+		super(sender, loc, plugin, plot, commandString);
 		
 		args = commandString;
 	}

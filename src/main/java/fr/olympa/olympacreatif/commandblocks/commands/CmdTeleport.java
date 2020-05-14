@@ -14,8 +14,8 @@ public class CmdTeleport extends CbCommand {
 	
 	private List<Location> tpPoints = new ArrayList<Location>();
 	
-	public CmdTeleport(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, plugin, plot, args);
+	public CmdTeleport(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(sender, loc, plugin, plot, args);
 		
 		switch(args.length) {
 		case 2:
@@ -26,9 +26,9 @@ public class CmdTeleport extends CbCommand {
 			
 		case 4:
 			targetEntities = parseSelector(plot, args[0], false);
-			Location loc = getLocation(sender, args[1], args[2], args[3]);
-			if (loc != null)
-				tpPoints.add(loc);
+			Location loc1 = getLocation(args[1], args[2], args[3]);
+			if (loc1 != null)
+				tpPoints.add(loc1);
 			break;
 		}
 	}

@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
@@ -16,8 +17,8 @@ public class CmdEnchant extends CbCommand {
 	private Enchantment ench;
 	private int level = 1;
 	
-	public CmdEnchant(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
-		super(sender, plugin, plot, commandString);
+	public CmdEnchant(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+		super(sender, loc, plugin, plot, commandString);
 		
 		if (args.length >= 2)
 			targetEntities = parseSelector(plot, args[0], true);

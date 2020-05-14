@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
@@ -19,8 +20,8 @@ public class CmdGive extends CbCommand {
 
 	private ItemStack item = null;
 	
-	public CmdGive(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, plugin, plot, args);
+	public CmdGive(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(sender, loc, plugin, plot, args);
 		
 		targetEntities = parseSelector(plot, args[0], true);
 		

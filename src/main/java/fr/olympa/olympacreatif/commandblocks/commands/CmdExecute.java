@@ -23,26 +23,21 @@ public class CmdExecute extends CbCommand {
 
 	private List<String> subCommands = new ArrayList<String>(Arrays.asList(new String[] {"if", "unless", "at", "as", "facing", "positioned", "store", "run"}));
 	
-	public CmdExecute(CommandSender sender, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, plugin, plot, args);
+	public CmdExecute(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(sender, loc, plugin, plot, args);
 	}
 
 	@Override
 	public int execute() {
 		
-		boolean stop = false;
-		
 		List<CommandSender> sendEntities = new ArrayList<CommandSender>();
 		List<Location> sendLocations = new ArrayList<Location>();
-		
+
 		List<String> args = new ArrayList<String>(Arrays.asList(this.args));
 		
 		List<Integer> lastResults = new ArrayList<Integer>();
 		
-		if (sender instanceof CommandBlock)
-			sendLocations.add(((CommandBlock) sender).getLocation());
-		else if (sender instanceof Player)
-			sendLocations.add(((Player) sender).getLocation());
+		sendLocations.add(sendingLoc);
 		
 		sendEntities.add(sender);
 		
@@ -71,7 +66,7 @@ public class CmdExecute extends CbCommand {
 				
 				for (CommandSender s : sendEntities)
 					for (Location loc : new ArrayList<Location>(sendLocations)) 
-						if (isTestValid(subArgs, loc))
+						if (isTestValid(subArgs, sendLocations))
 							lastResults.add(1);
 						else {
 							lastResults.add(0);
@@ -88,7 +83,7 @@ public class CmdExecute extends CbCommand {
 				
 				for (CommandSender s : sendEntities)
 					for (Location loc : new ArrayList<Location>(sendLocations)) 
-						if (!isTestValid(subArgs, loc))
+						if (!isTestValid(subArgs, sendLocations))
 							lastResults.add(1);
 						else {
 							lastResults.add(0);
@@ -145,11 +140,11 @@ public class CmdExecute extends CbCommand {
 									List<String >subArgsBis = new ArrayList<String>();
 									
 									for (String str : new ArrayList<String>(subArgs))
-										if (!subCommands.contains(s)) {
+										if (!subCommands.contains(str)) {
 											subArgsBis.add(str);
 											subArgs.remove(0);
 										}else //exécution de la commande suivante et stockage du résultat dans la bossbar
-											bar.setProgress(new CmdExecute(s, plugin, plot, (String[]) subArgsBis.toArray()).execute());
+											bar.setProgress(new CmdExecute(s, loc, plugin, plot, (String[]) subArgsBis.toArray()).execute());
 								}
 						else
 							return 0;
@@ -165,12 +160,12 @@ public class CmdExecute extends CbCommand {
 									List<String >subArgsBis = new ArrayList<String>();
 									
 									for (String str : new ArrayList<String>(subArgs))
-										if (!subCommands.contains(s)) {
+										if (!subCommands.contains(str)) {
 											subArgsBis.add(str);
 											subArgs.remove(0);
 										}else //exécution de la commande suivante et stockage du résultat dans le score de l'entité
 											if (s instanceof Entity)
-												obj.set((Entity) s, new CmdExecute(s, plugin, plot, (String[]) subArgsBis.toArray()).execute());
+												obj.set((Entity) s, new CmdExecute(s, loc, plugin, plot, (String[]) subArgsBis.toArray()).execute());
 								}
 						else
 							return 0;
@@ -188,7 +183,7 @@ public class CmdExecute extends CbCommand {
 				
 				for (Location loc : sendLocations)
 					for (CommandSender s : sendEntities) {
-						CbCommand cmd = CbCommand.getCommand(plugin, s, cmdStr);
+						CbCommand cmd = CbCommand.getCommand(plugin, s, loc, cmdStr);
 						
 						if (cmd != null && !(cmd instanceof CmdExecute))
 							lastResults.add(cmd.execute());	
@@ -204,7 +199,7 @@ public class CmdExecute extends CbCommand {
 	
 	//test effectués pour les commandes if et unless
 	//accepte actuellement les sous commandes : entity, block, blocks, score
-	private boolean isTestValid(List<String> subArgs, Location sendLoc) {
+	private boolean isTestValid(List<String> subArgs, List<Location> sendLocs) {
 		//sous commandes de if
 		switch (subArgs.get(1)) {
 		case "score": //compare des scores
@@ -285,11 +280,14 @@ public class CmdExecute extends CbCommand {
 			
 			
 		case "block":
-			if (subArgs.size() != 6)
+			if (subArgs.size() != 6 && sendLocs.size() > 0)
 				return false;
 			
 			Material mat = Material.getMaterial(subArgs.get(5));
-			Location loc = getLocation(sendLoc, subArgs.get(2), subArgs.get(3), subArgs.get(4));
+			
+			sendingLoc = sendLocs.get(0);
+			
+			Location loc = getLocation(subArgs.get(2), subArgs.get(3), subArgs.get(4));
 			
 			if (mat == null || loc == null)
 			return false;
@@ -303,19 +301,21 @@ public class CmdExecute extends CbCommand {
 			
 			
 		case "blocks":
-			if (subArgs.size() != 12)
+			if (subArgs.size() != 12 && sendLocs.size() > 0)
 				return false;
 			
 			List<BlockData> blocks = new ArrayList<BlockData>();
 
+			sendingLoc = sendLocs.get(0);
+			
 			//définition des 3 points servant de référence à la comparaiosn
-			Location loc1 = getLocation(sendLoc, subArgs.get(2), subArgs.get(3), subArgs.get(4));
+			Location loc1 = getLocation( subArgs.get(2), subArgs.get(3), subArgs.get(4));
 			if (loc1 == null)
 				return false;
-			Location loc2 = getLocation(sendLoc, subArgs.get(5), subArgs.get(6), subArgs.get(7));
+			Location loc2 = getLocation(subArgs.get(5), subArgs.get(6), subArgs.get(7));
 			if (loc2 == null)
 				return false;
-			Location finalLoc3 = getLocation(sendLoc, subArgs.get(8), subArgs.get(9), subArgs.get(10));
+			Location finalLoc3 = getLocation(subArgs.get(8), subArgs.get(9), subArgs.get(10));
 			if (finalLoc3 == null)
 				return false;
 
