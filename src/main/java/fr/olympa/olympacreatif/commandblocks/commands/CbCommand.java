@@ -159,6 +159,12 @@ public abstract class CbCommand {
 		case SUMMON:
 			cmd = new CmdSummon(sender, loc, plugin, plot, args);
 			break;
+		case KILL:
+			cmd = new CmdKill(sender, loc, plugin, plot, args);
+			break;
+		case SAY:
+			cmd = new CmdSay(sender, loc, plugin, plot, args);
+			break;
 		default:
 			break;
 		}		
@@ -179,6 +185,8 @@ public abstract class CbCommand {
 		EXPERIENCE, 
 		EFFECT, 
 		SUMMON, 
+		KILL,
+		SAY,
 		;
 		
 		public static CommandType get(String s) {
