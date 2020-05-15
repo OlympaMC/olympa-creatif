@@ -23,7 +23,7 @@ public class CmdClear extends CbCommand {
 	public CmdClear(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		super(sender, loc, plugin, plot, commandString);
 		
-		targetEntities = parseSelector(plot, args[0], true);
+		targetEntities = parseSelector(args[0], true);
 		
 		switch (args.length) {
 		case 1:

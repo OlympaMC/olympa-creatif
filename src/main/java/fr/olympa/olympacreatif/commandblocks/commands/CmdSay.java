@@ -17,7 +17,7 @@ public class CmdSay extends CbCommand {
 	
 	@Override
 	public int execute() {
-		targetEntities = parseSelector(plot, args[0], true);
+		targetEntities = parseSelector(args[0], true);
 		
 		String message = "";
 		int i = 0;

@@ -52,7 +52,7 @@ public class CmdTeam extends CbCommand {
 					break;
 				
 				if (args.length == 3) {
-					List<Entity> list = parseSelector(plot, args[2], false);
+					List<Entity> list = parseSelector(args[2], false);
 
 					for (Entity e : list)
 						t.addMember(e);
@@ -74,7 +74,7 @@ public class CmdTeam extends CbCommand {
 					break;
 				
 				if (args.length == 3) {
-					List<Entity> list = parseSelector(plot, args[2], false);
+					List<Entity> list = parseSelector(args[2], false);
 
 					for (Entity e : list)
 						t.removeMember(e);

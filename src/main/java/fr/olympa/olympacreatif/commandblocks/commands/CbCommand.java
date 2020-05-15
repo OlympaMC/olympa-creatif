@@ -2,51 +2,25 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
-
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.EntityEffect;
 import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Server;
-import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.CommandBlock;
-import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Pose;
-import org.bukkit.entity.Entity.Spigot;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.metadata.MetadataValue;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
-
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
+import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.plot.Plot;
-import net.minecraft.server.v1_15_R1.EntityTypes;
 
 public abstract class CbCommand {
 
@@ -67,6 +41,7 @@ public abstract class CbCommand {
 		this.sendingLoc = sendingLoc;
 	}
 	
+	//parse le selecteur et ses paramètres : x, y, z, dx, dy, dz, distance, name, team, scores, level, type
 	protected List<Entity> parseSelector(String s, boolean limitToPlayers){
 		List<Entity> list = new ArrayList<Entity>();
 		Map<String, String> parameters = new HashMap<String, String>();
@@ -87,9 +62,13 @@ public abstract class CbCommand {
 		}
 		
 		//ajout des entités concernées par le test (joueurs (et) entités)
-		list = new ArrayList<Entity>(plot.getPlayers());
+		if (s.startsWith("@s")) //ajout de l'entité exécutant la commande
+			if (sender instanceof Entity)
+				list.add((Entity) sender);
+		else
+			list = new ArrayList<Entity>(plot.getPlayers());
 		
-		if ((s.startsWith("@e") || s.startsWith("@s")) && !limitToPlayers)
+		if (s.startsWith("@e") && !limitToPlayers)
 			list.addAll(plot.getEntities());
 		
 
@@ -219,6 +198,7 @@ public abstract class CbCommand {
 							
 		}
 		
+		//parcours tous les paramètres intermédiaires
 		for (Entry<String, String> e : parameters.entrySet())
 			switch(e.getKey()) {
 			
@@ -269,7 +249,7 @@ public abstract class CbCommand {
 						type = EntityType.fromName(e.getValue().replace("!", ""));
 						isTestInequality = true;
 					}else
-						type = EntityType.fromName(e.getValue().replace("!", ""));						
+						type = EntityType.fromName(e.getValue());						
 						
 					//test des noms différents entre minecraft et spigot
 					if (type == null) {
@@ -290,14 +270,84 @@ public abstract class CbCommand {
 							list.remove(ent);
 							
 				}
+				break;
 				
+			case "team":
 				
+				for (String ss : e.getValue().split(",")) {
+				
+				boolean isTestInequality = false;
+				CbTeam team = null;
+				
+				//recherche du type de l'entité
+				if (ss.contains("!")) {
+					team = plugin.getCommandBlocksManager().getTeam(plot, e.getValue().replace("!", ""));
+					isTestInequality = true;
+				}else
+					team = plugin.getCommandBlocksManager().getTeam(plot, e.getValue());
+				
+				if (team == null)
+					return list;
+				
+				for (Entity ent : new ArrayList<Entity>(list))
+					if ((isTestInequality && team.isMember(ent)) || (!isTestInequality && !team.isMember(ent)))
+						list.remove(ent);
+						
+			}
+			break;
+				
+			}
+		
+		//trie le résultat
+		
+		//définition des comparateurs
+		Comparator<Entity> sortByNearest = new Comparator<Entity>() {
+			@Override
+			public int compare(Entity o1, Entity o2) {
+				return (int) (o1.getLocation().distance(selectorLoc) -  o2.getLocation().distance(selectorLoc));
+			}
+		};
+		
+		if (!parameters.containsKey("sort")) {
+			if (s.startsWith("@p"))
+				parameters.put("sort", "nearest");
+			if (s.startsWith("@r"))
+				parameters.put("sort", "random");
+		}
+		
+		if (parameters.containsKey("sort"))
+			switch(parameters.get("sort")) {
+			case "nearest":
+				list.sort(sortByNearest);
+				break;
+			case "furthest":
+				list.sort(sortByNearest);
+				Collections.reverse(list);
+				break;
+			case "random":
+				List<Entity> listBis = new ArrayList<Entity>();
+				
+				while (list.size() > 0) 
+					listBis.add(list.get(plugin.random.nextInt(list.size())));
+				
+				list = listBis;
 				break;
 			}
 		
-		//TODO
-		//TODO
-		
+		//limite le nombre de sorties au paramètre "limit" si fourni, ou à 1 en cas de @s ou @p
+		if (parameters.containsKey("limit")) {
+			range = getIntRange(parameters.get("limit"));
+			
+			if (range == null)
+				return list;
+			
+			List<Entity> listBis = new ArrayList<Entity>(list);
+			Collections.reverse(listBis);
+			
+			for (Entity e : listBis)
+				if (list.size() > range[0])
+					list.remove(e);
+		}
 		
 		return list;
 	}

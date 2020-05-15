@@ -108,7 +108,7 @@ public class CmdBossBar extends CbCommand {
 				return 1;
 				
 			case "players":
-				targetEntities = parseSelector(plot, args[3], true);
+				targetEntities = parseSelector(args[3], true);
 				for (Entity p : targetEntities)
 					bar.addPlayer((Player) p);
 				

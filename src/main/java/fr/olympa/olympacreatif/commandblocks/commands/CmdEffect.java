@@ -21,7 +21,7 @@ public class CmdEffect extends CbCommand {
 	public int execute() {
 		PotionEffectType type;
 		
-		targetEntities = parseSelector(plot, args[1], false);
+		targetEntities = parseSelector(args[1], false);
 		
 		switch (args[0]) {
 		case "clear":

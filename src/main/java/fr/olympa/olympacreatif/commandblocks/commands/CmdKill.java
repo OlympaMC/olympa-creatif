@@ -18,7 +18,7 @@ public class CmdKill extends CbCommand {
 		if (args.length != 1)
 			return 0;
 		
-		targetEntities = parseSelector(plot, args[0], false);
+		targetEntities = parseSelector(args[0], false);
 		
 		for (Entity e : targetEntities)
 			e.remove();

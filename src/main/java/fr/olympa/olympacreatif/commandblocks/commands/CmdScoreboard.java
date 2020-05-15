@@ -107,7 +107,7 @@ public class CmdScoreboard extends CbCommand {
 						
 						//ajout du score aux entités sélectionnées si un sélecteur a bien été utilisé
 						if (args[2].startsWith("@")) {
-							List<Entity> list = parseSelector(plot, args[2], false);
+							List<Entity> list = parseSelector(args[2], false);
 							
 							for (Entity e : list) {
 								obj.add(e, value);
@@ -150,7 +150,7 @@ public class CmdScoreboard extends CbCommand {
 						String e1 = null;
 						
 						if (args[2].startsWith("@")) {
-							List<Entity> list = parseSelector(plot, args[2], false);
+							List<Entity> list = parseSelector(args[2], false);
 							if (list.size() != 1)
 								return 0;
 							
@@ -163,7 +163,7 @@ public class CmdScoreboard extends CbCommand {
 						List<String> e2 = new ArrayList<String>();
 						
 						if (args[5].startsWith("@")){
-							List<Entity> list = parseSelector(plot, args[5], false);
+							List<Entity> list = parseSelector(args[5], false);
 							for (Entity e : list)
 								e2.add(e.getCustomName());
 						}else {
@@ -190,7 +190,7 @@ public class CmdScoreboard extends CbCommand {
 						
 						//ajout du score aux entités sélectionnées si un sélecteur a bien été utilisé
 						if (args[2].startsWith("@")) {
-							List<Entity> list = parseSelector(plot, args[2], false);
+							List<Entity> list = parseSelector(args[2], false);
 							
 							for (Entity e : list) {
 								obj.add(e, value);
@@ -208,7 +208,7 @@ public class CmdScoreboard extends CbCommand {
 				if (args.length >= 3) {
 					
 					if (args[2].startsWith("@")) {
-						List<Entity> list = parseSelector(plot, args[2], false);
+						List<Entity> list = parseSelector(args[2], false);
 						
 						for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
 							for (Entity e : list)
@@ -233,7 +233,7 @@ public class CmdScoreboard extends CbCommand {
 						
 						//ajout du score aux entités sélectionnées si un sélecteur a bien été utilisé
 						if (args[2].startsWith("@")) {
-							List<Entity> list = parseSelector(plot, args[2], false);
+							List<Entity> list = parseSelector(args[2], false);
 							
 							for (Entity e : list) {
 								obj.set(e, value);

@@ -139,7 +139,7 @@ public class CmdExecute extends CbCommand {
 				for (Location loc : sendLocations){
 					sendingLoc = loc;
 					
-					sendEntities.addAll(parseSelector(plot, subArgs.get(1), false));
+					sendEntities.addAll(parseSelector(subArgs.get(1), false));
 
 					result = sendEntities.size();
 				}
@@ -150,7 +150,7 @@ public class CmdExecute extends CbCommand {
 				
 				if (subArgs.size() == 2 && subArgs.get(0).equals("as")) {
 					
-					for (Entity e : parseSelector(plot, subArgs.get(1), false))
+					for (Entity e : parseSelector(subArgs.get(1), false))
 						sendLocations.add(e.getLocation());
 					
 				}else if (subArgs.size() == 3) {
@@ -264,7 +264,7 @@ public class CmdExecute extends CbCommand {
 			
 			//récupération des scores à comparer
 			if (subArgs.get(2).startsWith("@")) {
-				List<Entity> list = parseSelector(plot, subArgs.get(2), false);
+				List<Entity> list = parseSelector(subArgs.get(2), false);
 				if (list.size() == 1)
 					score1 = obj1.get(list.get(0));
 				else
@@ -274,7 +274,7 @@ public class CmdExecute extends CbCommand {
 
 			
 			if (subArgs.get(5).startsWith("@")) {
-				List<Entity> list = parseSelector(plot, subArgs.get(5), false);
+				List<Entity> list = parseSelector(subArgs.get(5), false);
 				if (list.size() == 1)
 					score2 = obj2.get(list.get(0));
 				else
@@ -321,7 +321,7 @@ public class CmdExecute extends CbCommand {
 			if (subArgs.size() != 3)
 				return null;
 			
-			if (parseSelector(plot, subArgs.get(2), false).size() > 0)
+			if (parseSelector(subArgs.get(2), false).size() > 0)
 				return true;
 			else
 				return false;
@@ -394,7 +394,7 @@ public class CmdExecute extends CbCommand {
 		List<Location> list = new ArrayList<Location>();
 		
 		if (subArgs.get(1).startsWith("@"))
-			for (Entity e : parseSelector(plot, subArgs.get(1), false))
+			for (Entity e : parseSelector(subArgs.get(1), false))
 				list.add(e.getLocation());
 		else {
 			Player p = Bukkit.getPlayer(subArgs.get(1));

@@ -21,7 +21,7 @@ public class CmdTellraw extends CbCommand {
 	
 	public CmdTellraw(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(sender, loc, plugin, plot, args);
-		targetEntities = parseSelector(plot, args[0], true);
+		targetEntities = parseSelector(args[0], true);
 		
 		//JSONObject json(JSONObject) new JSONParser().parse(args[1]);
 		NBTTagCompound tag;
@@ -40,11 +40,11 @@ public class CmdTellraw extends CbCommand {
 						
 					case "selector":
 						
-						List<Entity> list = parseSelector(plot, tag.getString(key), false);
+						List<Entity> list = parseSelector(tag.getString(key), false);
 
 						int i = 0;
 						
-						for (Entity e : parseSelector(plot, tag.getString(key), false)) {
+						for (Entity e : parseSelector(tag.getString(key), false)) {
 							text += ChatColor.translateAlternateColorCodes('&', e.getCustomName());
 							
 							i++;
@@ -58,7 +58,7 @@ public class CmdTellraw extends CbCommand {
 						
 						String objOwner = score.getString("name");
 						if (objOwner.startsWith("@")) {
-							List<Entity> l = parseSelector(plot, objOwner, false);
+							List<Entity> l = parseSelector(objOwner, false);
 							
 							if (l.size() != 1)
 								break;
