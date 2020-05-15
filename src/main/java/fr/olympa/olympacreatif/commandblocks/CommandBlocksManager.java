@@ -33,6 +33,8 @@ public class CommandBlocksManager {
 
 		plugin.getServer().getPluginManager().registerEvents(new CbObjectivesListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new CbTeamsListener(plugin), plugin);
+		
+		Bukkit.getPluginManager().registerEvents(new CbCommandListener(plugin), plugin);
 	}
 	
 	public void registerPlot(Plot plot) {
