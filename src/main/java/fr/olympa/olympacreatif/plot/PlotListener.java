@@ -152,7 +152,7 @@ public class PlotListener implements Listener {
 		//détection sortie du plot
 		}else if (plot.getId().isInPlot(e.getFrom()) && !plot.getId().isInPlot(e.getTo())) {
 			
-			plot.removePlayer(e.getPlayer());
+			plot.removePlayerInPlot(e.getPlayer());
 			
 			//rendu inventaire avant entrée dans zone
 			if (inventoryStorage.containsKey(e.getPlayer())) {
@@ -223,7 +223,7 @@ public class PlotListener implements Listener {
 		if (!plot.getId().isInPlot(e.getPlayer().getLocation()))
 			return;
 
-		plot.removePlayer(e.getPlayer());
+		plot.removePlayerInPlot(e.getPlayer());
 		
 		if (inventoryStorage.containsKey(e.getPlayer())) {
 			e.getPlayer().getInventory().clear();

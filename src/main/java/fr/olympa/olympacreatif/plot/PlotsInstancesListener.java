@@ -318,7 +318,7 @@ public class PlotsInstancesListener implements Listener{
 
 	public static void executeQuitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
 
-		plot.removePlayer(p);
+		plot.removePlayerInPlot(p);
 
 		//rendu inventaire si stocké
 		if (inventoryStorage.containsKey(plot) && inventoryStorage.get(plot).containsKey(p)) {

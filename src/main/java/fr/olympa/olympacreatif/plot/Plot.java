@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
@@ -33,6 +34,8 @@ public class Plot {
 	//private PlotListener listener;
 
 	private List<Player> playersInPlot = new ArrayList<Player>();
+	private List<Entity> entitiesInPlot = new ArrayList<Entity>();
+	
 	private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
 	private Map<String, BossBar> bossbarsList = new HashMap<String, BossBar>();
@@ -90,12 +93,24 @@ public class Plot {
 		playersInPlot.add(p);
 	}
 	
-	public void removePlayer(Player p) {
+	public void removePlayerInPlot(Player p) {
 		playersInPlot.remove(p);
+	}
+	
+	public void addEntityInPlot(Entity e) {
+		entitiesInPlot.add(e);
+	}
+	
+	public void clearEntitiesInPlot() {
+		entitiesInPlot.clear();
 	}
 	
 	public List<Player> getPlayers(){
 		return Collections.unmodifiableList(playersInPlot);
+	}
+	
+	public List<Entity> getEntities(){
+		return Collections.unmodifiableList(entitiesInPlot);
 	}
 	
 	public void teleportOut(Player p) {

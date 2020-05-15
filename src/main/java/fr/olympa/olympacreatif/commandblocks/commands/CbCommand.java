@@ -2,11 +2,16 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
@@ -39,7 +44,9 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.plot.Plot;
+import net.minecraft.server.v1_15_R1.EntityTypes;
 
 public abstract class CbCommand {
 
@@ -60,10 +67,234 @@ public abstract class CbCommand {
 		this.sendingLoc = sendingLoc;
 	}
 	
-	protected List<Entity> parseSelector(Plot plot, String s, boolean limitToPlayers){
+	protected List<Entity> parseSelector(String s, boolean limitToPlayers){
 		List<Entity> list = new ArrayList<Entity>();
+		Map<String, String> parameters = new HashMap<String, String>();
+		Location selectorLoc = sendingLoc.clone();
+
+		//variable générale pour les intervalles d'entiers
+		Integer[] range = null;
+		
+		if (s.length() < 2)
+			return list;
+		
+		//cas où un pseudo est passé en paramètre
+		if (!s.contains("@")) {
+			Player p = Bukkit.getPlayer(s);
+			if (p != null)
+				list.add(p);
+			return list;
+		}
+		
+		//ajout des entités concernées par le test (joueurs (et) entités)
+		list = new ArrayList<Entity>(plot.getPlayers());
+		
+		if ((s.startsWith("@e") || s.startsWith("@s")) && !limitToPlayers)
+			list.addAll(plot.getEntities());
 		
 
+		//récupération des scores en paramètre
+		if (s.contains(",scores={")) {
+			if (s.split(",scores={").length != 2)
+				return list;
+			
+			//pour chaque score renseigné, on teste les entités
+			for (String ss : s.substring(s.indexOf(",scores={")+9, s.indexOf("}")).split(",")){
+				String[] sss = ss.split("=");
+				if (sss.length != 2)
+					return list;
+				
+				CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, sss[0]);
+				range = getIntRange(sss[3]);
+				
+				if (obj != null && range != null) {
+					for (Entity e : new ArrayList<Entity>(list))
+						if (obj.get(e) < range[0] || obj.get(e) > range[2])
+							list.remove(e);
+				}
+				
+			}
+		}
+			
+		
+		//extraction des paramètres
+		for (String ss : s.replace("[", "").replace("]", "").split(",")) {
+			String[] sss = ss.split("="); 
+			if (sss.length == 2) {
+				
+				//regroupe les types d'entités & teams tolérées dans une seule liste du type "!pig,!cow,creeper" ou "equipebleue,!equipemechants"
+				if (sss[0].equals("type"))
+					if (parameters.containsKey("type"))
+						parameters.put("type", parameters.get("type") + "," + sss[1]);
+					else
+						parameters.put("type", sss[1]);
+				
+				else if (sss[0].equals("team"))
+					if (parameters.containsKey("team"))
+						parameters.put("team", parameters.get("team") + "," + sss[1]);
+					else
+						parameters.put("team", sss[1]);
+				
+				else
+					parameters.put(sss[0], sss[1]);	
+			}	
+		}
+
+		
+		//définition du point d'exécution de la commande
+		if (parameters.containsValue("x")) {
+			range = getIntRange(parameters.get("x"));
+					if (range != null)
+						selectorLoc.setX(range[0]);
+		}
+		
+		if (parameters.containsValue("y")) {
+			range = getIntRange(parameters.get("y"));
+					if (range != null)
+						selectorLoc.setX(range[0]);
+		}
+		
+		if (parameters.containsValue("z")) {
+			range = getIntRange(parameters.get("z"));
+					if (range != null)
+						selectorLoc.setX(range[0]);
+		}
+		
+		//exclusion des entités n'étant pas dans la zone de recherche
+		if (parameters.containsKey("distance")) {
+			range = getIntRange(parameters.get("distance"));
+			
+			if (range == null)
+				return list;
+			
+			for (Entity ent : new ArrayList<Entity>(list))
+				if (ent.getLocation().distance(selectorLoc) < range[0] || ent.getLocation().distance(selectorLoc) > range[1])
+					list.remove(ent);
+		}else {
+			
+			//répétition pour x, y et z (test de si l'entité a la composante x, y ou z respectant le dx/y/z)
+			if (parameters.containsKey("dx")) {
+				range = getIntRange(parameters.get("dx"));
+				
+				if (range == null)
+					return list;
+
+				range[0] = selectorLoc.getBlockX();
+				range[1] = selectorLoc.getBlockX() + range[1];
+				
+				for (Entity e : new ArrayList<Entity>(list))
+					if (e.getLocation().getX() < range[0] || e.getLocation().getX() > range[1])
+						list.remove(e);	
+			}
+			
+
+			if (parameters.containsKey("dy")) {
+				range = getIntRange(parameters.get("dy"));
+				
+				if (range == null)
+					return list;
+
+				range[0] = selectorLoc.getBlockY();
+				range[1] = selectorLoc.getBlockY() + range[1];
+				
+				for (Entity e : new ArrayList<Entity>(list))
+					if (e.getLocation().getY() < range[0] || e.getLocation().getY() > range[1])
+						list.remove(e);	
+			}
+			
+
+			if (parameters.containsKey("dz")) {
+				range = getIntRange(parameters.get("dz"));
+				
+				if (range == null)
+					return list;
+
+				range[0] = selectorLoc.getBlockZ();
+				range[1] = selectorLoc.getBlockZ() + range[1];
+				
+				for (Entity e : new ArrayList<Entity>(list))
+					if (e.getLocation().getZ() < range[0] || e.getLocation().getZ() > range[1])
+						list.remove(e);	
+			}
+							
+		}
+		
+		for (Entry<String, String> e : parameters.entrySet())
+			switch(e.getKey()) {
+			
+			case "level":
+				range = getIntRange(e.getValue());
+				
+				if (range == null)
+					return list;
+				
+				for (Entity ent : new ArrayList<Entity>(list))
+					
+					if (ent instanceof Player) {
+						
+						if (((Player)ent).getLevel() < range[0] || ((Player)ent).getLevel() > range[1]) {
+							list.remove(ent);	
+						}	
+					}else
+						list.remove(ent);
+						
+				break;
+				
+			case "name":
+				String entityName = "";
+				String selectorName = "";
+				boolean compareAsInequal = false;
+				
+				if (e.getValue().contains("!")) {
+					compareAsInequal = true;
+					selectorName = ChatColor.translateAlternateColorCodes('&', e.getValue().replace("!", ""));
+				}else
+					selectorName = ChatColor.translateAlternateColorCodes('&', e.getValue().replace("!", ""));
+					
+				for (Entity ent : new ArrayList<Entity>(list))
+					if ((ent.getCustomName().equals(selectorName) && compareAsInequal) || (!ent.getCustomName().equals(selectorName) && !compareAsInequal))
+						list.remove(ent);
+				
+				break;
+				
+			case "type":
+				
+				for (String ss : e.getValue().split(",")) {
+					
+					boolean isTestInequality = false;
+					EntityType type = null;
+					
+					//recherche du type de l'entité
+					if (ss.contains("!")) {
+						type = EntityType.fromName(e.getValue().replace("!", ""));
+						isTestInequality = true;
+					}else
+						type = EntityType.fromName(e.getValue().replace("!", ""));						
+						
+					//test des noms différents entre minecraft et spigot
+					if (type == null) {
+						switch (e.getValue()) {
+						case "mooshroom":
+							type = EntityType.MUSHROOM_COW;
+							break;
+						case "zombie_pigman":
+							type = EntityType.PIG_ZOMBIE;
+							break;
+						default:
+							return list;
+						}
+					}
+					
+					for (Entity ent : new ArrayList<Entity>(list))
+						if ((isTestInequality && ent.getType() == type) || (!isTestInequality && ent.getType() != type))
+							list.remove(ent);
+							
+				}
+				
+				
+				break;
+			}
+		
 		//TODO
 		//TODO
 		
@@ -71,9 +302,36 @@ public abstract class CbCommand {
 		return list;
 	}
 	
+	//renvoie deux entiers resprésentant les bornes du string (qui doit être sur le modèle 4..7)
+	private Integer[] getIntRange(String s) {
+		Integer[] response = new Integer[2];
+		
+		
+		String[] ss = s.split("..");
+		
+		//plage avec min <> max
+		if (ss.length == 2) {
+			if (StringUtils.isNumeric(ss[0]))
+				response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
+			else
+				return null;
+			
+			if (StringUtils.isNumeric(ss[1]))				
+				response[1] = Math.abs((int)(double)Double.valueOf(ss[1]));
+			else
+				return null;
+			
+		}else
+			if (StringUtils.isNumeric(ss[0])) {
+				response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
+				response[1] = response[0];
+			}else
+				return null;
+		
+		return response;
+	}
+	
 	protected Location getLocation (String x, String y, String z) {
-		Location locFinal = null;
-		Location locInit = sendingLoc;
 		
 		Double xF = getUnverifiedPoint(x, sendingLoc.getX());
 		Double yF = getUnverifiedPoint(y, sendingLoc.getY());
@@ -89,6 +347,7 @@ public abstract class CbCommand {
 			return null;
 	}
 	
+	//renvoie la coordonnée x, y ou z à partir du string
 	private Double getUnverifiedPoint(String s, double potentialVectorValueToAdd) {
 		
 		if (StringUtils.isNumeric(s))

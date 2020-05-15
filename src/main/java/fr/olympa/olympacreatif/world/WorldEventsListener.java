@@ -79,7 +79,7 @@ public class WorldEventsListener implements Listener{
 		maxEntitiesPerTypePerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue());
 		maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
 		
-		//gestion des entités (remove si plot null ou si nb par plot > 100)
+		//gestion des entités (remove si plot null ou si nb par plot > 100) et update de la liste des entités dans chaque plot (amélioration res performances du sélecteur @ dans les commandes)
 		new BukkitRunnable() {
 			
 			
@@ -116,6 +116,9 @@ public class WorldEventsListener implements Listener{
 						ListIterator<Entity> iterator = entities.listIterator(entities.size());
 						Entity entity = null;
 						
+						for (Plot plot : plugin.getPlotsManager().getPlots())
+							plot.clearEntitiesInPlot();
+						
 						//parcours de la liste en sens inverse pour supprimer les plus anciennes entités
 						while (iterator.hasPrevious()) {
 							entity = iterator.previous();
@@ -128,19 +131,26 @@ public class WorldEventsListener implements Listener{
 							//supprime l'entité si en dehors d'un plot (sauf si armorstand, peinture ou cadre) ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
 							if (plot == null && entity.getType() != EntityType.ARMOR_STAND && entity.getType() != EntityType.PAINTING && entity.getType() != EntityType.ITEM_FRAME)
 								entitiesToRemove.add(entity);
-							else //si le plot n'existe pas, on le crée
-								if (entitiesPerPlot.keySet().contains(plot))
+							
+							else 
+								if (entitiesPerPlot.keySet().contains(plot)) //ajout de l'entité à la liste des entités du plot, si la liste n'existe pas pour ce plot on la crée
+									
 									//si l'entité n'est pas référencée, on le fait
 									if (entitiesPerPlot.get(plot).containsKey(entity.getType())) {
 										entitiesPerPlot.get(plot).put(entity.getType(), entitiesPerPlot.get(plot).get(entity.getType()) + 1);
+										
 										//si le nb d'entités pour ce type ou si le nb total d'entités est dépassé, on la supprime
-										if (entitiesPerPlot.get(plot).get(entity.getType()) >= maxEntitiesPerTypePerPlot 
-												|| getTotalEntities(entitiesPerPlot.get(plot)) >= maxTotalEntitiesPerPlot)
+										if (entitiesPerPlot.get(plot).get(entity.getType()) >= maxEntitiesPerTypePerPlot || getTotalEntities(entitiesPerPlot.get(plot)) >= maxTotalEntitiesPerPlot)
+											
 											entitiesToRemove.add(entity);
-									}else
+									}else {
 										entitiesPerPlot.get(plot).put(entity.getType(), 1);
-								else
+										plot.addEntityInPlot(entity);
+									}
+								else {
 									entitiesPerPlot.put(plot, new HashMap<EntityType, Integer>());
+									plot.addEntityInPlot(entity);	
+								}
 						}
 					}
 				});

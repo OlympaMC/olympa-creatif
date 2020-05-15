@@ -21,7 +21,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdExecute extends CbCommand {
 
-	private List<String> subCommands = new ArrayList<String>(Arrays.asList(new String[] {"if", "unless", "at", "as", "facing", "positioned", "store", "run"}));
+	private List<String> subCommands = new ArrayList<String>(Arrays.asList(new String[] {"if", "unless", "at", "as", "positioned", "store", "run"}));
 	
 	public CmdExecute(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(sender, loc, plugin, plot, args);
@@ -143,9 +143,6 @@ public class CmdExecute extends CbCommand {
 
 					result = sendEntities.size();
 				}
-				break;
-				
-			case "facing":
 				break;
 				
 			case "positioned":
