@@ -20,6 +20,7 @@ import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
+import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
 
@@ -63,6 +64,7 @@ public class OcCommand extends OlympaCommand {
 						
 						plot = plugin.getPlotsManager().createPlot(p);
 						p.teleport(plot.getId().getLocation());
+						PlotsInstancesListener.executeEntryActions(plugin, p, plot);
 						sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue());	
 						
 					}else

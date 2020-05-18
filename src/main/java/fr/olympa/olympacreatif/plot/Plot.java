@@ -48,9 +48,13 @@ public class Plot {
 		plotId = new PlotId(plugin);
 		parameters = new PlotParameters(plugin, plotId);
 		members = new PlotMembers(plugin, plotId);
-		//listener = new PlotListener(plugin, this);
 
 		members.set(p, PlotRank.OWNER);
+
+		//exécution des actions d'entrée pour tous les joueurs sur le plot au moment du chargement
+		for (Player player : Bukkit.getOnlinePlayers())
+			if (plotId.isInPlot(player.getLocation()))
+				PlotsInstancesListener.executeEntryActions(plugin, player, this);
 	}
 	
 	public Plot(AsyncPlot ap) {

@@ -26,7 +26,7 @@ public abstract class CbCommand {
 
 	protected OlympaCreatifMain plugin;
 	protected Plot plot;
-	protected List<Entity> targetEntities;
+	protected List<Entity> targetEntities = new ArrayList<Entity>();
 	protected String[] args;
 	protected CommandSender sender;
 	
@@ -64,16 +64,17 @@ public abstract class CbCommand {
 		}
 		
 		//ajout des entités concernées par le test (joueurs (et) entités)
-		if (s.startsWith("@s")) //ajout de l'entité exécutant la commande
-			if (sender instanceof Entity)
-				list.add((Entity) sender);
-		else
+		if (s.startsWith("@s")) {//ajout de l'entité exécutant la commande
+			
+			if (sender instanceof Entity) {
+				list.add((Entity) sender);	
+			}
+		}else
 			list = new ArrayList<Entity>(plot.getPlayers());
 		
 		if (s.startsWith("@e") && !limitToPlayers)
 			list.addAll(plot.getEntities());
 		
-
 		//récupération des scores en paramètre
 		if (s.contains(",scores={")) {
 			if (s.split(",scores={").length != 2)

@@ -58,7 +58,7 @@ public class CbCommandListener implements Listener {
 		executeCommandBlockCommand(e.getSender(), ((CommandBlock)e.getSender()).getLocation(), e.getCommand());
 		
 		if (e.getSender() instanceof CommandBlock)
-			e.setCommand("/");
+			e.setCancelled(true);
 	}
 	
 	@EventHandler

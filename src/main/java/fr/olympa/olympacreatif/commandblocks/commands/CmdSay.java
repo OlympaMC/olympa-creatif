@@ -1,5 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
+import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -18,16 +20,13 @@ public class CmdSay extends CbCommand {
 	
 	@Override
 	public int execute() {
-		targetEntities = parseSelector(args[0], true);
+		targetEntities = new ArrayList<Entity>(plot.getPlayers());
 		
-		String message = "";
-		int i = 0;
-		for (String s : args) {
-			if (i > 0)
-				message += s;
-			
-			i++;
-		}
+		String message = "§7[CB] §r";
+
+		for (String s : args) 
+			message += s + " ";
+		
 		
 		for (Entity e : targetEntities)
 			((Player)e).sendMessage(ChatColor.translateAlternateColorCodes('&', message));

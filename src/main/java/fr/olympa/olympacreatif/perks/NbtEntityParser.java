@@ -267,7 +267,7 @@ public class NbtEntityParser {
 		try {
 			return parseJsonText(MojangsonParser.parse(nbtText));
 		} catch (CommandSyntaxException e) {
-			return "§Texte json invalide";
+			return "§cTexte json invalide";
 		}
 	}
 	

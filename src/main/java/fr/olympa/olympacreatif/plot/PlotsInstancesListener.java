@@ -250,6 +250,7 @@ public class PlotsInstancesListener implements Listener{
 			return;
 
 		executeQuitActions(plugin, e.getPlayer(), plot);
+		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 	}
 
 
@@ -330,7 +331,6 @@ public class PlotsInstancesListener implements Listener{
 		
 		p.setGameMode(GameMode.CREATIVE);
 		p.setAllowFlight(true);
-		p.teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 		p.resetPlayerTime();
 		p.resetPlayerWeather();
 	}

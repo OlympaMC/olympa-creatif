@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
@@ -58,7 +59,7 @@ public class CmdBossBar extends CbCommand {
 			for (Entry<String, BossBar> e : plot.getBossBars().entrySet()) 
 				sender.sendMessage("   §e> " + e.getKey() + " (" + e.getValue().getTitle() + "§r§e) : " + e.getValue().getPlayers().size() + " joueur(s)");
 			
-			return plot.getBossBars().size();
+			return 1;
 			
 		case "remove":
 			if (plot.removeBossBar(args[1]))
@@ -105,6 +106,17 @@ public class CmdBossBar extends CbCommand {
 				
 			case "name":
 				bar.setTitle(NbtEntityParser.parseJsonText(args[3]));
+				return 1;
+				
+			case "value":
+				int val = 0;
+				
+				if (StringUtils.isNumeric(args[3]))
+					val = Math.max((int) (double) Double.valueOf(args[3]), 0);
+				else
+					return 0;
+				
+				bar.setProgress(val);
 				return 1;
 				
 			case "players":
