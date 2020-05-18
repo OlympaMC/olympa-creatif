@@ -13,6 +13,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdScoreboard extends CbCommand {
@@ -23,10 +24,8 @@ public class CmdScoreboard extends CbCommand {
 	
 	String[] args;
 	
-	public CmdScoreboard(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
-		super(sender, loc, plugin, plot, commandString);
-		
-		args = commandString;
+	public CmdScoreboard(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(type, sender, loc, plugin, plot, args);
 	}
 	
 	@Override

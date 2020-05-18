@@ -16,7 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
-import fr.olympa.api.objects.OlympaPlayerInformations;
+import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.data.Message;

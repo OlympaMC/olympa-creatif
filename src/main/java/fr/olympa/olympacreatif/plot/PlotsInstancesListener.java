@@ -263,7 +263,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		//si le joueur est banni, téléportation en dehors du plot
 		if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId())) {
-			if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.STAFF_BYPASS_PLOT_BAN)) {
+			if (!PermissionsList.STAFF_BYPASS_PLOT_BAN.hasPermission(p.getUniqueId())) {
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
 				plotTo.teleportOut(p);
 				return;	

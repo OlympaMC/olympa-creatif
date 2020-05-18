@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdEnchant extends CbCommand {
@@ -17,9 +18,9 @@ public class CmdEnchant extends CbCommand {
 	private Enchantment ench;
 	private int level = 1;
 	
-	public CmdEnchant(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
-		super(sender, loc, plugin, plot, commandString);
-		
+	public CmdEnchant(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(type, sender, loc, plugin, plot, args);
+	
 		if (args.length >= 2)
 			targetEntities = parseSelector(args[0], true);
 		

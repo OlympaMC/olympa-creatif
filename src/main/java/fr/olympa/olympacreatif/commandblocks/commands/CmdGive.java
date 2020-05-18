@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -20,8 +21,9 @@ public class CmdGive extends CbCommand {
 
 	private ItemStack item = null;
 	
-	public CmdGive(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, loc, plugin, plot, args);
+	public CmdGive(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(type, sender, loc, plugin, plot, args);
+	
 		
 		targetEntities = parseSelector(args[0], true);
 		

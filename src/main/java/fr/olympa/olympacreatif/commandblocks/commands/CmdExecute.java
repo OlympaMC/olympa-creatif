@@ -17,14 +17,15 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdExecute extends CbCommand {
 
 	private List<String> subCommands = new ArrayList<String>(Arrays.asList(new String[] {"if", "unless", "at", "as", "positioned", "store", "run"}));
 	
-	public CmdExecute(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, loc, plugin, plot, args);
+	public CmdExecute(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(type, sender, loc, plugin, plot, args);
 	}
 
 	private List<String> args;
@@ -182,7 +183,7 @@ public class CmdExecute extends CbCommand {
 											subArgsBis.add(str);
 											subArgs.remove(0);
 										}else //exécution de la commande suivante et stockage du résultat dans la bossbar
-											bar.setProgress(new CmdExecute(s, loc, plugin, plot, (String[]) subArgsBis.toArray()).execute());
+											bar.setProgress(new CmdExecute(CommandType.execute, s, loc, plugin, plot, (String[]) subArgsBis.toArray()).execute());
 								}
 						else
 							return 0;
@@ -203,7 +204,7 @@ public class CmdExecute extends CbCommand {
 											subArgs.remove(0);
 										}else //exécution de la commande suivante et stockage du résultat dans le score de l'entité
 											if (s instanceof Entity)
-												obj.set((Entity) s, new CmdExecute(s, loc, plugin, plot, (String[]) subArgsBis.toArray()).execute());
+												obj.set((Entity) s, new CmdExecute(CommandType.execute, s, loc, plugin, plot, (String[]) subArgsBis.toArray()).execute());
 								}
 						else
 							return 0;

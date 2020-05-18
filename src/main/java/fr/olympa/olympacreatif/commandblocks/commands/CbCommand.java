@@ -31,14 +31,16 @@ public abstract class CbCommand {
 	protected CommandSender sender;
 	
 	protected Location sendingLoc;
+	protected CommandType cmdType;
 	
 	//la commande comprend un commandsender, une localisation (imposée par le execute at), le plugin, le plot à la commande est exécutée et les arguments de la commande
-	public CbCommand(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+	public CbCommand(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		this.plugin = plugin;
 		this.plot = plot;
 		this.sender = sender;
 		this.args = commandString;
 		this.sendingLoc = sendingLoc;
+		this.cmdType = cmdType;
 	}
 	
 	//parse le selecteur et ses paramètres : x, y, z, dx, dy, dz, distance, name, team, scores, level, type
@@ -381,6 +383,8 @@ public abstract class CbCommand {
 		return response;
 	}
 	
+	
+	
 	protected Location getLocation (String x, String y, String z) {
 		
 		Double xF = getUnverifiedPoint(x, sendingLoc.getX());
@@ -409,6 +413,15 @@ public abstract class CbCommand {
 		return null;
 	}
 	
+	
+	public Plot getPlot() {
+		return plot;
+	}
+	
+	public CommandType getType() {
+		return cmdType;
+	}
+	
 	public static CbCommand getCommand(OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {
 		Plot plot = null;
 		String[] args = fullCommand.split(" ");
@@ -420,87 +433,90 @@ public abstract class CbCommand {
 			plot = plugin.getPlotsManager().getPlot(((CommandBlock) sender).getLocation());	
 		}
 		
-		if (args.length < 3 && plot == null)
+		if (args.length < 2 || plot == null)
 			return null;
 		
 		CbCommand cmd = null;
 		
-		CommandType type = CommandType.get(args[0]);
+		CommandType type = CommandType.get(args[0].replace("/", ""));
 		
 		List<String> list = new ArrayList<String>(Arrays.asList(args));
 		list.remove(0);
-		args = (String[]) list.toArray();
+		args = list.toArray(new String[list.size()]);
+		
+		if (type == null)
+			return null;
 		
 		switch (type) {
-		case BOSSBAR:
-			cmd = new CmdBossBar(sender, loc, plugin, plot, args);
+		case bossbar:
+			cmd = new CmdBossBar(type, sender, loc, plugin, plot, args);
 			break;
-		case CLEAR:
-			cmd = new CmdClear(sender, loc, plugin, plot, args);
+		case clear:
+			cmd = new CmdClear(type, sender, loc, plugin, plot, args);
 			break;
-		case ENCHANT:
-			cmd = new CmdEnchant(sender, loc, plugin, plot, args);
+		case enchant:
+			cmd = new CmdEnchant(type, sender, loc, plugin, plot, args);
 			break;
-		case EXECUTE:
-			cmd = new CmdExecute(sender, loc, plugin, plot, args);
+		case execute:
+			cmd = new CmdExecute(type, sender, loc, plugin, plot, args);
 			break;
-		case EXPERIENCE:
-			cmd = new CmdExperience(sender, loc, plugin, plot, args);
+		case experience:
+			cmd = new CmdExperience(type, sender, loc, plugin, plot, args);
 			break;
-		case GIVE:
-			cmd = new CmdGive(sender, loc, plugin, plot, args);
+		case give:
+			cmd = new CmdGive(type, sender, loc, plugin, plot, args);
 			break;
-		case MSG:
-			cmd = new CmdTellraw(sender, loc, plugin, plot, args);
+		case tellraw:
+			cmd = new CmdTellraw(type, sender, loc, plugin, plot, args);
 			break;
-		case SCOREBOARD:
-			cmd = new CmdScoreboard(sender, loc, plugin, plot, args);
+		case scoreboqrd:
+			cmd = new CmdScoreboard(type, sender, loc, plugin, plot, args);
 			break;
-		case TEAM:
-			cmd = new CmdTeam(sender, loc, plugin, plot, args);
+		case team:
+			cmd = new CmdTeam(type, sender, loc, plugin, plot, args);
 			break;
-		case TELEPORT:
-			cmd = new CmdTeleport(sender, loc, plugin, plot, args);
+		case teleport:
+			cmd = new CmdTeleport(type, sender, loc, plugin, plot, args);
 			break;
-		case EFFECT:
-			cmd = new CmdEffect(sender, loc, plugin, plot, args);
+		case effect:
+			cmd = new CmdEffect(type, sender, loc, plugin, plot, args);
 			break;
-		case SUMMON:
-			cmd = new CmdSummon(sender, loc, plugin, plot, args);
+		case summon:
+			cmd = new CmdSummon(type, sender, loc, plugin, plot, args);
 			break;
-		case KILL:
-			cmd = new CmdKill(sender, loc, plugin, plot, args);
+		case kill:
+			cmd = new CmdKill(type, sender, loc, plugin, plot, args);
 			break;
-		case SAY:
-			cmd = new CmdSay(sender, loc, plugin, plot, args);
+		case say:
+			cmd = new CmdSay(type, sender, loc, plugin, plot, args);
 			break;
 		default:
-			break;
+			return null;
 		}		
 		
 		return cmd;
 	}
 	
 	public enum CommandType{
-		TELEPORT,
-		MSG,
-		EXECUTE,
-		TEAM,
-		SCOREBOARD,
-		BOSSBAR,
-		CLEAR,
-		GIVE,
-		ENCHANT,
-		EXPERIENCE, 
-		EFFECT, 
-		SUMMON, 
-		KILL,
-		SAY,
+		teleport,
+		tellraw,
+		execute,
+		team,
+		scoreboqrd,
+		bossbar,
+		clear,
+		give,
+		enchant,
+		experience, 
+		effect, 
+		summon, 
+		kill,
+		say,
 		;
 		
 		public static CommandType get(String s) {
 			for (CommandType cmd : CommandType.values())
-				if (cmd.toString().equalsIgnoreCase(s))
+				if (cmd.toString().equals(s))
 					return cmd;
 			return null;
 		}

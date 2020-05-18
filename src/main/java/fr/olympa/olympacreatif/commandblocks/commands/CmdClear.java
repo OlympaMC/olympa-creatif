@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdClear extends CbCommand {
@@ -20,8 +21,8 @@ public class CmdClear extends CbCommand {
 	int limitMax = 1000000;
 	int limit = limitMax;
 	
-	public CmdClear(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
-		super(sender, loc, plugin, plot, commandString);
+	public CmdClear(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(type, sender, loc, plugin, plot, args);
 		
 		targetEntities = parseSelector(args[0], true);
 		

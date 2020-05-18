@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.objects.OlympaPlayer;
+import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
@@ -102,7 +102,7 @@ public class OcoCommand extends OlympaCommand {
 			case "give":
 				args[1] = args[1].toUpperCase();
 				if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])))
-					if (p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])))) {
+					if (plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])).hasPermission(p.getPlayer().getUniqueId())) {
 						p.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(args[1])));
 						p.getPlayer().sendMessage(Message.OCO_GIVE_SUCCESSFUL.getValue().replace("%item%", args[1].toLowerCase().replace("_", " ")));
 					}

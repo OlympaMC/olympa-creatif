@@ -116,7 +116,15 @@ public enum Message {
 	OCO_INVALID_NBT_DATA, 
 	
 	WE_ERR_POS_NOT_DEFINED, 
-	PLOT_SPAWN_LOC_SET,
+	PLOT_SPAWN_LOC_SET, 
+	
+	PARAM_CB_MAX_CMDS_LEFT, 
+	PARAM_CB_PER_TICK_ADDED_CMDS, 
+	
+	CB_NO_COMMANDS_LEFT, 
+	
+	CB_RESULT_SUCCESS, 
+	CB_RESULT_FAILED,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();
@@ -140,6 +148,9 @@ public enum Message {
 		messagesList.put(PARAM_WE_MAX_QUEUED_ACTIONS_PER_PLAYER, "4");
 		messagesList.put(PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT, "5");
 		messagesList.put(PARAM_MAX_TOTAL_ENTITIES_PER_PLOT, "10");
+		
+		messagesList.put(PARAM_CB_MAX_CMDS_LEFT, "100");
+		messagesList.put(PARAM_CB_PER_TICK_ADDED_CMDS, "10");
 	}
 	
 	public void setValue(Object s) {

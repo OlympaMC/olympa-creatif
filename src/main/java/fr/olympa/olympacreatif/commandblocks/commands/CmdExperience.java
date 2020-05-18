@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdExperience extends CbCommand {
@@ -15,9 +16,9 @@ public class CmdExperience extends CbCommand {
 	private Experience expType = Experience.POINTS;
 	private int definedAmount = 0;
 	
-	public CmdExperience(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
-		super(sender, loc, plugin, plot, commandString);
-		
+	public CmdExperience(CommandType cmdType, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(cmdType, sender, loc, plugin, plot, args);
+	
 		switch(args[0]) {
 		case "add":
 			if (args.length >= 3) {

@@ -8,15 +8,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdTeleport extends CbCommand {
 	
 	private List<Location> tpPoints = new ArrayList<Location>();
 	
-	public CmdTeleport(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, loc, plugin, plot, args);
-		
+	public CmdTeleport(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(type, sender, loc, plugin, plot, args);
+	
 		switch(args.length) {
 		case 2:
 			targetEntities = parseSelector(args[0], false);

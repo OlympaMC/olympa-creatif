@@ -121,6 +121,7 @@ public class WorldManager {
 		restrictedItems.put(Material.DEBUG_STICK, PermissionsList.KIT_ADMIN);
 		restrictedItems.put(Material.STRUCTURE_BLOCK, PermissionsList.KIT_ADMIN);
 		restrictedItems.put(Material.STRUCTURE_VOID, PermissionsList.KIT_ADMIN);
+		restrictedItems.put(Material.REPEATING_COMMAND_BLOCK, PermissionsList.KIT_ADMIN);
 		
 		restrictedItems.put(Material.BEE_SPAWN_EGG, PermissionsList.KIT_ANIMALS);
 		restrictedItems.put(Material.CAT_SPAWN_EGG, PermissionsList.KIT_ANIMALS);

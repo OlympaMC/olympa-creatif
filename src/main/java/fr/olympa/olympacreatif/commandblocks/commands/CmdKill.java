@@ -5,12 +5,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdKill extends CbCommand {
 
-	public CmdKill(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, loc, plugin, plot, args);
+	public CmdKill(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(type, sender, loc, plugin, plot, args);
 	}
 	
 	@Override

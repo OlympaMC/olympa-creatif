@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.perks.NbtEntityParser;
 import fr.olympa.olympacreatif.perks.NbtEntityParser.EntitySourceType;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -19,8 +20,8 @@ public class CmdSummon extends CbCommand {
 
 	private static List<EntityType> allowedEntities = new ArrayList<EntityType>();
 	
-	public CmdSummon(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, loc, plugin, plot, args);
+	public CmdSummon(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(type, sender, loc, plugin, plot, args);
 	}
 
 	

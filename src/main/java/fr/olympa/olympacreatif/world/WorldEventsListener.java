@@ -51,7 +51,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
 import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.objects.OlympaPlayer;
+import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
@@ -254,7 +254,7 @@ public class WorldEventsListener implements Listener{
 		if (e.getCurrentItem() == null)
 			return;
 		
-		if (!AccountProvider.get(e.getWhoClicked().getUniqueId()).hasPermission(PermissionsList.USE_COLORED_TEXT))
+		if (!PermissionsList.USE_COLORED_TEXT.hasPermission(e.getWhoClicked().getUniqueId()))
 			return;
 		
 		e.setCurrentItem(ItemUtils.name(e.getCurrentItem(), ChatColor.translateAlternateColorCodes('&',	e.getCurrentItem().getItemMeta().getDisplayName())));
@@ -299,7 +299,7 @@ public class WorldEventsListener implements Listener{
 	//true si le joueur a la permission d'utiliser l'objet désigné
 	public boolean hasPlayerPermissionFor(OlympaPlayer p, Material mat, boolean setStoneInMainHand) {
 		if (plugin.getWorldManager().getRestrictedItems().keySet().contains(mat))
-			if (!p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(mat))) {
+			if (!plugin.getWorldManager().getRestrictedItems().get(mat).hasPermission(p.getUniqueId())) {
 				if (setStoneInMainHand)
 					if (p.getPlayer().getInventory().getItemInMainHand() != null)
 						ItemUtils.name(p.getPlayer().getInventory().getItemInMainHand(), Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
@@ -403,7 +403,7 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler //color sur pancartes
 	public void onSignColor(SignChangeEvent e) {
-		if (!AccountProvider.get(e.getPlayer().getUniqueId()).hasPermission(PermissionsList.USE_COLORED_TEXT))
+		if (!PermissionsList.USE_COLORED_TEXT.hasPermission(e.getPlayer().getUniqueId()))
 			return;
 		
 		int i = 0;

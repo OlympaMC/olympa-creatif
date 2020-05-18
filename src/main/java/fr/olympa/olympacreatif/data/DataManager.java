@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 
 import java.util.List;
 
-import fr.olympa.api.objects.OlympaPlayer;
+import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
 import fr.olympa.olympacreatif.plot.PlotId;

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.perks.NbtEntityParser;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
@@ -19,8 +20,12 @@ public class CmdTellraw extends CbCommand {
 	
 	private String text = "";
 	
-	public CmdTellraw(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(sender, loc, plugin, plot, args);
+	public CmdTellraw(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(type, sender, loc, plugin, plot, args);
+
+		if (args.length != 2)
+			return;
+		
 		targetEntities = parseSelector(args[0], true);
 		
 		//JSONObject json(JSONObject) new JSONParser().parse(args[1]);

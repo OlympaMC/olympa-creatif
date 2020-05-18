@@ -12,8 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.olympa.api.objects.OlympaPlayer;
-import fr.olympa.api.objects.OlympaPlayerInformations;
+import fr.olympa.api.player.OlympaPlayer;
+import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
@@ -221,11 +221,11 @@ public class PlotsManager {
 				modificator--;
 		
 		//retourne le nombre de plots restants
-		if (pp.hasPermission(PermissionsList.PLOTS_COUNT_CREATOR))
+		if (PermissionsList.PLOTS_COUNT_CREATOR.hasPermission(p.getUniqueId()))
 			return 10 + modificator;
-		else if (pp.hasPermission(PermissionsList.PLOTS_COUNT_ARCHITECT))
+		else if (PermissionsList.PLOTS_COUNT_ARCHITECT.hasPermission(p.getUniqueId()))
 			return 6 + modificator;
-		else if (pp.hasPermission(PermissionsList.PLOTS_COUNT_CONSTRUCTOR))
+		else if (PermissionsList.PLOTS_COUNT_CONSTRUCTOR.hasPermission(p.getUniqueId()))
 			return 3 + modificator;
 		
 		return 1 + modificator;
@@ -260,7 +260,9 @@ public class PlotsManager {
 	}
 	
 	public void removeAdminPlayer(OlympaPlayer p) {
-		adminPlayers.remove(p.getPlayer());
-		adminPlayers.remove(p.getInformation());
+		if (p != null) {
+			adminPlayers.remove(p.getPlayer());
+			adminPlayers.remove(p.getInformation());	
+		}
 	}
 }

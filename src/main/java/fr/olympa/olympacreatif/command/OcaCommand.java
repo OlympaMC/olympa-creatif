@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.command.OlympaCommand;
-import fr.olympa.api.objects.OlympaPlayer;
+import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.PermissionsList;
@@ -29,7 +29,7 @@ public class OcaCommand extends OlympaCommand {
 		
 		OlympaPlayer p = AccountProvider.get(((Player)sender).getUniqueId());
 		
-		if (!p.hasPermission(PermissionsList.STAFF_ENABLE_ADMIN_MODE))
+		if (!PermissionsList.STAFF_ENABLE_ADMIN_MODE.hasPermission(((Player)sender).getUniqueId()))
 			return false;
 		
 		if (args.length == 1)
