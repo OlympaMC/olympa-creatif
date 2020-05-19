@@ -3,6 +3,8 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
@@ -22,7 +24,10 @@ public class CmdKill extends CbCommand {
 		targetEntities = parseSelector(args[0], false);
 		
 		for (Entity e : targetEntities)
-			e.remove();
+			if (e instanceof Player)
+				((Player)e).setHealth(0d);
+			else
+				e.remove();
 		
 		return targetEntities.size();
 	}

@@ -270,7 +270,7 @@ public class WorldEventsListener implements Listener{
 		OlympaPlayer p = AccountProvider.get(e.getWhoClicked().getUniqueId());
 		
 		if (e.getCurrentItem() != null)
-			if (!hasPlayerPermissionFor(p, e.getCurrentItem().getType(), false)){
+			if (!plugin.getWorldManager().hasPlayerPermissionFor(p, e.getCurrentItem().getType(), false)){
 				e.setCancelled(true);
 			}
 	}
@@ -281,7 +281,7 @@ public class WorldEventsListener implements Listener{
 		if (e.getEntityType() != EntityType.PLAYER)
 			return;
 
-		if (!hasPlayerPermissionFor(AccountProvider.get(e.getEntity().getUniqueId()), e.getItem().getItemStack().getType(), false))
+		if (!plugin.getWorldManager().hasPlayerPermissionFor(AccountProvider.get(e.getEntity().getUniqueId()), e.getItem().getItemStack().getType(), false))
 			e.setCancelled(true);
 	}
 	
@@ -290,22 +290,10 @@ public class WorldEventsListener implements Listener{
 		if (e.getItem() == null)
 			return;
 		
-		if (!hasPlayerPermissionFor(AccountProvider.get(e.getPlayer().getUniqueId()), e.getItem().getType(), true)){
+		if (!plugin.getWorldManager().hasPlayerPermissionFor(AccountProvider.get(e.getPlayer().getUniqueId()), e.getItem().getType(), true)){
 			e.setCancelled(true);
 			e.getItem().setType(Material.STONE);
 		}
-	}
-
-	//true si le joueur a la permission d'utiliser l'objet désigné
-	public boolean hasPlayerPermissionFor(OlympaPlayer p, Material mat, boolean setStoneInMainHand) {
-		if (plugin.getWorldManager().getRestrictedItems().keySet().contains(mat))
-			if (!plugin.getWorldManager().getRestrictedItems().get(mat).hasPermission(p.getUniqueId())) {
-				if (setStoneInMainHand)
-					if (p.getPlayer().getInventory().getItemInMainHand() != null)
-						ItemUtils.name(p.getPlayer().getInventory().getItemInMainHand(), Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
-				return true;
-			}
-		return true;
 	}
 	
 	

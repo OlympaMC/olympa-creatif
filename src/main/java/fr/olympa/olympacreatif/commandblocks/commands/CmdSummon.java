@@ -3,8 +3,10 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -29,31 +31,39 @@ public class CmdSummon extends CbCommand {
 	public int execute() {
 		instanciateAllowedEntities();
 		
-		NBTTagCompound tag = new NBTTagCompound();
+		NBTTagCompound tag = null;
 		
-		if (args.length < 4 )
-			return 0;
+		if (args.length >= 4) {
+			Location loc = getLocation(args[1], args[2], args[3]);
+			
+			if (loc != null)
+				sendingLoc = loc;
+			else
+				return 0;
+		}
 		
 		if (args.length == 5)
 			tag = plugin.getPerksManager().getNbtEntityParser().getEntityNbtData(args[4], EntitySourceType.SUMMON);
 			
-		EntityType type = EntityType.fromName(args[0]);
+		EntityType type = null;
 		
-		Location spawnLoc = getLocation(args[1], args[2], args[3]);
+		if (args[0].split(":").length > 1 && EnumUtils.isValidEnum(EntityType.class, args[0].split(":")[1].toUpperCase()))
+			type = EntityType.valueOf(args[0].split(":")[1].toUpperCase());
 		
-		if (type == null || !allowedEntities.contains(type) || spawnLoc == null || tag == null) 
+		if (type == null || !allowedEntities.contains(type)) 
 			return 0;
 		
-		Entity e = plugin.getWorldManager().getWorld().spawnEntity(spawnLoc, type);
+		Entity e = plugin.getWorldManager().getWorld().spawnEntity(sendingLoc, type);
 
 		//application du tag
-		((CraftEntity)e).getHandle().f(tag);
+		if (tag != null)
+			((CraftEntity)e).getHandle().f(tag);
 		
 		return 1;
 	}
 	
 	private void instanciateAllowedEntities() {
-		if (allowedEntities.size() == 0)
+		if (allowedEntities.size() > 0)
 			return;
 		
 		allowedEntities.add(EntityType.BAT);

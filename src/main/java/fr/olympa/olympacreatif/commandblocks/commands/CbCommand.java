@@ -408,9 +408,16 @@ public abstract class CbCommand {
 		if (StringUtils.isNumeric(s))
 			return Double.valueOf(s);
 		
-		if (StringUtils.isNumeric(s.replaceFirst("~", "")))
-			return Double.valueOf(s.replaceFirst("~", "")) + potentialVectorValueToAdd;
-		
+		if (s.contains("~"))
+			if (s.length() >= 2)
+				try{
+					return Double.valueOf(s.replaceFirst("~", "")) + potentialVectorValueToAdd;	
+				}catch(NumberFormatException e) {
+					return null;
+				}
+			else
+				return potentialVectorValueToAdd;
+				
 		return null;
 	}
 	

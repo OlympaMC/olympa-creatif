@@ -55,29 +55,35 @@ public class CbCommandListener implements Listener {
 		if (!(e.getSender() instanceof CommandBlock))
 			return;
 		
-		executeCommandBlockCommand(e.getSender(), ((CommandBlock)e.getSender()).getLocation(), e.getCommand());
+		e.setCancelled(true);
+			
+		CbCommand cmd = getCommand(e.getSender(), ((CommandBlock)e.getSender()).getLocation(), e.getCommand());
 		
-		if (e.getSender() instanceof CommandBlock)
-			e.setCancelled(true);
+		if (cmd != null) 
+			executeCommandBlockCommand(cmd, e.getSender());			
+		
 	}
 	
 	@EventHandler
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e ) {
 		
-		if (executeCommandBlockCommand(e.getPlayer(), e.getPlayer().getLocation(), e.getMessage()))
+		CbCommand cmd = getCommand(e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
+		
+		if (cmd != null) {
 			e.setCancelled(true);
+			executeCommandBlockCommand(cmd, e.getPlayer());			
+		}
+		
 	}
 
-	
+	private CbCommand getCommand(CommandSender sender, Location sendLoc, String command) {
+		return CbCommand.getCommand(plugin, sender, sendLoc, command);
+	}
 	
 	//retourne true si la commande est bien une commande de commandblock
-	private boolean executeCommandBlockCommand(CommandSender sender, Location sendLoc, String command) {
+	private void executeCommandBlockCommand(CbCommand cmd, CommandSender sender) {
 		
-		CbCommand cmd = CbCommand.getCommand(plugin, sender, sendLoc, command);
 		Message message = Message.CB_RESULT_FAILED;
-		
-		if (cmd == null)
-			return false;
 		
 		Bukkit.broadcastMessage(cmd.getType().toString());
 		
@@ -88,7 +94,7 @@ public class CbCommandListener implements Listener {
 			if (commandsLeft.get(cmd.getPlot()) < 1) {
 				//si le plot n'a plus assez de commandes restantes, cancel exécution
 				sender.sendMessage(Message.CB_NO_COMMANDS_LEFT.getValue());
-				return true;
+				return;
 			}else
 				//si le plot a assez de commandes restantes, retrait d'une d'entre elles avant de passer à l'exécution
 				commandsLeft.put(cmd.getPlot(), commandsLeft.get(cmd.getPlot()) - 1);
@@ -125,7 +131,7 @@ public class CbCommandListener implements Listener {
 			tile.load(tag);
 		}
 			
-		return true;
+		return;
 	}
 	
 	

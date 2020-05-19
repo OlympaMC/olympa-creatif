@@ -13,7 +13,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 public class CmdExperience extends CbCommand {
 
 	private Type type = null;
-	private Experience expType = Experience.POINTS;
+	private Experience expType = Experience.LEVELS;
 	private int definedAmount = 0;
 	
 	public CmdExperience(CommandType cmdType, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
@@ -82,7 +82,7 @@ public class CmdExperience extends CbCommand {
 				if (expType == Experience.LEVELS)
 					((Player) p).setLevel(((Player) p).getLevel() + definedAmount);
 				else
-					((Player) p).setExp(((Player) p).getExp() + definedAmount);
+					((Player) p).setExp(Math.min(((Player) p).getExp() + definedAmount, 1f));
 			
 			return targetEntities.size();
 			

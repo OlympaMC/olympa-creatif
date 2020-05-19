@@ -20,13 +20,16 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 
+import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
 
 public class WorldManager {
 
+	private OlympaCreatifMain plugin;
 	private World world = null;
 	private net.minecraft.server.v1_15_R1.World nmsWorld = null;
 	
@@ -34,6 +37,7 @@ public class WorldManager {
 	private Map<Material, OlympaPermission> restrictedItems = new HashMap<Material, OlympaPermission>();
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
+		this.plugin = plugin;
 		
 		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
 		generateRestrictedItems();
@@ -114,6 +118,18 @@ public class WorldManager {
 	
 	public Map<Material, OlympaPermission> getRestrictedItems(){
 		return restrictedItems;
+	}
+
+	//true si le joueur a la permission d'utiliser l'objet désigné
+	public boolean hasPlayerPermissionFor(OlympaPlayer p, Material mat, boolean setStoneInMainHand) {
+		if (plugin.getWorldManager().getRestrictedItems().keySet().contains(mat))
+			if (!plugin.getWorldManager().getRestrictedItems().get(mat).hasPermission(p.getUniqueId())) {
+				if (setStoneInMainHand)
+					if (p.getPlayer().getInventory().getItemInMainHand() != null)
+						ItemUtils.name(p.getPlayer().getInventory().getItemInMainHand(), Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
+				return true;
+			}
+		return true;
 	}
 
 	private void generateRestrictedItems() {

@@ -220,6 +220,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		Plot plotTo = plugin.getPlotsManager().getPlot(e.getTo());
 		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
+		
 		//sortie de l'évent si pas de changement de plot
 		if (plotTo == plotFrom)
 			return;

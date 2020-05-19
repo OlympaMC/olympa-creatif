@@ -94,7 +94,8 @@ public class Plot {
 	}*/
 	
 	public void addPlayerInPlot(Player p) {
-		playersInPlot.add(p);
+		if (!playersInPlot.contains(p))
+			playersInPlot.add(p);
 	}
 	
 	public void removePlayerInPlot(Player p) {
