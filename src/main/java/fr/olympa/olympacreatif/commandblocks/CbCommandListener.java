@@ -67,12 +67,16 @@ public class CbCommandListener implements Listener {
 	@EventHandler
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e ) {
 		
+		if (CbCommand.getCommandType(e.getMessage()) == null)
+			return;
+
+		e.setCancelled(true);
+		
 		CbCommand cmd = getCommand(e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
 		
-		if (cmd != null) {
-			e.setCancelled(true);
+		if (cmd != null) 
 			executeCommandBlockCommand(cmd, e.getPlayer());			
-		}
+		
 		
 	}
 

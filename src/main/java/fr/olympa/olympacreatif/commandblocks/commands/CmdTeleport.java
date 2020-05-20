@@ -19,6 +19,13 @@ public class CmdTeleport extends CbCommand {
 		super(type, sender, loc, plugin, plot, args);
 	
 		switch(args.length) {
+		case 1:
+			if (sender instanceof Entity) {
+				targetEntities.add((Entity) sender);
+				for (Entity e : parseSelector(args[1], false))
+					tpPoints.add(e.getLocation());	
+			}
+			break;
 		case 2:
 			targetEntities = parseSelector(args[0], false);
 			for (Entity e : parseSelector(args[1], false))
@@ -43,8 +50,7 @@ public class CmdTeleport extends CbCommand {
 		
 		for (Entity e : targetEntities) {
 			i++;
-			int rnd = plugin.random.nextInt(tpPoints.size());
-			e.teleport(tpPoints.get(rnd));
+			e.teleport(tpPoints.get(0));
 		}
 		return i;
 	}

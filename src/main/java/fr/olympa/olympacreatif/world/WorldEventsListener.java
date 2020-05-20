@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Dropper;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -132,25 +133,29 @@ public class WorldEventsListener implements Listener{
 							if (plot == null && entity.getType() != EntityType.ARMOR_STAND && entity.getType() != EntityType.PAINTING && entity.getType() != EntityType.ITEM_FRAME)
 								entitiesToRemove.add(entity);
 							
-							else 
-								if (entitiesPerPlot.keySet().contains(plot)) //ajout de l'entité à la liste des entités du plot, si la liste n'existe pas pour ce plot on la crée
-									
-									//si l'entité n'est pas référencée, on le fait
-									if (entitiesPerPlot.get(plot).containsKey(entity.getType())) {
-										entitiesPerPlot.get(plot).put(entity.getType(), entitiesPerPlot.get(plot).get(entity.getType()) + 1);
+							else {
+								//si l'entité n'est pas un teamnahe holder, les tests de limitation d'entités sont effectués
+								if (!plugin.getCommandBlocksManager().getTeamsNameHolders(plot).contains(((CraftEntity)entity).getHandle())){
+									if (entitiesPerPlot.keySet().contains(plot)) //ajout de l'entité à la liste des entités du plot, si la liste n'existe pas pour ce plot on la crée
 										
-										//si le nb d'entités pour ce type ou si le nb total d'entités est dépassé, on la supprime
-										if (entitiesPerPlot.get(plot).get(entity.getType()) >= maxEntitiesPerTypePerPlot || getTotalEntities(entitiesPerPlot.get(plot)) >= maxTotalEntitiesPerPlot)
+										//si l'entité n'est pas référencée, on le fait
+										if (entitiesPerPlot.get(plot).containsKey(entity.getType())) {
+											entitiesPerPlot.get(plot).put(entity.getType(), entitiesPerPlot.get(plot).get(entity.getType()) + 1);
 											
-											entitiesToRemove.add(entity);
-									}else {
-										entitiesPerPlot.get(plot).put(entity.getType(), 1);
-										plot.addEntityInPlot(entity);
-									}
-								else {
-									entitiesPerPlot.put(plot, new HashMap<EntityType, Integer>());
-									plot.addEntityInPlot(entity);	
+											//si le nb d'entités pour ce type ou si le nb total d'entités est dépassé, on la supprime
+											if (entitiesPerPlot.get(plot).get(entity.getType()) >= maxEntitiesPerTypePerPlot || getTotalEntities(entitiesPerPlot.get(plot)) >= maxTotalEntitiesPerPlot)
+												
+												entitiesToRemove.add(entity);
+										}else {
+											entitiesPerPlot.get(plot).put(entity.getType(), 1);
+											plot.addEntityInPlot(entity);
+										}
+									else {
+										entitiesPerPlot.put(plot, new HashMap<EntityType, Integer>());
+										plot.addEntityInPlot(entity);	
+									}	
 								}
+							}
 						}
 					}
 				});

@@ -7,14 +7,16 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
-import fr.olympa.olympacreatif.commandblocks.CbTeam;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
-import fr.olympa.olympacreatif.perks.NbtEntityParser;
+import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.NBTTagList;
 
 public class CmdTellraw extends CbCommand {
 	
@@ -22,38 +24,55 @@ public class CmdTellraw extends CbCommand {
 	
 	public CmdTellraw(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(type, sender, loc, plugin, plot, args);
-
-		if (args.length != 2)
-			return;
 		
 		targetEntities = parseSelector(args[0], true);
 		
-		//JSONObject json(JSONObject) new JSONParser().parse(args[1]);
-		NBTTagCompound tag;
+		if (args.length < 2)
+			return;
+		
+		String concat = "";
+		int k = 0;
+		for (String s : args) {
+			if (k > 0 && k < args.length - 1)
+				concat += s + " ";
+			k++;
+		}
+		
+		concat += args[args.length-1];
+		concat = concat.replace("\"\",", "".replace(",\"\"", ""));
+		
+		NBTTagList mainTag;
 
-		String[] parts = args[1].replace("[", "").replace("]", "").split(",");
+		try {
+			concat = "{list:" + concat + "}";
+			
+			mainTag = MojangsonParser.parse(concat).getList("list", 10);
+		} catch (CommandSyntaxException e1) {
+			return;
+		}
 		
 		try {
-			for (String s : parts) {
-				tag = MojangsonParser.parse(s);
-
+			for (int i = 0 ; i < mainTag.size() ; i++) {
+				
+				NBTTagCompound tag = mainTag.getCompound(i);
+				
 				for (String key : tag.getKeys()) {
 					switch(key) {
 					case "text":
-						text += NbtEntityParser.parseJsonText(tag);
+						text += NbtParserUtil.parseJsonText(tag);
 						break;
 						
 					case "selector":
 						
 						List<Entity> list = parseSelector(tag.getString(key), false);
 
-						int i = 0;
+						int j = 0;
 						
 						for (Entity e : parseSelector(tag.getString(key), false)) {
 							text += ChatColor.translateAlternateColorCodes('&', e.getCustomName());
 							
-							i++;
-							if (i != list.size())
+							j++;
+							if (j != list.size())
 								text += "§r, ";
 						}
 						break;
@@ -94,8 +113,12 @@ public class CmdTellraw extends CbCommand {
 	
 	@Override
 	public int execute() {
+		if (text.length() == 0)
+			return 0;
+		
 		for (Entity e : targetEntities)
 			e.sendMessage("§7[CB]§r " + text);
+		
 		return targetEntities.size();
 	}
 }

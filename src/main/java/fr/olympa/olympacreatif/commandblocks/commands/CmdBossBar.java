@@ -13,7 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.perks.NbtEntityParser;
+import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdBossBar extends CbCommand {
@@ -32,7 +32,7 @@ public class CmdBossBar extends CbCommand {
 			if (args.length != 3)
 				return 0;
 			
-			plot.addBossBar(args[1], Bukkit.createBossBar(NbtEntityParser.parseJsonText(args[2]), BarColor.WHITE, BarStyle.SOLID));
+			plot.addBossBar(args[1], Bukkit.createBossBar(NbtParserUtil.parseJsonText(args[2]), BarColor.WHITE, BarStyle.SOLID));
 			return 1;
 			
 		case "get":
@@ -105,7 +105,7 @@ public class CmdBossBar extends CbCommand {
 				}
 				
 			case "name":
-				bar.setTitle(NbtEntityParser.parseJsonText(args[3]));
+				bar.setTitle(NbtParserUtil.parseJsonText(args[3]));
 				return 1;
 				
 			case "value":

@@ -17,12 +17,12 @@ import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
 
-public class NbtEntityParser {
+public class NbtParserUtil {
 
 	private OlympaCreatifMain plugin;
 	private List<String> tagsCopyValue = new ArrayList<String>();
 	
-	public NbtEntityParser(OlympaCreatifMain plugin) {
+	public NbtParserUtil(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 
 		tagsCopyValue.add("CustomNameVisible");
@@ -272,7 +272,7 @@ public class NbtEntityParser {
 	}
 	
 	public static String parseJsonText(NBTTagCompound nbtText) {
-		String text = "";
+		String text = "§r";
 
 		if (nbtText.hasKey("italic"))
 			text += ChatColor.ITALIC;

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -92,11 +93,12 @@ public class CbTeam {
 			removeTeamName((Player) e);
 		}else
 			removeMember(e.getCustomName());
+		
+		removeTeamName(e);
 	}
 	
 	public void removeMember(String s) {
 		members.remove(ChatColor.translateAlternateColorCodes('&', s));
-		
 	}
 
 	public List<String> getMembers(){
@@ -130,13 +132,14 @@ public class CbTeam {
 		color = ColorType.getColor(colorAsString);
 	}
 	
-	public void showTeamName(Player p) {//summon des entités pour faire apparaître le nom de la team au dessus du pseudo du joueur
+	public void showTeamName(Entity entity) {//summon des entités pour faire apparaître le nom de la team au dessus du pseudo du joueur
 		
-		removeTeamName(p);
+		removeTeamName(entity);
 		
 		if (name.equals(""))
 			return;
 		
+		//entité portant le nom ed l'équipe
 		EntitySlime eSlime = new EntitySlime(EntityTypes.SLIME, plugin.getWorldManager().getNmsWorld());
 		eSlime.setSize(1, true);
 		eSlime.updateSize();
@@ -147,34 +150,43 @@ public class CbTeam {
 		eSlime.setNoAI(true);
 		
 		
-		
+		//entité portant le nom du joueur
 		EntityBee eBee = new EntityBee(EntityTypes.BEE, plugin.getWorldManager().getNmsWorld());
 		eBee.updateSize();
 		eBee.setInvisible(true);
 		eBee.setInvulnerable(true);
 		eBee.setCustomNameVisible(true);
-		eBee.setCustomName(new ChatMessage(p.getDisplayName()));
+		if (entity.getType() == EntityType.PLAYER)
+			eBee.setCustomName(new ChatMessage(((Player) entity).getDisplayName()));
+		else
+			eBee.setCustomName(new ChatMessage(entity.getCustomName()));
+		
 		eBee.setNoAI(true);
 		
 		eSlime.spawnIn(plugin.getWorldManager().getNmsWorld());
 		eBee.spawnIn(plugin.getWorldManager().getNmsWorld());
 
-		eSlime.startRiding(((CraftPlayer)p).getHandle());
-		eBee.startRiding(((CraftPlayer)p).getHandle());
+		eSlime.startRiding(((CraftEntity)entity).getHandle());
+		eBee.startRiding(((CraftEntity)entity).getHandle());
 		
 
 		teamNameHolders.add(eSlime);
 		teamNameHolders.add(eBee);
 	}
 	
-	public void removeTeamName(Player p) {
-		for (Entity e : p.getPassengers())
-			e.remove();
+	public void removeTeamName(Entity entity) {
+		for (Entity e : entity.getPassengers())
+			if (teamNameHolders.contains(((CraftEntity)e).getHandle()))
+				e.remove();
 	}
 	
 	public void removeTeamNameForAll() {//tue les entités chevauchant les joueurs de cette équipe
 		for (net.minecraft.server.v1_15_R1.Entity e : teamNameHolders)
 			e.getBukkitEntity().remove();
+	}
+	
+	public List<net.minecraft.server.v1_15_R1.Entity> getTeamsNameHoldersEntityes(){
+		return teamNameHolders;
 	}
 	
 	public enum ColorType{
@@ -207,7 +219,8 @@ public class CbTeam {
 		}
 		public static String getColor(String colorAsString) {
 			for (ColorType c : ColorType.values())
-				return c.getColor();
+				if (c.toString().equals(colorAsString))
+					return c.getColor();
 			
 			return "";
 		}

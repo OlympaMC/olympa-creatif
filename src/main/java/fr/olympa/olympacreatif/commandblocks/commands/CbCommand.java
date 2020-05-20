@@ -430,6 +430,10 @@ public abstract class CbCommand {
 		return cmdType;
 	}
 	
+	public static CommandType getCommandType(String cmd) {
+		return CommandType.get(cmd.split(" ")[0].replaceFirst("/", ""));
+	}
+	
 	public static CbCommand getCommand(OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {
 		Plot plot = null;
 		String[] args = fullCommand.split(" ");
@@ -446,7 +450,7 @@ public abstract class CbCommand {
 		
 		CbCommand cmd = null;
 		
-		CommandType type = CommandType.get(args[0].replace("/", ""));
+		CommandType type = getCommandType(fullCommand);
 		
 		List<String> list = new ArrayList<String>(Arrays.asList(args));
 		list.remove(0);
@@ -486,6 +490,9 @@ public abstract class CbCommand {
 		case teleport:
 			cmd = new CmdTeleport(type, sender, loc, plugin, plot, args);
 			break;
+		case tp:
+			cmd = new CmdTeleport(type, sender, loc, plugin, plot, args);
+			break;
 		case effect:
 			cmd = new CmdEffect(type, sender, loc, plugin, plot, args);
 			break;
@@ -507,6 +514,7 @@ public abstract class CbCommand {
 	
 	public enum CommandType{
 		teleport,
+		tp,
 		tellraw,
 		execute,
 		team,

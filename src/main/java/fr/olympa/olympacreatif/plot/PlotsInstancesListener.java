@@ -334,6 +334,8 @@ public class PlotsInstancesListener implements Listener{
 		p.setAllowFlight(true);
 		p.resetPlayerTime();
 		p.resetPlayerWeather();
+		
+		plugin.getCommandBlocksManager().excecuteQuitActions(plot, p);
 	}
 	
 	
