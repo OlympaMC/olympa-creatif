@@ -3,6 +3,8 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.plaf.basic.BasicScrollPaneUI.HSBChangeListener;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -42,9 +44,9 @@ public class CmdSummon extends CbCommand {
 				return 0;
 		}
 		
-		if (args.length == 5)
-			tag = plugin.getPerksManager().getNbtEntityParser().getEntityNbtData(args[4], EntitySourceType.SUMMON);
-			
+		if (args.length >= 5) 			
+			tag = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.SUMMON);
+		
 		EntityType type = null;
 		
 		if (args[0].split(":").length > 1 && EnumUtils.isValidEnum(EntityType.class, args[0].split(":")[1].toUpperCase()))
@@ -56,8 +58,10 @@ public class CmdSummon extends CbCommand {
 		Entity e = plugin.getWorldManager().getWorld().spawnEntity(sendingLoc, type);
 
 		//application du tag
-		if (tag != null)
+		if (tag != null) {
 			((CraftEntity)e).getHandle().f(tag);
+			e.teleport(sendingLoc);
+		}
 		
 		return 1;
 	}

@@ -19,6 +19,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.perks.NbtParserUtil.EntitySourceType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
@@ -131,9 +132,9 @@ public class OcoCommand extends OlympaCommand {
 						NBTTagCompound nbt = new NBTTagCompound();
 						
 						if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("EGG"))
-							nbt = plugin.getPerksManager().getNbtEntityParser().getEntityNbtData(args[2], EntitySourceType.EGG);
+							nbt = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.EGG);
 						else if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("SPAWNER"))
-							nbt = plugin.getPerksManager().getNbtEntityParser().getEntityNbtData(args[2], EntitySourceType.SPAWNER);
+							nbt = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.SPAWNER);
 						
 						if (nbt != null) {
 							item.setTag(nbt);

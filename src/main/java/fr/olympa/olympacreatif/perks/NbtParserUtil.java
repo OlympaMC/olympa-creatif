@@ -19,12 +19,9 @@ import net.minecraft.server.v1_15_R1.NBTTagList;
 
 public class NbtParserUtil {
 
-	private OlympaCreatifMain plugin;
-	private List<String> tagsCopyValue = new ArrayList<String>();
+	private static List<String> tagsCopyValue = new ArrayList<String>();
 	
-	public NbtParserUtil(OlympaCreatifMain plugin) {
-		this.plugin = plugin;
-
+	public NbtParserUtil() {
 		tagsCopyValue.add("CustomNameVisible");
 		tagsCopyValue.add("NoAI");
 		tagsCopyValue.add("Glowing");
@@ -45,14 +42,11 @@ public class NbtParserUtil {
 		tagsCopyValue.add("generic.armorToughness");
 	}
 	
-	public NBTTagCompound getEntityNbtData(String data, EntitySourceType sourceType) {
-		NBTTagCompound oldTag = new NBTTagCompound();
+	public static NBTTagCompound getEntityNbtData(NBTTagCompound oldTag, EntitySourceType sourceType) {
 		NBTTagCompound newTag = new NBTTagCompound();
 		
 		try {			
 			//récupération tag nbt initial entré par le joueur
-			oldTag = MojangsonParser.parse(data);
-			
 			if (oldTag.hasKey("EntityTag"))
 				oldTag = oldTag.getCompound("EntityTag");
 
@@ -66,17 +60,23 @@ public class NbtParserUtil {
 			
 			//check customname
 			if (oldTag.hasKey("CustomName")) {
-				String name = oldTag.getString("CustomName").replace("{", "").replace("}", "").replace("_", " ");
-				
-				if (!name.startsWith("\""))
-					name = "\"" + name;
-				
-				if (!name.endsWith("\""))
-					name = name + "\"";
-				
-				name = ChatColor.translateAlternateColorCodes('&', name);
-				
-				newTag.setString("CustomName", name);	
+				if (!oldTag.getString("CustomName").startsWith("[")) {
+					String name = oldTag.getString("CustomName").replace("{", "").replace("}", "").replace("_", " ");
+					
+					if (!name.startsWith("\""))
+						name = "\"" + name;
+					
+					if (!name.endsWith("\""))
+						name = name + "\"";
+					
+					name = ChatColor.translateAlternateColorCodes('&', name);
+
+					newTag.setString("CustomName", name);	
+				}else {
+					String name = parseJsonList(getListCompoundFromString(oldTag.getString("CustomName")));
+					newTag.setString("CustomName", name);
+				}
+					
 			}
 			
 			//vérification de la taille du slime
@@ -158,11 +158,12 @@ public class NbtParserUtil {
 			
 			return finalTag;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	public NBTTagCompound getValidAttribute(NBTTagCompound oldTag) {
+	public static NBTTagCompound getValidAttribute(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
 		
 		if (!oldTag.hasKey("Base") || !oldTag.hasKey("Name"))
@@ -189,7 +190,7 @@ public class NbtParserUtil {
 	}
 	
 
-	public NBTTagCompound getValidItem(NBTTagCompound oldTag) {
+	public static NBTTagCompound getValidItem(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
 
 		if (oldTag.hasKey("id"))
@@ -214,6 +215,7 @@ public class NbtParserUtil {
 					try {
 						json = (JSONObject) new JSONParser().parse(nameTag);
 					} catch (ParseException e) {
+						e.printStackTrace();
 						return null;
 					}
 					if (json.get("text") != null) {
@@ -239,7 +241,7 @@ public class NbtParserUtil {
 		return newTag;
 	}
 	
-	public NBTTagCompound getValidEffect(NBTTagCompound oldTag) {
+	public static NBTTagCompound getValidEffect(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
 
 		if (oldTag.hasKey("Id"))
@@ -263,33 +265,95 @@ public class NbtParserUtil {
 		SUMMON;
 	}
 	
-	public static String parseJsonText(String nbtText) {
+	//renvoie le NBTTagCompound compris dans la liste de strings
+	public static NBTTagCompound getTagFromStrings(String[] args) {
+		
+		String concat = "";
+		int k = 0;
+		for (String s : args) {
+			concat += s + " ";
+		}
+		
+		return getTagFromString(concat);
+	}
+	
+	public static NBTTagCompound getTagFromString(String arg) {
 		try {
-			return parseJsonText(MojangsonParser.parse(nbtText));
+			String tag = arg;
+			if (!tag.contains("{") || !tag.contains("}")) 
+				return new NBTTagCompound();
+			
+			tag = tag.substring(tag.indexOf("{"), tag.lastIndexOf("}")+1);
+			
+			Bukkit.broadcastMessage(tag);
+			
+			return MojangsonParser.parse(tag);
 		} catch (CommandSyntaxException e) {
-			return "§cTexte json invalide";
+			e.printStackTrace();
+			return new NBTTagCompound();
 		}
 	}
 	
-	public static String parseJsonText(NBTTagCompound nbtText) {
-		String text = "§r";
+	//renvoie un string comprenant les parses de tous les tags de la liste
+	public static String parseJsonList(NBTTagList nbtList) {
+		String text = "";
 
-		if (nbtText.hasKey("italic"))
-			text += ChatColor.ITALIC;
-		if (nbtText.hasKey("bold"))
-			text += ChatColor.BOLD;
-		if (nbtText.hasKey("strikethrough"))
-			text += ChatColor.STRIKETHROUGH;
-		if (nbtText.hasKey("underlined"))
-			text += ChatColor.UNDERLINE;
-		if (nbtText.hasKey("obfuscated"))
-			text += ChatColor.MAGIC;
-		if (nbtText.hasKey("color"))
-			text += CbTeam.ColorType.getColor(nbtText.getString("color"));
+		for (int i = 0 ; i < nbtList.size() ; i++) 	
+			text += parseJsonCompound(nbtList.getCompound(i));
 		
-		if (nbtText.hasKey("text"))
-			text += nbtText.getString("text");
 		
 		return text;
+	}
+	
+	//renvoie un string formaté selon les paramètres json du tag
+	public static String parseJsonCompound(NBTTagCompound tag) {
+		
+		String text = "§r";
+		
+		if (tag.hasKey("italic"))
+			text += ChatColor.ITALIC;
+		if (tag.hasKey("bold"))
+			text += ChatColor.BOLD;
+		if (tag.hasKey("strikethrough"))
+			text += ChatColor.STRIKETHROUGH;
+		if (tag.hasKey("underlined"))
+			text += ChatColor.UNDERLINE;
+		if (tag.hasKey("obfuscated"))
+			text += ChatColor.MAGIC;
+		if (tag.hasKey("color"))
+			text += CbTeam.ColorType.getColor(tag.getString("color"));
+		
+		if (tag.hasKey("text"))
+			text += tag.getString("text");	
+		
+		return text;
+	}
+	
+	//renvoie un NBTTagList à partir d'arguments d'une commande
+	public static NBTTagList getListCompoundFromString(String[] args) {
+		String concat = "";
+		int k = 0;
+		for (String s : args) {
+			if (k > 0 && k < args.length - 1)
+				concat += s + " ";
+			k++;
+		}
+		
+		concat += args[args.length-1];
+		
+		return getListCompoundFromString(concat);
+	}
+
+	//renvoie un NBTTagList à partir d'arguments d'un string json
+	public static NBTTagList getListCompoundFromString(String concat) {
+
+		try {
+			concat = "{list:" + concat.replace("\"\",", "").replace(",\"\"", "") + "}";
+			
+			return MojangsonParser.parse(concat).getList("list", 10);
+		} catch (CommandSyntaxException e1) {
+			e1.printStackTrace();
+			return new NBTTagList();
+		}
 	}
 }

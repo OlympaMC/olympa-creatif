@@ -32,7 +32,7 @@ public class CmdBossBar extends CbCommand {
 			if (args.length != 3)
 				return 0;
 			
-			plot.addBossBar(args[1], Bukkit.createBossBar(NbtParserUtil.parseJsonText(args[2]), BarColor.WHITE, BarStyle.SOLID));
+			plot.addBossBar(args[1], Bukkit.createBossBar(NbtParserUtil.parseJsonCompound(NbtParserUtil.getTagFromString(args[2])), BarColor.WHITE, BarStyle.SOLID));
 			return 1;
 			
 		case "get":
@@ -105,7 +105,7 @@ public class CmdBossBar extends CbCommand {
 				}
 				
 			case "name":
-				bar.setTitle(NbtParserUtil.parseJsonText(args[3]));
+				bar.setTitle(NbtParserUtil.parseJsonCompound(NbtParserUtil.getTagFromString(args[3])));
 				return 1;
 				
 			case "value":

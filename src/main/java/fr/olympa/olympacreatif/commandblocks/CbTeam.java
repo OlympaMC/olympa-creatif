@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.ChatMessage;
 import net.minecraft.server.v1_15_R1.EntityBee;
@@ -31,19 +32,19 @@ public class CbTeam {
 	private String color = "";
 
 	private String id;
-	private String name = "";
+	private String teamName = "";
 	
-	private List<net.minecraft.server.v1_15_R1.Entity> teamNameHolders = new ArrayList<net.minecraft.server.v1_15_R1.Entity>();
+	private List<Entity> teamNameHolders = new ArrayList<Entity>();
 	
 	public CbTeam(OlympaCreatifMain plugin, Plot plot, String id, String name) {
 		this.plugin = plugin;
 		this.plot = plot;
 		this.id = id;
-		setName(ChatColor.translateAlternateColorCodes('&',name));
+		setName(name);
 	}
 	
 	public String getName() {
-		return name;
+		return teamName;
 	}
 	
 	public String getId() {
@@ -51,9 +52,9 @@ public class CbTeam {
 	}
 	
 	public void setName(String n) {
-		name = ChatColor.translateAlternateColorCodes('&',n);
+		//teamName = NbtParserUtil.parseJsonText(n);
 		
-		if (name.equals(""))
+		if (teamName.equals(""))
 			removeTeamNameForAll();
 	}
 	
@@ -63,33 +64,44 @@ public class CbTeam {
 	
 	public String getDisplayName() {
 		if (color.equals(""))
-			return name;
+			return teamName;
 		else
-			return color + name;
+			return color + teamName;
 	}
 	
-	public void addMember(Entity e) {
+	public boolean addMember(Entity e) {
+		boolean isAdded = false;
+		
 		if (e instanceof Player) {
-			addMember(((Player) e).getName());
-			showTeamName((Player) e);	
-		}else
-			addMember(e.getCustomName());
+			isAdded = addMember(((Player) e).getDisplayName());
+		}else {
+			isAdded = addMember(e.getCustomName());
+		}
+
+		if (isAdded) {
+			showTeamName(e);
+
+		}
+		
+		return isAdded;
 	}
 	
-	public void addMember(String s) {
+	public boolean addMember(String s) {
 		if (members.contains(s))
-			return;
+			return false;
 		
 		for (CbTeam t : plugin.getCommandBlocksManager().getTeams(plot))
 			if (t.getMembers().contains(s))
 				t.removeMember(s);
 		
 		members.add(ChatColor.translateAlternateColorCodes('&', s));
+		
+		return true;
 	}
 	
 	public void removeMember(Entity e) {
 		if (e instanceof Player) {
-			removeMember(((Player) e).getName());
+			removeMember(((Player) e).getDisplayName());
 			removeTeamName((Player) e);
 		}else
 			removeMember(e.getCustomName());
@@ -136,8 +148,13 @@ public class CbTeam {
 		
 		removeTeamName(entity);
 		
-		if (name.equals(""))
+		Bukkit.broadcastMessage("HERE");
+		
+		if (teamName.equals(""))
 			return;
+
+		
+		Bukkit.broadcastMessage("HERE 2");
 		
 		//entité portant le nom ed l'équipe
 		EntitySlime eSlime = new EntitySlime(EntityTypes.SLIME, plugin.getWorldManager().getNmsWorld());
@@ -146,7 +163,7 @@ public class CbTeam {
 		eSlime.setInvisible(true);
 		eSlime.setInvulnerable(true);
 		eSlime.setCustomNameVisible(true);
-		eSlime.setCustomName(new ChatMessage(color + name));
+		eSlime.setCustomName(new ChatMessage(color + getDisplayName()));
 		eSlime.setNoAI(true);
 		
 		
@@ -165,27 +182,27 @@ public class CbTeam {
 		
 		eSlime.spawnIn(plugin.getWorldManager().getNmsWorld());
 		eBee.spawnIn(plugin.getWorldManager().getNmsWorld());
-
+		
 		eSlime.startRiding(((CraftEntity)entity).getHandle());
 		eBee.startRiding(((CraftEntity)entity).getHandle());
 		
 
-		teamNameHolders.add(eSlime);
-		teamNameHolders.add(eBee);
+		teamNameHolders.add(eSlime.getBukkitEntity());
+		teamNameHolders.add(eBee.getBukkitEntity());
 	}
 	
 	public void removeTeamName(Entity entity) {
 		for (Entity e : entity.getPassengers())
-			if (teamNameHolders.contains(((CraftEntity)e).getHandle()))
+			if (teamNameHolders.contains(e))
 				e.remove();
 	}
 	
 	public void removeTeamNameForAll() {//tue les entités chevauchant les joueurs de cette équipe
-		for (net.minecraft.server.v1_15_R1.Entity e : teamNameHolders)
-			e.getBukkitEntity().remove();
+		for (Entity e : teamNameHolders)
+			e.remove();
 	}
 	
-	public List<net.minecraft.server.v1_15_R1.Entity> getTeamsNameHoldersEntityes(){
+	public List<Entity> getTeamsNameHoldersEntityes(){
 		return teamNameHolders;
 	}
 	

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -17,7 +18,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.plot.Plot;
-import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
 
 public class CommandBlocksManager {
@@ -169,13 +169,20 @@ public class CommandBlocksManager {
 	
 	////renvoie la liste des équipes d'un plot
 	public List<CbTeam> getTeams(Plot plot){
-		if (plot == null)
+		if (plot == null || !plotTeams.containsKey(plot))
 			return new ArrayList<CbTeam>();
 		
 		return plotTeams.get(plot);
 	}
 	
-	public CbTeam getTeamOfPlayer(Plot plot, String memberName) {
+	public CbTeam getTeamOfEntity(Plot plot, org.bukkit.entity.Entity e) {
+		if (e instanceof Player)
+			return getTeamOfString(plot, ((Player) e).getDisplayName());
+		else
+			return getTeamOfString(plot, e.getCustomName());
+	}
+	
+	public CbTeam getTeamOfString(Plot plot, String memberName) {
 		
 		memberName = ChatColor.translateAlternateColorCodes('&', memberName);
 		
@@ -186,7 +193,7 @@ public class CommandBlocksManager {
 		return null;
 	}
 
-	public CbTeam getTeam(Plot plot, String teamId) {
+	public CbTeam getTeamById(Plot plot, String teamId) {
 		for (CbTeam t : getTeams(plot))
 			if (t.getId().equals(teamId)) 
 				return t;			
@@ -195,7 +202,7 @@ public class CommandBlocksManager {
 	}
 	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
-		CbTeam team = getTeamOfPlayer(fromPlot, p.getCustomName());
+		CbTeam team = getTeamOfString(fromPlot, p.getDisplayName());
 		if (team != null)
 			team.removeMember(p);
 	}

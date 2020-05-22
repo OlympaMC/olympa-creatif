@@ -284,10 +284,10 @@ public abstract class CbCommand {
 				
 				//recherche du type de l'entité
 				if (ss.contains("!")) {
-					team = plugin.getCommandBlocksManager().getTeam(plot, e.getValue().replace("!", ""));
+					team = plugin.getCommandBlocksManager().getTeamById(plot, e.getValue().replace("!", ""));
 					isTestInequality = true;
 				}else
-					team = plugin.getCommandBlocksManager().getTeam(plot, e.getValue());
+					team = plugin.getCommandBlocksManager().getTeamById(plot, e.getValue());
 				
 				if (team == null)
 					return list;
@@ -385,7 +385,7 @@ public abstract class CbCommand {
 	}
 	
 	
-	
+	//renvoie une localisation absolue ou relative complète (null si err de syntaxe ou si hors du plot)
 	protected Location getLocation (String x, String y, String z) {
 		
 		Double xF = getUnverifiedPoint(x, sendingLoc.getX());
@@ -402,11 +402,13 @@ public abstract class CbCommand {
 			return null;
 	}
 	
-	//renvoie la coordonnée x, y ou z à partir du string
+	//renvoie la coordonnée x, y ou z à partir du string (en coordonnée absolue ou relative)
 	private Double getUnverifiedPoint(String s, double potentialVectorValueToAdd) {
 		
-		if (StringUtils.isNumeric(s))
+		try{
 			return Double.valueOf(s);
+		}catch(NumberFormatException e) {
+		}
 		
 		if (s.contains("~"))
 			if (s.length() >= 2)

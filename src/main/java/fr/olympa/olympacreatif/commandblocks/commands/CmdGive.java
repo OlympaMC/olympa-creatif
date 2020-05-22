@@ -15,6 +15,7 @@ import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
+import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.world.WorldEventsListener;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
@@ -58,7 +59,7 @@ public class CmdGive extends CbCommand {
 			if (tag != null) {				
 				net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 				
-				nmsItem.setTag(plugin.getPerksManager().getNbtEntityParser().getValidItem(tag));
+				nmsItem.setTag(NbtParserUtil.getValidItem(tag));
 				
 				item = CraftItemStack.asBukkitCopy(nmsItem);
 			}		

@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -36,7 +37,7 @@ public class CmdTeam extends CbCommand {
 			
 		case "empty":
 			if (args.length >= 2) {
-				CbTeam t = plugin.getCommandBlocksManager().getTeam(plot, args[1]);
+				CbTeam t = plugin.getCommandBlocksManager().getTeamById(plot, args[1]);
 				if (t != null) {
 					t.removeTeamNameForAll();
 					t.getMembers().clear();
@@ -47,7 +48,7 @@ public class CmdTeam extends CbCommand {
 			
 		case "join":
 			if (args.length >= 2) {
-				CbTeam t = plugin.getCommandBlocksManager().getTeam(plot, args[1]);
+				CbTeam t = plugin.getCommandBlocksManager().getTeamById(plot, args[1]);
 				
 				if (t == null)
 					break;
@@ -55,36 +56,44 @@ public class CmdTeam extends CbCommand {
 				if (args.length == 3) {
 					List<Entity> list = parseSelector(args[2], false);
 
+					int nbAddedEntities = 0;
+					
 					for (Entity e : list)
-						t.addMember(e);
+						if (t.addMember(e))
+							nbAddedEntities++;
 				
-					return list.size();
+					return nbAddedEntities;
 				}
 				else if(sender instanceof Player) {
-					t.addMember(((Player)sender).getDisplayName());
-					return 1;
+					if (t.addMember((Entity) sender))
+						return 1;
+					else 
+						return 0;
 				}
 			}
 			break;
 			
 		case "leave":
-			if (args.length >= 2) {
-				CbTeam t = plugin.getCommandBlocksManager().getTeam(plot, args[1]);
+			if (args.length == 2) { //supression de l'équipe pour les entités du sélecteur
+				List<Entity> list = parseSelector(args[2], false);
 				
-				if (t == null)
-					break;
+				int removedPlayers = 0;
 				
-				if (args.length == 3) {
-					List<Entity> list = parseSelector(args[2], false);
-
-					for (Entity e : list)
+				for (Entity e : list) {
+					CbTeam t = plugin.getCommandBlocksManager().getTeamOfEntity(plot, e);
+					if (t != null) {
 						t.removeMember(e);
-				
-					return list.size();
+						removedPlayers++;
+					}	
 				}
-				else if(sender instanceof Player) {
-					t.removeMember(((Player)sender).getDisplayName());
-					return 1;
+			
+				return removedPlayers;
+				
+			}else if(sender instanceof Player) { //supression de l'équipe de l'exécutant de la commande
+				CbTeam t = plugin.getCommandBlocksManager().getTeamOfEntity(plot, (Entity) sender);
+				if (t != null) {
+					t.removeMember((Player) sender);
+					return 1;	
 				}
 			}
 			break;
@@ -92,8 +101,18 @@ public class CmdTeam extends CbCommand {
 		case "add":
 			if (args.length >= 2) {
 				String display = "";
-				if (args.length == 3)
-					display = ChatColor.translateAlternateColorCodes('&', args[2]);
+				
+				boolean json = false;
+				
+				//récupération du texte au format json
+				for (String s : args)
+					if (s.startsWith("{") || json) {
+						json = true;
+						display += s + " ";
+					}
+				
+				if (display.length() > 1)
+					display = display.substring(0, display.length()-1);
 				
 				CbTeam t = new CbTeam(plugin, plot, args[1], display);
 				
@@ -114,16 +133,53 @@ public class CmdTeam extends CbCommand {
 			break;
 			
 		case "modify"://ne modifie que le nom (prefix) de l'équipe, aucune autre personnalisation du menu "modify" n'est prise en compte.
-			if (args.length >= 3 && args[2].equals("prefix")) {
-				CbTeam t = plugin.getCommandBlocksManager().getTeam(plot, args[1]);
+			if (args.length >= 3) {
+				CbTeam t = plugin.getCommandBlocksManager().getTeamById(plot, args[1]);
 				
 				if (t == null)
-					break;
+					return 0;	
 				
-				if (args.length == 4)
-					t.setName(args[3]);
-				else
-					t.setName("");
+				switch (args[2]) {
+				case "prefix":				
+					
+					if (args.length >= 4) {
+						String jsonString = "";
+						boolean json = false;
+						
+						for (String s : args) {
+							if (s.startsWith("{") || json) {
+								json = true;
+								jsonString += s + " ";
+							}
+						}
+						
+						//suppression dernier espace
+						jsonString = jsonString.substring(0, jsonString.length()-1);
+						t.setName(jsonString);
+					}
+					else
+						t.removeTeamNameForAll();
+					
+					return 1;
+					
+				case "friendlyFire":
+					if (args.length == 4) {
+						if (args[3].equals("true"))
+							t.setFriendlyFire(true);
+						else
+							t.setFriendlyFire(false);
+						
+						return 1;
+					}
+					break;
+					
+				case "color":
+					if (args.length < 4)
+						t.setColor("");
+					else
+						t.setColor(args[3]);
+					return 1;
+				}
 			}
 			break;
 		}

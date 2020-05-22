@@ -30,26 +30,7 @@ public class CmdTellraw extends CbCommand {
 		if (args.length < 2)
 			return;
 		
-		String concat = "";
-		int k = 0;
-		for (String s : args) {
-			if (k > 0 && k < args.length - 1)
-				concat += s + " ";
-			k++;
-		}
-		
-		concat += args[args.length-1];
-		concat = concat.replace("\"\",", "".replace(",\"\"", ""));
-		
-		NBTTagList mainTag;
-
-		try {
-			concat = "{list:" + concat + "}";
-			
-			mainTag = MojangsonParser.parse(concat).getList("list", 10);
-		} catch (CommandSyntaxException e1) {
-			return;
-		}
+		NBTTagList mainTag = NbtParserUtil.getListCompoundFromString(args);
 		
 		try {
 			for (int i = 0 ; i < mainTag.size() ; i++) {
@@ -59,7 +40,7 @@ public class CmdTellraw extends CbCommand {
 				for (String key : tag.getKeys()) {
 					switch(key) {
 					case "text":
-						text += NbtParserUtil.parseJsonText(tag);
+						text += NbtParserUtil.parseJsonCompound(tag);
 						break;
 						
 					case "selector":
