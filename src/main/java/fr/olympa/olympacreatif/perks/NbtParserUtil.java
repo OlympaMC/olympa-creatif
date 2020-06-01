@@ -34,6 +34,8 @@ public class NbtParserUtil {
 		tagsCopyValue.add("PersistenceRequired");
 		tagsCopyValue.add("NoGravity");
 		tagsCopyValue.add("ShowParticles");
+
+		tagsCopyValue.add("VillagerData");
 		
 		tagsCopyValue.add("generic.knockbackResistance");
 		tagsCopyValue.add("generic.maxHealth");
@@ -128,6 +130,20 @@ public class NbtParserUtil {
 				newTag.set("Attributes", list);
 			}
 			
+			if (oldTag.hasKey("Offers")) {
+				NBTTagList list = new NBTTagList();
+				int iMax = oldTag.getCompound("Offers").getList("Recipes", 10).size();
+
+				for (int i = 0 ; i < iMax ; i++) {
+					NBTTagCompound tag = new NBTTagCompound();
+					list.add(getValidShopkeeperExchanges(oldTag.getCompound("Offers").getList("Recipes", 10).getCompound(i)));	
+				}
+				
+				NBTTagCompound tag2 = new NBTTagCompound();
+				tag2.set("Recipes", list);
+				newTag.set("Offers", tag2);
+			}
+			
 			NBTTagCompound finalTag = new NBTTagCompound();
 			
 			switch (sourceType) {
@@ -196,7 +212,7 @@ public class NbtParserUtil {
 			newTag.set("id", oldTag.get("id"));
 		
 		if (oldTag.hasKey("Count"))
-			newTag.set("Count", oldTag.get("Count"));
+			newTag.setInt("Count", Math.min(oldTag.getInt("Count"), 64));
 		
 		if (oldTag.hasKey("HideFlags"))
 			newTag.set("HideFlags", oldTag.get("HideFlags"));
@@ -216,6 +232,12 @@ public class NbtParserUtil {
 					} catch (ParseException e) {
 						return null;
 					}
+					
+					//ajout lore
+					if (oldTag.getCompound("tag").getCompound("display").hasKey("Lore"))
+						tag2.set("Lore", oldTag.getCompound("tag").getCompound("display").get("Lore"));
+					
+					//coloration du nom de l'item
 					if (json.get("text") != null) {
 						tag2.setString("Name", "{\"text\":\"" + ChatColor.translateAlternateColorCodes('&', (String) json.get("text")) + "\"}");
 						tag1.set("display", tag2);
@@ -255,6 +277,24 @@ public class NbtParserUtil {
 			newTag.set("ShowParticles", oldTag.get("ShowParticles"));
 		
 		return newTag;
+	}
+	
+	public static NBTTagCompound getValidShopkeeperExchanges(NBTTagCompound oldTag) {
+		NBTTagCompound tag = new NBTTagCompound();
+
+		if (oldTag.hasKey("buy"))
+			tag.set("buy", getValidItem(oldTag.getCompound("buy")));
+		if (oldTag.hasKey("buyB"))
+			tag.set("buyB", getValidItem(oldTag.getCompound("buyB")));
+		if (oldTag.hasKey("sell"))
+			tag.set("sell", getValidItem(oldTag.getCompound("sell")));
+
+		if (oldTag.hasKey("maxUses"))
+			tag.set("maxUses", oldTag.get("maxUses"));
+		if (oldTag.hasKey("rewardExp"))
+			tag.set("rewardExp", oldTag.get("rewardExp"));
+			
+		return tag;
 	}
 	
 	public enum EntitySourceType{
