@@ -118,46 +118,42 @@ public class OcoCommand extends OlympaCommand {
 				break;
 			}
 			break;
-		case 3:
-			switch(args[0]) {
-			case "give"://give mob eggs with custom NBTtags
-				args[1] = args[1].toUpperCase();
-				
-				if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])) && 
-						(args[1].toLowerCase().contains("_egg") || args[1].toLowerCase().contains("spawner") || args[1].toLowerCase().contains("command_block")))
-					if (true/*p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])))*/) {
-						
-						net.minecraft.server.v1_15_R1.ItemStack item = CraftItemStack.asNMSCopy(new ItemStack(Material.getMaterial(args[1])));
-						
-						NBTTagCompound nbt = new NBTTagCompound();
-						
-						if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("EGG"))
-							nbt = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.EGG);
-						else if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("SPAWNER"))
-							nbt = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.SPAWNER);
-						
-						if (nbt != null) {
-							item.setTag(nbt);
-							p.getPlayer().getInventory().addItem(CraftItemStack.asBukkitCopy(item));
-							
-							p.getPlayer().sendMessage(Message.OCO_GIVE_SUCCESSFUL.getValue().replace("%item%", args[1].toLowerCase().replace("_", " ")));	
-						}else
-							p.getPlayer().sendMessage(Message.OCO_INVALID_NBT_DATA.getValue());
-					}
-					else
-						p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", 
-								plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])).toString().toLowerCase()));
-				else
-					p.getPlayer().sendMessage(Message.OCO_GIVE_INDISPONIBLE_BLOCK.getValue());
-				break;
-			default:
-				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
-				break;
-			}
-			break;
 		default:
 			sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
 			break;
+		}
+		
+		//commande give oeuf/spawner avec nbt data 
+		if (args.length > 3 && args[0].equals("give")) {
+			//give mob eggs with custom NBTtags
+			args[1] = args[1].toUpperCase();
+			
+			if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])) && 
+					(args[1].toLowerCase().contains("_egg") || args[1].toLowerCase().contains("spawner") || args[1].toLowerCase().contains("command_block")))
+				if (true/*p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])))*/) {
+					
+					net.minecraft.server.v1_15_R1.ItemStack item = CraftItemStack.asNMSCopy(new ItemStack(Material.getMaterial(args[1])));
+					
+					NBTTagCompound nbt = new NBTTagCompound();
+					
+					if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("EGG"))
+						nbt = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.EGG);
+					else if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("SPAWNER"))
+						nbt = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.SPAWNER);
+					
+					if (nbt != null) {
+						item.setTag(nbt);
+						p.getPlayer().getInventory().addItem(CraftItemStack.asBukkitCopy(item));
+						
+						p.getPlayer().sendMessage(Message.OCO_GIVE_SUCCESSFUL.getValue().replace("%item%", args[1].toLowerCase().replace("_", " ")));	
+					}else
+						p.getPlayer().sendMessage(Message.OCO_INVALID_NBT_DATA.getValue());
+				}
+				else
+					p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", 
+							plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])).toString().toLowerCase()));
+			else
+				p.getPlayer().sendMessage(Message.OCO_GIVE_INDISPONIBLE_BLOCK.getValue());
 		}
 		
 		return false;

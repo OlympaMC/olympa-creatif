@@ -66,24 +66,25 @@ public class PlotsManager {
 			@Override
 			public void run() {
 				//pour tous les plots
-				for (Entry<PlotId, Plot> e : loadedPlots.entrySet()) {
-					boolean hasMemberOnline = false;
-					
-					//s'il n'y a aucun joueur sur la parcelle
-					if (e.getValue().getPlayers().size() == 0) {
-						//si aucun membre n'est en ligne, unload de la parcelle
-						for (Player p : Bukkit.getOnlinePlayers()) {
-							if (e.getValue().getMembers().getPlayerRank(p) != PlotRank.VISITOR) {
-								hasMemberOnline = true;
+				synchronized (loadedPlots) {
+					for (Entry<PlotId, Plot> e : loadedPlots.entrySet()) {
+						boolean hasMemberOnline = false;
+						
+						//s'il n'y a aucun joueur sur la parcelle
+						if (e.getValue().getPlayers().size() == 0) {
+							//si aucun membre n'est en ligne, unload de la parcelle
+							for (Player p : Bukkit.getOnlinePlayers()) {
+								if (e.getValue().getMembers().getPlayerRank(p) != PlotRank.VISITOR) {
+									hasMemberOnline = true;
+								}
 							}
-						}
-						if (!hasMemberOnline) {
-							//e.getValue().unregisterListener();
-							loadedPlots.remove(e.getKey());
-							plugin.getCommandBlocksManager().removeScoreboard(e.getValue());
-						}
+							if (!hasMemberOnline) {
+								//e.getValue().unregisterListener();
+								loadedPlots.remove(e.getKey());
+								plugin.getCommandBlocksManager().unregisterPlot(e.getValue());
+							}
+						}	
 					}
-					
 				}
 			}
 		}.runTaskTimer(plugin, 20, 20*60);

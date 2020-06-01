@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -19,6 +20,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
+import net.minecraft.server.v1_15_R1.ItemFireworks.EffectType;
 
 public class CommandBlocksManager {
 
@@ -116,7 +118,7 @@ public class CommandBlocksManager {
 	}
 	
 	@Deprecated
-	public void removeScoreboard(Plot p) {
+	private void removeScoreboard(Plot p) {
 		plotsScoreboards.remove(p);
 	}
 
@@ -205,6 +207,9 @@ public class CommandBlocksManager {
 		CbTeam team = getTeamOfString(fromPlot, p.getDisplayName());
 		if (team != null)
 			team.removeMember(p);
+		
+		for (PotionEffect eff : p.getActivePotionEffects())
+			p.removePotionEffect(eff.getType());
 	}
 	
 	public List<Entity> getTeamsNameHolders(Plot plot){

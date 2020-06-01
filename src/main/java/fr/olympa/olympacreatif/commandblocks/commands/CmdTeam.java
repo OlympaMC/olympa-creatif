@@ -32,7 +32,7 @@ public class CmdTeam extends CbCommand {
 		case "list":
 			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getId().getAsString() + " <<<");
 			for (CbTeam t : plugin.getCommandBlocksManager().getTeams(plot))
-				sender.sendMessage("   §e> " + t.getId() + " (" + t.getName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
+				sender.sendMessage("   §e> " + t.getId() + " (" + t.getDisplayName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
 			return 1;
 			
 		case "empty":
@@ -53,14 +53,18 @@ public class CmdTeam extends CbCommand {
 				if (t == null)
 					break;
 				
+				
 				if (args.length == 3) {
 					List<Entity> list = parseSelector(args[2], false);
 
 					int nbAddedEntities = 0;
 					
-					for (Entity e : list)
+					for (Entity e : list) {
+						CbTeam quittedTeam = plugin.getCommandBlocksManager().getTeamOfEntity(plot, e);
+
 						if (t.addMember(e))
 							nbAddedEntities++;
+					}
 				
 					return nbAddedEntities;
 				}
@@ -75,7 +79,7 @@ public class CmdTeam extends CbCommand {
 			
 		case "leave":
 			if (args.length == 2) { //supression de l'équipe pour les entités du sélecteur
-				List<Entity> list = parseSelector(args[2], false);
+				List<Entity> list = parseSelector(args[1], false);
 				
 				int removedPlayers = 0;
 				
@@ -155,6 +159,7 @@ public class CmdTeam extends CbCommand {
 						
 						//suppression dernier espace
 						jsonString = jsonString.substring(0, jsonString.length()-1);
+
 						t.setName(jsonString);
 					}
 					else

@@ -73,7 +73,7 @@ public class NbtParserUtil {
 
 					newTag.setString("CustomName", name);	
 				}else {
-					String name = parseJsonList(getListCompoundFromString(oldTag.getString("CustomName")));
+					String name = oldTag.getString("CustomName");
 					newTag.setString("CustomName", name);
 				}
 					
@@ -158,7 +158,6 @@ public class NbtParserUtil {
 			
 			return finalTag;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return null;
 		}
 	}
@@ -215,7 +214,6 @@ public class NbtParserUtil {
 					try {
 						json = (JSONObject) new JSONParser().parse(nameTag);
 					} catch (ParseException e) {
-						e.printStackTrace();
 						return null;
 					}
 					if (json.get("text") != null) {
@@ -285,11 +283,8 @@ public class NbtParserUtil {
 			
 			tag = tag.substring(tag.indexOf("{"), tag.lastIndexOf("}")+1);
 			
-			Bukkit.broadcastMessage(tag);
-			
 			return MojangsonParser.parse(tag);
 		} catch (CommandSyntaxException e) {
-			e.printStackTrace();
 			return new NBTTagCompound();
 		}
 	}
@@ -351,8 +346,7 @@ public class NbtParserUtil {
 			concat = "{list:" + concat.replace("\"\",", "").replace(",\"\"", "") + "}";
 			
 			return MojangsonParser.parse(concat).getList("list", 10);
-		} catch (CommandSyntaxException e1) {
-			e1.printStackTrace();
+		} catch (CommandSyntaxException e) {
 			return new NBTTagList();
 		}
 	}

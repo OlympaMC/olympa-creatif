@@ -5,10 +5,15 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftArmorStand;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftBee;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftSlime;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -16,11 +21,13 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.ChatMessage;
+import net.minecraft.server.v1_15_R1.EntityArmorStand;
 import net.minecraft.server.v1_15_R1.EntityBee;
 import net.minecraft.server.v1_15_R1.EntitySlime;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import net.minecraft.server.v1_15_R1.ItemStack;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 
 public class CbTeam {
@@ -52,7 +59,7 @@ public class CbTeam {
 	}
 	
 	public void setName(String n) {
-		//teamName = NbtParserUtil.parseJsonText(n);
+		teamName = NbtParserUtil.parseJsonCompound(NbtParserUtil.getTagFromString(n));
 		
 		if (teamName.equals(""))
 			removeTeamNameForAll();
@@ -71,6 +78,10 @@ public class CbTeam {
 	
 	public boolean addMember(Entity e) {
 		boolean isAdded = false;
+
+		CbTeam quittedTeam = plugin.getCommandBlocksManager().getTeamOfEntity(plot, e);
+		if (quittedTeam != null)
+			quittedTeam.removeMember(e);
 		
 		if (e instanceof Player) {
 			isAdded = addMember(((Player) e).getDisplayName());
@@ -78,10 +89,9 @@ public class CbTeam {
 			isAdded = addMember(e.getCustomName());
 		}
 
-		if (isAdded) {
+		if (isAdded) 
 			showTeamName(e);
-
-		}
+		
 		
 		return isAdded;
 	}
@@ -90,9 +100,11 @@ public class CbTeam {
 		if (members.contains(s))
 			return false;
 		
+		/*
 		for (CbTeam t : plugin.getCommandBlocksManager().getTeams(plot))
 			if (t.getMembers().contains(s))
 				t.removeMember(s);
+		*/
 		
 		members.add(ChatColor.translateAlternateColorCodes('&', s));
 		
@@ -100,10 +112,9 @@ public class CbTeam {
 	}
 	
 	public void removeMember(Entity e) {
-		if (e instanceof Player) {
+		if (e instanceof Player) 
 			removeMember(((Player) e).getDisplayName());
-			removeTeamName((Player) e);
-		}else
+		else
 			removeMember(e.getCustomName());
 		
 		removeTeamName(e);
@@ -144,59 +155,54 @@ public class CbTeam {
 		color = ColorType.getColor(colorAsString);
 	}
 	
-	public void showTeamName(Entity entity) {//summon des entités pour faire apparaître le nom de la team au dessus du pseudo du joueur
+	//summon des entités pour faire apparaître le nom de la team au dessus du pseudo du joueur
+	public void showTeamName(Entity entity) {
 		
 		removeTeamName(entity);
 		
-		Bukkit.broadcastMessage("HERE");
-		
 		if (teamName.equals(""))
 			return;
-
 		
-		Bukkit.broadcastMessage("HERE 2");
+		EntityArmorStand entPlayerName = ((CraftArmorStand) plugin.getWorldManager().getWorld().spawnEntity(entity.getLocation(), EntityType.ARMOR_STAND)).getHandle();
 		
-		//entité portant le nom ed l'équipe
-		EntitySlime eSlime = new EntitySlime(EntityTypes.SLIME, plugin.getWorldManager().getNmsWorld());
-		eSlime.setSize(1, true);
-		eSlime.updateSize();
-		eSlime.setInvisible(true);
-		eSlime.setInvulnerable(true);
-		eSlime.setCustomNameVisible(true);
-		eSlime.setCustomName(new ChatMessage(color + getDisplayName()));
-		eSlime.setNoAI(true);
+		entity.addPassenger(entPlayerName.getBukkitEntity());
 		
-		
-		//entité portant le nom du joueur
-		EntityBee eBee = new EntityBee(EntityTypes.BEE, plugin.getWorldManager().getNmsWorld());
-		eBee.updateSize();
-		eBee.setInvisible(true);
-		eBee.setInvulnerable(true);
-		eBee.setCustomNameVisible(true);
+		entPlayerName.setSmall(true);
+		entPlayerName.setInvisible(true);
+		entPlayerName.setInvulnerable(true);
+		entPlayerName.setCustomNameVisible(true);
 		if (entity.getType() == EntityType.PLAYER)
-			eBee.setCustomName(new ChatMessage(((Player) entity).getDisplayName()));
+			entPlayerName.setCustomName(new ChatMessage(((Player) entity).getDisplayName()));
 		else
-			eBee.setCustomName(new ChatMessage(entity.getCustomName()));
-		
-		eBee.setNoAI(true);
-		
-		eSlime.spawnIn(plugin.getWorldManager().getNmsWorld());
-		eBee.spawnIn(plugin.getWorldManager().getNmsWorld());
-		
-		eSlime.startRiding(((CraftEntity)entity).getHandle());
-		eBee.startRiding(((CraftEntity)entity).getHandle());
+			entPlayerName.setCustomName(new ChatMessage(entity.getCustomName()));
 		
 
-		teamNameHolders.add(eSlime.getBukkitEntity());
-		teamNameHolders.add(eBee.getBukkitEntity());
+		EntityArmorStand entTeamName = ((CraftArmorStand) plugin.getWorldManager().getWorld().spawnEntity(entity.getLocation(), EntityType.ARMOR_STAND)).getHandle();
+		
+		entPlayerName.getBukkitEntity().addPassenger(entTeamName.getBukkitEntity());
+		
+		entTeamName.setMarker(true);
+		entTeamName.setInvisible(true);
+		entTeamName.setInvulnerable(true);
+		entTeamName.setCustomNameVisible(true);
+		entTeamName.setCustomName(new ChatMessage(getDisplayName()));
+
+		teamNameHolders.add(entTeamName.getBukkitEntity());
+		teamNameHolders.add(entPlayerName.getBukkitEntity());
 	}
 	
 	public void removeTeamName(Entity entity) {
 		for (Entity e : entity.getPassengers())
-			if (teamNameHolders.contains(e))
+			if (teamNameHolders.contains(e)) {
+				teamNameHolders.remove(e);
 				e.remove();
+				if (e.getPassengers().size() > 0) {
+					teamNameHolders.remove(e.getPassengers().get(0));
+					e.getPassengers().get(0).remove();
+				}	
+			}
 	}
-	
+
 	public void removeTeamNameForAll() {//tue les entités chevauchant les joueurs de cette équipe
 		for (Entity e : teamNameHolders)
 			e.remove();

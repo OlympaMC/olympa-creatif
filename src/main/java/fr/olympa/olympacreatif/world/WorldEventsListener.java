@@ -130,9 +130,11 @@ public class WorldEventsListener implements Listener{
 								continue;
 							
 							//supprime l'entité si en dehors d'un plot (sauf si armorstand, peinture ou cadre) ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
-							if (plot == null && entity.getType() != EntityType.ARMOR_STAND && entity.getType() != EntityType.PAINTING && entity.getType() != EntityType.ITEM_FRAME)
-								entitiesToRemove.add(entity);
-							
+							if (plot == null) {
+								if (entity.getType() != EntityType.ARMOR_STAND && entity.getType() != EntityType.PAINTING && entity.getType() != EntityType.ITEM_FRAME) {
+									entitiesToRemove.add(entity);	
+								}	
+							}
 							else {
 								//si l'entité n'est pas un teamnahe holder, les tests de limitation d'entités sont effectués
 								if (!plugin.getCommandBlocksManager().getTeamsNameHolders(plot).contains(((CraftEntity)entity).getHandle())){
