@@ -14,16 +14,13 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
+import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdTeam extends CbCommand {
-
-	private String[] args;
 	
 	public CmdTeam(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(type, sender, loc, plugin, plot, args);
-	
-		this.args = args;
 	}
 	
 	@Override 
@@ -32,7 +29,7 @@ public class CmdTeam extends CbCommand {
 		case "list":
 			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getId().getAsString() + " <<<");
 			for (CbTeam t : plugin.getCommandBlocksManager().getTeams(plot))
-				sender.sendMessage("   §e> " + t.getId() + " (" + t.getDisplayName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
+				sender.sendMessage("   §e> " + t.getId() + " (&r" + t.getDisplayName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
 			return 1;
 			
 		case "empty":
@@ -59,12 +56,9 @@ public class CmdTeam extends CbCommand {
 
 					int nbAddedEntities = 0;
 					
-					for (Entity e : list) {
-						CbTeam quittedTeam = plugin.getCommandBlocksManager().getTeamOfEntity(plot, e);
-
+					for (Entity e : list) 
 						if (t.addMember(e))
 							nbAddedEntities++;
-					}
 				
 					return nbAddedEntities;
 				}
@@ -104,21 +98,12 @@ public class CmdTeam extends CbCommand {
 			
 		case "add":
 			if (args.length >= 2) {
-				String display = "";
+				CbTeam t;
 				
-				boolean json = false;
-				
-				//récupération du texte au format json
-				for (String s : args)
-					if (s.startsWith("{") || json) {
-						json = true;
-						display += s + " ";
-					}
-				
-				if (display.length() > 1)
-					display = display.substring(0, display.length()-1);
-				
-				CbTeam t = new CbTeam(plugin, plot, args[1], display);
+				if (args.length >= 3)
+					t = new CbTeam(plugin, plot, args[1], NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
+				else
+					t = new CbTeam(plugin, plot, args[1], args[1]);
 				
 				if (plugin.getCommandBlocksManager().registerTeam(plot, t))
 					return 1;
@@ -144,9 +129,10 @@ public class CmdTeam extends CbCommand {
 					return 0;	
 				
 				switch (args[2]) {
-				case "prefix":				
-					
+				case "prefix":					
 					if (args.length >= 4) {
+						
+						/*
 						String jsonString = "";
 						boolean json = false;
 						
@@ -159,8 +145,9 @@ public class CmdTeam extends CbCommand {
 						
 						//suppression dernier espace
 						jsonString = jsonString.substring(0, jsonString.length()-1);
+						*/
 
-						t.setName(jsonString);
+						t.setName(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
 					}
 					else
 						t.removeTeamNameForAll();

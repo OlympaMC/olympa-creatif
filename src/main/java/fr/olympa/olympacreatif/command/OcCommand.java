@@ -104,7 +104,7 @@ public class OcCommand extends OlympaCommand {
 					double z = plot.getId().getLocation().getZ() + (double)Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue())/2.0;
 					
 					p.teleport(new Location(plugin.getWorldManager().getWorld(), 
-							x, plugin.getWorldManager().getWorld().getHighestBlockYAt((int)x, (int)z), z));
+							x, plugin.getWorldManager().getWorld().getHighestBlockYAt((int)x, (int)z) + 1, z));
 				}
 				break;
 			case "setspawn":

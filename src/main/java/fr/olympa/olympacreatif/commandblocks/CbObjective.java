@@ -1,5 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -9,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -31,14 +33,34 @@ public class CbObjective {
 	
 	private Map<String, Integer> values = new HashMap<String, Integer>();
 	
+	private String objId = "";
 	private String objName = "";
 	
-	public CbObjective(OlympaCreatifMain plugin, Plot plot, String objType, String name) {
+	@SuppressWarnings("deprecation")
+	public CbObjective(OlympaCreatifMain plugin, Plot plot, String objType, String id, String objName) {
 		this.plugin = plugin;
 		this.plot = plot;
-		this.objName = ChatColor.translateAlternateColorCodes('&', name).substring(0, 15);
+		this.objId = id.substring(0, Math.min(15, id.length()));
+		this.objName = objName;
 		type = ObjType.get(objType);
 		
+		if (type == null)
+			return;
+		
+		String s = objType.split(":")[1];
+		
+		String typeParamString = null;
+		
+		if (objType.contains(":")) {
+			String param = objType.split(":")[1];
+			
+			if (param.contains("."))
+				typeParamString = param.substring(Math.min(10, param.length()));
+			else
+				typeParamString = param;
+		}
+		
+		//récupération paramètre secondaire du type de l'obj
 		switch (type) {
 		case killedByTeam:
 			if (objType.split(".").length == 2)
@@ -49,36 +71,52 @@ public class CbObjective {
 				//TODO
 			break;
 		case minecraft_broken:
-			if (objType.split(":").length == 2)
-				typeParam = Material.getMaterial(objType.split(":")[2]);
+			if (typeParamString == null)
+				return;
+			
+			typeParam = Material.getMaterial(typeParamString.toUpperCase());
 			break;
 		case minecraft_crafted:
-			if (objType.split(":").length == 2)
-				typeParam = Material.getMaterial(objType.split(":")[2]);
+			if (typeParamString == null)
+				return;
+			
+			typeParam = Material.getMaterial(typeParamString.toUpperCase());
 			break;
 		case minecraft_dropped:
-			if (objType.split(":").length == 2)
-				typeParam = Material.getMaterial(objType.split(":")[2]);
+			if (typeParamString == null)
+				return;
+			
+			typeParam = Material.getMaterial(typeParamString.toUpperCase());
 			break;
 		case minecraft_killed:
-			if (objType.split(":").length == 2)
-				typeParam = EntityType.fromName(objType.split(":")[2]);
+			if (typeParamString == null)
+				return;
+			
+			typeParam = EntityType.fromName(typeParamString.toUpperCase());
 			break;
 		case minecraft_killed_by:
-			if (objType.split(":").length == 2)
-				typeParam = EntityType.fromName(objType.split(":")[2]);
+			if (typeParamString == null)
+				return;
+			
+			typeParam = EntityType.fromName(typeParamString.toUpperCase());
 			break;
 		case minecraft_mined:
-			if (objType.split(":").length == 2)
-				typeParam = Material.getMaterial(objType.split(":")[2]);
+			if (typeParamString == null)
+				return;
+			
+			typeParam = Material.getMaterial(typeParamString.toUpperCase());
 			break;
 		case minecraft_picked_up:
-			if (objType.split(":").length == 2)
-				typeParam = Material.getMaterial(objType.split(":")[2]);
+			if (typeParamString == null)
+				return;
+			
+			typeParam = Material.getMaterial(typeParamString.toUpperCase());
 			break;
 		case minecraft_used:
-			if (objType.split(":").length == 2)
-				typeParam = Material.getMaterial(objType.split(":")[2]);
+			if (typeParamString == null)
+				return;
+			
+			typeParam = Material.getMaterial(typeParamString.toUpperCase());
 			break;
 		}
 	}
@@ -92,8 +130,16 @@ public class CbObjective {
 		return type;
 	}
 	
+	public String getId() {
+		return objId;
+	}
+	
 	public String getName() {
 		return objName;
+	}
+
+	public void setName(String newObjName) {
+		this.objName = newObjName;
 	}
 	
 	public Object getParamType() {
@@ -190,7 +236,7 @@ public class CbObjective {
 		//affichage du score sur le slot indiqué
 		if (displayLoc != loc && loc != null) {
 			Objective obj = plugin.getCommandBlocksManager().getObjectiveOnSlot(plot, loc);
-			obj.setDisplayName(objName);
+			obj.setDisplayName(objId);
 		}
 		
 		this.displayLoc = loc;		
@@ -226,7 +272,7 @@ public class CbObjective {
 		public static ObjType get(String s) {
 			
 			for (ObjType t : ObjType.values())
-				if (t.toString().replaceFirst("_", ".").equals(s))
+				if (t.toString().equals(s.replace(".", "_").split(":")[0]))
 					return t;
 			return null;
 		}

@@ -47,7 +47,8 @@ public class CbTeam {
 		this.plugin = plugin;
 		this.plot = plot;
 		this.id = id;
-		setName(name);
+		this.teamName = name;
+		//setName(name);
 	}
 	
 	public String getName() {
@@ -58,8 +59,9 @@ public class CbTeam {
 		return id;
 	}
 	
-	public void setName(String n) {
-		teamName = NbtParserUtil.parseJsonCompound(NbtParserUtil.getTagFromString(n));
+	public void setName(String newTeamName) {
+
+		teamName = newTeamName;
 		
 		if (teamName.equals(""))
 			removeTeamNameForAll();

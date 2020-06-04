@@ -68,9 +68,14 @@ public class CommandBlocksManager {
 	
 	//macimum 20 objectifs par plot
 	public boolean registerObjective(Plot plot, CbObjective obj) {
+		
+		//créée la liste d'objectifs si n'existe pas encore
+		if (!plotObjectives.containsKey(plot))
+			plotObjectives.put(plot, new ArrayList<CbObjective>());
+
 		//n'enregistre pas le scoreboard si un autre avec le même nom existe déjà dans le plot
 		for (CbObjective o : plotObjectives.get(plot))
-			if (o.getName().equals(obj.getName()))
+			if (o.getId().equals(obj.getId()))
 				return false;
 		
 		plotObjectives.get(plot).add(obj);
@@ -92,7 +97,7 @@ public class CommandBlocksManager {
 		objName = ChatColor.translateAlternateColorCodes('&', objName);
 		
 		for (CbObjective o : getObjectives(plot))
-			if (o.getName().equals(objName))
+			if (o.getId().equals(objName))
 				return o;
 		
 		return null;
@@ -101,12 +106,12 @@ public class CommandBlocksManager {
 	//renvoie le scoreboard affiché sur le slot désigné du plot choisi
 	public Objective getObjectiveOnSlot(Plot p, DisplaySlot slot) {
 		if (!plotsScoreboards.containsKey(p))
-			createScoreboard(p);
+			createScoreboardHolder(p);
 		
 		return plotsScoreboards.get(p).getObjective(slot);
 	}
 	
-	private void createScoreboard(Plot p) {
+	private void createScoreboardHolder(Plot p) {
 		Scoreboard scb = Bukkit.getScoreboardManager().getNewScoreboard();
 
 		Objective objSidebar = scb.registerNewObjective("sidebar", "dummy", "sidebar");

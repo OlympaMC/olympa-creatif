@@ -40,7 +40,7 @@ public class CmdTellraw extends CbCommand {
 				for (String key : tag.getKeys()) {
 					switch(key) {
 					case "text":
-						text += NbtParserUtil.parseJsonCompound(tag);
+						text += NbtParserUtil.parseJsonFromCompound(tag);
 						break;
 						
 					case "selector":

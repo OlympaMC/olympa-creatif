@@ -254,7 +254,7 @@ public class NbtParserUtil {
 				
 				tag.setInt("Amplifier", Math.min(tag.getInt("Amplifier"), 4));
 				list.add(tag);
-			}				
+			}
 			
 			newTag.set("Enchantments", list);
 		}
@@ -307,7 +307,6 @@ public class NbtParserUtil {
 	public static NBTTagCompound getTagFromStrings(String[] args) {
 		
 		String concat = "";
-		int k = 0;
 		for (String s : args) {
 			concat += s + " ";
 		}
@@ -330,18 +329,18 @@ public class NbtParserUtil {
 	}
 	
 	//renvoie un string comprenant les parses de tous les tags de la liste
-	public static String parseJsonList(NBTTagList nbtList) {
+	public static String parseJsonFromList(NBTTagList nbtList) {
 		String text = "";
 
 		for (int i = 0 ; i < nbtList.size() ; i++) 	
-			text += parseJsonCompound(nbtList.getCompound(i));
+			text += parseJsonFromCompound(nbtList.getCompound(i));
 		
 		
 		return text;
 	}
 	
 	//renvoie un string formaté selon les paramètres json du tag
-	public static String parseJsonCompound(NBTTagCompound tag) {
+	public static String parseJsonFromCompound(NBTTagCompound tag) {
 		
 		String text = "§r";
 		

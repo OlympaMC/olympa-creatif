@@ -483,7 +483,7 @@ public abstract class CbCommand {
 		case tellraw:
 			cmd = new CmdTellraw(type, sender, loc, plugin, plot, args);
 			break;
-		case scoreboqrd:
+		case scoreboard:
 			cmd = new CmdScoreboard(type, sender, loc, plugin, plot, args);
 			break;
 		case team:
@@ -520,7 +520,7 @@ public abstract class CbCommand {
 		tellraw,
 		execute,
 		team,
-		scoreboqrd,
+		scoreboard,
 		bossbar,
 		clear,
 		give,
