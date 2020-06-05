@@ -82,11 +82,11 @@ public class CmdScoreboard extends CbCommand {
 					for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot)){
 						if (o.getId().equals(args[3])) {
 							if (args[2].equals("belowName")) {
-								o.setDisplay(DisplaySlot.BELOW_NAME);
+								o.setDisplaySlot(DisplaySlot.BELOW_NAME);
 								return 1;
 							}
 							if (args[2].equals("sidebar")) {
-								o.setDisplay(DisplaySlot.SIDEBAR);
+								o.setDisplaySlot(DisplaySlot.SIDEBAR);
 								return 1;
 							}
 						}

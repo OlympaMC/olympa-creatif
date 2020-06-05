@@ -36,7 +36,6 @@ public class CbObjective {
 	private String objId = "";
 	private String objName = "";
 	
-	@SuppressWarnings("deprecation")
 	public CbObjective(OlympaCreatifMain plugin, Plot plot, String objType, String id, String objName) {
 		this.plugin = plugin;
 		this.plot = plot;
@@ -222,10 +221,11 @@ public class CbObjective {
 			return get(e.getCustomName());
 	}
 	
-	public void setDisplay(DisplaySlot loc) {
-		for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
-			if (o.getDisplaySlot() == loc)
-				o.setDisplay(null);
+	public void setDisplaySlot(DisplaySlot loc) {
+		if (loc != null)
+			for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
+				if (o.getDisplaySlot() == loc)
+					o.setDisplaySlot(null);
 		
 		//clear l'emplacement si nécessaire
 		if (displayLoc != null && loc == null)

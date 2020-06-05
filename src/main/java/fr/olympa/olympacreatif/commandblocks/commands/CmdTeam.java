@@ -29,7 +29,7 @@ public class CmdTeam extends CbCommand {
 		case "list":
 			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getId().getAsString() + " <<<");
 			for (CbTeam t : plugin.getCommandBlocksManager().getTeams(plot))
-				sender.sendMessage("   §e> " + t.getId() + " (&r" + t.getDisplayName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
+				sender.sendMessage("   §e> " + t.getId() + " (§r" + t.getDisplayName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
 			return 1;
 			
 		case "empty":

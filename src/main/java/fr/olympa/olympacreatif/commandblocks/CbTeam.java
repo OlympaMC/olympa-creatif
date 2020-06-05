@@ -41,8 +41,6 @@ public class CbTeam {
 	private String id;
 	private String teamName = "";
 	
-	private List<Entity> teamNameHolders = new ArrayList<Entity>();
-	
 	public CbTeam(OlympaCreatifMain plugin, Plot plot, String id, String name) {
 		this.plugin = plugin;
 		this.plot = plot;
@@ -91,10 +89,10 @@ public class CbTeam {
 			isAdded = addMember(e.getCustomName());
 		}
 
-		if (isAdded) 
+		if (isAdded && !getDisplayName().equals(getId())) 
 			showTeamName(e);
 		
-		
+		Bukkit.broadcastMessage("" + isAdded);
 		return isAdded;
 	}
 	
@@ -102,11 +100,11 @@ public class CbTeam {
 		if (members.contains(s))
 			return false;
 		
-		/*
+		
 		for (CbTeam t : plugin.getCommandBlocksManager().getTeams(plot))
 			if (t.getMembers().contains(s))
 				t.removeMember(s);
-		*/
+		
 		
 		members.add(ChatColor.translateAlternateColorCodes('&', s));
 		
@@ -161,57 +159,33 @@ public class CbTeam {
 	public void showTeamName(Entity entity) {
 		
 		removeTeamName(entity);
-		
-		if (teamName.equals(""))
-			return;
-		
-		EntityArmorStand entPlayerName = ((CraftArmorStand) plugin.getWorldManager().getWorld().spawnEntity(entity.getLocation(), EntityType.ARMOR_STAND)).getHandle();
-		
-		entity.addPassenger(entPlayerName.getBukkitEntity());
-		
-		entPlayerName.setSmall(true);
-		entPlayerName.setInvisible(true);
-		entPlayerName.setInvulnerable(true);
-		entPlayerName.setCustomNameVisible(true);
-		if (entity.getType() == EntityType.PLAYER)
-			entPlayerName.setCustomName(new ChatMessage(((Player) entity).getDisplayName()));
-		else
-			entPlayerName.setCustomName(new ChatMessage(entity.getCustomName()));
-		
 
-		EntityArmorStand entTeamName = ((CraftArmorStand) plugin.getWorldManager().getWorld().spawnEntity(entity.getLocation(), EntityType.ARMOR_STAND)).getHandle();
-		
-		entPlayerName.getBukkitEntity().addPassenger(entTeamName.getBukkitEntity());
-		
-		entTeamName.setMarker(true);
-		entTeamName.setInvisible(true);
-		entTeamName.setInvulnerable(true);
-		entTeamName.setCustomNameVisible(true);
-		entTeamName.setCustomName(new ChatMessage(getDisplayName()));
+		if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(entity) == 0)
+			if (entity.getType() == EntityType.PLAYER)
+				plugin.getPerksManager().getLinesOnHeadUtil().setLine(entity, 0, ((Player) entity).getDisplayName(), true);
+			else
+				plugin.getPerksManager().getLinesOnHeadUtil().setLine(entity, 0, entity.getCustomName(), true);
 
-		teamNameHolders.add(entTeamName.getBukkitEntity());
-		teamNameHolders.add(entPlayerName.getBukkitEntity());
+		plugin.getPerksManager().getLinesOnHeadUtil().setLine(entity, 1, getDisplayName(), false);
+	
 	}
 	
 	public void removeTeamName(Entity entity) {
-		for (Entity e : entity.getPassengers())
-			if (teamNameHolders.contains(e)) {
-				teamNameHolders.remove(e);
-				e.remove();
-				if (e.getPassengers().size() > 0) {
-					teamNameHolders.remove(e.getPassengers().get(0));
-					e.getPassengers().get(0).remove();
-				}	
-			}
+		//supprime le nom de l'équipe. Clear de tous les teamnaheholders si le score n'est pas affiché. Supression de la ligne correspondante au nom de l'équipe sinon.
+		if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(entity) <= 2)
+			plugin.getPerksManager().getLinesOnHeadUtil().clearLines(entity);
+		else
+			plugin.getPerksManager().getLinesOnHeadUtil().removeLine(entity, 1);
 	}
 
 	public void removeTeamNameForAll() {//tue les entités chevauchant les joueurs de cette équipe
-		for (Entity e : teamNameHolders)
-			e.remove();
-	}
-	
-	public List<Entity> getTeamsNameHoldersEntityes(){
-		return teamNameHolders;
+		for (Player p : plot.getPlayers())
+			if (members.contains(p.getDisplayName()))
+				removeTeamName(p);
+		
+		for (Entity e : plot.getEntities())
+			if (members.contains(e.getCustomName()))
+				removeTeamName(e);
 	}
 	
 	public enum ColorType{

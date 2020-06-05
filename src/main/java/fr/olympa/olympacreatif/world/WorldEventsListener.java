@@ -137,7 +137,7 @@ public class WorldEventsListener implements Listener{
 							}
 							else {
 								//si l'entité n'est pas un teamnahe holder, les tests de limitation d'entités sont effectués
-								if (!plugin.getCommandBlocksManager().getTeamsNameHolders(plot).contains(((CraftEntity)entity).getHandle())){
+								if (!plugin.getPerksManager().getLinesOnHeadUtil().isTextHolder(entity)){
 									if (entitiesPerPlot.keySet().contains(plot)) //ajout de l'entité à la liste des entités du plot, si la liste n'existe pas pour ce plot on la crée
 										
 										//si l'entité n'est pas référencée, on le fait

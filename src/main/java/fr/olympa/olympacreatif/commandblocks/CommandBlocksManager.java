@@ -216,19 +216,4 @@ public class CommandBlocksManager {
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());
 	}
-	
-	public List<Entity> getTeamsNameHolders(Plot plot){
-		//si le plot a déjà été testé mendant ce tick, on ne refait pas tous les tests
-		if (plotLastTestedTick.containsKey(plot) && plotLastTestedTick.get(plot) == MinecraftServer.currentTick)
-			return plotTeamNameHolders.get(plot);
-		
-		List<Entity> list = new ArrayList<Entity>();
-		for (CbTeam team : getTeams(plot))
-			list.addAll(team.getTeamsNameHoldersEntityes());
-		
-		plotTeamNameHolders.put(plot, list);
-		plotLastTestedTick.put(plot, MinecraftServer.currentTick);
-		
-		return list;
-	}
 }
