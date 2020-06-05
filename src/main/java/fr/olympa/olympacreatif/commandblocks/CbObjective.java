@@ -47,8 +47,6 @@ public class CbObjective {
 		if (type == null)
 			return;
 		
-		String s = objType.split(":")[1];
-		
 		String typeParamString = null;
 		
 		if (objType.contains(":")) {
