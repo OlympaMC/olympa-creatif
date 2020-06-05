@@ -135,14 +135,16 @@ public class LinesOnNameUtil {
 	public boolean removeLine(Entity e, int row) {		
 		if (!rowsMap.containsKey(e))
 			return false;
-
-		List<LineData> list = rowsMap.get(e);
 		
-		if (list.size() >= row)
+		List<LineData> list = rowsMap.get(e);
+
+		row = Math.min(list.size() - 1, row);
+		
+		if (list.size() == 0)
 			return false;
 		
 		//décalage des lignes vers le bas
-		for (int i = list.size() - 1 ; i > row ; i--) 
+		for (int i = 0 ; i < row ; i++)
 			list.get(i + 1).getArmorStand().setCustomName(list.get(i).getArmorStand().getCustomName());
 
 		//supression de la dernière ligne de l'armorstand (maintenant en doublon avec l'avant dernière après avoir écrasé la ligne row)
@@ -208,20 +210,22 @@ public class LinesOnNameUtil {
 
 			//summon silverfish qui portera le porte armure
 			LivingEntity silverfish = (LivingEntity) plugin.getWorldManager().getWorld().spawnEntity(holdingEntity.getLocation(), EntityType.SILVERFISH);
-			//silverfish.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 0, false, false, false));
+			silverfish.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 0, false, false, false));
 			silverfish.setInvulnerable(true);
+			silverfish.getBoundingBox().resize(-5, -5, -5, -4, -4, -4);
 			
 			((CraftSilverfish)silverfish).getHandle().setNoAI(true);
 			((CraftSilverfish)silverfish).getHandle().setSilent(true);
 			
 			//création de l'armorstand portant le nom visible
 			EntityArmorStand armorStand = ((CraftArmorStand) plugin.getWorldManager().getWorld().spawnEntity(holdingEntity.getLocation(), EntityType.ARMOR_STAND)).getHandle();
-			//armorStand.setInvisible(true);
+			armorStand.setInvisible(true);
 			armorStand.setCustomName(new ChatMessage(text));
 			armorStand.setCustomNameVisible(true);
 			armorStand.setMarker(true);
 			armorStand.setSmall(true);
-
+			armorStand.getBukkitEntity().getBoundingBox().resize(-5, -5, -5, -4, -4, -4);
+			
 			this.armHolder = silverfish; 
 			this.arm = armorStand.getBukkitEntity();
 			

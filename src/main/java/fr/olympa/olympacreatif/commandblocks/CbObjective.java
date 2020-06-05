@@ -176,7 +176,8 @@ public class CbObjective {
 	public void set(String name, int value) {
 		values.put(name, value);
 		
-		if (displayLoc != null) {
+		//affichage scoreboard sidebar
+		if (displayLoc == DisplaySlot.SIDEBAR) {
 			Objective obj = plugin.getCommandBlocksManager().getObjectiveOnSlot(plot, displayLoc);
 			obj.getScore(name).setScore(value);
 		}
@@ -194,20 +195,34 @@ public class CbObjective {
 	}
 	
 	public void add(Entity e, int value) {
-		if (e instanceof Player)
-			add(((Player) e).getDisplayName(), value);
-		else
-			add(e.getCustomName(), value);
+		set (e, value + get(e));
 	}
 	
 	public void set(Entity e, int value) {
+		
+		//définition string portant le score
+		String scoreHolder = "";
+		
 		if (e instanceof Player)
-			set(((Player) e).getDisplayName(), value);
+			scoreHolder = ((Player) e).getDisplayName();
 		else
-			set(e.getCustomName(), value);
+			scoreHolder = e.getCustomName();
+		
+		//affichage scoreboard belowName
+		if (displayLoc == DisplaySlot.BELOW_NAME)
+			if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(e) == 2)
+				plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 1, value + " " + objName, true);
+			else
+				plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 2, value + " " + objName, true);
+		
+		set(scoreHolder, value);
 	}
 	
 	public void reset(Entity e) {
+		
+		//utilisation du set pour réinitialiser l'affichage du scoreboard
+		set(e, 0);
+		
 		if (e instanceof Player)
 			values.remove(((Player) e).getDisplayName());
 		else
@@ -221,23 +236,49 @@ public class CbObjective {
 			return get(e.getCustomName());
 	}
 	
-	public void setDisplaySlot(DisplaySlot loc) {
-		if (loc != null)
+	//méthodes d'affichage en sidebar et belowname
+	public void setDisplaySlot(DisplaySlot newDisplayLoc) {
+		if (newDisplayLoc != null)
 			for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
-				if (o.getDisplaySlot() == loc)
+				if (o.getDisplaySlot() == newDisplayLoc)
 					o.setDisplaySlot(null);
 		
 		//clear l'emplacement si nécessaire
-		if (displayLoc != null && loc == null)
+		if (displayLoc != null && newDisplayLoc == null)
 			plugin.getCommandBlocksManager().clearScoreboardSlot(plot, displayLoc);
 		
-		//affichage du score sur le slot indiqué
-		if (displayLoc != loc && loc != null) {
-			Objective obj = plugin.getCommandBlocksManager().getObjectiveOnSlot(plot, loc);
+		//affichage du score sur la sidebar
+		if (displayLoc != newDisplayLoc && newDisplayLoc == DisplaySlot.SIDEBAR) {
+			Objective obj = plugin.getCommandBlocksManager().getObjectiveOnSlot(plot, newDisplayLoc);
 			obj.setDisplayName(objId);
+			
+			for (Entry<String, Integer> e : values.entrySet()) 
+				obj.getScore(e.getKey()).setScore(e.getValue());
+		
+		//affichage du score sur le belowName
+		}else if (displayLoc != newDisplayLoc && newDisplayLoc == DisplaySlot.BELOW_NAME) {
+			for (Player p : plot.getPlayers()) {
+				//affichage nom entité
+				plugin.getPerksManager().getLinesOnHeadUtil().setLine(p, 0, p.getDisplayName(), true);
+				
+				//affichage score entité
+				if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(p) == 2)
+					plugin.getPerksManager().getLinesOnHeadUtil().setLine(p, 1, get(p) + " " + getName(), false);
+				else
+					plugin.getPerksManager().getLinesOnHeadUtil().setLine(p, 2, get(p) + " " + getName(), false);
+			}
+			
+			for (Entity e : plot.getEntities()) {
+				plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 0, e.getCustomName(), true);
+				
+				if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(e) == 2)
+					plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 2, get(e) + " " + getName(), false);
+				else
+					plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 1, get(e) + " " + getName(), false);
+			}
 		}
 		
-		this.displayLoc = loc;		
+		this.displayLoc = newDisplayLoc;		
 	}
 
 

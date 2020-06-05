@@ -46,7 +46,6 @@ public class CbTeam {
 		this.plot = plot;
 		this.id = id;
 		this.teamName = name;
-		//setName(name);
 	}
 	
 	public String getName() {
@@ -92,7 +91,6 @@ public class CbTeam {
 		if (isAdded && !getDisplayName().equals(getId())) 
 			showTeamName(e);
 		
-		Bukkit.broadcastMessage("" + isAdded);
 		return isAdded;
 	}
 	

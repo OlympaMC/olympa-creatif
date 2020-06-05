@@ -115,7 +115,7 @@ public class CmdScoreboard extends CbCommand {
 			playerType = PlayersType.get(args[1]);
 			
 			switch (playerType) {
-			case ADD:
+			case add:
 				if (args.length >= 5) {
 					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
 					
@@ -134,17 +134,22 @@ public class CmdScoreboard extends CbCommand {
 							}	
 							return list.size();	
 						}else {
-							obj.add(args[2], value);
+							Player p = Bukkit.getPlayer(args[2]);
+							
+							if (p != null && plot.getPlayers().contains(p))
+								obj.add(p, value);
+							else
+								obj.add(args[2], value);
 							return 1;
 						}
 					}
 				}
 				break;
-			case ENABLE:
+			case enable:
 				
 				//TODO
 				break;
-			case GET:
+			case get:
 				if (args.length >= 4) {
 					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
 
@@ -152,7 +157,7 @@ public class CmdScoreboard extends CbCommand {
 						return obj.get(args[2]);
 				}
 				break;
-			case LIST:
+			case list:
 				if (args.length >= 3) {
 					sender.sendMessage("§6  >>>  Objectifs pour" + args[2] + " <<<");
 					for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
@@ -161,7 +166,7 @@ public class CmdScoreboard extends CbCommand {
 				}
 				break;
 				
-			case OPERATION:
+			case operation:
 				if (args.length >= 7) {
 					CbObjective obj1 = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
 					CbObjective obj2 = plugin.getCommandBlocksManager().getObjective(plot, args[6]);
@@ -198,7 +203,7 @@ public class CmdScoreboard extends CbCommand {
 				}
 				break;
 				
-			case REMOVE:
+			case remove:
 				if (args.length >= 5) {
 					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
 					
@@ -224,7 +229,7 @@ public class CmdScoreboard extends CbCommand {
 				}
 				break;
 				
-			case RESET:
+			case reset:
 				if (args.length >= 3) {
 					
 					if (args[2].startsWith("@")) {
@@ -241,7 +246,7 @@ public class CmdScoreboard extends CbCommand {
 				}
 				break;
 				
-			case SET:
+			case set:
 				if (args.length >= 5) {
 					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
 					
@@ -260,8 +265,12 @@ public class CmdScoreboard extends CbCommand {
 							}	
 							return list.size();	
 						}else {
-							obj.set(args[2], value);
-							return 1;
+							Player p = Bukkit.getPlayer(args[2]);
+							
+							if (p != null && plot.getPlayers().contains(p))
+								obj.set(p, value);
+							else
+								obj.set(args[2], value);
 						}
 					}
 				}
@@ -373,18 +382,18 @@ public class CmdScoreboard extends CbCommand {
 	}
 	
 	private enum PlayersType{
-		ADD,
-		ENABLE,
-		GET,
-		LIST,
-		OPERATION,
-		REMOVE,
-		RESET,
-		SET;
+		add,
+		enable,
+		get,
+		list,
+		operation,
+		remove,
+		reset,
+		set;
 		
 		public static PlayersType get(String s) {
 			for (PlayersType t : PlayersType.values())
-				if (t.toString().equalsIgnoreCase(s))
+				if (t.toString().equals(s))
 					return t;
 			return null;
 		}

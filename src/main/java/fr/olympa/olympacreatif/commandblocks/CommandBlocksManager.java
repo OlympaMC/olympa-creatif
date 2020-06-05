@@ -103,53 +103,52 @@ public class CommandBlocksManager {
 		return null;
 	}
 	
+	
+	//gestion sidebar scoreboards
+	
 	//renvoie le scoreboard affiché sur le slot désigné du plot choisi
-	public Objective getObjectiveOnSlot(Plot p, DisplaySlot slot) {
-		if (!plotsScoreboards.containsKey(p))
-			createScoreboardHolder(p);
+	public Objective getObjectiveOnSlot(Plot plot, DisplaySlot slot) {
+		if (!plotsScoreboards.containsKey(plot))
+			createScoreboardHolder(plot);
 		
-		return plotsScoreboards.get(p).getObjective(slot);
+		return plotsScoreboards.get(plot).getObjective(slot);
 	}
 	
-	private void createScoreboardHolder(Plot p) {
+	//crée le scoreboard pour le plot en paramètre
+	private void createScoreboardHolder(Plot plot) {
 		Scoreboard scb = Bukkit.getScoreboardManager().getNewScoreboard();
 
 		Objective objSidebar = scb.registerNewObjective("sidebar", "dummy", "sidebar");
 		objSidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
-		Objective objBelowName = scb.registerNewObjective("belowName", "dummy", "belowName");
-		objBelowName.setDisplaySlot(DisplaySlot.BELOW_NAME);
 		
-		plotsScoreboards.put(p, scb);
+		plotsScoreboards.put(plot, scb);
 	}
 	
-	@Deprecated
-	private void removeScoreboard(Plot p) {
-		plotsScoreboards.remove(p);
-	}
-
-	private boolean hasCustomScoreboard(Plot plotTo) {
-		return plotsScoreboards.containsKey(plotTo);
-	}
-
-	public void setCustomScoreboardFor(Plot plot, Player p) {
-		if (hasCustomScoreboard(plot))
-			p.setScoreboard(plotsScoreboards.get(plot));
-	}
-
-	public void clearScoreboardSlot(Plot plot, DisplaySlot displayLoc) {
-		if (displayLoc == null || !plotsScoreboards.containsKey(plot))
+	//vide le slot de scoreboard en paramètre
+	public void clearScoreboardSlot(Plot plot, DisplaySlot displaySlot) {
+		if (displaySlot == null)
 			return;
 		
-		Scoreboard scb = plotsScoreboards.get(plot);
+		if (!plotsScoreboards.containsKey(plot))
+			createScoreboardHolder(plot);
 		
-		scb.getObjective(displayLoc).unregister();
-
-		if (displayLoc == DisplaySlot.BELOW_NAME)
-			scb.registerNewObjective("belowName", "dummy", "belowName");
-		if (displayLoc == DisplaySlot.SIDEBAR)
-			scb.registerNewObjective("sidebar", "dummy", "sidebar");
+		//supression de l'ancien objectif et création d'un nouveau
+		if (displaySlot == DisplaySlot.SIDEBAR) {
+			plotsScoreboards.get(plot).getObjective(DisplaySlot.SIDEBAR).unregister();	
+			Objective objSidebar = plotsScoreboards.get(plot).registerNewObjective("sidebar", "dummy", "sidebar");
+			objSidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
+		}
+		
+		//supression des textholders des joueurs et entités si nécessaire
+		if (displaySlot == DisplaySlot.BELOW_NAME) {
+			for (Player p : plot.getPlayers())
+				if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(p) == 2)
+					plugin.getPerksManager().getLinesOnHeadUtil().clearLines(p);
+				else
+					plugin.getPerksManager().getLinesOnHeadUtil().removeLine(p, 2);
+		}
+			
 	}
-	
 
 	
 	
@@ -174,7 +173,7 @@ public class CommandBlocksManager {
 		return true;
 	}
 	
-	////renvoie la liste des équipes d'un plot
+	//renvoie la liste des équipes d'un plot
 	public List<CbTeam> getTeams(Plot plot){
 		if (plot == null || !plotTeams.containsKey(plot))
 			return new ArrayList<CbTeam>();
@@ -208,11 +207,21 @@ public class CommandBlocksManager {
 		return null;
 	}
 	
+	
+	//Actions à exécuter en entrée et sortie de plot
+	
+	public void executeJoinActions(Plot toPlot, Player p) {
+		if (!plotsScoreboards.containsKey(toPlot))
+			createScoreboardHolder(toPlot);
+		p.setScoreboard(plotsScoreboards.get(toPlot));
+	}
+	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
 		CbTeam team = getTeamOfString(fromPlot, p.getDisplayName());
 		if (team != null)
 			team.removeMember(p);
 		
+		plugin.getPerksManager().getLinesOnHeadUtil().clearLines(p);
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());
 	}
