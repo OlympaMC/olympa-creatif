@@ -184,19 +184,10 @@ public class CommandBlocksManager {
 		return plotTeams.get(plot);
 	}
 	
-	public CbTeam getTeamOfEntity(Plot plot, org.bukkit.entity.Entity e) {
-		if (e instanceof Player)
-			return getTeamOfString(plot, ((Player) e).getDisplayName());
-		else
-			return getTeamOfString(plot, e.getCustomName());
-	}
-	
-	public CbTeam getTeamOfString(Plot plot, String memberName) {
-		
-		memberName = ChatColor.translateAlternateColorCodes('&', memberName);
+	public CbTeam getTeamOf(Plot plot, Entity e) {
 		
 		for (CbTeam t : getTeams(plot))
-			if (t.getMembers().contains(memberName)) 
+			if (t.getMembers().contains(e)) 
 				return t;			
 				
 		return null;
@@ -216,11 +207,16 @@ public class CommandBlocksManager {
 	public void executeJoinActions(Plot toPlot, Player p) {
 		if (!plotsScoreboards.containsKey(toPlot))
 			createScoreboardHolder(toPlot);
+		
 		p.setScoreboard(plotsScoreboards.get(toPlot));
+		
+		for (CbObjective obj : getObjectives(toPlot))
+			if (obj.getDisplaySlot() == DisplaySlot.BELOW_NAME)
+				obj.set(p, 0);
 	}
 	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
-		CbTeam team = getTeamOfString(fromPlot, p.getDisplayName());
+		CbTeam team = getTeamOf(fromPlot, p);
 		if (team != null)
 			team.removeMember(p);
 		

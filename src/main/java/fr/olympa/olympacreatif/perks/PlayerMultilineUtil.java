@@ -63,6 +63,8 @@ public class PlayerMultilineUtil {
 		return rowsMap.get(p);
 	}
 	
+	
+	
 	public class LineDataWrapper{
 		
 		private Player p;
@@ -70,6 +72,11 @@ public class PlayerMultilineUtil {
 		
 		private LineDataWrapper(Player p) {
 			this.p = p;
+		}
+		
+		@Override
+		public String toString() {
+			return "[Wrapper " + p.getDisplayName() + "] : " + lines.toString();
 		}
 		
 		public Player getPlayer() {
@@ -125,8 +132,8 @@ public class PlayerMultilineUtil {
 					PacketPlayOutEntityDestroy packetHolder = new PacketPlayOutEntityDestroy(data.getArmorStandHolder().getEntityId());
 					PacketPlayOutEntityDestroy packetArmorStand = new PacketPlayOutEntityDestroy(data.getArmorStand().getEntityId());
 					
-					((CraftPlayer) p).getHandle().playerConnection.sendPacket(packetHolder);
-					((CraftPlayer) p).getHandle().playerConnection.sendPacket(packetArmorStand);
+					//((CraftPlayer) p).getHandle().playerConnection.sendPacket(packetHolder);
+					//((CraftPlayer) p).getHandle().playerConnection.sendPacket(packetArmorStand);
 				
 			}}, 1);
 			
@@ -136,21 +143,21 @@ public class PlayerMultilineUtil {
 		}
 		
 		public boolean moveLine(String lineIdToMove, int destination) {
-			return moveLine(getLineIndex(lineIdToMove), destination);
+			return swapLine(getLineIndex(lineIdToMove), destination);
 		}
 		
-		public boolean moveLine(int lineToMove, int destination) {
-			if (lines.size() <= lineToMove || lines.size() <= destination || lineToMove == destination)
+		public boolean swapLine(int line1, int line2) {
+			if (lines.size() <= line1 || lines.size() <= line2 || line1 == line2)
 				return false;
 
-			String idToMove = lines.get(lineToMove).getId();
-			String textToMove = lines.get(lineToMove).getText();
+			String idToMove = lines.get(line1).getId();
+			String textToMove = lines.get(line1).getText();
 
-			lines.get(lineToMove).setId(lines.get(destination).getId());
-			lines.get(lineToMove).setText(lines.get(destination).getText());
+			lines.get(line1).setId(lines.get(line2).getId());
+			lines.get(line1).setText(lines.get(line2).getText());
 			
-			lines.get(destination).setId(idToMove);
-			lines.get(destination).setText(textToMove);
+			lines.get(line2).setId(idToMove);
+			lines.get(line2).setText(textToMove);
 			
 			return true;
 		}
@@ -231,7 +238,7 @@ public class PlayerMultilineUtil {
 			
 			//summon silverfish qui portera le porte armure
 			LivingEntity silverfish = (LivingEntity) plugin.getWorldManager().getWorld().spawnEntity(holdingEntity.getLocation(), EntityType.SILVERFISH);
-			silverfish.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 0, false, false, false));
+			//silverfish.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 0, false, false, false));
 			silverfish.setInvulnerable(true);
 			silverfish.getBoundingBox().resize(-0.1, -5, -0.1, 0.1, -4.9, 0.1);
 			
@@ -240,7 +247,7 @@ public class PlayerMultilineUtil {
 			
 			//création de l'armorstand portant le nom visible
 			EntityArmorStand armorStand = ((CraftArmorStand) plugin.getWorldManager().getWorld().spawnEntity(holdingEntity.getLocation(), EntityType.ARMOR_STAND)).getHandle();
-			armorStand.setInvisible(true);
+			//armorStand.setInvisible(true);
 			armorStand.setCustomName(new ChatMessage(text));
 			armorStand.setCustomNameVisible(true);
 			armorStand.setMarker(true);
@@ -257,6 +264,11 @@ public class PlayerMultilineUtil {
 			
 			holdersEntities.add(arm);
 			holdersEntities.add(armHolder);
+		}
+		
+		@Override
+		public String toString() {
+			return "Id : " + id + " - Text : " + arm.getCustomName();
 		}
 		
 		public String getText() {

@@ -27,23 +27,9 @@ public class CbTeamsListener implements Listener {
 		
 		if (p1 == null || p2 == null || !p1.equals(p2))
 			return;
-
-		String s1 = "";
-		String s2 = "";
-
-		if (e.getEntity() instanceof Player)
-			s1 = ((Player) e.getEntity()).getDisplayName();
-		else
-			s2 = e.getEntity().getCustomName();
 		
-		if (e.getDamager() instanceof Player)
-			s1 = ((Player) e.getDamager()).getDisplayName();
-		else
-			s2 = e.getDamager().getCustomName();
-
-		
-		CbTeam t1 = plugin.getCommandBlocksManager().getTeamOfString(p1, s1);
-		CbTeam t2 = plugin.getCommandBlocksManager().getTeamOfString(p1, s2);
+		CbTeam t1 = plugin.getCommandBlocksManager().getTeamOf(p1, e.getEntity());
+		CbTeam t2 = plugin.getCommandBlocksManager().getTeamOf(p1, e.getDamager());
 		
 		if (t1 != null && t2 != null && t1.equals(t2) && !t1.hasFriendlyFire())
 			e.setCancelled(true);

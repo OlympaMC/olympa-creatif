@@ -78,7 +78,7 @@ public class CmdTeam extends CbCommand {
 				int removedPlayers = 0;
 				
 				for (Entity e : list) {
-					CbTeam t = plugin.getCommandBlocksManager().getTeamOfEntity(plot, e);
+					CbTeam t = plugin.getCommandBlocksManager().getTeamOf(plot, e);
 					if (t != null) {
 						t.removeMember(e);
 						removedPlayers++;
@@ -88,7 +88,7 @@ public class CmdTeam extends CbCommand {
 				return removedPlayers;
 				
 			}else if(sender instanceof Player) { //supression de l'équipe de l'exécutant de la commande
-				CbTeam t = plugin.getCommandBlocksManager().getTeamOfEntity(plot, (Entity) sender);
+				CbTeam t = plugin.getCommandBlocksManager().getTeamOf(plot, (Entity) sender);
 				if (t != null) {
 					t.removeMember((Player) sender);
 					return 1;	

@@ -2,7 +2,9 @@ package fr.olympa.olympacreatif;
 
 import java.util.Random;
 
+import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.plugin.OlympaAPIPlugin;

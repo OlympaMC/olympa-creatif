@@ -35,7 +35,7 @@ public class CbTeam {
 
 	private OlympaCreatifMain plugin;
 	private Plot plot;
-	private List<String> members = new ArrayList<String>();
+	private List<Entity> members = new ArrayList<Entity>();
 	private boolean allowFriendlyFire = false;
 	private String color = "";
 
@@ -83,66 +83,34 @@ public class CbTeam {
 	}
 	
 	public boolean addMember(Entity e) {
-		boolean isAdded = false;
-
-		CbTeam quittedTeam = plugin.getCommandBlocksManager().getTeamOfEntity(plot, e);
-		if (quittedTeam != null)
-			quittedTeam.removeMember(e);
-		
-		if (e instanceof Player) {
-			isAdded = addMember(((Player) e).getDisplayName());
-		}else {
-			isAdded = addMember(e.getCustomName());
-		}
-
-		if (isAdded && e.getType() == EntityType.PLAYER && !getDisplayName().equals(getId())) 
-			showTeamName((Player) e);
-		
-		return isAdded;
-	}
-	
-	public boolean addMember(String s) {
-		if (members.contains(s))
+		if (members.contains(e))
 			return false;
 		
-		
-		for (CbTeam t : plugin.getCommandBlocksManager().getTeams(plot))
-			if (t.getMembers().contains(s))
-				t.removeMember(s);
-		
-		
-		members.add(ChatColor.translateAlternateColorCodes('&', s));
+		CbTeam quittedTeam = plugin.getCommandBlocksManager().getTeamOf(plot, e);
+		if (quittedTeam != null)
+			quittedTeam.removeMember(e);
+		else
+			members.add(e);
+
+		if (e.getType() == EntityType.PLAYER && !getDisplayName().equals(getId())) 
+			showTeamName((Player) e);
 		
 		return true;
 	}
 	
 	public void removeMember(Entity e) {
-		if (e instanceof Player) 
-			removeMember(((Player) e).getDisplayName());
-		else
-			removeMember(e.getCustomName());
+		members.remove(e);
 		
 		if (e.getType() == EntityType.PLAYER)
 			removeTeamName((Player) e);
 	}
-	
-	public void removeMember(String s) {
-		members.remove(ChatColor.translateAlternateColorCodes('&', s));
-	}
 
-	public List<String> getMembers(){
+	public List<Entity> getMembers(){
 		return members;
 	}
 	
 	public boolean isMember(Entity e) {
-		if (e instanceof Player)
-			return isMember(((Player) e).getDisplayName());
-		else
-			return isMember(e.getCustomName());
-	}
-	
-	public boolean isMember(String s) {
-		return members.contains(s);
+		return members.contains(e);
 	}
 	
 	public void setFriendlyFire(boolean b) {
@@ -163,8 +131,6 @@ public class CbTeam {
 	
 	//summon des entités pour faire apparaître le nom de la team au dessus du pseudo du joueur
 	public void showTeamName(Player p) {
-		
-		removeTeamName(p);
 
 		LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p);
 		
@@ -174,6 +140,8 @@ public class CbTeam {
 			data.addLine("team", teamName);
 			data.moveLine("team", 1);
 		}
+		
+		Bukkit.broadcastMessage(data.toString());
 	}
 	
 	public void removeTeamName(Player p) {
@@ -185,9 +153,9 @@ public class CbTeam {
 	}
 
 	public void removeTeamNameForAll() {
-		for (Player p : plot.getPlayers())
-			if (members.contains(p.getDisplayName()))
-				removeTeamName(p);
+		for (Entity e : members)
+			if (e.getType() == EntityType.PLAYER)
+				removeTeamName((Player) e);
 	}
 	
 	public enum ColorType{
