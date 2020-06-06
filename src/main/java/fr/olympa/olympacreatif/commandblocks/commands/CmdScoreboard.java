@@ -140,6 +140,7 @@ public class CmdScoreboard extends CbCommand {
 								obj.add(p, value);
 							else
 								obj.add(args[2], value);
+							
 							return 1;
 						}
 					}
@@ -271,6 +272,8 @@ public class CmdScoreboard extends CbCommand {
 								obj.set(p, value);
 							else
 								obj.set(args[2], value);
+							
+							return 1;
 						}
 					}
 				}

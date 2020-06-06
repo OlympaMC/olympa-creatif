@@ -53,7 +53,7 @@ public class CmdTeam extends CbCommand {
 				
 				if (args.length == 3) {
 					List<Entity> list = parseSelector(args[2], false);
-
+					
 					int nbAddedEntities = 0;
 					
 					for (Entity e : list) 

@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CbObjective {
@@ -209,11 +210,15 @@ public class CbObjective {
 			scoreHolder = e.getCustomName();
 		
 		//affichage scoreboard belowName
-		if (displayLoc == DisplaySlot.BELOW_NAME)
-			if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(e) == 2)
-				plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 1, value + " " + objName, true);
-			else
-				plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 2, value + " " + objName, true);
+		if (displayLoc == DisplaySlot.BELOW_NAME && e.getType() == EntityType.PLAYER) {
+			
+			LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper((Player) e); 
+			
+			if (!data.editLine("score", value + " " + getName())) {
+				data.addLine("playerName", ((Player) e).getDisplayName());
+				data.addLine("score", value + " " + getName());
+			}	
+		}
 		
 		set(scoreHolder, value);
 	}
@@ -243,44 +248,35 @@ public class CbObjective {
 				if (o.getDisplaySlot() == newDisplayLoc)
 					o.setDisplaySlot(null);
 		
+		
 		//clear l'emplacement si nécessaire
 		if (displayLoc != null && newDisplayLoc == null)
 			plugin.getCommandBlocksManager().clearScoreboardSlot(plot, displayLoc);
 		
+		
 		//affichage du score sur la sidebar
 		if (displayLoc != newDisplayLoc && newDisplayLoc == DisplaySlot.SIDEBAR) {
+
+			this.displayLoc = newDisplayLoc;
+			
 			Objective obj = plugin.getCommandBlocksManager().getObjectiveOnSlot(plot, newDisplayLoc);
 			obj.setDisplayName(objId);
 			
 			for (Entry<String, Integer> e : values.entrySet()) 
 				obj.getScore(e.getKey()).setScore(e.getValue());
 		
+			
 		//affichage du score sur le belowName
 		}else if (displayLoc != newDisplayLoc && newDisplayLoc == DisplaySlot.BELOW_NAME) {
-			for (Player p : plot.getPlayers()) {
-				//affichage nom entité
-				plugin.getPerksManager().getLinesOnHeadUtil().setLine(p, 0, p.getDisplayName(), true);
-				
-				//affichage score entité
-				if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(p) == 2)
-					plugin.getPerksManager().getLinesOnHeadUtil().setLine(p, 1, get(p) + " " + getName(), false);
-				else
-					plugin.getPerksManager().getLinesOnHeadUtil().setLine(p, 2, get(p) + " " + getName(), false);
-			}
 			
-			for (Entity e : plot.getEntities()) {
-				plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 0, e.getCustomName(), true);
-				
-				if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(e) == 2)
-					plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 2, get(e) + " " + getName(), false);
-				else
-					plugin.getPerksManager().getLinesOnHeadUtil().setLine(e, 1, get(e) + " " + getName(), false);
-			}
-		}
-		
-		this.displayLoc = newDisplayLoc;		
+			this.displayLoc = newDisplayLoc;
+			
+			for (Player p : plot.getPlayers()) 
+				set(p, get(p));
+			
+		}		
 	}
-
+	
 
 	public DisplaySlot getDisplaySlot() {
 		return displayLoc;

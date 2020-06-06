@@ -351,14 +351,6 @@ public class WorldEventsListener implements Listener{
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 	}
 	
-	/*
-	@Deprecated
-	@EventHandler //mise du GM 1
-	public void onJoinEvent(PlayerJoinEvent e) {
-		Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> e.getPlayer().setGameMode(GameMode.CREATIVE), 1);
-	}
-	*/
-	
 	@EventHandler //cancel téléportation par portail de l'end ou du nether
 	public void onChangeWorld(PlayerTeleportEvent e) {
 		if (e.getCause() == TeleportCause.END_PORTAL || e.getCause() == TeleportCause.NETHER_PORTAL)

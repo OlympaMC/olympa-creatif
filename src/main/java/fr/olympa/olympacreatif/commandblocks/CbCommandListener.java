@@ -20,6 +20,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -74,10 +75,10 @@ public class CbCommandListener implements Listener {
 		
 		CbCommand cmd = getCommand(e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
 		
-		if (cmd != null) 
-			executeCommandBlockCommand(cmd, e.getPlayer());			
-		
-		
+		if (cmd != null && cmd.getPlot().getMembers().getPlayerLevel(e.getPlayer()) >= 3) 
+			executeCommandBlockCommand(cmd, e.getPlayer());
+		else
+			e.getPlayer().sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
 	}
 
 	private CbCommand getCommand(CommandSender sender, Location sendLoc, String command) {

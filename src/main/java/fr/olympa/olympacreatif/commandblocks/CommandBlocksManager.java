@@ -18,6 +18,7 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.ItemFireworks.EffectType;
@@ -141,11 +142,13 @@ public class CommandBlocksManager {
 		
 		//supression des textholders des joueurs et entités si nécessaire
 		if (displaySlot == DisplaySlot.BELOW_NAME) {
-			for (Player p : plot.getPlayers())
-				if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(p) == 2)
-					plugin.getPerksManager().getLinesOnHeadUtil().clearLines(p);
-				else
-					plugin.getPerksManager().getLinesOnHeadUtil().removeLine(p, 2);
+			for (Player p : plot.getPlayers()){
+				LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p);
+				
+				data.removeLine("score");
+				if (data.getLinesCount() == 1)
+					data.clearLines();
+			}
 		}
 			
 	}
@@ -221,7 +224,7 @@ public class CommandBlocksManager {
 		if (team != null)
 			team.removeMember(p);
 		
-		plugin.getPerksManager().getLinesOnHeadUtil().clearLines(p);
+		plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p).clearLines();
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());
 	}

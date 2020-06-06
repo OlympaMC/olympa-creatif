@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.NbtParserUtil;
+import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.ChatMessage;
 import net.minecraft.server.v1_15_R1.EntityArmorStand;
@@ -38,13 +39,13 @@ public class CbTeam {
 	private boolean allowFriendlyFire = false;
 	private String color = "";
 
-	private String id;
+	private String teamId;
 	private String teamName = "";
 	
 	public CbTeam(OlympaCreatifMain plugin, Plot plot, String id, String name) {
 		this.plugin = plugin;
 		this.plot = plot;
-		this.id = id;
+		this.teamId = id;
 		this.teamName = name;
 	}
 	
@@ -53,15 +54,21 @@ public class CbTeam {
 	}
 	
 	public String getId() {
-		return id;
+		return teamId;
 	}
 	
 	public void setName(String newTeamName) {
-
-		teamName = newTeamName;
 		
-		if (teamName.equals(""))
+		if (newTeamName.equals(teamId))
 			removeTeamNameForAll();
+		else if (!teamName.equals(newTeamName)) {
+
+			teamName = newTeamName;
+			
+			for (Player p : plot.getPlayers())
+				if (isMember(p))
+					showTeamName(p);	
+		}
 	}
 	
 	public Plot getPlot() {
@@ -88,8 +95,8 @@ public class CbTeam {
 			isAdded = addMember(e.getCustomName());
 		}
 
-		if (isAdded && !getDisplayName().equals(getId())) 
-			showTeamName(e);
+		if (isAdded && e.getType() == EntityType.PLAYER && !getDisplayName().equals(getId())) 
+			showTeamName((Player) e);
 		
 		return isAdded;
 	}
@@ -115,7 +122,8 @@ public class CbTeam {
 		else
 			removeMember(e.getCustomName());
 		
-		removeTeamName(e);
+		if (e.getType() == EntityType.PLAYER)
+			removeTeamName((Player) e);
 	}
 	
 	public void removeMember(String s) {
@@ -154,36 +162,32 @@ public class CbTeam {
 	}
 	
 	//summon des entités pour faire apparaître le nom de la team au dessus du pseudo du joueur
-	public void showTeamName(Entity entity) {
+	public void showTeamName(Player p) {
 		
-		removeTeamName(entity);
+		removeTeamName(p);
 
-		if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(entity) == 0)
-			if (entity.getType() == EntityType.PLAYER)
-				plugin.getPerksManager().getLinesOnHeadUtil().setLine(entity, 0, ((Player) entity).getDisplayName(), true);
-			else
-				plugin.getPerksManager().getLinesOnHeadUtil().setLine(entity, 0, entity.getCustomName(), true);
-
-		plugin.getPerksManager().getLinesOnHeadUtil().setLine(entity, 1, getDisplayName(), false);
-	
+		LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p);
+		
+		data.addLine("playerName", p.getDisplayName());
+		
+		if (!data.editLine("team", teamName)) {
+			data.addLine("team", teamName);
+			data.moveLine("team", 1);
+		}
 	}
 	
-	public void removeTeamName(Entity entity) {
-		//supprime le nom de l'équipe. Clear de tous les teamnaheholders si le score n'est pas affiché. Supression de la ligne correspondante au nom de l'équipe sinon.
-		if (plugin.getPerksManager().getLinesOnHeadUtil().getLinesCount(entity) <= 2)
-			plugin.getPerksManager().getLinesOnHeadUtil().clearLines(entity);
-		else
-			plugin.getPerksManager().getLinesOnHeadUtil().removeLine(entity, 1);
+	public void removeTeamName(Player p) {
+		LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p);
+		
+		data.removeLine("team");
+		if (data.getLinesCount() == 1)
+			data.clearLines();
 	}
 
-	public void removeTeamNameForAll() {//tue les entités chevauchant les joueurs de cette équipe
+	public void removeTeamNameForAll() {
 		for (Player p : plot.getPlayers())
 			if (members.contains(p.getDisplayName()))
 				removeTeamName(p);
-		
-		for (Entity e : plot.getEntities())
-			if (members.contains(e.getCustomName()))
-				removeTeamName(e);
 	}
 	
 	public enum ColorType{

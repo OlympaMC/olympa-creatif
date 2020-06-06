@@ -68,7 +68,8 @@ public abstract class CbCommand {
 			
 			if (sender instanceof Entity) {
 				list.add((Entity) sender);	
-			}
+			}else
+				return list;
 		}else
 			list = new ArrayList<Entity>(plot.getPlayers());
 		

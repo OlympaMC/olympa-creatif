@@ -7,13 +7,13 @@ public class PerksManager {
 	private OlympaCreatifMain plugin;
 	private MicroBlocks mb = null;
 	private SchematicCreator schem = null;
-	private LinesOnNameUtil linesOnName = null;
+	private PlayerMultilineUtil linesOnName = null;
 	
 	public PerksManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		mb = new MicroBlocks(plugin);
 		schem = new SchematicCreator(plugin);
-		linesOnName = new LinesOnNameUtil(plugin);
+		linesOnName = new PlayerMultilineUtil(plugin);
 	}
 	
 	public MicroBlocks getMicroBlocks() {
@@ -24,7 +24,7 @@ public class PerksManager {
 		return schem;
 	}
 	
-	public LinesOnNameUtil getLinesOnHeadUtil() {
+	public PlayerMultilineUtil getLinesOnHeadUtil() {
 		return linesOnName;
 	}
 }
