@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -24,11 +25,6 @@ public class MembersGui extends OlympaGUI {
 	private OlympaCreatifMain plugin;
 	private Plot plot;
 	private Player p;
-
-	List<OlympaPlayerInformations> rank1 = new ArrayList<OlympaPlayerInformations>();
-	List<OlympaPlayerInformations> rank2 = new ArrayList<OlympaPlayerInformations>();
-	List<OlympaPlayerInformations> rank3 = new ArrayList<OlympaPlayerInformations>();
-	List<OlympaPlayerInformations> rank4 = new ArrayList<OlympaPlayerInformations>();
 	
 	public MembersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
 		super("§6Membres du plot : " + plot.getId().getAsString(), 3);
@@ -39,52 +35,37 @@ public class MembersGui extends OlympaGUI {
 		
 		inv.setItem(26, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 		
-		for (Entry<OlympaPlayerInformations, PlotRank> e : plot.getMembers().getList().entrySet()) {
-			switch (e.getValue()) {
-			case CO_OWNER:
-				rank3.add(e.getKey());
-				break;
-			case MEMBER:
-				rank1.add(e.getKey());
-				break;
-			case OWNER:
-				rank4.add(e.getKey());
-				break;
-			case TRUSTED:
-				rank2.add(e.getKey());
-				break;
-			}
-		}
+		//affichage des membres
+		int headIndex = -1;
 		
 		for (Entry<OlympaPlayerInformations, PlotRank> e : plot.getMembers().getList().entrySet()) {
+			
+			headIndex++;
+			final int thisHeadIndex = headIndex;
+			
 			//création de la tête du joueur
-			ItemStack skull = ItemUtils.skull("§6" + e.getKey().getName(), e.getKey().getName(), "§6Rang : " + e.getValue().getRankName());
+			Consumer<ItemStack> consumer = sk -> {
+				inv.setItem(thisHeadIndex, sk);
+			};
+			
+			List<String> lore = new ArrayList<String>();
+			lore.add("§6Rang : " + e.getValue().getRankName());
 
 			//définition de son statut
 			if (Bukkit.getPlayer(e.getKey().getUUID()) != null)
-				skull = ItemUtils.loreAdd(skull, "§eStatut : §aen ligne");
+				lore.add("§eStatut : §aen ligne");
 			else
-				skull = ItemUtils.loreAdd(skull, "§eStatut : §chors ligne");
+				lore.add("§eStatut : §chors ligne");
 			
 			//définition de si le joueur a la permission de promouvoir/rétrogader un membre
-			if ((plot.getMembers().getPlayerLevel(p) == 3 && e.getValue().getLevel() < 3) || plot.getMembers().getPlayerLevel(p) == 4 && e.getValue().getLevel() < 4) 
-				skull = ItemUtils.loreAdd(skull, " ", "§8Clic gauche : promouvoir", "§8Clic droit : rétrograder");
-
-			//placement de la tête selon le rang du joueur
-			switch (e.getValue()) {
-			case CO_OWNER:
-				inv.setItem(rank4.size() + rank3.indexOf(e.getKey()), skull);
-				break;
-			case MEMBER:
-				inv.setItem(rank4.size() +rank3.size() + rank2.size() + rank1.indexOf(e.getKey()), skull);
-				break;
-			case OWNER:
-				inv.setItem(rank4.indexOf(e.getKey()), skull);
-				break;
-			case TRUSTED:
-				inv.setItem(rank4.size() +rank3.size() + rank2.indexOf(e.getKey()), skull);
-				break;
+			if ((plot.getMembers().getPlayerLevel(p) == 3 && e.getValue().getLevel() < 3) || plot.getMembers().getPlayerLevel(p) == 4 && e.getValue().getLevel() < 4) {
+				lore.add(" ");
+				lore.add("§8Clic gauche : promouvoir");
+				lore.add("§8Clic droit : rétrograder");	
 			}
+			
+			consumer.accept(ItemUtils.item(Material.BEDROCK, "§6" + e.getKey().getName(), (String[]) lore.toArray()));
+			ItemUtils.skull(consumer, "§6" + e.getKey().getName(), e.getKey().getName(), (String[]) lore.toArray());
 		}
 	}
 

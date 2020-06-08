@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.command;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -92,14 +93,17 @@ public class OcoCommand extends OlympaCommand {
 				}else
 					p.getPlayer().sendMessage(Message.OCO_UNKNOWN_MB.getValue());
 				break;
+				
 			case "skull":
 				/*if (!p.hasPermission(PermissionsList.USE_SKULL_COMMAND)) {
 					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_SKULL_COMMAND.getGroup().getName(p.getGender())));
 					return false;
 				}*/
-				p.getPlayer().getInventory().addItem(ItemUtils.skull("§6Tête de " + args[1], args[1]));
+				Consumer<ItemStack> consumer = sk -> p.getPlayer().getInventory().addItem(sk);
+				ItemUtils.skull(consumer, "§6Tête de " + args[1], args[1]);
 				p.getPlayer().sendMessage(Message.OCO_BLOCK_GIVED.getValue());
 				break;
+				
 			case "give":
 				args[1] = args[1].toUpperCase();
 				if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])))

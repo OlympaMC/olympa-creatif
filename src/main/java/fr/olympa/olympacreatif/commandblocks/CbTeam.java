@@ -17,6 +17,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import fr.olympa.api.player.OlympaPlayer;
+import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
@@ -140,13 +142,11 @@ public class CbTeam {
 			data.addLine("team", teamName);
 			data.moveLine("team", 1);
 		}
-		
-		Bukkit.broadcastMessage(data.toString());
 	}
 	
 	public void removeTeamName(Player p) {
 		LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p);
-		
+
 		data.removeLine("team");
 		if (data.getLinesCount() == 1)
 			data.clearLines();

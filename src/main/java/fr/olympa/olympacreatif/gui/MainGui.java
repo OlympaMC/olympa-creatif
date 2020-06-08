@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.gui;
 
 import java.util.Random;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -56,13 +57,25 @@ public class MainGui extends OlympaGUI {
 		inv.setItem(6, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		inv.setItem(38, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		inv.setItem(42, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
-		
+
+		final int totalPlayerOwnedPlotsFinal = totalPlayerOwnedPlots;
+		final int totalPlayerPlotsFinal = totalPlayerPlots;
 		
 		//génération de l'interface
-		inv.setItem(12, ItemUtils.skull("§6Profil de " + player.getDisplayName(), player.getName(), 
-				"§eGrade : " + p.getGroupNameColored(), " ", 
-				"§eParcelles totales : " + totalPlayerPlots + "/36", 
-				"§eParcelles propriétaire : " + totalPlayerOwnedPlots + "/" + (totalPlayerOwnedPlots + plugin.getPlotsManager().getAvailablePlotSlotsLeftOwner(player))));
+		
+		//génération de la tête en async car l'appel aux serveurs mojang est nécessaire
+		Consumer<ItemStack> consumer = sk -> {
+			sk = ItemUtils.name(sk, "§6Profil de " + player.getDisplayName());
+			sk = ItemUtils.loreAdd(sk, "§eGrade : " + p.getGroupNameColored(), 
+					" ",
+					"§eParcelles totales : " + totalPlayerPlotsFinal + "/36",  
+					"§eParcelles propriétaire : " + totalPlayerOwnedPlotsFinal + "/" + (totalPlayerOwnedPlotsFinal + plugin.getPlotsManager().getAvailablePlotSlotsLeftOwner(player))
+					);
+			inv.setItem(12, sk);
+		};
+
+		consumer.accept(new ItemStack(Material.BEDROCK));
+		ItemUtils.skull(consumer, "", p.getName());
 
 		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes plots", clickToOpenMenu));
 		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", "§eVotre monnaie : TODO", clickToOpenMenu));

@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
@@ -74,7 +75,7 @@ public class CmdTeam extends CbCommand {
 		case "leave":
 			if (args.length == 2) { //supression de l'équipe pour les entités du sélecteur
 				List<Entity> list = parseSelector(args[1], false);
-				
+
 				int removedPlayers = 0;
 				
 				for (Entity e : list) {
@@ -84,7 +85,7 @@ public class CmdTeam extends CbCommand {
 						removedPlayers++;
 					}	
 				}
-			
+				
 				return removedPlayers;
 				
 			}else if(sender instanceof Player) { //supression de l'équipe de l'exécutant de la commande

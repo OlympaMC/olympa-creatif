@@ -1,11 +1,19 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
 import fr.olympa.api.item.OlympaItemBuild;
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
@@ -15,7 +23,15 @@ public class PlotMembers{
 
 	private OlympaCreatifMain plugin;
 	private PlotId plotId;
-	private Map<OlympaPlayerInformations, PlotRank> members = new HashMap<OlympaPlayerInformations, PlotRank>();
+	
+	//membres triés par ordre alphabétique
+	private Map<OlympaPlayerInformations, PlotRank> members = new TreeMap<OlympaPlayerInformations, PlotRank>(new Comparator<OlympaPlayerInformations>() {
+
+		@Override
+		public int compare(OlympaPlayerInformations o1, OlympaPlayerInformations o2) {
+			return o1.getName().compareTo(o2.getName());
+		}
+	});
 
 	public PlotMembers(OlympaCreatifMain plugin, PlotId plotId) {
 		this.plugin = plugin;

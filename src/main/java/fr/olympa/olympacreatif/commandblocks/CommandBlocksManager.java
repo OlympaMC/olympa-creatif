@@ -16,6 +16,8 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
+import fr.olympa.api.player.OlympaPlayer;
+import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
@@ -32,9 +34,6 @@ public class CommandBlocksManager {
 	private Map<Plot, List<CbTeam>> plotTeams = new HashMap<Plot, List<CbTeam>>();
 	
 	private Map<Plot, Scoreboard> plotsScoreboards = new HashMap<Plot, Scoreboard>();
-
-	private Map<Plot, List<Entity>> plotTeamNameHolders = new HashMap<Plot, List<Entity>>();
-	private Map<Plot, Integer> plotLastTestedTick = new HashMap<Plot, Integer>();
 	
 	private int maxTeamsPerPlot = 20;
 	private int maxScoreboardsPerPlot = 20;
