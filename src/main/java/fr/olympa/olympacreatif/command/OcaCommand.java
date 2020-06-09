@@ -11,6 +11,7 @@ import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 
 public class OcaCommand extends OlympaCommand {
@@ -24,7 +25,7 @@ public class OcaCommand extends OlympaCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!(sender instanceof Player) || plugin.getDataManager().getCreatifPlayer(player) == null)
+		if (!(sender instanceof Player))
 			return false;
 		
 		if (!PermissionsList.STAFF_ENABLE_ADMIN_MODE.hasPermission(((Player)sender).getUniqueId()))
@@ -33,11 +34,11 @@ public class OcaCommand extends OlympaCommand {
 		if (args.length == 1)
 			switch(args[0]) {
 			case "on":
-				plugin.getDataManager().getCreatifPlayer(player).setAdmin(true);
+				((OlympaPlayerCreatif) AccountProvider.get(player.getUniqueId())).setAdmin(true);
 				sender.sendMessage("§cOlympaCréatif : mode admin activé.");
 				return false;
 			case "off":
-				plugin.getDataManager().getCreatifPlayer(player).setAdmin(false);
+				((OlympaPlayerCreatif) AccountProvider.get(player.getUniqueId())).setAdmin(false);
 				sender.sendMessage("§aOlympaCréatif : mode admin désactivé.");
 				return false;
 			}

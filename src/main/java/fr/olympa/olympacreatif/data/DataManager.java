@@ -14,7 +14,6 @@ import fr.olympa.olympacreatif.plot.PlotId;
 public class DataManager {
 
 	private OlympaCreatifMain plugin;
-	private Map<Player, OlympaPlayerCreatif> players = new HashMap<Player, OlympaPlayerCreatif>();
 	
 	public DataManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -23,27 +22,9 @@ public class DataManager {
 		
 		Message.initialize();
 	}
-
-	public OlympaPlayerCreatif getCreatifPlayer(Player p) {
-		return players.get(p);
-	}
 	
-	public void loadPlayer(OlympaPlayer p) {
-		// TODO Auto-generated method stub
-		
-		//charger plots joueur
-		//charger monnaie joueur
-		//charger plots suplémentaires joueur
-		
-		OlympaPlayerCreatif pc = new OlympaPlayerCreatif(plugin, p.getUniqueId(), p.getName(), p.getIp());
-		pc.addBonusPlots(0);
-		pc.addGameMoney(0);
-		
-		players.put(p.getPlayer(), pc);
-	}
-
-	public void unloadPlayer(Player p) {
-		// TODO Auto-generated method stub
+	public void loadPlayerPlots(OlympaPlayerCreatif p) {
+		//TODO charger plots joueur
 		
 	}
 	
@@ -68,11 +49,5 @@ public class DataManager {
 		}
 		*/
 		return resultSet;
-	}
-
-
-	public int getTotalPlotsCount() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

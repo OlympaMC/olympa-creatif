@@ -39,6 +39,7 @@ import org.bukkit.potion.PotionEffect;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
@@ -260,7 +261,8 @@ public class PlotsInstancesListener implements Listener{
 	//actions à exécuter en entrée du plot 
 	public static void executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
 		
-		if (plugin.getDataManager().getCreatifPlayer(p).isAdmin())
+		
+		if (((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).hasAdminMode())
 			return;
 		
 		//si le joueur est banni, téléportation en dehors du plot

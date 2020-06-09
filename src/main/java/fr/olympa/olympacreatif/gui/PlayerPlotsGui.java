@@ -10,28 +10,30 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class PlayerPlotsGui extends OlympaGUI {
 
 	private OlympaCreatifMain plugin;
-	private Player p;
+	private OlympaPlayerCreatif pc;
 	private List<Plot> playerPlots = new ArrayList<Plot>();
 	
 	public PlayerPlotsGui(OlympaCreatifMain plugin, Player p) {
 		super("§6Plots du joueur " + p.getDisplayName(), 5);
 		this.plugin = plugin;
-		this.p = p;
+		this.pc = AccountProvider.get(p.getUniqueId());
 
 		inv.setItem(44, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 		
 		//recherche des plots du joueur
 		for (Plot plot : plugin.getPlotsManager().getPlots()) {
 			Material mat = null;
-			switch(plot.getMembers().getPlayerRank(p)) {
+			switch(plot.getMembers().getPlayerRank(pc)) {
 			case CO_OWNER:
 				mat = Material.DIAMOND_BLOCK;
 				break;
@@ -48,7 +50,7 @@ public class PlayerPlotsGui extends OlympaGUI {
 			
 			if (mat != null) {
 				playerPlots.add(plot);
-				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getId().getAsString(), "§eRang : " + plot.getMembers().getPlayerRank(p).getRankName()));	
+				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getId().getAsString(), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName()));	
 			}
 		}
 			

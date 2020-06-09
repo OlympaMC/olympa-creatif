@@ -17,11 +17,6 @@ public class DataManagerListener implements Listener {
 
 	@EventHandler
 	public void onJoin(OlympaPlayerLoadEvent e) {
-		plugin.getDataManager().loadPlayer(e.getOlympaPlayer());
-	}
-	
-	@EventHandler
-	public void onQuit(PlayerQuitEvent e) {
-		plugin.getDataManager().unloadPlayer(e.getPlayer());
+		plugin.getDataManager().loadPlayerPlots(e.getOlympaPlayer());
 	}
 }

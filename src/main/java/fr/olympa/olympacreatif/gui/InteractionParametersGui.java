@@ -12,7 +12,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotParameters;
@@ -20,14 +22,14 @@ import fr.olympa.olympacreatif.plot.PlotParameters;
 public class InteractionParametersGui extends OlympaGUI {
 
 	private OlympaCreatifMain plugin;
-	private Player p;
+	private OlympaPlayerCreatif pc;
 	private Plot plot;
 	
 	@SuppressWarnings("unchecked")
 	public InteractionParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
 		super("§6Interactions du plot : " + plot.getId().getAsString(), 6);
 		this.plugin = plugin;
-		this.p = p;
+		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
 
 		inv.setItem(53, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
@@ -46,7 +48,7 @@ public class InteractionParametersGui extends OlympaGUI {
 			else
 				it = ItemUtils.loreAdd(it, "§eEtat : §cinterdit");
 			
-			if (plot.getMembers().getPlayerLevel(p) >= 3)
+			if (plot.getMembers().getPlayerLevel(pc) >= 3)
 				it = ItemUtils.loreAdd(it, " ", "§8Clic gauche : changer l'état du bloc");
 			
 			inv.addItem(it);
@@ -65,7 +67,7 @@ public class InteractionParametersGui extends OlympaGUI {
 		}
 		
 		//changement de l'état d'autorisation de l'interraction pour le bloc cliqué si le joueur a la permission
-		if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(p) >= 3 && slot < PlotParamType.getAllPossibleBlocksWithInteractions().size()) {
+		if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(pc) >= 3 && slot < PlotParamType.getAllPossibleBlocksWithInteractions().size()) {
 			if (((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(current.getType())) {
 				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).remove(current.getType());
 				current = ItemUtils.removeEnchant(current, Enchantment.DURABILITY);

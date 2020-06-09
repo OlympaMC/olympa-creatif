@@ -7,13 +7,16 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.player.OlympaPlayerProvider;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.command.OcaCommand;
 import fr.olympa.olympacreatif.command.OceCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.DataManager;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.PerksManager;
 import fr.olympa.olympacreatif.plot.PlotsManager;
@@ -30,6 +33,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private PerksManager perksManager;
 	private CommandBlocksManager cbManager;
 	
+	private static OlympaCreatifMain plugin;
+	
 	public Random random = new Random();
 	
 	@Override //retourne le générateur de chunks custom
@@ -37,10 +42,17 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		return new CustomChunkGenerator(this);
 	}
 	
+	public static OlympaCreatifMain getMainClass() {
+		return plugin;
+	}
+	
 	//private OlympaStatement statement = new OlympaStatement("SELECT * FROM xxx WHERE xx = ?");
 	public void onEnable() {
 		//génération de la config de base
 		super.onEnable();
+		
+		plugin = this;
+		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
 		
 		OlympaPermission.registerPermissions(PermissionsList.class);
 		

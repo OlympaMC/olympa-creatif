@@ -52,32 +52,35 @@ public class PlotMembers{
 			members.put(p, rank);
 		else
 			members.remove(p);
+	}
+
+	
+	public PlotRank getPlayerRank(OlympaPlayerCreatif p) {			
+		if (p.hasAdminMode())
+			return PlotRank.OWNER;
 		
-		//TODO
-		//plugin.getTask().runTaskAsynchronously(() -> plugin.getDataManager().updatePlayerPlotRank(p.getId(), plotId, rank));
+		return getPlayerRank(p.getInformation());
+	}
+	
+	public PlotRank getPlayerRank(OlympaPlayerInformations pi) {
+		if (members.containsKey(pi))
+			return members.get(pi);
+		else
+			return PlotRank.VISITOR;
 	}
 
 	public PlotRank getPlayerRank(Player p) {
-		if (plugin.getDataManager().getCreatifPlayer(p) != null)
-			if (plugin.getDataManager().getCreatifPlayer(p).isAdmin())
-				return PlotRank.OWNER;
-			
-		return getPlayerRank(AccountProvider.get(p.getUniqueId()).getInformation());
+		return getPlayerRank((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
 	}
 	
-	public PlotRank getPlayerRank(OlympaPlayerInformations p) {
-		
-		if (members.containsKey(p))
-			return members.get(p);
-		
-		else return PlotRank.VISITOR;
+	public int getPlayerLevel(OlympaPlayerCreatif p) {
+		return getPlayerRank(p).getLevel();
 	}
 
-	public int getPlayerLevel(Player p) {
-		return getPlayerRank(AccountProvider.get(p.getUniqueId()).getInformation()).getLevel();
+	public int getPlayerLevel(OlympaPlayerInformations key) {
+		return getPlayerRank(key).getLevel();
 	}
-	
-	public int getPlayerLevel(OlympaPlayerInformations p) {
+	public int getPlayerLevel(Player p) {
 		return getPlayerRank(p).getLevel();
 	}
 	
@@ -126,7 +129,7 @@ public class PlotMembers{
 				if (pr.toString().equals(plotRankString))
 					return pr;
 			
-			return null;
+			return VISITOR;
 		}
 		
 		public static PlotRank getPlotRank(int plotRank) {

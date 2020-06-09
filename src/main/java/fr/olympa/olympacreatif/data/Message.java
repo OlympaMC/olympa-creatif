@@ -49,7 +49,6 @@ public enum Message {
 	PARAM_PLOT_X_SIZE,
 	PARAM_PLOT_Z_SIZE,
 	PARAM_ROAD_SIZE,
-	PARAM_PREFIX,
 	PARAM_WE_MAX_QUEUED_ACTIONS_PER_PLAYER,
 
 	PLOT_RECIEVE_INVITATION,
@@ -140,7 +139,6 @@ public enum Message {
 		messagesList.put(PARAM_PLOT_X_SIZE, "10");
 		messagesList.put(PARAM_PLOT_Z_SIZE, "15");
 		messagesList.put(PARAM_ROAD_SIZE, "6");
-		messagesList.put(PARAM_PREFIX, "[A SUPPRIMER : Message.PARAM_PREFIX] ");
 		messagesList.put(PARAM_WORLDEDIT_BPS, "1000");
 		messagesList.put(PARAM_WORLD_LEVEL, "60");
 		messagesList.put(PARAM_WORLD_NAME, "CREATIF");

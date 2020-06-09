@@ -18,8 +18,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotParamType;
@@ -28,7 +30,7 @@ import fr.olympa.olympacreatif.plot.PlotParameters;
 public class PlotParametersGui extends OlympaGUI {
 
 	private OlympaCreatifMain plugin;
-	private Player p;
+	private OlympaPlayerCreatif pc;
 	private Plot plot;
 	
 	private Biome newBiome;
@@ -40,14 +42,14 @@ public class PlotParametersGui extends OlympaGUI {
 	public PlotParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
 		super("§6Paramètres du plot : " + plot.getId().getAsString(), 2);
 		this.plugin = plugin;
-		this.p = p;
+		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
 
 		newBiome = (Biome) plot.getParameters().getParameter(PlotParamType.PLOT_BIOME);
 		
 		inv.setItem(17, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 		
-		if (plot.getMembers().getPlayerLevel(p) >= 3)
+		if (plot.getMembers().getPlayerLevel(pc) >= 3)
 			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs", "§8Cliquez pour changer la valeur"};
 		else
 			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs"};
@@ -109,7 +111,7 @@ public class PlotParametersGui extends OlympaGUI {
 			else
 				it = ItemUtils.loreAdd(it, "§2Disponible : " + biome.toString());
 		
-		if (plot.getMembers().getPlayerRank(p) == PlotRank.OWNER)
+		if (plot.getMembers().getPlayerRank(pc) == PlotRank.OWNER)
 			it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(6,it);
 
@@ -182,7 +184,7 @@ public class PlotParametersGui extends OlympaGUI {
 			return true;
 		}
 		
-		if (plot.getMembers().getPlayerLevel(p)<3)
+		if (plot.getMembers().getPlayerLevel(pc) < 3)
 			return true;
 		
 		//modification des options
@@ -230,7 +232,7 @@ public class PlotParametersGui extends OlympaGUI {
 			break;
 		case 6:
 			//édition du biome réservée au propriétaire
-			if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER)
+			if (plot.getMembers().getPlayerRank(pc) != PlotRank.OWNER)
 				return true;
 			
 			int biomeRank = PlotParamType.getAllPossibleBiomes().indexOf(newBiome);

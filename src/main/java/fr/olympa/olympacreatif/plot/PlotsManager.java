@@ -27,14 +27,7 @@ public class PlotsManager {
 	private List<PlotId> emptyPlots = new ArrayList<PlotId>();
 	private List<AsyncPlot> asyncPlots = new ArrayList<AsyncPlot>();
 	
-	private List<Player> loadedPlayers = new ArrayList<Player>();
-
-	private Map<Player, Integer> playerBonusPlots = new HashMap<Player, Integer>();
-	private Map<Player, Integer> playerMoney = new HashMap<Player, Integer>();
-	
-	private int plotCount; 
-	
-	private List<Object> adminPlayers = new ArrayList<Object>();
+	private int plotCount;
 	
 	public PlotsManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -42,7 +35,7 @@ public class PlotsManager {
 		plugin.getServer().getPluginManager().registerEvents(new PlotsManagerListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new PlotsInstancesListener(plugin), plugin);
 		
-		plotCount = plugin.getDataManager().getTotalPlotsCount();
+		//plotCount = plugin.getDataManager().getTotalPlotsCount();
 		
 		//construit les objets Plot chargés depuis la bdd de manière synchrone avec le serveur
 		new BukkitRunnable() {

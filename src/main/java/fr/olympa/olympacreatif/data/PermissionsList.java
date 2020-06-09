@@ -21,10 +21,6 @@ public class PermissionsList {
 	
 	public static final OlympaPermission USE_SKULL_COMMAND = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	public static final OlympaPermission USE_HAT_COMMAND = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
-
-	public static final OlympaPermission PLOTS_COUNT_CREATOR = new OlympaPermission(OlympaGroup.CREA_CREATOR);
-	public static final OlympaPermission PLOTS_COUNT_ARCHITECT= new OlympaPermission(OlympaGroup.CREA_ARCHITECT);
-	public static final OlympaPermission PLOTS_COUNT_CONSTRUCTOR = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	
 	public static final OlympaPermission STAFF_BYPASS_PLOT_BAN = new OlympaPermission(OlympaGroup.ASSISTANT);
 	public static final OlympaPermission STAFF_ENABLE_ADMIN_MODE = new OlympaPermission(OlympaGroup.MOD);

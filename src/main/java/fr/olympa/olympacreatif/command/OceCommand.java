@@ -30,12 +30,8 @@ public class OceCommand extends OlympaCommand{
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player))
 			return false;
-		Player p = (Player) sender;
 		
-		if (plugin.getDataManager().getCreatifPlayer(player) == null) {
-			p.sendMessage("§4Chargement des données en cours, commande annulée...");
-			return false;	
-		}
+		Player p = (Player) sender;
 		
 		//définition de pos1 et pos2 ne nécessitant pas de permission
 		if (args.length == 1)

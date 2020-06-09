@@ -38,14 +38,11 @@ public class OcCommand extends OlympaCommand {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (sender instanceof Player)
-			if (plugin.getDataManager().getCreatifPlayer(player) == null) {
-				sender.sendMessage("§4Chargement des données en cours, commande annulée...");
-				return false;	
-			}
+		if (!(sender instanceof Player))
+			return false;
 		
 		Player p = (Player) sender;
-		OlympaPlayerCreatif pc = plugin.getDataManager().getCreatifPlayer(player);
+		OlympaPlayerCreatif pc = AccountProvider.get(player.getUniqueId());
 		
 		Player target = null;
 		Plot plot;

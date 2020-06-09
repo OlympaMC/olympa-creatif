@@ -59,7 +59,7 @@ public class WorldManager {
 			worldCreator.generateStructures(false);
 			worldCreator.generator(new CustomChunkGenerator(plugin));
 
-			Bukkit.getLogger().log(Level.INFO, Message.PARAM_PREFIX.getValue() + "World " + Message.PARAM_WORLD_NAME.getValue() + " not detected. Generation started. This may take a while...");
+			Bukkit.getLogger().log(Level.INFO, plugin.getPrefixConsole() + "World " + Message.PARAM_WORLD_NAME.getValue() + " not detected. Generation started. This may take a while...");
 			world = worldCreator.createWorld();
 			world.setDifficulty(Difficulty.EASY);
 			world.setTime(6000);
@@ -104,7 +104,7 @@ public class WorldManager {
 	        }
 	        
 	        
-			Bukkit.getLogger().info(Message.PARAM_PREFIX.getValue() + "World fully generated ! Server restart is now needed.");
+			Bukkit.getLogger().info(plugin.getPrefixConsole() + "World fully generated ! Server restart is now needed.");
 		}
 	}
 

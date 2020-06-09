@@ -15,6 +15,7 @@ import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
@@ -22,13 +23,11 @@ import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 public class MainGui extends OlympaGUI {
 
 	private OlympaCreatifMain plugin;
-	private OlympaPlayer p;
+	private OlympaPlayerCreatif p;
 	private Plot plot;
+	
 	public MainGui(OlympaCreatifMain plugin, Player player, Plot plot, String inventoryName) {
 		super(inventoryName, 6);
-
-		if (plugin.getDataManager().getCreatifPlayer(player) == null)
-			return;
 		
 		this.plugin = plugin;
 		this.p = AccountProvider.get(player.getUniqueId());
@@ -52,11 +51,11 @@ public class MainGui extends OlympaGUI {
 		
 		//génération de la tête en async car l'appel aux serveurs mojang est nécessaire
 		Consumer<ItemStack> consumer = sk -> {
-
-			int ownedPlots = plugin.getDataManager().getCreatifPlayer(player).getPlots(true).size();
-			int memberPlots = plugin.getDataManager().getCreatifPlayer(player).getPlots(false).size();
-			int ownedPlotsSlots = plugin.getDataManager().getCreatifPlayer(player).getPlotsSlots(true);
-			int memberPlotsSlots = plugin.getDataManager().getCreatifPlayer(player).getPlotsSlots(false);
+			
+			int ownedPlots = p.getPlots(true).size();
+			int memberPlots = p.getPlots(false).size();
+			int ownedPlotsSlots = p.getPlotsSlots(true);
+			int memberPlotsSlots = p.getPlotsSlots(false);
 			
 			sk = ItemUtils.name(sk, "§6Profil de " + player.getDisplayName());
 			sk = ItemUtils.loreAdd(sk, "§eGrade : " + p.getGroupNameColored(), 

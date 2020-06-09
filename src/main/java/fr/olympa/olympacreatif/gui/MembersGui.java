@@ -16,7 +16,9 @@ import org.bukkit.inventory.ItemStack;
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.player.OlympaPlayerInformations;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
@@ -25,12 +27,14 @@ public class MembersGui extends OlympaGUI {
 	private OlympaCreatifMain plugin;
 	private Plot plot;
 	private Player p;
+	private OlympaPlayerCreatif pc;
 	
 	public MembersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
 		super("§6Membres du plot : " + plot.getId().getAsString(), 3);
 		
 		this.plugin = plugin;
 		this.p = p;
+		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
 		
 		inv.setItem(26, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
@@ -56,7 +60,7 @@ public class MembersGui extends OlympaGUI {
 				lore.add("§eStatut : §chors ligne");
 			
 			//définition de si le joueur a la permission de promouvoir/rétrogader un membre
-			if ((plot.getMembers().getPlayerLevel(p) == 3 && e.getValue().getLevel() < 3) || plot.getMembers().getPlayerLevel(p) == 4 && e.getValue().getLevel() < 4) {
+			if ((plot.getMembers().getPlayerLevel(pc) == 3 && e.getValue().getLevel() < 3) || plot.getMembers().getPlayerLevel(pc) == 4 && e.getValue().getLevel() < 4) {
 				lore.add(" ");
 				lore.add("§8Clic gauche : promouvoir");
 				lore.add("§8Clic droit : rétrograder");	
@@ -77,7 +81,7 @@ public class MembersGui extends OlympaGUI {
 			return true;
 		}
 
-		if (plot.getMembers().getPlayerLevel(p) < 3) 
+		if (plot.getMembers().getPlayerLevel(pc) < 3) 
 			return true;
 		
 		//recherche le joueur cliqué
@@ -86,13 +90,13 @@ public class MembersGui extends OlympaGUI {
 				boolean hasChange = false;
 				
 				//promote le joueur
-				if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(p) > e.getValue().getLevel() + 1) {
+				if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(pc) > e.getValue().getLevel() + 1) {
 					hasChange = true;
 					plot.getMembers().set(e.getKey(), PlotRank.getPlotRank(e.getValue().getLevel() + 1));	
 				}
 				
 				//démote le joueur
-				if (click == ClickType.RIGHT && plot.getMembers().getPlayerLevel(p) > e.getValue().getLevel() && e.getValue() != PlotRank.VISITOR) {
+				if (click == ClickType.RIGHT && plot.getMembers().getPlayerLevel(pc) > e.getValue().getLevel() && e.getValue() != PlotRank.VISITOR) {
 					hasChange = true;
 					plot.getMembers().set(e.getKey(), PlotRank.getPlotRank(e.getValue().getLevel() - 1));	
 				}
