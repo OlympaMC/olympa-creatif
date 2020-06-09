@@ -32,7 +32,7 @@ public class OceCommand extends OlympaCommand{
 			return false;
 		Player p = (Player) sender;
 		
-		if (!plugin.getPlotsManager().isPlayerLoaded(p)) {
+		if (plugin.getDataManager().getCreatifPlayer(player) == null) {
 			p.sendMessage("§4Chargement des données en cours, commande annulée...");
 			return false;	
 		}

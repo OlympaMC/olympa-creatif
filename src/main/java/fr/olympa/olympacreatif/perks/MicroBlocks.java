@@ -36,8 +36,6 @@ public class MicroBlocks {
 	private Map<String, ItemStack> microBlocks = new LinkedHashMap<String, ItemStack>();
 	private List<ItemStack> namedMicroBlocks = new ArrayList<ItemStack>();
 	
-	private MbGuiInterface gui;
-	
 	public MicroBlocks(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
@@ -59,8 +57,6 @@ public class MicroBlocks {
 		
 		//initialise la liste des têtes
 		initialize(isFirstInitialization);
-		
-		gui = new MbGuiInterface("§9Microblocks", DyeColor.ORANGE, namedMicroBlocks);
 	}
 	
 	public ItemStack getMb(String name) {
@@ -75,7 +71,7 @@ public class MicroBlocks {
 	}
 	
 	public void openGui(Player p){
-		gui.create(p);
+		new MbGuiInterface("§9Microblocks", DyeColor.ORANGE, namedMicroBlocks).create(p);
 	}
 	
 	private class MbGuiInterface extends PagedGUI<ItemStack>{

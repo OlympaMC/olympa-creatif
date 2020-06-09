@@ -1,41 +1,55 @@
 package fr.olympa.olympacreatif.data;
 
 import java.sql.ResultSet;
-import java.util.AbstractMap.SimpleEntry;
+import org.bukkit.entity.Player;
 
-import org.bukkit.Bukkit;
-
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
 import fr.olympa.olympacreatif.plot.PlotId;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class DataManager {
 
 	private OlympaCreatifMain plugin;
+	private Map<Player, OlympaPlayerCreatif> players = new HashMap<Player, OlympaPlayerCreatif>();
 	
 	public DataManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		
+		plugin.getServer().getPluginManager().registerEvents(new DataManagerListener(plugin), plugin);
+		
 		Message.initialize();
 	}
+
+	public OlympaPlayerCreatif getCreatifPlayer(Player p) {
+		return players.get(p);
+	}
 	
+	public void loadPlayer(OlympaPlayer p) {
+		// TODO Auto-generated method stub
+		
+		//charger plots joueur
+		//charger monnaie joueur
+		//charger plots suplémentaires joueur
+		
+		OlympaPlayerCreatif pc = new OlympaPlayerCreatif(plugin, p.getUniqueId(), p.getName(), p.getIp());
+		pc.addBonusPlots(0);
+		pc.addGameMoney(0);
+		
+		players.put(p.getPlayer(), pc);
+	}
+
+	public void unloadPlayer(Player p) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	public void loadPlot(PlotId plotId) {
 		AsyncPlot plot = null;
 		plugin.getPlotsManager().addAsyncPlot(plot, plotId);			
-	}
-
-	public void loadPlayerPlots(OlympaPlayer p) {
-		// TODO Auto-generated method stub
-		plugin.getPlotsManager().addLoadedPlayer(p.getPlayer());
-		return;
-	}
-	
-	public void updatePlayerPlotRank(long playerId, PlotId plotId, PlotRank rank) {
-		
 	}
 
 	private ResultSet executeRequest(String request) {

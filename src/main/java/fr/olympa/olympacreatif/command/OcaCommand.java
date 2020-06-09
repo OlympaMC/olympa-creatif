@@ -24,10 +24,8 @@ public class OcaCommand extends OlympaCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!(sender instanceof Player))
+		if (!(sender instanceof Player) || plugin.getDataManager().getCreatifPlayer(player) == null)
 			return false;
-		
-		OlympaPlayer p = AccountProvider.get(((Player)sender).getUniqueId());
 		
 		if (!PermissionsList.STAFF_ENABLE_ADMIN_MODE.hasPermission(((Player)sender).getUniqueId()))
 			return false;
@@ -35,11 +33,11 @@ public class OcaCommand extends OlympaCommand {
 		if (args.length == 1)
 			switch(args[0]) {
 			case "on":
-				plugin.getPlotsManager().addAdminPlayer(p);
+				plugin.getDataManager().getCreatifPlayer(player).setAdmin(true);
 				sender.sendMessage("§cOlympaCréatif : mode admin activé.");
 				return false;
 			case "off":
-				plugin.getPlotsManager().removeAdminPlayer(p);
+				plugin.getDataManager().getCreatifPlayer(player).setAdmin(false);
 				sender.sendMessage("§aOlympaCréatif : mode admin désactivé.");
 				return false;
 			}

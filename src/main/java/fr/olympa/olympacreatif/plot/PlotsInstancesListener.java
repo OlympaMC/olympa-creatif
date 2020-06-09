@@ -260,7 +260,7 @@ public class PlotsInstancesListener implements Listener{
 	//actions à exécuter en entrée du plot 
 	public static void executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
 		
-		if (plugin.getPlotsManager().isAdmin(p))
+		if (plugin.getDataManager().getCreatifPlayer(p).isAdmin())
 			return;
 		
 		//si le joueur est banni, téléportation en dehors du plot

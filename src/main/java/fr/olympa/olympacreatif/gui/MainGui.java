@@ -27,7 +27,7 @@ public class MainGui extends OlympaGUI {
 	public MainGui(OlympaCreatifMain plugin, Player player, Plot plot, String inventoryName) {
 		super(inventoryName, 6);
 
-		if (!plugin.getPlotsManager().isPlayerLoaded(player))
+		if (plugin.getDataManager().getCreatifPlayer(player) == null)
 			return;
 		
 		this.plugin = plugin;
@@ -35,16 +35,6 @@ public class MainGui extends OlympaGUI {
 		this.plot = plot;
 		
 		String clickToOpenMenu = "§9Cliquez pour ouvrir le menu";
-		int totalPlayerPlots = 0;
-		int totalPlayerOwnedPlots = 0;
-		
-		//comptage du nombre de plots du joueur
-		for (Plot plot2 : plugin.getPlotsManager().getPlots())
-			if (plot2.getMembers().getPlayerRank(p.getInformation()) != PlotRank.VISITOR)
-				if (plot2.getMembers().getPlayerRank(p.getInformation()) == PlotRank.OWNER)
-					totalPlayerOwnedPlots++;
-				else
-					totalPlayerPlots++;
 		
 		//création de l'interface Olympa
 		for (int i = 0 ; i < 9*6 ; i++) {
@@ -57,20 +47,23 @@ public class MainGui extends OlympaGUI {
 		inv.setItem(6, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		inv.setItem(38, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		inv.setItem(42, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
-
-		final int totalPlayerOwnedPlotsFinal = totalPlayerOwnedPlots;
-		final int totalPlayerPlotsFinal = totalPlayerPlots;
 		
 		//génération de l'interface
 		
 		//génération de la tête en async car l'appel aux serveurs mojang est nécessaire
 		Consumer<ItemStack> consumer = sk -> {
+
+			int ownedPlots = plugin.getDataManager().getCreatifPlayer(player).getPlots(true).size();
+			int memberPlots = plugin.getDataManager().getCreatifPlayer(player).getPlots(false).size();
+			int ownedPlotsSlots = plugin.getDataManager().getCreatifPlayer(player).getPlotsSlots(true);
+			int memberPlotsSlots = plugin.getDataManager().getCreatifPlayer(player).getPlotsSlots(false);
+			
 			sk = ItemUtils.name(sk, "§6Profil de " + player.getDisplayName());
 			sk = ItemUtils.loreAdd(sk, "§eGrade : " + p.getGroupNameColored(), 
 					" ",
-					"§eParcelles totales : " + totalPlayerPlotsFinal + "/36",  
-					"§eParcelles propriétaire : " + totalPlayerOwnedPlotsFinal + "/" + (totalPlayerOwnedPlotsFinal + plugin.getPlotsManager().getAvailablePlotSlotsLeftOwner(player))
-					);
+					"§eParcelles totales : " + memberPlots + "/" + memberPlotsSlots,  
+					"§eParcelles propriétaire : " + ownedPlots + "/" + ownedPlotsSlots);
+			
 			inv.setItem(12, sk);
 		};
 

@@ -18,25 +18,6 @@ public class PlotsManagerListener implements Listener {
 	
 	PlotsManagerListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-	}	
-	
-	/*
-	@EventHandler //chargement du plot sur le chunk tout juste chargé 
-	public void onChunkLoad(ChunkLoadEvent e) {
-		//on teste seulement le point d'origine du chunk pour générer moins de calculs
-		plugin.getPlotsManager().registerPlot(plugin.getPlotsManager().getPlotId(e.getChunk().getX()*16, e.getChunk().getZ()*16));
-	}
-	*/
-	
-	@EventHandler //charge tous les plots du joueur
-	public void onJoinEvent(PlayerJoinEvent e) {
-		plugin.getPlotsManager().loadPlotsFor(AccountProvider.get(e.getPlayer().getUniqueId()));
-	}
-	
-	@EventHandler //retire le joueur de la liste des joueurs chargés
-	public void onLeftEvent(PlayerQuitEvent e){
-		plugin.getPlotsManager().removeLoadedPlayer(e.getPlayer());
-		plugin.getPlotsManager().removeAdminPlayer(AccountProvider.get(e.getPlayer().getUniqueId()));
 	}
 	
 	@EventHandler //charge les plots non encore chargés sur lesquels les joueurs se rendent

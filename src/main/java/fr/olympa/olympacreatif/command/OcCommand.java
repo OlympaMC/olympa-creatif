@@ -15,6 +15,7 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -38,12 +39,14 @@ public class OcCommand extends OlympaCommand {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (sender instanceof Player)
-			if (!plugin.getPlotsManager().isPlayerLoaded((Player) sender)) {
+			if (plugin.getDataManager().getCreatifPlayer(player) == null) {
 				sender.sendMessage("§4Chargement des données en cours, commande annulée...");
 				return false;	
 			}
 		
 		Player p = (Player) sender;
+		OlympaPlayerCreatif pc = plugin.getDataManager().getCreatifPlayer(player);
+		
 		Player target = null;
 		Plot plot;
 		WorldEditError err;
@@ -58,9 +61,10 @@ public class OcCommand extends OlympaCommand {
 			case "find":
 				if (!(sender instanceof Player))
 					break;
+				
 				//teste si le joueur a encore des plots dispo
-				if (plugin.getPlotsManager().getAvailablePlotSlotsLeftOwner(p) > 0) {
-					if (plugin.getPlotsManager().getAvailablePlotSlotsLeftTotal(p) > 0) {
+				if (pc.getPlotsSlots(true) - pc.getPlots(true).size() > 0) {
+					if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
 						
 						plot = plugin.getPlotsManager().createPlot(p);
 						p.teleport(plot.getId().getLocation());
@@ -82,18 +86,23 @@ public class OcCommand extends OlympaCommand {
 						new MainGui(plugin, p, plot, "§9Menu >> " + plot.getId().getAsString()).create(p);
 				}
 				break;
+				
 			case "accept":
 				if (pendingInvitations.containsKey(sender)) {
-					if (plugin.getPlotsManager().getAvailablePlotSlotsLeftTotal(p) > 0) {
+					
+					if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
+						
 						sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue());
 						pendingInvitations.get(sender).getMembers().set(p, PlotRank.MEMBER);
 						pendingInvitations.remove(sender);
+						
 					}else {
 						sender.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
 					}
 				}else
 					sender.sendMessage(Message.PLOT_NO_PENDING_INVITATION.getValue());
 				break;
+				
 			case "center":
 				plot = plugin.getPlotsManager().getPlot(p.getLocation());
 				if (plot == null || plot.getMembers().getPlayerLevel(p) == 0)

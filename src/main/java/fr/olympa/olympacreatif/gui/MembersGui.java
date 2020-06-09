@@ -44,9 +44,7 @@ public class MembersGui extends OlympaGUI {
 			final int thisHeadIndex = headIndex;
 			
 			//création de la tête du joueur
-			Consumer<ItemStack> consumer = sk -> {
-				inv.setItem(thisHeadIndex, sk);
-			};
+			Consumer<ItemStack> consumer = sk -> inv.setItem(thisHeadIndex, sk);
 			
 			List<String> lore = new ArrayList<String>();
 			lore.add("§6Rang : " + e.getValue().getRankName());
