@@ -31,7 +31,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	private OlympaCreatifMain plugin;
 	private int gameMoney = 0;
 	private int bonusPlots = 0;
-	private boolean isAdminMode = false;
+	private boolean hasAdminMode = false;
 	private ScoreboardManager<OlympaPlayerCreatif> scm;
 
 	private Map<Integer, String> scoreboardLines = new HashMap<Integer, String>();
@@ -68,12 +68,12 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		return gameMoney;
 	}
 	
-	public void setAdmin(boolean b) {
-		isAdminMode = b;
+	public void setAdminMode(boolean b) {
+		hasAdminMode = b;
 	}
 	
 	public boolean hasAdminMode() {
-		return isAdminMode;
+		return hasAdminMode;
 	}
 
 	public void addBonusPlots(int i) {

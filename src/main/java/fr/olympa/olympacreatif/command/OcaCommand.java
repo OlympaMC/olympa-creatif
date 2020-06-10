@@ -34,11 +34,11 @@ public class OcaCommand extends OlympaCommand {
 		if (args.length == 1)
 			switch(args[0]) {
 			case "on":
-				((OlympaPlayerCreatif) AccountProvider.get(player.getUniqueId())).setAdmin(true);
+				((OlympaPlayerCreatif) AccountProvider.get(player.getUniqueId())).setAdminMode(true);
 				sender.sendMessage("§cOlympaCréatif : mode admin activé.");
 				return false;
 			case "off":
-				((OlympaPlayerCreatif) AccountProvider.get(player.getUniqueId())).setAdmin(false);
+				((OlympaPlayerCreatif) AccountProvider.get(player.getUniqueId())).setAdminMode(false);
 				sender.sendMessage("§aOlympaCréatif : mode admin désactivé.");
 				return false;
 			}

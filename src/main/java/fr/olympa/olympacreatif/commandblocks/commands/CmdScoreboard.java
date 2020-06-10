@@ -238,10 +238,10 @@ public class CmdScoreboard extends CbCommand {
 						
 						for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
 							for (Entity e : list)
-								o.reset(e);
+								o.set(e, null);
 					}else {
 						for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
-							o.reset(args[2]);
+							o.set(args[2], null);
 					}
 					return 1;
 				}

@@ -1,7 +1,6 @@
 package fr.olympa.olympacreatif.commandblocks;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,15 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CbObjective {
@@ -30,7 +30,7 @@ public class CbObjective {
 	private ObjType type = null;
 	private Object typeParam =null; //contient éventuellement le second paramètre de l'objectif (par exemple, killed_by:minecraft.zombie
 	
-	private DisplaySlot displayLoc = null;
+	private DisplaySlot displaySlot = null;
 	
 	private Map<String, Integer> values = new HashMap<String, Integer>();
 	
@@ -137,7 +137,17 @@ public class CbObjective {
 	}
 
 	public void setName(String newObjName) {
-		this.objName = newObjName;
+		if (!newObjName.equals(objName)) {
+			if (displaySlot == DisplaySlot.BELOW_NAME)
+				plugin.getCommandBlocksManager().getPlotScoreboard(plot).getObjective("belowName").setDisplayName(newObjName);
+			
+			if (displaySlot == DisplaySlot.SIDEBAR)
+				for (Player p : plot.getPlayers())
+					((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCustomScoreboardLine(0, newObjName);
+		}
+		
+			
+		objName = newObjName;
 	}
 	
 	public Object getParamType() {
@@ -158,7 +168,7 @@ public class CbObjective {
 			}
 	   });
 	
-	   Map<String, Integer> result = new LinkedHashMap<String, Integer>();
+		Map<String, Integer> result = new LinkedHashMap<String, Integer>();
 	   for (Entry<String, Integer> e : list) {
 		   result.put(e.getKey(), e.getValue());
 	   }
@@ -174,20 +184,26 @@ public class CbObjective {
 	}
 	
 	//gestion sidebar/belowname ici
-	public void set(String name, int value) {
-		values.put(name, value);
+	public void set(String name, Integer value) {
+		if (value == null)
+			values.remove(name);
+		else
+			values.put(name, value);
 		
 		//affichage scoreboard sidebar
-		if (displayLoc == DisplaySlot.SIDEBAR) {
-			Objective obj = plugin.getCommandBlocksManager().getObjectiveOnSlot(plot, displayLoc);
-			obj.getScore(name).setScore(value);
+		if (displaySlot == DisplaySlot.SIDEBAR) {
+			Map<String, Integer> scores = getValues(true);
+			List<String> keys = new ArrayList<String>(scores.keySet());
+
+			for (Player p : plot.getPlayers()) {
+				OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+				
+				for (int i = 0 ; i < keys.size() ; i++) 
+					pc.setCustomScoreboardLine(i, keys.get(i));				
+			}	
 		}
 	}
-	
-	public void reset(String name) {
-		values.remove(name);
-	}
-	
+
 	public int get(String name) {
 		if (values.containsKey(name))
 			return values.get(name);
@@ -199,7 +215,8 @@ public class CbObjective {
 		set (e, value + get(e));
 	}
 	
-	public void set(Entity e, int value) {
+	@SuppressWarnings("deprecation")
+	public void set(Entity e, Integer value) {
 		
 		//définition string portant le score
 		String scoreHolder = "";
@@ -209,29 +226,16 @@ public class CbObjective {
 		else
 			scoreHolder = e.getCustomName();
 		
-		//affichage scoreboard belowName
-		if (displayLoc == DisplaySlot.BELOW_NAME && e.getType() == EntityType.PLAYER) {
+		if (displaySlot == DisplaySlot.BELOW_NAME && e.getType() == EntityType.PLAYER) {
+			Scoreboard scb = plugin.getCommandBlocksManager().getPlotScoreboard(plot);
 			
-			LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper((Player) e); 
-			
-			if (!data.editLine("score", value + " " + getName())) {
-				data.addLine("playerName", ((Player) e).getDisplayName());
-				data.addLine("score", value + " " + getName());
-			}	
+			if (value == null)
+				scb.resetScores((Player) e);
+			else
+				scb.getObjective("belowName").getScore((Player) e).setScore(value);
 		}
 		
 		set(scoreHolder, value);
-	}
-	
-	public void reset(Entity e) {
-		
-		//utilisation du set pour réinitialiser l'affichage du scoreboard
-		set(e, 0);
-		
-		if (e instanceof Player)
-			values.remove(((Player) e).getDisplayName());
-		else
-			values.remove(e.getCustomName());
 	}
 	
 	public int get(Entity e) {
@@ -240,46 +244,47 @@ public class CbObjective {
 		else
 			return get(e.getCustomName());
 	}
-	
-	//méthodes d'affichage en sidebar et belowname
-	public void setDisplaySlot(DisplaySlot newDisplayLoc) {
-		if (newDisplayLoc != null)
-			for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
-				if (o.getDisplaySlot() == newDisplayLoc)
-					o.setDisplaySlot(null);
-		
-		
-		//clear l'emplacement si nécessaire
-		if (displayLoc != null && newDisplayLoc == null)
-			plugin.getCommandBlocksManager().clearScoreboardSlot(plot, displayLoc);
-		
-		
-		//affichage du score sur la sidebar
-		if (displayLoc != newDisplayLoc && newDisplayLoc == DisplaySlot.SIDEBAR) {
 
-			this.displayLoc = newDisplayLoc;
-			
-			Objective obj = plugin.getCommandBlocksManager().getObjectiveOnSlot(plot, newDisplayLoc);
-			obj.setDisplayName(objId);
-			
-			for (Entry<String, Integer> e : values.entrySet()) 
-				obj.getScore(e.getKey()).setScore(e.getValue());
+	
+	public void setDisplaySlot(DisplaySlot newDisplaySlot) {
+		if (newDisplaySlot == displaySlot)
+			return;
 		
-			
-		//affichage du score sur le belowName
-		}else if (displayLoc != newDisplayLoc && newDisplayLoc == DisplaySlot.BELOW_NAME) {
-			
-			this.displayLoc = newDisplayLoc;
-			
-			for (Player p : plot.getPlayers()) 
-				set(p, get(p));
-			
-		}		
+		clearDisplaySlots();
+		
+		if (newDisplaySlot == DisplaySlot.BELOW_NAME) {
+			Objective obj = plugin.getCommandBlocksManager().getPlotScoreboard(plot).getObjective("belowName");
+			obj.setDisplaySlot(newDisplaySlot);
+			obj.setDisplayName(getName());
+		}
+		
+		if (newDisplaySlot == DisplaySlot.SIDEBAR) {
+			Map<String, Integer> scores = getValues(true);
+			List<String> keys = new ArrayList<String>(scores.keySet());
+
+			for (Player p : plot.getPlayers()) {
+				OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+				
+				for (int i = 0 ; i < keys.size() ; i++) 
+					pc.setCustomScoreboardLine(i, keys.get(i));				
+			}	
+		}				
+		
+		displaySlot = newDisplaySlot;
 	}
 	
+	
+	public void clearDisplaySlots() {
+		if (displaySlot == DisplaySlot.SIDEBAR)
+			for (Player p : plot.getPlayers())
+				((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
+		
+		if (displaySlot == DisplaySlot.BELOW_NAME)
+			plugin.getCommandBlocksManager().getPlotScoreboard(plot).clearSlot(displaySlot);
+	}
 
 	public DisplaySlot getDisplaySlot() {
-		return displayLoc;
+		return displaySlot;
 	}
 
 	public enum ObjType{

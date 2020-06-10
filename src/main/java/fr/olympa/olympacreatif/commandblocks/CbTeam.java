@@ -16,6 +16,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
+
+import com.google.common.util.concurrent.SettableFuture;
 
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
@@ -48,7 +52,9 @@ public class CbTeam {
 		this.plugin = plugin;
 		this.plot = plot;
 		this.teamId = id;
-		this.teamName = name;
+		
+		if (!name.equals(id))
+			setName(name);
 	}
 	
 	public String getName() {
@@ -59,18 +65,33 @@ public class CbTeam {
 		return teamId;
 	}
 	
-	public void setName(String newTeamName) {
+	public void setName(String newTeamName) {	
+		if (teamName.equals(newTeamName)) 
+			return;
 		
-		if (newTeamName.equals(teamId))
-			removeTeamNameForAll();
-		else if (!teamName.equals(newTeamName)) {
-
-			teamName = newTeamName;
+		Scoreboard scb = plugin.getCommandBlocksManager().getPlotScoreboard(plot);
+		
+		//masquage nom team si id=nom
+		if (newTeamName.equals(teamId)) {
+			Team scbTeam = scb.getTeam(getId());
+			if (scbTeam != null)
+				scbTeam.setPrefix("");
+			return;
+		}
+		
+		teamName = newTeamName;		
+		
+		//si la team bukkit n'existe pas encore, création
+		if (scb.getTeam(getId()) == null) {
+			scb.registerNewTeam(getId());
 			
 			for (Player p : plot.getPlayers())
-				if (isMember(p))
-					showTeamName(p);	
+				if (isMember(p) && scb.getTeam(getId()).getPlayers().contains(p))
+					showTeamName(p);
 		}
+		
+		//set du nom de l'équipe bukkit
+		scb.getTeam(getId()).setPrefix(getDisplayName());
 	}
 	
 	public Plot getPlot() {
@@ -78,10 +99,7 @@ public class CbTeam {
 	}
 	
 	public String getDisplayName() {
-		if (color.equals(""))
-			return teamName;
-		else
-			return color + teamName;
+		return color + teamName;
 	}
 	
 	public boolean addMember(Entity e) {
@@ -94,7 +112,7 @@ public class CbTeam {
 		else
 			members.add(e);
 
-		if (e.getType() == EntityType.PLAYER && !getDisplayName().equals(getId())) 
+		if (e.getType() == EntityType.PLAYER) 
 			showTeamName((Player) e);
 		
 		return true;
@@ -132,30 +150,20 @@ public class CbTeam {
 	}
 	
 	//summon des entités pour faire apparaître le nom de la team au dessus du pseudo du joueur
+	@SuppressWarnings("deprecation")
 	public void showTeamName(Player p) {
-
-		LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p);
+		Scoreboard scb = plugin.getCommandBlocksManager().getPlotScoreboard(plot);
 		
-		data.addLine("playerName", p.getDisplayName());
-		
-		if (!data.editLine("team", teamName)) {
-			data.addLine("team", teamName);
-			data.moveLine("team", 1);
-		}
+		if (scb.getTeam(getId()) != null)
+			scb.getTeam(getId()).addPlayer(p);		
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void removeTeamName(Player p) {
-		LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p);
-
-		data.removeLine("team");
-		if (data.getLinesCount() == 1)
-			data.clearLines();
-	}
-
-	public void removeTeamNameForAll() {
-		for (Entity e : members)
-			if (e.getType() == EntityType.PLAYER)
-				removeTeamName((Player) e);
+		Scoreboard scb = plugin.getCommandBlocksManager().getPlotScoreboard(plot);
+		
+		if (scb.getTeam(getId()) != null)		
+			scb.getTeam(getId()).removePlayer(p);
 	}
 	
 	public enum ColorType{

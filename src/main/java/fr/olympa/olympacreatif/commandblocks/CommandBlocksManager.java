@@ -17,9 +17,11 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.api.player.OlympaPlayer;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
@@ -152,7 +154,16 @@ public class CommandBlocksManager {
 			
 	}
 
-	
+	public Scoreboard getPlotScoreboard(Plot plot) {
+		if (!plotsScoreboards.containsKey(plot)) {
+			Scoreboard scb = Bukkit.getScoreboardManager().getNewScoreboard();
+			scb.registerNewObjective("belowName", "dummy", "§4ERROR");
+
+			plotsScoreboards.put(plot, scb);
+		}
+		
+		return plotsScoreboards.get(plot);
+	}
 	
 	//gestion des équipes
 	//ajoute la team à la liste du plot. Max teams autorisées : maxTeamsPerPlot
@@ -204,10 +215,9 @@ public class CommandBlocksManager {
 	//Actions à exécuter en entrée et sortie de plot
 	
 	public void executeJoinActions(Plot toPlot, Player p) {
-		if (!plotsScoreboards.containsKey(toPlot))
-			createScoreboardHolder(toPlot);
 		
-		p.setScoreboard(plotsScoreboards.get(toPlot));
+		if (plotsScoreboards.containsKey(toPlot))
+			p.setScoreboard(plotsScoreboards.get(toPlot));
 		
 		for (CbObjective obj : getObjectives(toPlot))
 			if (obj.getDisplaySlot() == DisplaySlot.BELOW_NAME)
@@ -218,6 +228,9 @@ public class CommandBlocksManager {
 		CbTeam team = getTeamOf(fromPlot, p);
 		if (team != null)
 			team.removeMember(p);
+		
+		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
+		p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		
 		plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p).clearLines();
 		for (PotionEffect eff : p.getActivePotionEffects())

@@ -37,7 +37,10 @@ public class CmdTeam extends CbCommand {
 			if (args.length >= 2) {
 				CbTeam t = plugin.getCommandBlocksManager().getTeamById(plot, args[1]);
 				if (t != null) {
-					t.removeTeamNameForAll();
+					for (Player p : plot.getPlayers())
+						if (t.isMember(p))
+							t.removeTeamName(p);
+					
 					t.getMembers().clear();
 					return 1;
 				}
@@ -115,7 +118,9 @@ public class CmdTeam extends CbCommand {
 			if (args.length >= 2) {
 				for (CbTeam t : new ArrayList<CbTeam>(plugin.getCommandBlocksManager().getTeams(plot)))
 					if (t.getId().equals(args[1])) {
-						t.removeTeamNameForAll();
+						for (Player p : plot.getPlayers())
+							if (t.isMember(p))
+								t.removeTeamName(p);
 						plugin.getCommandBlocksManager().getTeams(plot).remove(t);
 						return 1;
 					}
@@ -131,27 +136,12 @@ public class CmdTeam extends CbCommand {
 				
 				switch (args[2]) {
 				case "prefix":					
-					if (args.length >= 4) {
-						
-						/*
-						String jsonString = "";
-						boolean json = false;
-						
-						for (String s : args) {
-							if (s.startsWith("{") || json) {
-								json = true;
-								jsonString += s + " ";
-							}
-						}
-						
-						//suppression dernier espace
-						jsonString = jsonString.substring(0, jsonString.length()-1);
-						*/
-
+					if (args.length >= 4) 
 						t.setName(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
-					}
 					else
-						t.removeTeamNameForAll();
+						for (Player p : plot.getPlayers())
+							if (t.isMember(p))
+								t.removeTeamName(p);
 					
 					return 1;
 					
