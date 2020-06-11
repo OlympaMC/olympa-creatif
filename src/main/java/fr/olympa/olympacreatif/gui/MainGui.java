@@ -31,6 +31,7 @@ public class MainGui extends OlympaGUI {
 		
 		this.plugin = plugin;
 		this.p = AccountProvider.get(player.getUniqueId());
+		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
 		
 		String clickToOpenMenu = "§9Cliquez pour ouvrir le menu";
@@ -51,6 +52,7 @@ public class MainGui extends OlympaGUI {
 		
 		//génération de la tête en async car l'appel aux serveurs mojang est nécessaire
 		Consumer<ItemStack> consumer = sk -> {
+			//Bukkit.broadcastMessage("tête chargée : " + sk.toString());
 			
 			int ownedPlots = p.getPlots(true).size();
 			int memberPlots = p.getPlots(false).size();
@@ -64,13 +66,17 @@ public class MainGui extends OlympaGUI {
 					"§eParcelles propriétaire : " + ownedPlots + "/" + ownedPlotsSlots);
 			
 			inv.setItem(12, sk);
+			
 		};
 
-		consumer.accept(new ItemStack(Material.BEDROCK));
-		ItemUtils.skull(consumer, "", p.getName());
+		consumer.accept(new ItemStack(Material.PLAYER_HEAD));
+		ItemUtils.skull(consumer, p.getName(), p.getName());
+		//plugin.getPerksManager().getMicroBlocks().skull(consumer, p.getName(), p.getName());
 
 		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes plots", clickToOpenMenu));
-		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", "§eVotre monnaie : TODO", clickToOpenMenu));
+		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", 
+				"§eVotre monnaie : " + pc.getGameMoney(), "§eRang : " + pc.getGroupName(), "§eParcelles bonus : " + pc.getBonusPlots(), 
+				clickToOpenMenu));
 		
 		if (plot != null) {
 			inv.setItem(21, ItemUtils.item(Material.PAINTING, "§6Membres parcelle", "§eNombre de membres : " + plot.getMembers().getCount(), clickToOpenMenu));

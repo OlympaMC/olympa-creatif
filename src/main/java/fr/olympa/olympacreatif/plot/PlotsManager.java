@@ -121,13 +121,19 @@ public class PlotsManager {
 	}
 	
 	public PlotId getPlotId(int x, int z) {
-		int xb = Math.floorMod(x, Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
-		int zb = Math.floorMod(z, Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
+		int xSize = Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue());
+		int zSize = Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue());
+		int roadSize = Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue());
 		
-		if (xb <  + Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) && zb <  + Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()))
-			return new PlotId(plugin, xb, zb);
+		int xb = Math.floorMod(x, xSize + roadSize);
+		int zb = Math.floorMod(z, zSize + roadSize);
 		
-
+		if (xb < xSize && zb < zSize)
+			return new PlotId(plugin, Math.floorDiv(x, xSize + roadSize), Math.floorDiv(z, zSize + roadSize));
+		else
+			return null;
+		
+		/*
 		int xId = x / (Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
 		int zId = x / (Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue()));
 		
@@ -135,6 +141,7 @@ public class PlotsManager {
 			return new PlotId(plugin, xId, zId);
 
 		return null;
+		*/
 	}
 	
 	public void incrementTotalPlotCount() {

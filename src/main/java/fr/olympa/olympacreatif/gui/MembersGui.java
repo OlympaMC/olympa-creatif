@@ -65,9 +65,9 @@ public class MembersGui extends OlympaGUI {
 				lore.add("§8Clic gauche : promouvoir");
 				lore.add("§8Clic droit : rétrograder");	
 			}
-			
-			consumer.accept(ItemUtils.item(Material.BEDROCK, "§6" + e.getKey().getName(), (String[]) lore.toArray()));
-			ItemUtils.skull(consumer, "§6" + e.getKey().getName(), e.getKey().getName(), (String[]) lore.toArray());
+
+			consumer.accept(ItemUtils.item(Material.PLAYER_HEAD, "§6" + e.getKey().getName(), (String[]) lore.toArray(new String[lore.size()])));
+			ItemUtils.skull(consumer, "§6" + e.getKey().getName(), e.getKey().getName(), (String[]) lore.toArray(new String[lore.size()]));
 		}
 	}
 

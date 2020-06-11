@@ -229,7 +229,7 @@ public class CommandBlocksManager {
 		if (team != null)
 			team.removeMember(p);
 		
-		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
+		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).getCustomScoreboardLines().clear();;
 		p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		
 		plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p).clearLines();

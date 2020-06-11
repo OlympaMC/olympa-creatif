@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.scheduler.BukkitRunnable;
+
 import com.google.common.collect.ImmutableMap; 
 
 import fr.olympa.api.groups.OlympaGroup;
@@ -40,7 +42,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		super(uuid, name, ip);
 		this.plugin = OlympaCreatifMain.getMainClass();
 		
-		createScoreboard();
+		for (int i = 0 ; i < 9 ; i++)
+			scoreboardLines.put(i, null);
 	}
 	
 	@Override
@@ -114,101 +117,17 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	}
 	
 	//définit une ligne de scoreboard custom
-	public void setCustomScoreboardLine(int line, String text) {
-		if (scoreboardLines.size() == 0)
-			for (int i = 1 ; i <= 8 ; i++)
-				scoreboardLines.put(i, "§" + i);
-		
-		if (line >= 0 && line < 8)
+	public void setCustomScoreboardLine(int line, String text) {		
+		if (line >= 0 && line < scoreboardLines.size())
 			scoreboardLines.put(line, text);
 	}
 	
-	//rétablit le scoreboard par défaut
-	public void clearCustomScoreboard() {
-		scoreboardLines.clear();
+	public Map<Integer, String> getCustomScoreboardLines(){
+		return scoreboardLines;
 	}
-	
-	//crée le scoreboard du joueur avec des lignes dynamiques, pour afficher le scoreboard custom du plot si besoin
-	@SuppressWarnings("unchecked")
-	public void createScoreboard() {
-		scm = new ScoreboardManager<OlympaPlayerCreatif>(plugin, "§6Olympa Créatif");
 
-		//initialisation lignes de base scoreboard
-		scm.addLines(
-					new TimerLine<OlympaPlayerCreatif>( p -> {				
-						if (scoreboardLines.size() >= 0)
-							return scoreboardLines.get(0);
-						else
-							return "§1";
-					}, plugin, 20),
-	
-					new TimerLine<OlympaPlayerCreatif>( p -> {				
-						if (scoreboardLines.size() >= 0)
-							return scoreboardLines.get(1);
-						else {
-							PlotId plotId = plugin.getPlotsManager().getPlotId(p.getPlayer().getLocation());
-							if (plotId == null)
-								return "§7Parcelle : §6route";
-							else
-								return "§7Parcelle : §6" + plotId;
-						}
-					}, plugin, 20),
-	
-					new TimerLine<OlympaPlayerCreatif>( p -> {				
-						if (scoreboardLines.size() >= 0)
-							return scoreboardLines.get(2);
-						else
-							return "§2";
-					}, plugin, 20),
-				
-				new TimerLine<OlympaPlayerCreatif>( p -> {				
-					if (scoreboardLines.size() >= 0)
-						return scoreboardLines.get(3);
-					else
-						return "§7Grade : " + getGroupNameColored();
-				}, plugin, 20),
-	
-				new TimerLine<OlympaPlayerCreatif>( p -> {				
-					if (scoreboardLines.size() >= 0)
-						return scoreboardLines.get(4);
-					else {
-						Plot plot = plugin.getPlotsManager().getPlot(getPlayer().getLocation());
-						if (plot == null)
-							return "§7Rang : §cAucun";
-						else
-							return "§7Rang : " + plot.getMembers().getPlayerRank(this).getRankName();
-					}
-				}, plugin, 20),
-	
-				new TimerLine<OlympaPlayerCreatif>( p -> {				
-					if (scoreboardLines.size() >= 0)
-						return scoreboardLines.get(5);
-					else
-						return "§3";
-				}, plugin, 20),
-	
-				new TimerLine<OlympaPlayerCreatif>( p -> {				
-					if (scoreboardLines.size() >= 0)
-						return scoreboardLines.get(6);
-					else
-						return "§7[monnaie jeu] : §6" + gameMoney + "$";
-				}, plugin, 20),
-	
-				new TimerLine<OlympaPlayerCreatif>( p -> {				
-					if (scoreboardLines.size() >= 0)
-						return scoreboardLines.get(7);
-					else
-						return "§7[monnaie serveur] : §6" + getStoreMoney().getFormatted();
-				}, plugin, 20)
-		);
-		
-		scm.addFooters(
-				FixedLine.EMPTY_LINE,
-				//new AnimLine(plugin, "play.olympa.fr", 1, 200)
-				new FixedLine<OlympaPlayerCreatif>("§eplay.olympa.fr")
-				);
-		
-		scm.create(this);
+	public String getGameMoneyFormated() {
+		return gameMoney + "₼";
 	}
 }
 

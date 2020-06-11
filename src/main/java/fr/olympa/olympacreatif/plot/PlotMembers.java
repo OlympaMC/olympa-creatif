@@ -94,11 +94,11 @@ public class PlotMembers{
 
 	public enum PlotRank {
 
-		VISITOR("visitor_level", 0, "Visiteur"),
-		MEMBER("member_level", 1, "Membre"),
-		TRUSTED("trusted_level", 2, "Contremaître"),
-		CO_OWNER("coowner_level", 3, "Co-propriétaire"),
-		OWNER("owner_level", 4, "Propriétaire");
+		VISITOR("visitor_level", 0, "§7Visiteur"),
+		MEMBER("member_level", 1, "§bMembre"),
+		TRUSTED("trusted_level", 2, "§3Contremaître"),
+		CO_OWNER("coowner_level", 3, "§9Co-propriétaire"),
+		OWNER("owner_level", 4, "§1Propriétaire");
 		
 		
 		private String s;

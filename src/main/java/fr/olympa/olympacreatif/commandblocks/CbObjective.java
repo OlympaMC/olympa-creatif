@@ -277,7 +277,7 @@ public class CbObjective {
 	public void clearDisplaySlots() {
 		if (displaySlot == DisplaySlot.SIDEBAR)
 			for (Player p : plot.getPlayers())
-				((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
+				((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getCustomScoreboardLines().clear();;
 		
 		if (displaySlot == DisplaySlot.BELOW_NAME)
 			plugin.getCommandBlocksManager().getPlotScoreboard(plot).clearSlot(displaySlot);
