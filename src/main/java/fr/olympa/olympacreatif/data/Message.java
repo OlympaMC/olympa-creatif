@@ -141,7 +141,7 @@ public enum Message {
 		messagesList.put(PARAM_ROAD_SIZE, "6");
 		messagesList.put(PARAM_WORLDEDIT_BPS, "1000");
 		messagesList.put(PARAM_WORLD_LEVEL, "60");
-		messagesList.put(PARAM_WORLD_NAME, "CREATIF");
+		messagesList.put(PARAM_WORLD_NAME, "plots");
 		messagesList.put(PARAM_WE_MAX_BLOCKS_PER_CMD, "10000");
 		messagesList.put(PARAM_WE_MAX_QUEUED_ACTIONS_PER_PLAYER, "4");
 		messagesList.put(PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT, "5");
