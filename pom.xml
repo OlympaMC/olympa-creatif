@@ -24,15 +24,16 @@
 			<groupId>fr.olympa</groupId>
 			<artifactId>olympa-api</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<defaultGoal>clean package</defaultGoal>
-		<sourceDirectory>${basedir}/src/java/</sourceDirectory>
+		<sourceDirectory>${basedir}/src/main/java/</sourceDirectory>
 		<resources>
 			<resource>
-				<directory>src/resources</directory>
+				<directory>src/main/resources</directory>
 			</resource>
 		</resources>
 		<plugins>
