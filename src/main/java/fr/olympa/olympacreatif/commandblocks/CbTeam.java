@@ -46,15 +46,15 @@ public class CbTeam {
 	private String color = "";
 
 	private String teamId;
-	private String teamName = "";
+	private String teamName;
 	
 	public CbTeam(OlympaCreatifMain plugin, Plot plot, String id, String name) {
 		this.plugin = plugin;
 		this.plot = plot;
 		this.teamId = id;
-		
-		if (!name.equals(id))
-			setName(name);
+		this.teamName = name;
+
+		plugin.getCommandBlocksManager().getScoreboard(plot).registerNewTeam(teamId);
 	}
 	
 	public String getName() {
@@ -65,33 +65,9 @@ public class CbTeam {
 		return teamId;
 	}
 	
-	public void setName(String newTeamName) {	
-		if (teamName.equals(newTeamName)) 
-			return;
-		
-		Scoreboard scb = plugin.getCommandBlocksManager().getPlotScoreboard(plot);
-		
-		//masquage nom team si id=nom
-		if (newTeamName.equals(teamId)) {
-			Team scbTeam = scb.getTeam(getId());
-			if (scbTeam != null)
-				scbTeam.setPrefix("");
-			return;
-		}
-		
-		teamName = newTeamName;		
-		
-		//si la team bukkit n'existe pas encore, création
-		if (scb.getTeam(getId()) == null) {
-			scb.registerNewTeam(getId());
-			
-			for (Player p : plot.getPlayers())
-				if (isMember(p) && scb.getTeam(getId()).getPlayers().contains(p))
-					showTeamName(p);
-		}
-		
-		//set du nom de l'équipe bukkit
-		scb.getTeam(getId()).setPrefix(getDisplayName());
+	public void setName(String newTeamName) {
+		teamName = newTeamName;
+		plugin.getCommandBlocksManager().getScoreboard(plot).getTeam(teamId).setPrefix(teamName);
 	}
 	
 	public Plot getPlot() {
@@ -111,9 +87,10 @@ public class CbTeam {
 			quittedTeam.removeMember(e);
 		else
 			members.add(e);
-
+		
 		if (e.getType() == EntityType.PLAYER) 
-			showTeamName((Player) e);
+			plugin.getCommandBlocksManager().getScoreboard(plot).getTeam(teamId).addPlayer((Player)e);
+		
 		
 		return true;
 	}
@@ -122,7 +99,7 @@ public class CbTeam {
 		members.remove(e);
 		
 		if (e.getType() == EntityType.PLAYER)
-			removeTeamName((Player) e);
+			plugin.getCommandBlocksManager().getScoreboard(plot).getTeam(teamId).removePlayer((Player)e);
 	}
 
 	public List<Entity> getMembers(){
@@ -147,23 +124,6 @@ public class CbTeam {
 	
 	public void setColor(String colorAsString) {
 		color = ColorType.getColor(colorAsString);
-	}
-	
-	//summon des entités pour faire apparaître le nom de la team au dessus du pseudo du joueur
-	@SuppressWarnings("deprecation")
-	public void showTeamName(Player p) {
-		Scoreboard scb = plugin.getCommandBlocksManager().getPlotScoreboard(plot);
-		
-		if (scb.getTeam(getId()) != null)
-			scb.getTeam(getId()).addPlayer(p);		
-	}
-	
-	@SuppressWarnings("deprecation")
-	public void removeTeamName(Player p) {
-		Scoreboard scb = plugin.getCommandBlocksManager().getPlotScoreboard(plot);
-		
-		if (scb.getTeam(getId()) != null)		
-			scb.getTeam(getId()).removePlayer(p);
 	}
 	
 	public enum ColorType{

@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -10,13 +11,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -139,11 +143,11 @@ public class CbObjective {
 	public void setName(String newObjName) {
 		if (!newObjName.equals(objName)) {
 			if (displaySlot == DisplaySlot.BELOW_NAME)
-				plugin.getCommandBlocksManager().getPlotScoreboard(plot).getObjective("belowName").setDisplayName(newObjName);
+				plugin.getCommandBlocksManager().getScoreboard(plot).getObjective(DisplaySlot.BELOW_NAME).setDisplayName(newObjName);
 			
 			if (displaySlot == DisplaySlot.SIDEBAR)
 				for (Player p : plot.getPlayers())
-					((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCustomScoreboardLine(0, newObjName);
+					((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCustomScoreboardTitle(newObjName);
 		}
 		
 			
@@ -164,7 +168,7 @@ public class CbObjective {
 
 			@Override
 			public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-				return o1.getValue().compareTo(o2.getValue());
+				return - o1.getValue().compareTo(o2.getValue());
 			}
 	   });
 	
@@ -192,15 +196,9 @@ public class CbObjective {
 		
 		//affichage scoreboard sidebar
 		if (displaySlot == DisplaySlot.SIDEBAR) {
-			Map<String, Integer> scores = getValues(true);
-			List<String> keys = new ArrayList<String>(scores.keySet());
 
-			for (Player p : plot.getPlayers()) {
-				OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
-				
-				for (int i = 0 ; i < keys.size() ; i++) 
-					pc.setCustomScoreboardLine(i, keys.get(i));				
-			}	
+			for (Player p : plot.getPlayers()) 
+				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardValues(getValues(true));	
 		}
 	}
 
@@ -212,7 +210,7 @@ public class CbObjective {
 	}
 	
 	public void add(Entity e, int value) {
-		set (e, value + get(e));
+		set(e, value + get(e));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -227,12 +225,12 @@ public class CbObjective {
 			scoreHolder = e.getCustomName();
 		
 		if (displaySlot == DisplaySlot.BELOW_NAME && e.getType() == EntityType.PLAYER) {
-			Scoreboard scb = plugin.getCommandBlocksManager().getPlotScoreboard(plot);
+			Objective obj = plugin.getCommandBlocksManager().getScoreboard(plot).getObjective(DisplaySlot.BELOW_NAME);
 			
 			if (value == null)
-				scb.resetScores((Player) e);
+				obj.getScore((Player) e).setScore(0);
 			else
-				scb.getObjective("belowName").getScore((Player) e).setScore(value);
+				obj.getScore((Player) e).setScore(value);
 		}
 		
 		set(scoreHolder, value);
@@ -244,43 +242,45 @@ public class CbObjective {
 		else
 			return get(e.getCustomName());
 	}
-
 	
-	public void setDisplaySlot(DisplaySlot newDisplaySlot) {
+	public int setDisplaySlot(DisplaySlot newDisplaySlot) {
 		if (newDisplaySlot == displaySlot)
-			return;
+			return 0;
 		
-		clearDisplaySlots();
+		clearDisplaySlots(newDisplaySlot);
+		clearDisplaySlots(displaySlot);
 		
-		if (newDisplaySlot == DisplaySlot.BELOW_NAME) {
-			Objective obj = plugin.getCommandBlocksManager().getPlotScoreboard(plot).getObjective("belowName");
-			obj.setDisplaySlot(newDisplaySlot);
-			obj.setDisplayName(getName());
-		}
+		if (newDisplaySlot == DisplaySlot.BELOW_NAME) 
+			plugin.getCommandBlocksManager().getScoreboard(plot).getObjective(DisplaySlot.BELOW_NAME).setDisplayName(objName);
+		
 		
 		if (newDisplaySlot == DisplaySlot.SIDEBAR) {
 			Map<String, Integer> scores = getValues(true);
-			List<String> keys = new ArrayList<String>(scores.keySet());
-
+			
 			for (Player p : plot.getPlayers()) {
 				OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 				
-				for (int i = 0 ; i < keys.size() ; i++) 
-					pc.setCustomScoreboardLine(i, keys.get(i));				
+				pc.setCustomScoreboardTitle(getName());
+				pc.setCustomScoreboardValues(scores);
 			}	
-		}				
+		}
 		
 		displaySlot = newDisplaySlot;
+		return 1;
 	}
 	
-	
-	public void clearDisplaySlots() {
+	public void clearDisplaySlots(DisplaySlot displaySlot) {
 		if (displaySlot == DisplaySlot.SIDEBAR)
 			for (Player p : plot.getPlayers())
-				((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getCustomScoreboardLines().clear();;
+				((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
 		
 		if (displaySlot == DisplaySlot.BELOW_NAME)
-			plugin.getCommandBlocksManager().getPlotScoreboard(plot).clearSlot(displaySlot);
+			plugin.getCommandBlocksManager().clearBelowName(plot);
+		
+		if (displaySlot != null)
+			for (CbObjective obj : plugin.getCommandBlocksManager().getObjectives(plot))
+				if (obj.getDisplaySlot() == displaySlot)
+					obj.setDisplaySlot(null);
 	}
 
 	public DisplaySlot getDisplaySlot() {

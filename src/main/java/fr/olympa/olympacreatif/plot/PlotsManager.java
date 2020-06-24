@@ -35,6 +35,7 @@ public class PlotsManager {
 		plugin.getServer().getPluginManager().registerEvents(new PlotsManagerListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new PlotsInstancesListener(plugin), plugin);
 		
+		plotCount = plugin.getDataManager().getPlotsCount();
 		//plotCount = plugin.getDataManager().getTotalPlotsCount();
 		
 		//construit les objets Plot chargés depuis la bdd de manière synchrone avec le serveur
@@ -72,9 +73,8 @@ public class PlotsManager {
 								}
 							}
 							if (!hasMemberOnline) {
-								//e.getValue().unregisterListener();
+								e.getValue().unload();
 								loadedPlots.remove(e.getKey());
-								plugin.getCommandBlocksManager().unregisterPlot(e.getValue());
 							}
 						}	
 					}

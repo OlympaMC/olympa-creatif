@@ -50,4 +50,9 @@ public class DataManager {
 		*/
 		return resultSet;
 	}
+
+	public int getPlotsCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

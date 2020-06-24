@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.player.OlympaPlayer;
@@ -37,11 +38,8 @@ public class CmdTeam extends CbCommand {
 			if (args.length >= 2) {
 				CbTeam t = plugin.getCommandBlocksManager().getTeamById(plot, args[1]);
 				if (t != null) {
-					for (Player p : plot.getPlayers())
-						if (t.isMember(p))
-							t.removeTeamName(p);
-					
-					t.getMembers().clear();
+					for (Entity e : new ArrayList<Entity>(t.getMembers()))
+						t.removeMember(e);
 					return 1;
 				}
 			}
@@ -107,7 +105,7 @@ public class CmdTeam extends CbCommand {
 				if (args.length >= 3)
 					t = new CbTeam(plugin, plot, args[1], NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
 				else
-					t = new CbTeam(plugin, plot, args[1], args[1]);
+					t = new CbTeam(plugin, plot, args[1], "");
 				
 				if (plugin.getCommandBlocksManager().registerTeam(plot, t))
 					return 1;
@@ -117,10 +115,10 @@ public class CmdTeam extends CbCommand {
 		case "remove":
 			if (args.length >= 2) {
 				for (CbTeam t : new ArrayList<CbTeam>(plugin.getCommandBlocksManager().getTeams(plot)))
+					
 					if (t.getId().equals(args[1])) {
-						for (Player p : plot.getPlayers())
-							if (t.isMember(p))
-								t.removeTeamName(p);
+						
+						plugin.getCommandBlocksManager().getScoreboard(plot).getTeam(t.getId()).unregister();
 						plugin.getCommandBlocksManager().getTeams(plot).remove(t);
 						return 1;
 					}
@@ -138,10 +136,6 @@ public class CmdTeam extends CbCommand {
 				case "prefix":					
 					if (args.length >= 4) 
 						t.setName(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
-					else
-						for (Player p : plot.getPlayers())
-							if (t.isMember(p))
-								t.removeTeamName(p);
 					
 					return 1;
 					

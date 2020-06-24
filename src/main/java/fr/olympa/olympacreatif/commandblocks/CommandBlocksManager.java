@@ -30,12 +30,15 @@ import net.minecraft.server.v1_15_R1.ItemFireworks.EffectType;
 public class CommandBlocksManager {
 
 	private OlympaCreatifMain plugin;
-	private Map<Plot, List<CbCommand>> queuedCommands = new LinkedHashMap<Plot, List<CbCommand>>(); 
+	private Map<Plot, List<CbCommand>> queuedCommands = new LinkedHashMap<Plot, List<CbCommand>>();
 
 	private Map<Plot, List<CbObjective>> plotObjectives = new HashMap<Plot, List<CbObjective>>();
 	private Map<Plot, List<CbTeam>> plotTeams = new HashMap<Plot, List<CbTeam>>();
 	
+	//scoreboards utilisés pour l'affichage du belowName
 	private Map<Plot, Scoreboard> plotsScoreboards = new HashMap<Plot, Scoreboard>();
+	//scoreboards inutilisés qui seront réaffectés au besoin à d'autres plots chargés ultérieurement
+	private List<Scoreboard> unusedScoreboards = new ArrayList<Scoreboard>();
 	
 	private int maxTeamsPerPlot = 20;
 	private int maxScoreboardsPerPlot = 20;
@@ -49,6 +52,7 @@ public class CommandBlocksManager {
 		Bukkit.getPluginManager().registerEvents(new CbCommandListener(plugin), plugin);
 	}
 	
+	//création des variables nécessaires pour ce plot 
 	public void registerPlot(Plot plot) {
 		if (!queuedCommands.containsKey(plot))
 			queuedCommands.put(plot, new ArrayList<CbCommand>());
@@ -58,22 +62,38 @@ public class CommandBlocksManager {
 		
 		if (!plotTeams.containsKey(plot))
 			plotTeams.put(plot, new ArrayList<CbTeam>());
+		
+		if (unusedScoreboards.size() == 0) {
+			Scoreboard scb = Bukkit.getServer().getScoreboardManager().getNewScoreboard();
+			Objective obj = scb.registerNewObjective("belowName", "dummy", "à spécifier");
+			obj.setDisplaySlot(DisplaySlot.BELOW_NAME);
+			
+			plotsScoreboards.put(plot, scb);
+		}else {
+			plotsScoreboards.put(plot, unusedScoreboards.get(0));
+			unusedScoreboards.remove(0);
+		}
 	}
 	
+	//unload les données du plot pour libérer de la mémoire
 	public void unregisterPlot(Plot plot) {
 		queuedCommands.remove(plot);
 		plotObjectives.remove(plot);
 		plotTeams.remove(plot);
+		
+		//met de côté le scoreboard pour un usage ultérieur
+		Scoreboard scb = plotsScoreboards.get(plot);
+		scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
+		scb.registerNewObjective("belowName", "dummy", "à spécifier");
+		
+		plotsScoreboards.remove(plot);
+		unusedScoreboards.add(scb);
 	}
 	
 	//gestion des scoreboards (affichage sidebar/belowname)
 	
 	//macimum 20 objectifs par plot
 	public boolean registerObjective(Plot plot, CbObjective obj) {
-		
-		//créée la liste d'objectifs si n'existe pas encore
-		if (!plotObjectives.containsKey(plot))
-			plotObjectives.put(plot, new ArrayList<CbObjective>());
 
 		//n'enregistre pas le scoreboard si un autre avec le même nom existe déjà dans le plot
 		for (CbObjective o : plotObjectives.get(plot))
@@ -88,7 +108,7 @@ public class CommandBlocksManager {
 	}
 	
 	public List<CbObjective> getObjectives(Plot plot){
-		if (plot == null || !plotObjectives.containsKey(plot))
+		if (plot == null)
 			return new ArrayList<CbObjective>();
 		else
 			return plotObjectives.get(plot);
@@ -107,71 +127,22 @@ public class CommandBlocksManager {
 	
 	
 	//gestion sidebar scoreboards
-	
-	//renvoie le scoreboard affiché sur le slot désigné du plot choisi
-	public Objective getObjectiveOnSlot(Plot plot, DisplaySlot slot) {
-		if (!plotsScoreboards.containsKey(plot))
-			createScoreboardHolder(plot);
-		
-		return plotsScoreboards.get(plot).getObjective(slot);
-	}
-	
-	//crée le scoreboard pour le plot en paramètre
-	private void createScoreboardHolder(Plot plot) {
-		Scoreboard scb = Bukkit.getScoreboardManager().getNewScoreboard();
 
-		Objective objSidebar = scb.registerNewObjective("sidebar", "dummy", "sidebar");
-		objSidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
-		
-		plotsScoreboards.put(plot, scb);
-	}
-	
-	//vide le slot de scoreboard en paramètre
-	public void clearScoreboardSlot(Plot plot, DisplaySlot displaySlot) {
-		if (displaySlot == null)
-			return;
-		
-		if (!plotsScoreboards.containsKey(plot))
-			createScoreboardHolder(plot);
-		
-		//supression de l'ancien objectif et création d'un nouveau
-		if (displaySlot == DisplaySlot.SIDEBAR) {
-			plotsScoreboards.get(plot).getObjective(DisplaySlot.SIDEBAR).unregister();	
-			Objective objSidebar = plotsScoreboards.get(plot).registerNewObjective("sidebar", "dummy", "sidebar");
-			objSidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
-		}
-		
-		//supression des textholders des joueurs et entités si nécessaire
-		if (displaySlot == DisplaySlot.BELOW_NAME) {
-			for (Player p : plot.getPlayers()){
-				LineDataWrapper data = plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p);
-				
-				data.removeLine("score");
-				if (data.getLinesCount() == 1)
-					data.clearLines();
-			}
-		}
-			
-	}
-
-	public Scoreboard getPlotScoreboard(Plot plot) {
-		if (!plotsScoreboards.containsKey(plot)) {
-			Scoreboard scb = Bukkit.getScoreboardManager().getNewScoreboard();
-			scb.registerNewObjective("belowName", "dummy", "§4ERROR");
-
-			plotsScoreboards.put(plot, scb);
-		}
-		
+	public Scoreboard getScoreboard(Plot plot) {		
 		return plotsScoreboards.get(plot);
+	}
+	
+	public void clearBelowName(Plot plot) {
+		Scoreboard scb = plotsScoreboards.get(plot);
+		scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
+
+		Objective obj = scb.registerNewObjective("belowName", "dummy", "à spécifier");
+		obj.setDisplaySlot(DisplaySlot.BELOW_NAME);
 	}
 	
 	//gestion des équipes
 	//ajoute la team à la liste du plot. Max teams autorisées : maxTeamsPerPlot
 	public boolean registerTeam(Plot plot, CbTeam team) {
-
-		//crée la liste des teams si inexistante
-		if (!plotTeams.containsKey(plot))
-			plotTeams.put(plot, new ArrayList<CbTeam>());
 		
 		//si une team avec ce nom existe déjà, return
 		for (CbTeam t : getTeams(plot))
@@ -188,7 +159,7 @@ public class CommandBlocksManager {
 	
 	//renvoie la liste des équipes d'un plot
 	public List<CbTeam> getTeams(Plot plot){
-		if (plot == null || !plotTeams.containsKey(plot))
+		if (plot == null)
 			return new ArrayList<CbTeam>();
 		
 		return plotTeams.get(plot);
@@ -216,12 +187,24 @@ public class CommandBlocksManager {
 	
 	public void executeJoinActions(Plot toPlot, Player p) {
 		
-		if (plotsScoreboards.containsKey(toPlot))
-			p.setScoreboard(plotsScoreboards.get(toPlot));
+		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		
-		for (CbObjective obj : getObjectives(toPlot))
-			if (obj.getDisplaySlot() == DisplaySlot.BELOW_NAME)
-				obj.set(p, 0);
+		//maj belowName si un objectif y est positionné
+		Scoreboard scb = plotsScoreboards.get(toPlot);
+		
+		p.setScoreboard(plotsScoreboards.get(toPlot));
+		if (!scb.getObjective(DisplaySlot.BELOW_NAME).getDisplayName().equals("à spécifier"))
+			scb.getObjective(DisplaySlot.BELOW_NAME).getScore(p).setScore(0);
+		
+		//maj sidebar si on objectif y est positionné
+		for (CbObjective obj : getObjectives(toPlot)) {
+			
+			if (obj.getDisplaySlot() == DisplaySlot.SIDEBAR) {
+				
+				pc.setCustomScoreboardTitle(obj.getName());
+				pc.setCustomScoreboardValues(obj.getValues(true));
+			}	
+		}
 	}
 	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
@@ -229,7 +212,10 @@ public class CommandBlocksManager {
 		if (team != null)
 			team.removeMember(p);
 		
-		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).getCustomScoreboardLines().clear();;
+		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
+		
+		//maj du scoreboard (reset du score du scoreboard du plot et réaffectation du scoreboard
+		p.getScoreboard().resetScores(p);
 		p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		
 		plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p).clearLines();

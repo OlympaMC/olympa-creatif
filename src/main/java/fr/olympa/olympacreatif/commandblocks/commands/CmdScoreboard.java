@@ -67,29 +67,26 @@ public class CmdScoreboard extends CbCommand {
 				
 			case remove:
 				if (args.length >= 3) {
-					for (CbObjective o : new ArrayList<CbObjective>(plugin.getCommandBlocksManager().getObjectives(plot))){
-						if (o.getId().equals(args[2])) {
-							plugin.getCommandBlocksManager().clearScoreboardSlot(plot, o.getDisplaySlot());
-							plugin.getCommandBlocksManager().getObjectives(plot).remove(o);
-							return 1;
-						}
+					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[2]);
+					
+					if (obj != null) {
+						obj.clearDisplaySlots(obj.getDisplaySlot());
+						plugin.getCommandBlocksManager().getObjectives(plot).remove(obj);
+						return 1;
 					}
 				}
 				break;
 					
 			case setdisplay:
-				if (args.length >= 4) {
-					for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot)){
-						if (o.getId().equals(args[3])) {
-							if (args[2].equals("belowName")) {
-								o.setDisplaySlot(DisplaySlot.BELOW_NAME);
-								return 1;
-							}
-							if (args[2].equals("sidebar")) {
-								o.setDisplaySlot(DisplaySlot.SIDEBAR);
-								return 1;
-							}
-						}
+				if (args.length == 4) {
+					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
+					
+					if (obj != null) {
+						if (args[2].equals("belowName")) 
+							return obj.setDisplaySlot(DisplaySlot.BELOW_NAME);
+							
+						if (args[2].equals("sidebar")) 
+							return obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 					}
 				}
 				break;

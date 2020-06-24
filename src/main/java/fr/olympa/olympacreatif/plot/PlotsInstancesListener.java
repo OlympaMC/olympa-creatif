@@ -276,6 +276,9 @@ public class PlotsInstancesListener implements Listener{
 
 		plotTo.addPlayerInPlot(p);
 		
+		//exécution instruction commandblock d'entrée
+		plugin.getCommandBlocksManager().executeJoinActions(plotTo, p);
+		
 		//les actions suivantes ne sont effectuées que si le joueur n'appartient pas au plot
 		if (plotTo.getMembers().getPlayerRank(p) != PlotRank.VISITOR)
 			return;
@@ -315,9 +318,6 @@ public class PlotsInstancesListener implements Listener{
 		
 		//définition de la météo
 		p.setPlayerWeather((WeatherType) plotTo.getParameters().getParameter(PlotParamType.PLOT_WEATHER));
-		
-		//exécution instruction commandblock d'entrée
-		plugin.getCommandBlocksManager().executeJoinActions(plotTo, p);
 	}
 
 	public static void executeQuitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
@@ -339,10 +339,6 @@ public class PlotsInstancesListener implements Listener{
 		
 		plugin.getCommandBlocksManager().excecuteQuitActions(plot, p);
 	}
-	
-	
-	
-	
 	
 	@EventHandler //cancel remove paintings et itemsframes
 	public void onItemFrameDestroy(HangingBreakByEntityEvent e) {

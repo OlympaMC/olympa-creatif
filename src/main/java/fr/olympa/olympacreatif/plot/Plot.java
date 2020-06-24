@@ -43,7 +43,7 @@ public class Plot {
 	//private boolean isActive = true; //sert à détecter quand un chunk est inactif
 	
 	//constructeur pour un plot n'existant pas encore
-	Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
+	public Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
 		this.plugin = plugin;
 		plotId = new PlotId(plugin);
 		parameters = new PlotParameters(plugin, plotId);
@@ -51,18 +51,23 @@ public class Plot {
 
 		members.set(p, PlotRank.OWNER);
 
+		plugin.getCommandBlocksManager().registerPlot(this);
+		
 		//exécution des actions d'entrée pour tous les joueurs sur le plot au moment du chargement
 		for (Player player : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(player.getLocation()))
 				PlotsInstancesListener.executeEntryActions(plugin, player, this);
 	}
 	
+	//chargement d'un plot déjà existant
 	public Plot(AsyncPlot ap) {
 		this.plugin = ap.getPlugin();
 		this.parameters = ap.getParameters();
 		this.members = ap.getMembers();
 		this.plotId = ap.getId();
 
+		plugin.getCommandBlocksManager().registerPlot(this);
+		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
@@ -147,5 +152,9 @@ public class Plot {
 	
 	public Map<String, BossBar> getBossBars() {
 		return Collections.unmodifiableMap(bossbarsList);
+	}
+
+	public void unload() {
+		plugin.getCommandBlocksManager().unregisterPlot(this);
 	}
 }

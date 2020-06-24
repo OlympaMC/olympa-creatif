@@ -4,23 +4,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.collect.ImmutableMap; 
 
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
-import fr.olympa.api.scoreboard.sign.lines.FixedLine;
-import fr.olympa.api.scoreboard.sign.lines.TimerLine;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class OlympaPlayerCreatif extends OlympaPlayerObject {
@@ -34,7 +30,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	private int gameMoney = 0;
 	private int bonusPlots = 0;
 	private boolean hasAdminMode = false;
-	private ScoreboardManager<OlympaPlayerCreatif> scm;
 
 	private Map<Integer, String> scoreboardLines = new HashMap<Integer, String>();
 	
@@ -42,7 +37,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		super(uuid, name, ip);
 		this.plugin = OlympaCreatifMain.getMainClass();
 		
-		for (int i = 0 ; i < 9 ; i++)
+		for (int i = 0 ; i < 8 ; i++)
 			scoreboardLines.put(i, null);
 	}
 	
@@ -117,17 +112,51 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	}
 	
 	//définit une ligne de scoreboard custom
-	public void setCustomScoreboardLine(int line, String text) {		
+	@Deprecated
+	private void setCustomScoreboardLine(int line, String text) {
+		
+		if (scoreboardLines.get(0) == null)
+			for (int i = 0 ; i < scoreboardLines.size() ; i++)
+				scoreboardLines.put(i, "§" + i);
+		
 		if (line >= 0 && line < scoreboardLines.size())
-			scoreboardLines.put(line, text);
+			if (text != null)
+				scoreboardLines.put(line, text);
+			else
+				scoreboardLines.put(line, "§" + line);
+	}
+	
+	public void setCustomScoreboardTitle(String title) {
+		if (scoreboardLines.get(0) == null) 
+			for (int i = 1 ; i < scoreboardLines.size() ; i++)
+				scoreboardLines.put(i, "§" + i);
+		
+		scoreboardLines.put(0, title);
+	}
+	
+	public void setCustomScoreboardValues(Map<String, Integer> scores) {
+		
+		List<String> keys = new ArrayList<String>(scores.keySet());
+		List<Integer> values = new ArrayList<Integer>(scores.values());
+		
+		for (int i = 1 ; i < scoreboardLines.size() ; i++)
+			if (keys.size() >= i)
+				scoreboardLines.put(i, keys.get(i - 1) + " §r: " + values.get(i - 1));
+			else
+				scoreboardLines.put(i, "§" + i);
 	}
 	
 	public Map<Integer, String> getCustomScoreboardLines(){
-		return scoreboardLines;
+		return Collections.unmodifiableMap(scoreboardLines);
+	}
+	
+	public void clearCustomScoreboard() {
+		for (int i = 0 ; i < scoreboardLines.size() ; i++)
+			scoreboardLines.put(i, null);
 	}
 
 	public String getGameMoneyFormated() {
-		return gameMoney + "₼";
+		return gameMoney + "$";
 	}
 }
 
