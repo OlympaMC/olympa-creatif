@@ -88,6 +88,10 @@ public class CommandBlocksManager {
 		
 		plotsScoreboards.remove(plot);
 		unusedScoreboards.add(scb);
+		
+		//clear des teams
+		for (CbTeam t : plotTeams.get(plot))
+			t.executeDeletionActions();
 	}
 	
 	//gestion des scoreboards (affichage sidebar/belowname)
@@ -128,8 +132,14 @@ public class CommandBlocksManager {
 	
 	//gestion sidebar scoreboards
 
+	/*
 	public Scoreboard getScoreboard(Plot plot) {		
 		return plotsScoreboards.get(plot);
+	}
+	*/
+	
+	public Objective getObjectiveBelowName(Plot plot) {		
+		return plotsScoreboards.get(plot).getObjective(DisplaySlot.BELOW_NAME);
 	}
 	
 	public void clearBelowName(Plot plot) {

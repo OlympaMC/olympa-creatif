@@ -118,7 +118,7 @@ public class CmdTeam extends CbCommand {
 					
 					if (t.getId().equals(args[1])) {
 						
-						plugin.getCommandBlocksManager().getScoreboard(plot).getTeam(t.getId()).unregister();
+						t.executeDeletionActions();
 						plugin.getCommandBlocksManager().getTeams(plot).remove(t);
 						return 1;
 					}

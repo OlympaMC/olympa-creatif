@@ -23,7 +23,9 @@ import com.google.common.util.concurrent.SettableFuture;
 
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -53,8 +55,6 @@ public class CbTeam {
 		this.plot = plot;
 		this.teamId = id;
 		this.teamName = name;
-
-		plugin.getCommandBlocksManager().getScoreboard(plot).registerNewTeam(teamId);
 	}
 	
 	public String getName() {
@@ -67,7 +67,9 @@ public class CbTeam {
 	
 	public void setName(String newTeamName) {
 		teamName = newTeamName;
-		plugin.getCommandBlocksManager().getScoreboard(plot).getTeam(teamId).setPrefix(teamName);
+		for (Entity e : members)
+			if (e.getType() == EntityType.PLAYER)
+				OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(" + getName() + "§7)");
 	}
 	
 	public Plot getPlot() {
@@ -89,7 +91,9 @@ public class CbTeam {
 			members.add(e);
 		
 		if (e.getType() == EntityType.PLAYER) 
-			plugin.getCommandBlocksManager().getScoreboard(plot).getTeam(teamId).addPlayer((Player)e);
+			Bukkit.broadcastMessage(e.getName());
+			//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(TEST§7)");
+			//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(" + getName() + "§7)");
 		
 		
 		return true;
@@ -99,7 +103,7 @@ public class CbTeam {
 		members.remove(e);
 		
 		if (e.getType() == EntityType.PLAYER)
-			plugin.getCommandBlocksManager().getScoreboard(plot).getTeam(teamId).removePlayer((Player)e);
+			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(" + getName() + "§7)");
 	}
 
 	public List<Entity> getMembers(){
@@ -158,9 +162,14 @@ public class CbTeam {
 			for (ColorType c : ColorType.values())
 				if (c.toString().equals(colorAsString))
 					return c.getColor();
-			
 			return "";
 		}
+	}
+
+	public void executeDeletionActions() {
+		for (Entity e : members)
+			if (e.getType() == EntityType.PLAYER)
+				OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
 	}
 	
 }

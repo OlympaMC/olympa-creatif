@@ -143,7 +143,7 @@ public class CbObjective {
 	public void setName(String newObjName) {
 		if (!newObjName.equals(objName)) {
 			if (displaySlot == DisplaySlot.BELOW_NAME)
-				plugin.getCommandBlocksManager().getScoreboard(plot).getObjective(DisplaySlot.BELOW_NAME).setDisplayName(newObjName);
+				plugin.getCommandBlocksManager().getObjectiveBelowName(plot).setDisplayName(newObjName);
 			
 			if (displaySlot == DisplaySlot.SIDEBAR)
 				for (Player p : plot.getPlayers())
@@ -225,7 +225,7 @@ public class CbObjective {
 			scoreHolder = e.getCustomName();
 		
 		if (displaySlot == DisplaySlot.BELOW_NAME && e.getType() == EntityType.PLAYER) {
-			Objective obj = plugin.getCommandBlocksManager().getScoreboard(plot).getObjective(DisplaySlot.BELOW_NAME);
+			Objective obj = plugin.getCommandBlocksManager().getObjectiveBelowName(plot);
 			
 			if (value == null)
 				obj.getScore((Player) e).setScore(0);
@@ -251,7 +251,7 @@ public class CbObjective {
 		clearDisplaySlots(displaySlot);
 		
 		if (newDisplaySlot == DisplaySlot.BELOW_NAME) 
-			plugin.getCommandBlocksManager().getScoreboard(plot).getObjective(DisplaySlot.BELOW_NAME).setDisplayName(objName);
+			plugin.getCommandBlocksManager().getObjectiveBelowName(plot).setDisplayName(objName);
 		
 		
 		if (newDisplaySlot == DisplaySlot.SIDEBAR) {
