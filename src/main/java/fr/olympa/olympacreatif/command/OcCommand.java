@@ -57,8 +57,6 @@ public class OcCommand extends OlympaCommand {
 				break;
 				
 			case "find":
-				if (!(sender instanceof Player))
-					break;
 				
 				//teste si le joueur a encore des plots dispo
 				if (pc.getPlotsSlots(true) - pc.getPlots(true).size() > 0) {
@@ -104,7 +102,7 @@ public class OcCommand extends OlympaCommand {
 			case "center":
 				plot = plugin.getPlotsManager().getPlot(p.getLocation());
 				if (plot == null || plot.getMembers().getPlayerLevel(p) == 0)
-					p.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else {
 					p.sendMessage(Message.TELEPORT_PLOT_CENTER.getValue());
 					double x = plot.getId().getLocation().getX() + (double)Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue())/2.0;
@@ -117,7 +115,7 @@ public class OcCommand extends OlympaCommand {
 			case "setspawn":
 				plot = plugin.getPlotsManager().getPlot(p.getLocation());
 				if (plot == null || plot.getMembers().getPlayerLevel(p) < 3)
-					p.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else {
 					plot.getParameters().setParameter(PlotParamType.SPAWN_LOC, p.getLocation());
 					p.sendMessage(Message.PLOT_SPAWN_LOC_SET.getValue());
@@ -138,7 +136,7 @@ public class OcCommand extends OlympaCommand {
 					return false;
 				}
 				if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER) {
-					p.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 					return false;
 				}
 				/*if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.USE_PROTECTED_AREA)) {
@@ -186,13 +184,11 @@ public class OcCommand extends OlympaCommand {
 					(p).teleport(id.getLocation());
 					sender.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
 				}else {
-					sender.sendMessage(Message.INVALID_PLID_ID.getValue());
+					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
 				}
 				break;
 				
 			case "invite":
-				if (!(sender instanceof Player))
-					return false;
 				
 				plot = plugin.getPlotsManager().getPlot((p).getLocation());
 				target = Bukkit.getPlayer(args[1]);
@@ -209,74 +205,87 @@ public class OcCommand extends OlympaCommand {
 						else
 							sender.sendMessage(Message.PLAYER_TARGET_OFFLINE.getValue());
 					else
-						sender.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+						sender.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else
 					sender.sendMessage(Message.PLOT_NULL_PLOT.getValue());
 				break;
 				
 			case "kick":
-				if (!(sender instanceof Player))
-					return false;
+
 				plot = plugin.getPlotsManager().getPlot((p).getLocation());
 				target = Bukkit.getPlayer(args[1]);
 				
-				Bukkit.broadcastMessage(plot.getId().getAsString() + " ; " + target.toString());
+				//vérifications avant kick
+				if (plot == null)
+					p.sendMessage(Message.INVALID_PLOT_ID.getValue());
 				
-				if (plot != null)
-					if (plot.getMembers().getPlayerLevel(p) >= 3)
-						if (target != null)
-							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR && plot.getPlayers().contains(target) && 
-							!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
-								
-								plot.teleportOut(target);
-								target.sendMessage(Message.PLOT_HAVE_BEEN_KICKED.getValue());
-								sender.sendMessage(Message.PLOT_KICK_PLAYER.getValue().replace("%player%", target.getDisplayName()));
-								return false;
-								
-							}
-				sender.sendMessage(Message.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.getValue().replace("%player%", target.getDisplayName()));
+				else if (plot.getMembers().getPlayerLevel(pc) < 3)
+					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+				
+				else if (plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR || !plot.getPlayers().contains(target))
+					p.sendMessage(Message.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.getValue());
+				
+				else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN))
+					p.sendMessage(Message.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.getValue());
+				
+				else {
+					//exécution du kick					
+					plot.teleportOut(target);
+					target.sendMessage(Message.PLOT_HAVE_BEEN_KICKED.getValue());
+					sender.sendMessage(Message.PLOT_KICK_PLAYER.getValue().replace("%player%", target.getDisplayName()));
+					return false;	
+				}
+				
+				
 				break;
 				
 			case "ban":
-				if (!(sender instanceof Player))
-					return false;
+
 				plot = plugin.getPlotsManager().getPlot((p).getLocation());
 				target = Bukkit.getPlayer(args[1]);
 				
-				if (plot != null)
-					if (plot.getMembers().getPlayerLevel(p) >= 3) {
-						if (target != null) {
-							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR && plot.getPlayers().contains(target) && 
-									!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
-								
-								((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).add(AccountProvider.get(target.getUniqueId()).getId());
-								plot.teleportOut(target);
-								target.sendMessage(Message.PLOT_HAVE_BEEN_BANNED.getValue());
-								sender.sendMessage(Message.PLOT_BAN_PLAYER.getValue().replace("%player%", target.getDisplayName()));
-								return false;
-							}
-						}
-					}else {
-						sender.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
-						return false;
-					}
-				sender.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue().replace("%player%", target.getDisplayName()));
+				//vérifications avant ban
+				if (plot == null)
+					p.sendMessage(Message.INVALID_PLOT_ID.getValue());
+				
+				else if (plot.getMembers().getPlayerLevel(pc) < 3)
+					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+				
+				else if (plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR || !plot.getPlayers().contains(target))
+					p.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue());
+				
+				else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN))
+					p.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue());
+				
+				else {
+					//exécution du ban
+					((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).add(AccountProvider.get(target.getUniqueId()).getId());
+					
+					plot.teleportOut(target);
+					target.sendMessage(Message.PLOT_HAVE_BEEN_BANNED.getValue());
+					sender.sendMessage(Message.PLOT_BAN_PLAYER.getValue().replace("%player%", target.getDisplayName()));
+					return false;	
+				}
+
 				break;
 				
 			case "unban":
-				if (!(sender instanceof Player))
-					return false;
+
 				plot = plugin.getPlotsManager().getPlot((p).getLocation());
 				target = Bukkit.getPlayer(args[1]);
+
+				//vérifications avant unban
+				if (plot == null)
+					p.sendMessage(Message.INVALID_PLOT_ID.getValue());
 				
-				if (plot != null && target != null)
-					if (plot.getMembers().getPlayerLevel(p) >= 3)
-						if (((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).remove(AccountProvider.get(target.getUniqueId()).getId()))
-							sender.sendMessage(Message.PLOT_UNBAN_PLAYER.getValue());
-						else
-							sender.sendMessage(Message.PLOT_CANT_UNBAN_PLAYER.getValue());
-					else
-						sender.sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+				else if (plot.getMembers().getPlayerLevel(pc) < 3)
+					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+
+				else if (((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).remove(AccountProvider.get(target.getUniqueId()).getId()))
+					sender.sendMessage(Message.PLOT_UNBAN_PLAYER.getValue());
+				else
+					sender.sendMessage(Message.PLOT_CANT_UNBAN_PLAYER.getValue());
+				
 				break;
 			default:
 				sender.sendMessage(Message.COMMAND_HELP.getValue());
@@ -319,6 +328,11 @@ public class OcCommand extends OlympaCommand {
 				break;
 				
 			case "unban":
+				for (Player p : Bukkit.getOnlinePlayers())
+					list.add(p.getName());
+				break;
+				
+			case "kick":
 				for (Player p : Bukkit.getOnlinePlayers())
 					list.add(p.getName());
 				break;

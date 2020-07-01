@@ -33,8 +33,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.util.Vector;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -215,6 +217,23 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	@SuppressWarnings("unchecked")
+	@EventHandler //édite destination téléport si joueur banni du plot
+	public void onTeleportEvent(PlayerTeleportEvent e) {
+		Player p = e.getPlayer();
+		Plot plot = plugin.getPlotsManager().getPlot(p.getLocation());
+		
+		if (plot == null)
+			return;
+		
+		if (((List<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId())) {
+			if (((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
+				e.setTo(plot.getOutLoc());
+				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());	
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
 	@EventHandler //actions à effectuer lors de la sortie/entrée d'un joueur
 	public void onPlayerMove(PlayerMoveEvent e) {
 		if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ())
@@ -226,14 +245,13 @@ public class PlotsInstancesListener implements Listener{
 		//sortie de l'évent si pas de changement de plot
 		if (plotTo == plotFrom)
 			return;
-		
-		//actions d'entrée de plot
 
 		//expulse les joueurs bannis
 		if (plotTo != null) {
 			if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(e.getPlayer().getUniqueId()).getId())) {
 				e.setCancelled(true);
-				e.getPlayer().setVelocity(e.getPlayer().getVelocity().multiply(-2));
+				e.getPlayer().setVelocity(e.getPlayer().getVelocity().multiply(-1));
+				//e.getPlayer().teleport(new Location(e.getPlayer().getWorld(), 5 * (e.getTo().getX() - e.getFrom().getX()), 0, 5 * (e.getTo().getZ() - e.getFrom().getZ())));
 				e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
 				return;
 			}

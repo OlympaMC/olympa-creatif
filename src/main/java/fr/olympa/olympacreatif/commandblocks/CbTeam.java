@@ -91,7 +91,7 @@ public class CbTeam {
 			members.add(e);
 		
 		if (e.getType() == EntityType.PLAYER) 
-			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(" + getName() + "§7)");
+			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
 		
 		
 		return true;

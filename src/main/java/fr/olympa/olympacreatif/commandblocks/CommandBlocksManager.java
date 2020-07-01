@@ -63,16 +63,11 @@ public class CommandBlocksManager {
 		if (!plotTeams.containsKey(plot))
 			plotTeams.put(plot, new ArrayList<CbTeam>());
 		
-		if (unusedScoreboards.size() == 0) {
-			Scoreboard scb = Bukkit.getServer().getScoreboardManager().getNewScoreboard();
-			Objective obj = scb.registerNewObjective("belowName", "dummy", "à spécifier");
-			obj.setDisplaySlot(DisplaySlot.BELOW_NAME);
-			
-			plotsScoreboards.put(plot, scb);
-		}else {
-			plotsScoreboards.put(plot, unusedScoreboards.get(0));
-			unusedScoreboards.remove(0);
-		}
+		if (unusedScoreboards.size() == 0) 
+			plotsScoreboards.put(plot, Bukkit.getServer().getScoreboardManager().getNewScoreboard());
+		else 
+			plotsScoreboards.put(plot, unusedScoreboards.remove(0));
+		
 	}
 	
 	//unload les données du plot pour libérer de la mémoire
@@ -142,7 +137,8 @@ public class CommandBlocksManager {
 	}
 	
 	public void clearBelowName(Plot plot) {
-		plotsScoreboards.get(plot).getObjective(DisplaySlot.BELOW_NAME).unregister();
+		if (plotsScoreboards.get(plot).getObjective(DisplaySlot.BELOW_NAME) != null)
+			plotsScoreboards.get(plot).getObjective(DisplaySlot.BELOW_NAME).unregister();
 	}
 	
 	//gestion des équipes
@@ -198,7 +194,7 @@ public class CommandBlocksManager {
 		Scoreboard scb = plotsScoreboards.get(toPlot);
 		
 		p.setScoreboard(plotsScoreboards.get(toPlot));
-		if (!scb.getObjective(DisplaySlot.BELOW_NAME).getDisplayName().equals("à spécifier"))
+		if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
 			scb.getObjective(DisplaySlot.BELOW_NAME).getScore(p).setScore(0);
 		
 		//maj sidebar si on objectif y est positionné

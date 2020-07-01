@@ -124,7 +124,13 @@ public class Plot {
 	}
 	
 	public void teleportOut(Player p) {
-		p.teleport(plotId.getLocation().clone().add(-3, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue()), -3));
+		p.teleport(getOutLoc());
+	}
+	
+	public Location getOutLoc() {
+		Location loc = plotId.getLocation().add(-3, 0, -3);
+		loc.setY(1 + Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue()));
+		return loc;
 	}
 
 	public Map<Location, SimpleEntry<BlockData, TileEntity>> getProtectedZoneData() {

@@ -78,7 +78,7 @@ public class CbCommandListener implements Listener {
 		if (cmd != null && cmd.getPlot().getMembers().getPlayerLevel(e.getPlayer()) >= 3) 
 			executeCommandBlockCommand(cmd, e.getPlayer());
 		else
-			e.getPlayer().sendMessage(Message.PLOT_INSUFFICIENT_PERMISSION.getValue());
+			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 	}
 
 	private CbCommand getCommand(CommandSender sender, Location sendLoc, String command) {

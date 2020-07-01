@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.gui;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -8,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.player.Gender;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -47,6 +49,8 @@ public class StaffGui extends OlympaGUI {
 
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
+		
+		Bukkit.broadcastMessage(p.getName() + " a la perm bypass kick ban plot : " + StaffPerm.BYPASS_KICK_AND_BAN.getOlympaPerm().hasPermission(p.getUniqueId()));
 		
 		switch (slot) {
 		case 0:

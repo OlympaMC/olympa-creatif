@@ -70,7 +70,7 @@ public class CmdScoreboard extends CbCommand {
 					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[2]);
 					
 					if (obj != null) {
-						obj.clearDisplaySlots(obj.getDisplaySlot());
+						obj.clearDisplaySlot();
 						plugin.getCommandBlocksManager().getObjectives(plot).remove(obj);
 						return 1;
 					}
