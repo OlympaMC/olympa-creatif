@@ -19,6 +19,7 @@ import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 
 public class PlotMembers{
 
@@ -55,8 +56,10 @@ public class PlotMembers{
 	}
 
 	
+	
+	
 	public PlotRank getPlayerRank(OlympaPlayerCreatif p) {			
-		if (p.hasAdminMode())
+		if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
 			return PlotRank.OWNER;
 		
 		return getPlayerRank(p.getInformation());
@@ -73,6 +76,9 @@ public class PlotMembers{
 		return getPlayerRank((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
 	}
 	
+	
+	
+	
 	public int getPlayerLevel(OlympaPlayerCreatif p) {
 		return getPlayerRank(p).getLevel();
 	}
@@ -83,6 +89,9 @@ public class PlotMembers{
 	public int getPlayerLevel(Player p) {
 		return getPlayerRank(p).getLevel();
 	}
+	
+	
+	
 	
 	public Map<OlympaPlayerInformations, PlotRank> getList(){
 		return members;

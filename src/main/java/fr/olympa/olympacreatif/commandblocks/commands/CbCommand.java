@@ -17,9 +17,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public abstract class CbCommand {
@@ -75,6 +79,12 @@ public abstract class CbCommand {
 		
 		if (s.startsWith("@e") && !limitToPlayers)
 			list.addAll(plot.getEntities());
+		
+		//exclusion des staff avec le mode Vanilla Commands Bypass actif
+		for (Entity e : new ArrayList<Entity>(list))
+			if (e.getType() == EntityType.PLAYER)
+				if (((OlympaPlayerCreatif) AccountProvider.get(e.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
+					list.remove(e);
 		
 		//récupération des scores en paramètre
 		if (s.contains(",scores={")) {

@@ -133,7 +133,7 @@ public class CmdTeam extends CbCommand {
 					return 0;	
 				
 				switch (args[2]) {
-				case "prefix":					
+				case "suffix":					
 					if (args.length >= 4) 
 						t.setName(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
 					

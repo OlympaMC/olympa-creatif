@@ -41,6 +41,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -261,13 +262,12 @@ public class PlotsInstancesListener implements Listener{
 	//actions à exécuter en entrée du plot 
 	public static void executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
 		
-		
-		if (((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).hasAdminMode())
-			return;
+		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		
 		//si le joueur est banni, téléportation en dehors du plot
-		if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId())) {
-			if (!PermissionsList.STAFF_BYPASS_PLOT_BAN.hasPermission(p.getUniqueId())) {
+		if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
+			
+			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
 				plotTo.teleportOut(p);
 				return;	

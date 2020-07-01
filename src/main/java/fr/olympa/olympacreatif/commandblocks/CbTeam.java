@@ -69,7 +69,7 @@ public class CbTeam {
 		teamName = newTeamName;
 		for (Entity e : members)
 			if (e.getType() == EntityType.PLAYER)
-				OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(" + getName() + "§7)");
+				OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
 	}
 	
 	public Plot getPlot() {
@@ -91,9 +91,7 @@ public class CbTeam {
 			members.add(e);
 		
 		if (e.getType() == EntityType.PLAYER) 
-			Bukkit.broadcastMessage(e.getName());
-			//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(TEST§7)");
-			//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(" + getName() + "§7)");
+			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(" + getName() + "§7)");
 		
 		
 		return true;
@@ -103,7 +101,7 @@ public class CbTeam {
 		members.remove(e);
 		
 		if (e.getType() == EntityType.PLAYER)
-			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "§7(" + getName() + "§7)");
+			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
 	}
 
 	public List<Entity> getMembers(){

@@ -13,6 +13,7 @@ import java.util.UUID;
 import com.google.common.collect.ImmutableMap; 
 
 import fr.olympa.api.groups.OlympaGroup;
+import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -29,9 +30,10 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	private OlympaCreatifMain plugin;
 	private int gameMoney = 0;
 	private int bonusPlots = 0;
-	private boolean hasAdminMode = false;
 
 	private Map<Integer, String> scoreboardLines = new HashMap<Integer, String>();
+	
+	private List<StaffPerm> staffPerm = new ArrayList<StaffPerm>();
 	
 	public OlympaPlayerCreatif(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
@@ -64,14 +66,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	public int getGameMoney() {
 		return gameMoney;
-	}
-	
-	public void setAdminMode(boolean b) {
-		hasAdminMode = b;
-	}
-	
-	public boolean hasAdminMode() {
-		return hasAdminMode;
 	}
 
 	public void addBonusPlots(int i) {
@@ -157,6 +151,41 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 
 	public String getGameMoneyFormated() {
 		return gameMoney + "$";
+	}
+	
+	public boolean hasStaffPerm(StaffPerm perm) {
+		return staffPerm.contains(perm);
+	}
+	
+	//renvoie true si le changement a été fait, false si le joueur n'a pas la permission
+	public boolean toggleStaffPerm(StaffPerm perm) {
+		if (!perm.getOlympaPerm().hasPermission(this))
+			return false;
+		
+		if (staffPerm.contains(perm))
+			staffPerm.remove(perm);
+		else
+			staffPerm.add(perm);
+		
+		return true;
+	}
+	
+	public enum StaffPerm{
+		BYPASS_KICK_AND_BAN(PermissionsList.STAFF_BYPASS_PLOT_KICK_AND_BAN),
+		BYPASS_VANILLA_COMMANDS(PermissionsList.STAFF_BYPASS_VANILLA_COMMANDS),
+		BYPASS_WORLDEDIT(PermissionsList.STAFF_BYPASS_WORLDEDIT),
+		FAKE_OWNER_EVERYWHERE(PermissionsList.STAFF_PLOT_OWNER_EVERYWHERE);
+		
+		OlympaPermission corePerm;
+		
+		StaffPerm(OlympaPermission perm){
+			corePerm = perm;
+			
+		}
+		
+		public OlympaPermission getOlympaPerm() {
+			return corePerm;
+		}
 	}
 }
 

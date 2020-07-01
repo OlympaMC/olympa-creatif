@@ -15,8 +15,10 @@ import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.*;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
@@ -31,6 +33,7 @@ public class WorldEditInstance {
 
 	private OlympaCreatifMain plugin;
 	private Player p;
+	private OlympaPlayerCreatif pc;
 	
 	private List<Undo> undoList = new ArrayList<Undo>();
 	
@@ -44,25 +47,28 @@ public class WorldEditInstance {
 	public WorldEditInstance(OlympaCreatifMain plugin, Player p) {
 		this.plugin = plugin;
 		this.p = p;
+		pc = AccountProvider.get(p.getUniqueId());
 	}
 
 	//définit la position 1 de copie si elle est dans la même zone que l'autre (retourne vrai si le joueur a la perm worldedit, false sinon)
 	public WorldEditError setPos1(Location loc) {
-		if (plugin.getPlotsManager().getPlot(loc) != null)
-			if (plugin.getPlotsManager().getPlot(loc).getMembers().getPlayerLevel(p) > 1) {
-				this.pos1 = loc;
-				return WorldEditError.NO_ERROR;
-			}
+		if (pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) || 
+				(plugin.getPlotsManager().getPlot(loc) != null && plugin.getPlotsManager().getPlot(loc).getMembers().getPlayerLevel(p) > 1)) {
+
+			this.pos1 = loc;
+			return WorldEditError.NO_ERROR;
+		}
 		return WorldEditError.ERR_INSUFFICIENT_PLOT_PERMISSION;
 	}
 	
 	//définit la position 2 de copie si elle est dans la même zone que l'autre (retourne vrai si le joueur a la perm worldedit, false sinon)
 	public WorldEditError setPos2(Location loc) {
-		if (plugin.getPlotsManager().getPlot(loc) != null)
-			if (plugin.getPlotsManager().getPlot(loc).getMembers().getPlayerLevel(p) > 1) {
-				this.pos2 = loc;
-				return WorldEditError.NO_ERROR;
-			}
+		if (pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) || 
+				(plugin.getPlotsManager().getPlot(loc) != null && plugin.getPlotsManager().getPlot(loc).getMembers().getPlayerLevel(p) > 1)) {
+
+			this.pos2 = loc;
+			return WorldEditError.NO_ERROR;
+		}
 		return WorldEditError.ERR_INSUFFICIENT_PLOT_PERMISSION;
 	}
 	
@@ -101,11 +107,12 @@ public class WorldEditInstance {
 			return WorldEditError.ERR_OPERATION_TOO_BIG;
 		
 		//vérification que les deux points sont bien dans le même plot
-		if (pos1 != null && pos2 != null)
-			if (plugin.getPlotsManager().getPlot(pos1) != null && plugin.getPlotsManager().getPlot(pos2) != null)
-				if (!plugin.getPlotsManager().getPlot(pos1).equals(plugin.getPlotsManager().getPlot(pos2)))
-					return WorldEditError.ERR_OPERATION_CROSS_PLOT;
-		
+		if (pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) || 
+				(pos1 != null && pos2 != null &&
+				plugin.getPlotsManager().getPlot(pos1) != null && plugin.getPlotsManager().getPlot(pos2) != null &&
+				!plugin.getPlotsManager().getPlot(pos1).equals(plugin.getPlotsManager().getPlot(pos2)) ))
+			return WorldEditError.ERR_OPERATION_CROSS_PLOT;
+			
 		return WorldEditError.NO_ERROR;
 	}
 	
@@ -282,7 +289,6 @@ public class WorldEditInstance {
 	}
 	
 	//colle la sélection à l'endroit souhaité (erreur si paste en dehors du plot ou si le joeur n'est pas proprio des 2 plots)
-	//ATTENTION les données de localisation doivent être relatives au joueur !!
 	private WorldEditError buildBlocks(Map<Location, SimpleEntry<BlockData, TileEntity>> clipboard2, boolean useRelativeLocation, boolean saveUndo) {
 		Undo undo = new Undo(plugin);
 		Plot targetPlot = null;

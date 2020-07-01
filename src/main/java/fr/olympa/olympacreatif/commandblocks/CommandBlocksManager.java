@@ -129,25 +129,20 @@ public class CommandBlocksManager {
 		return null;
 	}
 	
-	
-	//gestion sidebar scoreboards
-
-	/*
-	public Scoreboard getScoreboard(Plot plot) {		
-		return plotsScoreboards.get(plot);
-	}
-	*/
-	
 	public Objective getObjectiveBelowName(Plot plot) {		
-		return plotsScoreboards.get(plot).getObjective(DisplaySlot.BELOW_NAME);
+		Scoreboard scb = plotsScoreboards.get(plot);
+		if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
+			return scb.getObjective(DisplaySlot.BELOW_NAME);
+		else {
+			Objective obj = scb.registerNewObjective("belowName", "dummy", "à spécifier");
+			obj.setDisplaySlot(DisplaySlot.BELOW_NAME);
+			
+			return obj;
+		}
 	}
 	
 	public void clearBelowName(Plot plot) {
-		Scoreboard scb = plotsScoreboards.get(plot);
-		scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
-
-		Objective obj = scb.registerNewObjective("belowName", "dummy", "à spécifier");
-		obj.setDisplaySlot(DisplaySlot.BELOW_NAME);
+		plotsScoreboards.get(plot).getObjective(DisplaySlot.BELOW_NAME).unregister();
 	}
 	
 	//gestion des équipes
