@@ -483,7 +483,7 @@ public abstract class CbCommand {
 			cmd = new CmdEnchant(type, sender, loc, plugin, plot, args);
 			break;
 		case execute:
-			cmd = new CmdExecute(type, sender, loc, plugin, plot, args);
+			cmd = new CmdExecuteBis(type, sender, loc, plugin, plot, args);
 			break;
 		case experience:
 			cmd = new CmdExperience(type, sender, loc, plugin, plot, args);

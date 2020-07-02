@@ -28,7 +28,7 @@ public class CmdExecute extends CbCommand {
 		super(type, sender, loc, plugin, plot, args);
 	}
 
-	private List<String> args;
+	private List<String> argsBis;
 	
 	private List<CommandSender> sendEntities;
 	private List<Location> sendLocations;
@@ -38,7 +38,7 @@ public class CmdExecute extends CbCommand {
 	@Override
 	public int execute() {
 
-		args = new ArrayList<String>(Arrays.asList(super.args));
+		argsBis = new ArrayList<String>(Arrays.asList(super.args));
 		
 		sendEntities = new ArrayList<CommandSender>();
 		sendLocations = new ArrayList<Location>();
@@ -48,7 +48,7 @@ public class CmdExecute extends CbCommand {
 		
 		//return si une même sous commandes est utilisée plusieurs fois
 		List<String> alreadyUsed = new ArrayList<String>();
-		for (String s : args)
+		for (String s : argsBis)
 			if (subCommands.contains(s))
 				if (!alreadyUsed.contains(s))
 					alreadyUsed.add(s);
@@ -56,17 +56,17 @@ public class CmdExecute extends CbCommand {
 					return 0;
 		
 		//tant que la commande n'est pas terminée, évaluation des sous commandes une par une
-		while (args.size() > 0) {
+		while (argsBis.size() > 0) {
 			
 			List<String> subArgs = new ArrayList<String>();
-			subArgs.add(args.get(0));
-			args.remove(0);
+			subArgs.add(argsBis.get(0));
+			argsBis.remove(0);
 			
 			//extraction des paramètres de la commande
-			for (String s : new ArrayList<String>(args))
+			for (String s : new ArrayList<String>(argsBis))
 				if (!subCommands.contains(s)) {
 					subArgs.add(s);
-					args.remove(0);
+					argsBis.remove(0);
 				}else
 					break;
 					
