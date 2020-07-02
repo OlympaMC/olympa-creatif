@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -87,6 +88,9 @@ public class CommandBlocksManager {
 		//clear des teams
 		for (CbTeam t : plotTeams.get(plot))
 			t.executeDeletionActions();
+		
+		for (BossBar bar : plot.getBossBars().values())
+			bar.removeAll();
 	}
 	
 	//gestion des scoreboards (affichage sidebar/belowname)
@@ -188,6 +192,8 @@ public class CommandBlocksManager {
 	
 	public void executeJoinActions(Plot toPlot, Player p) {
 		
+		p.setExp(0);
+		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		
 		//maj belowName si un objectif y est positionné
@@ -222,5 +228,8 @@ public class CommandBlocksManager {
 		plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p).clearLines();
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());
+		
+		for (BossBar bar : fromPlot.getBossBars().values())
+			bar.removePlayer(p);
 	}
 }

@@ -177,4 +177,23 @@ public class WorldEditManager {
 			return errMessage;
 		}
 	}
+	
+	/* 
+wizjanyAujourd’hui à 03:21
+for general usage just use world.getChunkAtAsync() which gives you a Future
+Flo | GestankbratwurstAujourd’hui à 03:21
+Then you can just enable async chunk loading in your paper.yml and use something like CompletableFuture.runAsync(() -> "something something load chunk at pos")
+wizjanyAujourd’hui à 03:21
+and related methods
+eg there's also entity#teleportasync which will async load the target location before teleporting
+BullobilyAujourd’hui à 03:22
+Okay, I though that the chunks coming from world.getChunkAtAsync() were read-only
+@Flo | Gestankbratwurst ok, I will search about this
+wizjanyAujourd’hui à 03:23
+it's literally exactly the same as getChunkAt except it gives you a future that you can .thenApply some stuff in once it's loaded
+and no absolutely do not do what flo said
+you must get your future from the getChunkAtAsync methods etc exposed by the api
+and you must call those methods from the main thread
+using CompletableFuture.runAsync will at best trigger the async catcher and throw an exception
+*/
 }

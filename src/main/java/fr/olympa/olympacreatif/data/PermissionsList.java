@@ -22,10 +22,10 @@ public class PermissionsList {
 	public static final OlympaPermission USE_SKULL_COMMAND = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	public static final OlympaPermission USE_HAT_COMMAND = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	
-	public static final OlympaPermission STAFF_BYPASS_PLOT_KICK_AND_BAN = new OlympaPermission(OlympaGroup.ASSISTANT);
-	public static final OlympaPermission STAFF_BYPASS_VANILLA_COMMANDS = new OlympaPermission(OlympaGroup.MOD);
-	public static final OlympaPermission STAFF_BYPASS_WORLDEDIT = new OlympaPermission(OlympaGroup.MODP);
-	public static final OlympaPermission STAFF_PLOT_OWNER_EVERYWHERE = new OlympaPermission(OlympaGroup.MODP);
+	public static final OlympaPermission STAFF_BYPASS_PLOT_KICK_AND_BAN = new OlympaPermission(OlympaGroup.DEV);
+	public static final OlympaPermission STAFF_BYPASS_VANILLA_COMMANDS = new OlympaPermission(OlympaGroup.DEV);
+	public static final OlympaPermission STAFF_BYPASS_WORLDEDIT = new OlympaPermission(OlympaGroup.DEV);
+	public static final OlympaPermission STAFF_PLOT_OWNER_EVERYWHERE = new OlympaPermission(OlympaGroup.DEV);
 	
 	 
 	/*nb de plots propriétaire :

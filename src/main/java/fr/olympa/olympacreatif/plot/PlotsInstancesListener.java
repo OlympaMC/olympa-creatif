@@ -250,7 +250,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plotTo != null) {
 			if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(e.getPlayer().getUniqueId()).getId())) {
 				e.setCancelled(true);
-				e.getPlayer().setVelocity(e.getPlayer().getVelocity().multiply(-1));
+				//e.getPlayer().setVelocity(e.getPlayer().getVelocity().multiply(-1));
 				//e.getPlayer().teleport(new Location(e.getPlayer().getWorld(), 5 * (e.getTo().getX() - e.getFrom().getX()), 0, 5 * (e.getTo().getZ() - e.getFrom().getZ())));
 				e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
 				return;

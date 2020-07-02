@@ -1,11 +1,14 @@
 package fr.olympa.olympacreatif.gui;
 
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
@@ -37,6 +40,11 @@ public class StaffGui extends OlympaGUI {
 		inv.setItem(3, ItemUtils.item(Material.REDSTONE_TORCH, "§6Fake owner", "§7Permet d'éditer le plot comme si vous", "§7en étiez le propriétaire"));
 		inv.setItem(3 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().getGroup().getName(pc.getGender())));
 
+		inv.setItem(4, ItemUtils.itemSeparator(DyeColor.RED));
+		inv.setItem(4 + 9, ItemUtils.itemSeparator(DyeColor.RED));
+		
+		//TODO clear plot, stoplag plot, ...
+		
 		if (pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN))
 			toggleSwitch(0);
 		if (pc.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
@@ -50,32 +58,26 @@ public class StaffGui extends OlympaGUI {
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		
-		Bukkit.broadcastMessage(p.getName() + " a la perm bypass kick ban plot : " + StaffPerm.BYPASS_KICK_AND_BAN.getOlympaPerm().hasPermission(p.getUniqueId()));
-		
 		switch (slot) {
 		case 0:
-			if (StaffPerm.BYPASS_KICK_AND_BAN.getOlympaPerm().hasPermission(pc)) {
-				pc.toggleStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN);
+			if (pc.toggleStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) 
 				toggleSwitch(slot);
-			}
+			
 			break;
 		case 1:
-			if (StaffPerm.BYPASS_VANILLA_COMMANDS.getOlympaPerm().hasPermission(pc)) {
-				pc.toggleStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS);
+			if (pc.toggleStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
 				toggleSwitch(slot);
-			}
+			
 			break;
 		case 2:
-			if (StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().hasPermission(pc)) {
-				pc.toggleStaffPerm(StaffPerm.BYPASS_WORLDEDIT);
+			if (pc.toggleStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
 				toggleSwitch(slot);
-			}
+			
 			break;
 		case 3:
-			if (StaffPerm.FAKE_OWNER_EVERYWHERE.getOlympaPerm().hasPermission(pc)) {
-				pc.toggleStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE);
+			if (pc.toggleStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))	
 				toggleSwitch(slot);
-			}
+			
 			break;
 		}
 		
@@ -92,13 +94,17 @@ public class StaffGui extends OlympaGUI {
 		if (ItemUtils.hasEnchant(it, Enchantment.DURABILITY)) {
 			it = ItemUtils.removeEnchant(it, Enchantment.DURABILITY);
 			
-			inv.getItem(slot).setType(Material.RED_WOOL);
-			inv.setItem(slot, ItemUtils.name(inv.getItem(slot), "§cInactif"));
+			inv.getItem(slot + 9).setType(Material.RED_WOOL);
+			inv.setItem(slot + 9, ItemUtils.name(inv.getItem(slot + 9), "§cInactif"));
 		}else {
 			it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
-
-			inv.getItem(slot).setType(Material.GREEN_WOOL);
-			inv.setItem(slot, ItemUtils.name(inv.getItem(slot), "§aActif"));
+			
+			ItemMeta itMeta = it.getItemMeta();
+			itMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			it.setItemMeta(itMeta);
+			
+			inv.getItem(slot + 9).setType(Material.GREEN_WOOL);
+			inv.setItem(slot + 9, ItemUtils.name(inv.getItem(slot + 9), "§aActif"));
 		}
 	}
 }

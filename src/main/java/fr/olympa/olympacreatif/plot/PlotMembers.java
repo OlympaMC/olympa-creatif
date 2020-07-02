@@ -107,7 +107,7 @@ public class PlotMembers{
 		MEMBER("member_level", 1, "§bMembre"),
 		TRUSTED("trusted_level", 2, "§3Contremaître"),
 		CO_OWNER("coowner_level", 3, "§9Co-propriétaire"),
-		OWNER("owner_level", 4, "§1Propriétaire");
+		OWNER("owner_level", 4, "§4Propriétaire");
 		
 		
 		private String s;

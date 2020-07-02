@@ -40,8 +40,6 @@ public class Plot {
 	
 	private Map<String, BossBar> bossbarsList = new HashMap<String, BossBar>();
 	
-	//private boolean isActive = true; //sert à détecter quand un chunk est inactif
-	
 	//constructeur pour un plot n'existant pas encore
 	public Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
 		this.plugin = plugin;
