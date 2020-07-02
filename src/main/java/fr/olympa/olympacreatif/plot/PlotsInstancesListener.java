@@ -424,6 +424,7 @@ public class PlotsInstancesListener implements Listener{
 		
 	}
 	
+	/*
 	private void tpPlayerToPlotSpawnOnDeath(EntityDamageEvent e, Plot plot) {
 		Player p =  (Player) e.getEntity();
 		if (((Player)e.getEntity()).getHealth() - e.getDamage() <= 0) {
@@ -433,6 +434,7 @@ public class PlotsInstancesListener implements Listener{
 			p.setFoodLevel(20);
 		}
 	}	
+	*/
 	
 	@EventHandler //empêche le drop d'items si interdit sur le plot (et cancel si route)
 	public void onDropItem(PlayerDropItemEvent e) {

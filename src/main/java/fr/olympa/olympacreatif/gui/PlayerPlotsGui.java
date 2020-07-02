@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -15,6 +16,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class PlayerPlotsGui extends OlympaGUI {
@@ -69,7 +71,7 @@ public class PlayerPlotsGui extends OlympaGUI {
 		
 		if (slot < playerPlots.size()) {
 			p.closeInventory();
-			p.teleport(playerPlots.get(slot).getId().getLocation());
+			p.teleport((Location) playerPlots.get(slot).getParameters().getParameter(PlotParamType.SPAWN_LOC));
 			p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
 		}
 		

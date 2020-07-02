@@ -246,12 +246,12 @@ public class CbObjective {
 	public int setDisplaySlot(DisplaySlot newDisplaySlot) {
 		if (newDisplaySlot == displaySlot)
 			return 0;
-
-		displaySlot = newDisplaySlot;
 		
 		for (CbObjective obj : plugin.getCommandBlocksManager().getObjectives(plot))
-			if (obj.getDisplaySlot() == displaySlot)
+			if (obj.getDisplaySlot() == newDisplaySlot)
 				obj.clearDisplaySlot();
+
+		displaySlot = newDisplaySlot;
 		
 		if (displaySlot == DisplaySlot.BELOW_NAME) 
 			plugin.getCommandBlocksManager().getObjectiveBelowName(plot).setDisplayName(objName);
@@ -276,6 +276,8 @@ public class CbObjective {
 
 		if (displaySlot == DisplaySlot.BELOW_NAME)
 			plugin.getCommandBlocksManager().clearBelowName(plot);
+		
+		displaySlot = null;
 	}
 
 	public DisplaySlot getDisplaySlot() {

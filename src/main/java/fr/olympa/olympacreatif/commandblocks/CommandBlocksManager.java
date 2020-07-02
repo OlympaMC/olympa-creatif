@@ -79,8 +79,8 @@ public class CommandBlocksManager {
 		
 		//met de côté le scoreboard pour un usage ultérieur
 		Scoreboard scb = plotsScoreboards.get(plot);
-		scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
-		scb.registerNewObjective("belowName", "dummy", "à spécifier");
+		if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
+			scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
 		
 		plotsScoreboards.remove(plot);
 		unusedScoreboards.add(scb);

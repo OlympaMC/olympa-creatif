@@ -1,6 +1,5 @@
 package fr.olympa.olympacreatif.gui;
 
-import java.util.Random;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
@@ -9,16 +8,15 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class MainGui extends OlympaGUI {
 
@@ -143,7 +141,7 @@ public class MainGui extends OlympaGUI {
 		case 32:
 			if (plugin.getPlotsManager().getPlots().size()>0) {
 				Plot pl = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
-				p.teleport(pl.getId().getLocation());
+				p.teleport((Location) pl.getParameters().getParameter(PlotParamType.SPAWN_LOC));
 				p.sendMessage(Message.TELEPORT_TO_RANDOM_PLOT.getValue());	
 			}
 			break;

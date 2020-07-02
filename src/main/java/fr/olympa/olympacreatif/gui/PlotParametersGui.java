@@ -50,7 +50,7 @@ public class PlotParametersGui extends OlympaGUI {
 		inv.setItem(17, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 		
 		if (plot.getMembers().getPlayerLevel(pc) >= 3)
-			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs", "§8Cliquez pour changer la valeur"};
+			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs", "§7Cliquez pour changer la valeur"};
 		else
 			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs"};
 		
@@ -172,6 +172,14 @@ public class PlotParametersGui extends OlympaGUI {
 
 		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(13,it);
+
+		//14 : Gamerule keepInventory
+		it = ItemUtils.item(Material.BUCKET, "§6Conservation items à la mort");
+
+		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH));
+
+		it = ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(14,it);
 	}
 
 	@Override
@@ -281,6 +289,10 @@ public class PlotParametersGui extends OlympaGUI {
 		case 13:
 			current = setSwitchState(current, !getSwitchState(current));
 			plot.getParameters().setParameter(PlotParamType.ALLOW_PVE, getSwitchState(current));
+			break;
+		case 14:
+			current = setSwitchState(current, !getSwitchState(current));
+			plot.getParameters().setParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH, getSwitchState(current));
 			break;
 		}
 		

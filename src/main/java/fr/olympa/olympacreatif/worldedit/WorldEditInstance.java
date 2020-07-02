@@ -107,7 +107,7 @@ public class WorldEditInstance {
 			return WorldEditError.ERR_OPERATION_TOO_BIG;
 		
 		//vérification que les deux points sont bien dans le même plot
-		if (pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) || 
+		if (!pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) || 
 				(pos1 != null && pos2 != null &&
 				plugin.getPlotsManager().getPlot(pos1) != null && plugin.getPlotsManager().getPlot(pos2) != null &&
 				!plugin.getPlotsManager().getPlot(pos1).equals(plugin.getPlotsManager().getPlot(pos2)) ))
@@ -302,14 +302,16 @@ public class WorldEditInstance {
 		//localisation du bloc à poser
 		Location loc;
 		
+		boolean playerBypassOrAbsoluteLocation = pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) || !useRelativeLocation;
+		
 		for (Entry<Location, SimpleEntry<BlockData, TileEntity>> entry : clipboard2.entrySet()) {
 			if (useRelativeLocation)
 				targetPlot = plugin.getPlotsManager().getPlot(entry.getKey().clone().add(p.getLocation()));
 
 			//si le plot cible n'est pas nul ou si les coordonnées sont absolues
-			if (targetPlot != null || !useRelativeLocation) {
+			if (playerBypassOrAbsoluteLocation || targetPlot != null) {
 				//si le plot cible est égal à celui de départ ou si les coordonnées sont absolues
-				if (!useRelativeLocation || clipboardPlot.equals(targetPlot)) {
+				if (playerBypassOrAbsoluteLocation || targetPlot.equals(clipboardPlot)) {
 					
 					//paste du block
 					if (useRelativeLocation)
