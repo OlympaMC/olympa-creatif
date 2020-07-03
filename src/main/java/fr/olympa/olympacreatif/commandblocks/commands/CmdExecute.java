@@ -169,7 +169,7 @@ public class CmdExecute extends CbCommand {
 				if (subArgs.size() == 5 && (subArgs.get(1).equals("result") || subArgs.get(1).equals("success"))) {
 					
 					if (subArgs.get(2).equals("bossbar") && subArgs.get(4).equals("value")) {//stockage du résultat de la commande suivante dans une bossbar
-						BossBar bar = plot.getBossBar(subArgs.get(3));
+						BossBar bar = plot.getCbBossBar(subArgs.get(3)).getBar();
 						
 						if (bar != null)
 							for (Location loc : sendLocations)

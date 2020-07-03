@@ -367,7 +367,7 @@ public abstract class CbCommand {
 	}
 	
 	//renvoie deux entiers resprésentant les bornes du string (qui doit être sur le modèle 4..7)
-	private Integer[] getIntRange(String s) {
+	public Integer[] getIntRange(String s) {
 		Integer[] response = new Integer[2];
 		
 		

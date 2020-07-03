@@ -18,6 +18,7 @@ import org.bukkit.event.HandlerList;
 
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
@@ -38,7 +39,7 @@ public class Plot {
 	
 	private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
-	private Map<String, BossBar> bossbarsList = new HashMap<String, BossBar>();
+	private Map<String, CbBossBar> bossbarsList = new HashMap<String, CbBossBar>();
 	
 	//constructeur pour un plot n'existant pas encore
 	public Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
@@ -135,18 +136,18 @@ public class Plot {
 		return protectedZoneData;
 	}
 	
-	public void addBossBar(String id, BossBar bar){
+	public void addBossBar(String id, CbBossBar bar){
 		if (!bossbarsList.containsKey(id)) 
 			bossbarsList.put(id, bar);
 	}
 	
-	public BossBar getBossBar(String id) {
+	public CbBossBar getCbBossBar(String id) {
 		return bossbarsList.get(id);
 	}
 	
 	public boolean removeBossBar(String id) {
 		if (bossbarsList.containsKey(id)) {
-			bossbarsList.get(id).removeAll();
+			bossbarsList.get(id).getBar().removeAll();
 			bossbarsList.remove(id);
 			return true;
 		}else
@@ -154,7 +155,7 @@ public class Plot {
 			
 	}
 	
-	public Map<String, BossBar> getBossBars() {
+	public Map<String, CbBossBar> getBossBars() {
 		return Collections.unmodifiableMap(bossbarsList);
 	}
 

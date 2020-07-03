@@ -89,8 +89,8 @@ public class CommandBlocksManager {
 		for (CbTeam t : plotTeams.get(plot))
 			t.executeDeletionActions();
 		
-		for (BossBar bar : plot.getBossBars().values())
-			bar.removeAll();
+		for (CbBossBar bar : plot.getBossBars().values())
+			bar.getBar().removeAll();
 	}
 	
 	//gestion des scoreboards (affichage sidebar/belowname)
@@ -229,7 +229,7 @@ public class CommandBlocksManager {
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());
 		
-		for (BossBar bar : fromPlot.getBossBars().values())
-			bar.removePlayer(p);
+		for (CbBossBar bar : fromPlot.getBossBars().values())
+			bar.getBar().removePlayer(p);
 	}
 }

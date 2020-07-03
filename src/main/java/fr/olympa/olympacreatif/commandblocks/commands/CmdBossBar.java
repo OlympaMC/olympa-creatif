@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
 
@@ -25,39 +26,41 @@ public class CmdBossBar extends CbCommand {
 	@Override
 	public int execute() {
 		
-		BossBar bar = null;
+		CbBossBar bar = null;
 		
 		switch (args[0]) {
 		case "add":
 			if (args.length != 3)
 				return 0;
 			
-			plot.addBossBar(args[1], Bukkit.createBossBar(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[2])), BarColor.WHITE, BarStyle.SOLID));
+			BossBar bukkitBar = Bukkit.createBossBar(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[2])), BarColor.WHITE, BarStyle.SOLID);
+			
+			plot.addBossBar(args[1], new CbBossBar(plugin, bukkitBar));
 			return 1;
 			
 		case "get":
 			if (args.length != 3)
 				return 0;
 			
-			bar = plot.getBossBar(args[1]);
+			bar = plot.getCbBossBar(args[1]);
 			if (bar == null)
 				return 0;
 			
 			switch (args[2]) {
 			case "max":
-				return 100;
+				return bar.getMax();
 			case "value":
-				return (int) bar.getProgress();
+				return (int) bar.getBar().getProgress();
 			case "players":
-				return bar.getPlayers().size();
+				return bar.getBar().getPlayers().size();
 			default:
 				return 0;
 			}
 			
 		case "list":
 			sender.sendMessage("§6  >>>  Bossbars du plot " + plot.getId().getAsString() + " <<<");
-			for (Entry<String, BossBar> e : plot.getBossBars().entrySet()) 
-				sender.sendMessage("   §e> " + e.getKey() + " (" + e.getValue().getTitle() + "§r§e) : " + e.getValue().getPlayers().size() + " joueur(s)");
+			for (Entry<String, CbBossBar> e : plot.getBossBars().entrySet()) 
+				sender.sendMessage("   §e> " + e.getKey() + " (" + e.getValue().getBar().getTitle() + "§r§e) : " + e.getValue().getBar().getPlayers().size() + " joueur(s)");
 			
 			return 1;
 			
@@ -71,7 +74,7 @@ public class CmdBossBar extends CbCommand {
 			if (args.length != 4)
 				return 0;
 			
-			bar = plot.getBossBar(args[1]);
+			bar = plot.getCbBossBar(args[1]);
 			
 			if (bar == null)
 				return 0;
@@ -80,49 +83,50 @@ public class CmdBossBar extends CbCommand {
 			case "color":
 				switch (args[3]) {
 				case "white":
-					bar.setColor(BarColor.WHITE);
+					bar.getBar().setColor(BarColor.WHITE);
 					return 1;
 				case "red":
-					bar.setColor(BarColor.RED);
+					bar.getBar().setColor(BarColor.RED);
 					return 1;
 				case "blue":
-					bar.setColor(BarColor.BLUE);
+					bar.getBar().setColor(BarColor.BLUE);
 					return 1;
 				case "green":
-					bar.setColor(BarColor.GREEN);
+					bar.getBar().setColor(BarColor.GREEN);
 					return 1;
 				case "pink":
-					bar.setColor(BarColor.PINK);
+					bar.getBar().setColor(BarColor.PINK);
 					return 1;
 				case "purple":
-					bar.setColor(BarColor.PURPLE);
+					bar.getBar().setColor(BarColor.PURPLE);
 					return 1;
 				case "yellow":
-					bar.setColor(BarColor.YELLOW);
+					bar.getBar().setColor(BarColor.YELLOW);
 					return 1;
 				default:
 					return 0;
 				}
 				
 			case "name":
-				bar.setTitle(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[3])));
+				bar.getBar().setTitle(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[3])));
 				return 1;
 				
 			case "value":
 				int val = 0;
 				
 				if (StringUtils.isNumeric(args[3]))
-					val = Math.max((int) (double) Double.valueOf(args[3]), 0);
+					val = (int) (double) Double.valueOf(args[3]);
 				else
 					return 0;
 				
-				bar.setProgress(val);
+				bar.setValue(val);
 				return 1;
 				
 			case "players":
+				
 				targetEntities = parseSelector(args[3], true);
 				for (Entity p : targetEntities)
-					bar.addPlayer((Player) p);
+					bar.getBar().addPlayer((Player) p);
 				
 				return targetEntities.size();
 				
@@ -132,19 +136,19 @@ public class CmdBossBar extends CbCommand {
 				
 				switch (args[3]) {
 				case "progress":
-					bar.setStyle(BarStyle.SOLID);
+					bar.getBar().setStyle(BarStyle.SOLID);
 					return 1;
 				case "notched_10":
-					bar.setStyle(BarStyle.SEGMENTED_10);
+					bar.getBar().setStyle(BarStyle.SEGMENTED_10);
 					return 1;
 				case "notched_12":
-					bar.setStyle(BarStyle.SEGMENTED_12);
+					bar.getBar().setStyle(BarStyle.SEGMENTED_12);
 					return 1;
 				case "notched_20":
-					bar.setStyle(BarStyle.SEGMENTED_20);
+					bar.getBar().setStyle(BarStyle.SEGMENTED_20);
 					return 1;
 				case "notched_6":
-					bar.setStyle(BarStyle.SEGMENTED_6);
+					bar.getBar().setStyle(BarStyle.SEGMENTED_6);
 					return 1;
 				default:
 					return 0;
@@ -153,10 +157,10 @@ public class CmdBossBar extends CbCommand {
 			case "visible":
 				switch(args[3]) {
 				case "true":
-					bar.setVisible(true);
+					bar.getBar().setVisible(true);
 					return 1;
 				case "false":
-					bar.setVisible(false);
+					bar.getBar().setVisible(false);
 					return 1;
 				default:
 				return 0;
