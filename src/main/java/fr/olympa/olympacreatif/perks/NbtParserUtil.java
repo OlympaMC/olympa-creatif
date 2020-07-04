@@ -381,12 +381,30 @@ public class NbtParserUtil {
 	//renvoie un NBTTagList à partir d'arguments d'un string json
 	public static NBTTagList getListCompoundFromString(String concat) {
 
-		try {
-			concat = "{list:" + concat.replace("\"\",", "").replace(",\"\"", "") + "}";
-			
-			return MojangsonParser.parse(concat).getList("list", 10);
-		} catch (CommandSyntaxException e) {
-			return new NBTTagList();
+		//si le concat est formé comme un NBTTagCompound
+		if (concat.startsWith("{")) {
+			try {
+				NBTTagCompound tag = MojangsonParser.parse(concat);
+				NBTTagList list = new NBTTagList();
+				
+				list.add(tag);
+				return list;
+			} catch(CommandSyntaxException e) {
+				return new NBTTagList();
+			}	
 		}
+		
+		//si le concat est formaté comme une liste
+		if (concat.startsWith("[")) {
+			try {
+				concat = "{list:" + concat.replace("\"\",", "").replace(",\"\"", "") + "}";
+				
+				return MojangsonParser.parse(concat).getList("list", 10);
+			} catch (CommandSyntaxException e) {
+				return new NBTTagList();
+			}	
+		}
+		
+		return new NBTTagList();
 	}
 }

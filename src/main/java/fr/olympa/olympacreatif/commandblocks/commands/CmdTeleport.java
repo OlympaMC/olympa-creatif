@@ -22,7 +22,7 @@ public class CmdTeleport extends CbCommand {
 		case 1:
 			if (sender instanceof Entity) {
 				targetEntities.add((Entity) sender);
-				for (Entity e : parseSelector(args[1], false))
+				for (Entity e : parseSelector(args[0], false))
 					tpPoints.add(e.getLocation());	
 			}
 			break;

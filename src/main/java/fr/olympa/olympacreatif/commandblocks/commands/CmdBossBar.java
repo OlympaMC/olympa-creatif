@@ -114,13 +114,31 @@ public class CmdBossBar extends CbCommand {
 			case "value":
 				int val = 0;
 				
-				if (StringUtils.isNumeric(args[3]))
+				if (StringUtils.isNumeric(args[3])) {
 					val = (int) (double) Double.valueOf(args[3]);
+					if (val < 0)
+						return 0;
+				}
 				else
 					return 0;
 				
 				bar.setValue(val);
 				return 1;
+				
+			case "max":
+				int max = 100;
+
+				if (StringUtils.isNumeric(args[3])) {
+					max = (int) (double) Double.valueOf(args[3]);
+					if (max <= 0)
+						return 0;
+				}
+				else
+					return 0;
+				
+				bar.setMax(max);
+				return 1;
+				
 				
 			case "players":
 				
