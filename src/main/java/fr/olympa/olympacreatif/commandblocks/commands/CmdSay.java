@@ -31,7 +31,7 @@ public class CmdSay extends CbCommand {
 		for (Entity e : targetEntities)
 			((Player)e).sendMessage(ChatColor.translateAlternateColorCodes('&', message));
 		
-		return targetEntities.size();
+		return 1;
 	}
 
 }

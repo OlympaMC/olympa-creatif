@@ -31,7 +31,7 @@ public class CmdExecuteBis extends CbCommand {
 
 	@Override
 	public int execute() {
-		Map<ExecuteType, List<String>> subCommands = new LinkedHashMap<ExecuteType, List<String>>();
+		LinkedHashMap<ExecuteType, List<String>> subCommands = new LinkedHashMap<ExecuteType, List<String>>();
 		
 		//liste utilisée exclusivement pour la génération de la map subCommands
 		List<String> subArgs = new ArrayList<String>();
@@ -59,6 +59,10 @@ public class CmdExecuteBis extends CbCommand {
 		if (currentType == ExecuteType.cmd_run)
 			subCommands.put(currentType, subArgs);
 		
+		//passage de la sous commande store (s'il y en a une) tout à la fin de la liste
+		if (subCommands.keySet().contains(ExecuteType.cmd_store))
+			subCommands.put(ExecuteType.cmd_store, subCommands.remove(ExecuteType.cmd_store));
+		
 		List<CommandSender> listSenders = new ArrayList<CommandSender>();
 		List<Location> listLocations = new ArrayList<Location>();
 		
@@ -67,6 +71,8 @@ public class CmdExecuteBis extends CbCommand {
 		
 		//résultats commande (nombre de résultats = locations * commandSender)
 		List<Integer> cmdResults = new ArrayList<Integer>();
+		
+		//Bukkit.broadcastMessage(subCommands.toString());
 		
 		for (Entry<ExecuteType, List<String>> subCmd : subCommands.entrySet()) 
 			switch (subCmd.getKey()) {
@@ -136,12 +142,10 @@ public class CmdExecuteBis extends CbCommand {
 						
 						Integer result = executeIfUnlessTest(subCmd.getValue());
 						
-						Bukkit.broadcastMessage("result : " + result);
-						
 						if (result == null)
 							return 0;
 						
-						if (result == 0) 
+						if (result == 0)
 							listLocations.remove(loc);
 						
 
@@ -188,8 +192,6 @@ public class CmdExecuteBis extends CbCommand {
 					for (CommandSender s : listSenders) {
 						sender = s;
 						
-						//Bukkit.broadcastMessage("sender : " + sender.toString() + " + loc : " + sendingLoc.toString());
-						
 						CbCommand runCmd = CbCommand.getCommand(plugin, sender, sendingLoc, stringCmd);
 						if (runCmd == null)
 							return 0;
@@ -198,71 +200,72 @@ public class CmdExecuteBis extends CbCommand {
 					}
 				}
 				break;
+				
+			case cmd_store:
+				
+				//Bukkit.broadcastMessage(cmdResults.size() + " = " + listSenders.size() + " * " + listLocations.size());
+				
+				//return si le nombre de résultats n'est pas suffisant
+				if (cmdResults.size() != listSenders.size() * listLocations.size())
+					return 0;
+				
+				List<String> subCmdArgs = subCommands.get(ExecuteType.cmd_store);
+				
+				if (subCmdArgs.size() == 0)
+					return 0;
+				
+				//support de deux types de store : score et bossbar
+				switch (subCmdArgs.get(1)) {
+				case "score":
+					
+					if (subCmdArgs.size() != 4)
+						return 0;
+					
+					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, subCmdArgs.get(3));
+					
+					if (obj == null)
+						return 0;
+					
+					int i = -1;
+					
+					for (Location loc : listLocations) {
+						sendingLoc = loc;
+						for (CommandSender s : listSenders) {
+							sender = s;
+							
+							i++;
+							//pour chaque entité du sélecteur, stockage du résultat précédent dans score obj
+							for (Entity e : parseSelector(subCmdArgs.get(2), false))
+								obj.set(e, cmdResults.get(i));
+						}
+					}
+					break;
+					
+					
+				case "bossbar":
+					
+					if (subCmdArgs.size() != 4)
+						return 0;
+					
+					CbBossBar bar = plot.getCbBossBar(subCmdArgs.get(2));
+					
+					if (bar == null || cmdResults.size() == 0)
+						return 0;
+					
+					switch (subCmdArgs.get(3)) {
+					case "value":
+						bar.setValue(cmdResults.get(0));
+						break;
+					case "max":
+						bar.setMax(cmdResults.get(0));
+					}	
+				}
+				
+				break;
 			default:
 				return 0;
 			}
-		
-		//exécution store si subcommande présente
-		if (subCommands.keySet().contains(ExecuteType.cmd_store)) {
-			
-			//return si le nombre de résultats n'est pas suffisant
-			if (cmdResults.size() != listSenders.size() * listLocations.size())
-				return 0;
-			
-			List<String> subCmdArgs = subCommands.get(ExecuteType.cmd_store);
-			
-			if (subCmdArgs.size() < 2)
-				return 0;
-			
-			//support de deux types de store : score et bossbar
-			switch (subCmdArgs.get(1)) {
-			case "score":
-				
-				if (subCmdArgs.size() != 4)
-					return 0;
-				
-				CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, subCmdArgs.get(3));
-				
-				if (obj == null)
-					return 0;
-				
-				int i = -1;
-				
-				for (Location loc : listLocations) {
-					sendingLoc = loc;
-					for (CommandSender s : listSenders) {
-						sender = s;
-						
-						i++;
-						//pour chaque entité du sélecteur, stockage du résultat précédent dans score obj
-						for (Entity e : parseSelector(subCmdArgs.get(2), false))
-							obj.set(e, cmdResults.get(i));
-					}
-				}
-				break;
-				
-				
-			case "bossbar":
-				
-				if (subCmdArgs.size() != 4)
-					return 0;
-				
-				CbBossBar bar = plot.getCbBossBar(subCmdArgs.get(2));
-				
-				if (bar == null || cmdResults.size() == 0)
-					return 0;
-				
-				switch (subCmdArgs.get(3)) {
-				case "value":
-					bar.setValue(cmdResults.get(0));
-					break;
-				case "max":
-					bar.setMax(cmdResults.get(0));
-				}
-				
-			}
-		}
-		
+
 		//return final
 		if (cmdResults.size() == 0)
 			return 0;
@@ -273,8 +276,6 @@ public class CmdExecuteBis extends CbCommand {
 	private Integer executeIfUnlessTest(List<String> args) {
 		if (args.size() == 0)
 			return null;
-		
-		Bukkit.broadcastMessage(args.toString());
 		
 		switch (args.get(0)) {
 		
