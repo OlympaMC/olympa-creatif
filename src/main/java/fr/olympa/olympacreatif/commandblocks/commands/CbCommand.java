@@ -451,8 +451,8 @@ public abstract class CbCommand {
 		Plot plot = null;
 		String[] args = fullCommand.split(" ");
 
-		if (sender instanceof Player) {
-			plot = plugin.getPlotsManager().getPlot(((Player) sender).getLocation());	
+		if (sender instanceof Entity) {
+			plot = plugin.getPlotsManager().getPlot(((Entity) sender).getLocation());	
 		}
 		if (sender instanceof CommandBlock) {
 			plot = plugin.getPlotsManager().getPlot(((CommandBlock) sender).getLocation());	

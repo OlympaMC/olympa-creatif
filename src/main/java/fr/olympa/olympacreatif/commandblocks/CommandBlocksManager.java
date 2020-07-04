@@ -79,11 +79,14 @@ public class CommandBlocksManager {
 		
 		//met de côté le scoreboard pour un usage ultérieur
 		Scoreboard scb = plotsScoreboards.get(plot);
-		if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
-			scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
 		
-		plotsScoreboards.remove(plot);
-		unusedScoreboards.add(scb);
+		if (scb != null) {
+			if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
+				scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
+			
+			plotsScoreboards.remove(plot);
+			unusedScoreboards.add(scb);	
+		}
 		
 		//clear des teams
 		for (CbTeam t : plotTeams.get(plot))

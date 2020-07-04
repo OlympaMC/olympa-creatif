@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class CmdExecuteBis extends CbCommand {
 		
 		ExecuteType currentType = null;
 		
+		//extraction de chaque subcommand
 		for (String s : args) {
 			ExecuteType newType = ExecuteType.getSubCommandType(s);
 			
@@ -54,13 +56,16 @@ public class CmdExecuteBis extends CbCommand {
 			}
 		}
 		
+		if (currentType == ExecuteType.cmd_run)
+			subCommands.put(currentType, subArgs);
+		
 		List<CommandSender> listSenders = new ArrayList<CommandSender>();
 		List<Location> listLocations = new ArrayList<Location>();
 		
 		listSenders.add(sender);
 		listLocations.add(sendingLoc);
 		
-		//résultats commande (factorisation locations * commandSender)
+		//résultats commande (nombre de résultats = locations * commandSender)
 		List<Integer> cmdResults = new ArrayList<Integer>();
 		
 		for (Entry<ExecuteType, List<String>> subCmd : subCommands.entrySet()) 
@@ -129,14 +134,16 @@ public class CmdExecuteBis extends CbCommand {
 					for (CommandSender s : new ArrayList<CommandSender>(listSenders)) {
 						sender = s;
 						
-						Integer result = executeIfUnlessTest(subArgs);
+						Integer result = executeIfUnlessTest(subCmd.getValue());
+						
+						Bukkit.broadcastMessage("result : " + result);
+						
 						if (result == null)
 							return 0;
 						
-						if (result == 0) {
+						if (result == 0) 
 							listLocations.remove(loc);
-							listSenders.remove(s);
-						}
+						
 
 						cmdResults.add(result);	
 					}
@@ -152,14 +159,13 @@ public class CmdExecuteBis extends CbCommand {
 					for (CommandSender s : new ArrayList<CommandSender>(listSenders)) {
 						sender = s;
 						
-						Integer result = executeIfUnlessTest(subArgs);
+						Integer result = executeIfUnlessTest(subCmd.getValue());
 						if (result == null)
 							return 0;
 						
-						if (result != 0) {
+						if (result != 0) 
 							listLocations.remove(loc);
-							listSenders.remove(s);
-						}
+						
 
 						cmdResults.add(result);	
 					}
@@ -181,7 +187,9 @@ public class CmdExecuteBis extends CbCommand {
 					sendingLoc = loc;
 					for (CommandSender s : listSenders) {
 						sender = s;
-
+						
+						//Bukkit.broadcastMessage("sender : " + sender.toString() + " + loc : " + sendingLoc.toString());
+						
 						CbCommand runCmd = CbCommand.getCommand(plugin, sender, sendingLoc, stringCmd);
 						if (runCmd == null)
 							return 0;
@@ -266,25 +274,28 @@ public class CmdExecuteBis extends CbCommand {
 		if (args.size() == 0)
 			return null;
 		
+		Bukkit.broadcastMessage(args.toString());
+		
 		switch (args.get(0)) {
 		
 		case "block":
 
-			if (args.size() != 4)
+			if (args.size() != 5)
 				return null;
 			
 			//définition de la loc à tester
 			Location loc = getLocation(args.get(1), args.get(2), args.get(3));
+			
 			if (loc == null)
 				return 0;
-
+			
 			//définition du type cible
 			Material mat = null;
 			
-			if (args.get(4).split(".").length == 1)
-				mat = Material.getMaterial(args.get(4).split(".")[0]);
+			if (args.get(4).split(":").length == 2)
+				mat = Material.getMaterial(args.get(4).split(":")[1].toUpperCase());
 			else
-				mat = Material.getMaterial(args.get(4).split(".")[1]);
+				mat = Material.getMaterial(args.get(4).toUpperCase());
 			
 			if (mat == null)
 				return null;
