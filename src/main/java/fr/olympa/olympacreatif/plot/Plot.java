@@ -20,6 +20,7 @@ import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
+import fr.olympa.olympacreatif.commandblocks.PlotCommandBlockData;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.TileEntity;
@@ -32,6 +33,8 @@ public class Plot {
 	private PlotParameters parameters;
 	private PlotId plotId;
 	
+	private PlotCommandBlockData cbData;
+	
 	//private PlotListener listener;
 
 	private List<Player> playersInPlot = new ArrayList<Player>();
@@ -39,7 +42,7 @@ public class Plot {
 	
 	private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
-	private Map<String, CbBossBar> bossbarsList = new HashMap<String, CbBossBar>();
+	
 	
 	//constructeur pour un plot n'existant pas encore
 	public Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
@@ -84,18 +87,10 @@ public class Plot {
 	public PlotId getId() {
 		return plotId;
 	}
-	/*
-	public void unregisterListener() {
-		HandlerList.unregisterAll(listener);
-	}*/
-	/*
-	public boolean isActive() {
-		return isActive;
-	}
 	
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
-	}*/
+	public PlotCommandBlockData getCbData() {
+		return cbData;
+	}
 	
 	public void addPlayerInPlot(Player p) {
 		if (!playersInPlot.contains(p))
@@ -134,29 +129,6 @@ public class Plot {
 
 	public Map<Location, SimpleEntry<BlockData, TileEntity>> getProtectedZoneData() {
 		return protectedZoneData;
-	}
-	
-	public void addBossBar(String id, CbBossBar bar){
-		if (!bossbarsList.containsKey(id)) 
-			bossbarsList.put(id, bar);
-	}
-	
-	public CbBossBar getCbBossBar(String id) {
-		return bossbarsList.get(id);
-	}
-	
-	public boolean removeBossBar(String id) {
-		if (bossbarsList.containsKey(id)) {
-			bossbarsList.get(id).getBar().removeAll();
-			bossbarsList.remove(id);
-			return true;
-		}else
-			return false;
-			
-	}
-	
-	public Map<String, CbBossBar> getBossBars() {
-		return Collections.unmodifiableMap(bossbarsList);
 	}
 
 	public void unload() {

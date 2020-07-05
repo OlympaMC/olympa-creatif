@@ -7,8 +7,10 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.CommandBlock;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_15_R1.command.CraftBlockCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -52,13 +54,17 @@ public class CbCommandListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onPreprocessCommandServer(ServerCommandEvent e) {
-		if (!(e.getSender() instanceof CommandBlock))
+	public void onPreprocessCommandServer(ServerCommandEvent e) {		
+		if (!(e.getSender() instanceof CraftBlockCommandSender) || !(((CraftBlockCommandSender) e.getSender()).getBlock().getState() instanceof CommandBlock))
 			return;
 		
+		CommandBlock cb = ((CommandBlock)((CraftBlockCommandSender)e.getSender()).getBlock().getState());
+		
 		e.setCancelled(true);
-			
-		CbCommand cmd = getCommand(e.getSender(), ((CommandBlock)e.getSender()).getLocation(), e.getCommand());
+		
+		Bukkit.broadcastMessage("handled command : " + e.getCommand());
+
+		CbCommand cmd = getCommand(e.getSender(), cb.getLocation(), e.getCommand());
 		
 		if (cmd != null) 
 			executeCommandBlockCommand(cmd, e.getSender());			

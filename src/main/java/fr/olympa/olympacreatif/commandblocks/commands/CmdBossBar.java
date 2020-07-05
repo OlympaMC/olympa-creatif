@@ -35,14 +35,14 @@ public class CmdBossBar extends CbCommand {
 			
 			BossBar bukkitBar = Bukkit.createBossBar(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[2])), BarColor.WHITE, BarStyle.SOLID);
 			
-			plot.addBossBar(args[1], new CbBossBar(plugin, bukkitBar));
+			plotCbData.addBossBar(args[1], new CbBossBar(plugin, bukkitBar));
 			return 1;
 			
 		case "get":
 			if (args.length != 3)
 				return 0;
 			
-			bar = plot.getCbBossBar(args[1]);
+			bar = plotCbData.getBossBar(args[1]);
 			if (bar == null)
 				return 0;
 			
@@ -50,7 +50,7 @@ public class CmdBossBar extends CbCommand {
 			case "max":
 				return bar.getMax();
 			case "value":
-				return (int) bar.getBar().getProgress();
+				return bar.getValue();
 			case "players":
 				return bar.getBar().getPlayers().size();
 			default:
@@ -59,13 +59,13 @@ public class CmdBossBar extends CbCommand {
 			
 		case "list":
 			sender.sendMessage("§6  >>>  Bossbars du plot " + plot.getId().getAsString() + " <<<");
-			for (Entry<String, CbBossBar> e : plot.getBossBars().entrySet()) 
+			for (Entry<String, CbBossBar> e : plot.getCbData().getBossBars().entrySet()) 
 				sender.sendMessage("   §e> " + e.getKey() + " (" + e.getValue().getBar().getTitle() + "§r§e) : " + e.getValue().getBar().getPlayers().size() + " joueur(s)");
 			
 			return 1;
 			
 		case "remove":
-			if (plot.removeBossBar(args[1]))
+			if (plotCbData.removeBossBar(args[1]))
 				return 1;
 			else
 				return 0;
@@ -74,7 +74,7 @@ public class CmdBossBar extends CbCommand {
 			if (args.length != 4)
 				return 0;
 			
-			bar = plot.getCbBossBar(args[1]);
+			bar = plotCbData.getBossBar(args[1]);
 			
 			if (bar == null)
 				return 0;

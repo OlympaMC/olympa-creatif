@@ -45,7 +45,6 @@ public class PlotMembers{
 	}
 	
 	public void set(OlympaPlayerInformations p, PlotRank rank) {
-		
 		if (members.size() >= 18)
 			return;
 		

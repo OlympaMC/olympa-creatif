@@ -73,7 +73,7 @@ public class CmdTellraw extends CbCommand {
 							
 						}
 						
-						CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, score.getString("objective"));
+						CbObjective obj = plotCbData.getObjective(score.getString("objective"));
 						if (obj == null) 
 							break;
 						

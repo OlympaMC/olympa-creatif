@@ -28,8 +28,8 @@ public class CbTeamsListener implements Listener {
 		if (p1 == null || p2 == null || !p1.equals(p2))
 			return;
 		
-		CbTeam t1 = plugin.getCommandBlocksManager().getTeamOf(p1, e.getEntity());
-		CbTeam t2 = plugin.getCommandBlocksManager().getTeamOf(p1, e.getDamager());
+		CbTeam t1 = p1.getCbData().getTeamOf(e.getEntity());
+		CbTeam t2 = p1.getCbData().getTeamOf( e.getDamager());
 		
 		if (t1 != null && t2 != null && t1.equals(t2) && !t1.hasFriendlyFire())
 			e.setCancelled(true);

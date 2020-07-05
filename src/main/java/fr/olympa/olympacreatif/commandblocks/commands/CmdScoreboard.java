@@ -49,29 +49,29 @@ public class CmdScoreboard extends CbCommand {
 					if (obj.getType() == null)
 						return 0;
 
-					if (plugin.getCommandBlocksManager().registerObjective(plot, obj))
+					if (plotCbData.registerObjective(obj))
 						return 1;
 				}
 				break;
 				
 			case list:
 				sender.sendMessage("§6  >>>  Objectifs du plot " + plot.getId().getAsString() + " <<<");
-				for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot)) {
+				for (CbObjective o : plotCbData.getObjectives()) {
 					String paramType = "";
 					if (o.getParamType() != null)
 						paramType = " - " + o.getParamType().toString();
 					
 					sender.sendMessage("   §e> " + o.getId() + "(§r" + o.getName() + "§r§e) : " + o.getType().toString() + paramType);	
 				}
-				return plugin.getCommandBlocksManager().getObjectives(plot).size();
+				return plotCbData.getObjectives().size();
 				
 			case remove:
 				if (args.length >= 3) {
-					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[2]);
+					CbObjective obj = plotCbData.getObjective(args[2]);
 					
 					if (obj != null) {
 						obj.clearDisplaySlot();
-						plugin.getCommandBlocksManager().getObjectives(plot).remove(obj);
+						plotCbData.getObjectives().remove(obj);
 						return 1;
 					}
 				}
@@ -79,7 +79,7 @@ public class CmdScoreboard extends CbCommand {
 					
 			case setdisplay:
 				if (args.length == 4) {
-					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
+					CbObjective obj = plotCbData.getObjective(args[3]);
 					
 					if (obj != null) {
 						if (args[2].equals("belowName")) 
@@ -93,7 +93,7 @@ public class CmdScoreboard extends CbCommand {
 				
 			case modify:
 				if (args.length >= 5 && args[3].equals("displayname")) {
-					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[2]);
+					CbObjective obj = plotCbData.getObjective(args[2]);
 					
 					if (obj == null)
 						return 0;
@@ -114,7 +114,7 @@ public class CmdScoreboard extends CbCommand {
 			switch (playerType) {
 			case add:
 				if (args.length >= 5) {
-					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
+					CbObjective obj = plotCbData.getObjective(args[3]);
 					
 					int value = 0;
 					if (StringUtils.isNumeric(args[4]))
@@ -149,7 +149,7 @@ public class CmdScoreboard extends CbCommand {
 				break;
 			case get:
 				if (args.length >= 4) {
-					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
+					CbObjective obj = plotCbData.getObjective(args[3]);
 
 					if (obj != null) 
 						return obj.get(args[2]);
@@ -158,7 +158,7 @@ public class CmdScoreboard extends CbCommand {
 			case list:
 				if (args.length >= 3) {
 					sender.sendMessage("§6  >>>  Objectifs pour" + args[2] + " <<<");
-					for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
+					for (CbObjective o : plotCbData.getObjectives())
 						sender.sendMessage("   §e> " + o.getId() + " : " + o.get(args[2]));
 					return 1;
 				}
@@ -166,8 +166,8 @@ public class CmdScoreboard extends CbCommand {
 				
 			case operation:
 				if (args.length >= 7) {
-					CbObjective obj1 = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
-					CbObjective obj2 = plugin.getCommandBlocksManager().getObjective(plot, args[6]);
+					CbObjective obj1 = plotCbData.getObjective(args[3]);
+					CbObjective obj2 = plotCbData.getObjective(args[6]);
 					
 					if (obj1 != null && obj2 != null) {
 						String e1 = null;
@@ -203,7 +203,7 @@ public class CmdScoreboard extends CbCommand {
 				
 			case remove:
 				if (args.length >= 5) {
-					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
+					CbObjective obj = plotCbData.getObjective(args[3]);
 					
 					int value = 0;
 					if (StringUtils.isNumeric(args[4]))
@@ -233,11 +233,11 @@ public class CmdScoreboard extends CbCommand {
 					if (args[2].startsWith("@")) {
 						List<Entity> list = parseSelector(args[2], false);
 						
-						for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
+						for (CbObjective o : plotCbData.getObjectives())
 							for (Entity e : list)
 								o.set(e, null);
 					}else {
-						for (CbObjective o : plugin.getCommandBlocksManager().getObjectives(plot))
+						for (CbObjective o : plotCbData.getObjectives())
 							o.set(args[2], null);
 					}
 					return 1;
@@ -246,7 +246,7 @@ public class CmdScoreboard extends CbCommand {
 				
 			case set:
 				if (args.length >= 5) {
-					CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, args[3]);
+					CbObjective obj = plotCbData.getObjective(args[3]);
 					
 					int value = 0;
 					if (StringUtils.isNumeric(args[4]))

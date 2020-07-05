@@ -84,7 +84,7 @@ public class CbTeam {
 		if (members.contains(e))
 			return false;
 		
-		CbTeam quittedTeam = plugin.getCommandBlocksManager().getTeamOf(plot, e);
+		CbTeam quittedTeam = plot.getCbData().getTeamOf(e);
 		if (quittedTeam != null)
 			quittedTeam.removeMember(e);
 		else

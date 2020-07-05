@@ -32,6 +32,7 @@ import net.minecraft.server.v1_15_R1.ItemFireworks.EffectType;
 public class CommandBlocksManager {
 
 	private OlympaCreatifMain plugin;
+	
 	private Map<Plot, List<CbCommand>> queuedCommands = new LinkedHashMap<Plot, List<CbCommand>>();
 
 	private Map<Plot, List<CbObjective>> plotObjectives = new HashMap<Plot, List<CbObjective>>();
@@ -40,10 +41,13 @@ public class CommandBlocksManager {
 	//scoreboards utilisés pour l'affichage du belowName
 	private Map<Plot, Scoreboard> plotsScoreboards = new HashMap<Plot, Scoreboard>();
 	//scoreboards inutilisés qui seront réaffectés au besoin à d'autres plots chargés ultérieurement
+	  
+	 
+	 
 	private List<Scoreboard> unusedScoreboards = new ArrayList<Scoreboard>();
 	
-	private int maxTeamsPerPlot = 20;
-	private int maxScoreboardsPerPlot = 20;
+	public final static int maxTeamsPerPlot = 20;
+	public final static int maxScoreboardsPerPlot = 20;
 	
 	public CommandBlocksManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -52,6 +56,13 @@ public class CommandBlocksManager {
 		plugin.getServer().getPluginManager().registerEvents(new CbTeamsListener(plugin), plugin);
 		
 		Bukkit.getPluginManager().registerEvents(new CbCommandListener(plugin), plugin);
+	}
+	
+	public PlotCommandBlockData createPlotCbData() {
+		if (unusedScoreboards.size() == 0)
+			return new PlotCommandBlockData(plugin, Bukkit.getScoreboardManager().getNewScoreboard());
+		else
+			return new PlotCommandBlockData(plugin, unusedScoreboards.remove(0));
 	}
 	
 	//création des variables nécessaires pour ce plot 
@@ -90,106 +101,16 @@ public class CommandBlocksManager {
 		}
 		
 		//clear des teams
-		for (CbTeam t : plotTeams.get(plot))
-			t.executeDeletionActions();
+		if (plotTeams.containsKey(plot))
+			for (CbTeam t : plotTeams.get(plot))
+				t.executeDeletionActions();
 		
-		for (CbBossBar bar : plot.getBossBars().values())
-			bar.getBar().removeAll();
+		if (plot.getCbData().getBossBars() != null)
+			for (CbBossBar bar : plot.getCbData().getBossBars().values())
+				bar.getBar().removeAll();
 	}
 	
 	//gestion des scoreboards (affichage sidebar/belowname)
-	
-	//macimum 20 objectifs par plot
-	public boolean registerObjective(Plot plot, CbObjective obj) {
-
-		//n'enregistre pas le scoreboard si un autre avec le même nom existe déjà dans le plot
-		for (CbObjective o : plotObjectives.get(plot))
-			if (o.getId().equals(obj.getId()))
-				return false;
-		
-		plotObjectives.get(plot).add(obj);
-		if (plotObjectives.get(plot).size() > maxScoreboardsPerPlot)
-			plotObjectives.get(plot).remove(0);
-		
-		return true;
-	}
-	
-	public List<CbObjective> getObjectives(Plot plot){
-		if (plot == null)
-			return new ArrayList<CbObjective>();
-		else
-			return plotObjectives.get(plot);
-	}
-	
-	public CbObjective getObjective(Plot plot, String objName) {
-		
-		objName = ChatColor.translateAlternateColorCodes('&', objName);
-		
-		for (CbObjective o : getObjectives(plot))
-			if (o.getId().equals(objName))
-				return o;
-		
-		return null;
-	}
-	
-	public Objective getObjectiveBelowName(Plot plot) {		
-		Scoreboard scb = plotsScoreboards.get(plot);
-		if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
-			return scb.getObjective(DisplaySlot.BELOW_NAME);
-		else {
-			Objective obj = scb.registerNewObjective("belowName", "dummy", "à spécifier");
-			obj.setDisplaySlot(DisplaySlot.BELOW_NAME);
-			
-			return obj;
-		}
-	}
-	
-	public void clearBelowName(Plot plot) {
-		if (plotsScoreboards.get(plot).getObjective(DisplaySlot.BELOW_NAME) != null)
-			plotsScoreboards.get(plot).getObjective(DisplaySlot.BELOW_NAME).unregister();
-	}
-	
-	//gestion des équipes
-	//ajoute la team à la liste du plot. Max teams autorisées : maxTeamsPerPlot
-	public boolean registerTeam(Plot plot, CbTeam team) {
-		
-		//si une team avec ce nom existe déjà, return
-		for (CbTeam t : getTeams(plot))
-			if (t.getId().equals(team.getId()))
-				return false;
-		
-		plotTeams.get(plot).add(team);
-		
-		if (plotTeams.get(plot).size() > maxTeamsPerPlot)
-			plotTeams.get(plot).remove(0);
-		
-		return true;
-	}
-	
-	//renvoie la liste des équipes d'un plot
-	public List<CbTeam> getTeams(Plot plot){
-		if (plot == null)
-			return new ArrayList<CbTeam>();
-		
-		return plotTeams.get(plot);
-	}
-	
-	public CbTeam getTeamOf(Plot plot, Entity e) {
-		
-		for (CbTeam t : getTeams(plot))
-			if (t.getMembers().contains(e)) 
-				return t;			
-				
-		return null;
-	}
-
-	public CbTeam getTeamById(Plot plot, String teamId) {
-		for (CbTeam t : getTeams(plot))
-			if (t.getId().equals(teamId)) 
-				return t;			
-				
-		return null;
-	}
 	
 	
 	//Actions à exécuter en entrée et sortie de plot
@@ -201,14 +122,14 @@ public class CommandBlocksManager {
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		
 		//maj belowName si un objectif y est positionné
-		Scoreboard scb = plotsScoreboards.get(toPlot);
+		Scoreboard scb = toPlot.getCbData().getScoreboard();
 		
-		p.setScoreboard(plotsScoreboards.get(toPlot));
+		p.setScoreboard(scb);
 		if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
 			scb.getObjective(DisplaySlot.BELOW_NAME).getScore(p).setScore(0);
 		
 		//maj sidebar si on objectif y est positionné
-		for (CbObjective obj : getObjectives(toPlot)) {
+		for (CbObjective obj : toPlot.getCbData().getObjectives()) {
 			
 			if (obj.getDisplaySlot() == DisplaySlot.SIDEBAR) {
 				
@@ -219,7 +140,7 @@ public class CommandBlocksManager {
 	}
 	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
-		CbTeam team = getTeamOf(fromPlot, p);
+		CbTeam team = fromPlot.getCbData().getTeamOf(p);
 		if (team != null)
 			team.removeMember(p);
 		
@@ -233,7 +154,7 @@ public class CommandBlocksManager {
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());
 		
-		for (CbBossBar bar : fromPlot.getBossBars().values())
+		for (CbBossBar bar : fromPlot.getCbData().getBossBars().values())
 			bar.getBar().removePlayer(p);
 	}
 }

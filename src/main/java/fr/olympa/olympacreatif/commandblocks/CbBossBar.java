@@ -26,11 +26,17 @@ public class CbBossBar {
 		bar.setProgress(Math.max(0, Math.min(1, value / max)));
 	}
 	
-	public BossBar getBar() {
-		return bar;
+	public int getValue() {
+		return (int) value;
 	}
 
 	public int getMax() {
 		return (int) max;
+	}
+	
+	
+	
+	public BossBar getBar() {
+		return bar;
 	}
 }

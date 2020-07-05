@@ -22,6 +22,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
+import fr.olympa.olympacreatif.commandblocks.PlotCommandBlockData;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -30,6 +31,7 @@ public abstract class CbCommand {
 
 	protected OlympaCreatifMain plugin;
 	protected Plot plot;
+	protected PlotCommandBlockData plotCbData;
 	protected List<Entity> targetEntities = new ArrayList<Entity>();
 	protected String[] args;
 	protected CommandSender sender;
@@ -41,6 +43,7 @@ public abstract class CbCommand {
 	public CbCommand(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		this.plugin = plugin;
 		this.plot = plot;
+		plotCbData = plot.getCbData();
 		this.sender = sender;
 		this.args = commandString;
 		this.sendingLoc = sendingLoc;
@@ -97,7 +100,7 @@ public abstract class CbCommand {
 				if (sss.length != 2)
 					return list;
 				
-				CbObjective obj = plugin.getCommandBlocksManager().getObjective(plot, sss[0]);
+				CbObjective obj = plotCbData.getObjective(sss[0]);
 				range = getIntRange(sss[3]);
 				
 				if (obj != null && range != null) {
@@ -295,10 +298,10 @@ public abstract class CbCommand {
 				
 				//recherche du type de l'entité
 				if (ss.contains("!")) {
-					team = plugin.getCommandBlocksManager().getTeamById(plot, e.getValue().replace("!", ""));
+					team = plotCbData.getTeamById(e.getValue().replace("!", ""));
 					isTestInequality = true;
 				}else
-					team = plugin.getCommandBlocksManager().getTeamById(plot, e.getValue());
+					team = plotCbData.getTeamById(e.getValue());
 				
 				if (team == null)
 					return list;
@@ -483,7 +486,7 @@ public abstract class CbCommand {
 			cmd = new CmdEnchant(type, sender, loc, plugin, plot, args);
 			break;
 		case execute:
-			cmd = new CmdExecuteBis(type, sender, loc, plugin, plot, args);
+			cmd = new CmdExecute(type, sender, loc, plugin, plot, args);
 			break;
 		case experience:
 			cmd = new CmdExperience(type, sender, loc, plugin, plot, args);

@@ -143,7 +143,7 @@ public class CbObjective {
 	public void setName(String newObjName) {
 		if (!newObjName.equals(objName)) {
 			if (displaySlot == DisplaySlot.BELOW_NAME)
-				plugin.getCommandBlocksManager().getObjectiveBelowName(plot).setDisplayName(newObjName);
+				plot.getCbData().getObjectiveBelowName().setDisplayName(newObjName);
 			
 			if (displaySlot == DisplaySlot.SIDEBAR)
 				for (Player p : plot.getPlayers())
@@ -225,7 +225,7 @@ public class CbObjective {
 			scoreHolder = e.getCustomName();
 		
 		if (displaySlot == DisplaySlot.BELOW_NAME && e.getType() == EntityType.PLAYER) {
-			Objective obj = plugin.getCommandBlocksManager().getObjectiveBelowName(plot);
+			Objective obj = plot.getCbData().getObjectiveBelowName();
 			
 			if (value == null)
 				obj.getScore((Player) e).setScore(0);
@@ -247,14 +247,14 @@ public class CbObjective {
 		if (newDisplaySlot == displaySlot)
 			return 0;
 		
-		for (CbObjective obj : plugin.getCommandBlocksManager().getObjectives(plot))
+		for (CbObjective obj : plot.getCbData().getObjectives())
 			if (obj.getDisplaySlot() == newDisplaySlot)
 				obj.clearDisplaySlot();
 
 		displaySlot = newDisplaySlot;
 		
 		if (displaySlot == DisplaySlot.BELOW_NAME) 
-			plugin.getCommandBlocksManager().getObjectiveBelowName(plot).setDisplayName(objName);
+			plot.getCbData().getObjectiveBelowName().setDisplayName(objName);
 				
 		if (displaySlot == DisplaySlot.SIDEBAR) {
 			Map<String, Integer> scores = getValues(true);
@@ -275,7 +275,7 @@ public class CbObjective {
 				((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
 
 		if (displaySlot == DisplaySlot.BELOW_NAME)
-			plugin.getCommandBlocksManager().clearBelowName(plot);
+			plot.getCbData().clearBelowName();
 		
 		displaySlot = null;
 	}

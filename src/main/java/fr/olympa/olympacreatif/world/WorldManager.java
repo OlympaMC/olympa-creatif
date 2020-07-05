@@ -95,7 +95,7 @@ public class WorldManager {
 	            lines.add("spawn-monsters=true");
 	            lines.add("spawn-protection=0");
 	            lines.add("allow-nether=false");
-	            lines.add("enable-command-block=false");
+	            lines.add("enable-command-block=true");
 	            lines.add("difficulty=easy");
 	            
 	            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);

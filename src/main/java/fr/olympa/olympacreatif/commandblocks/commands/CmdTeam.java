@@ -30,13 +30,13 @@ public class CmdTeam extends CbCommand {
 		switch (args[0]) {
 		case "list":
 			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getId().getAsString() + " <<<");
-			for (CbTeam t : plugin.getCommandBlocksManager().getTeams(plot))
+			for (CbTeam t : plotCbData.getTeams())
 				sender.sendMessage("   §e> " + t.getId() + " (§r" + t.getDisplayName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
 			return 1;
 			
 		case "empty":
 			if (args.length >= 2) {
-				CbTeam t = plugin.getCommandBlocksManager().getTeamById(plot, args[1]);
+				CbTeam t = plotCbData.getTeamById(args[1]);
 				if (t != null) {
 					for (Entity e : new ArrayList<Entity>(t.getMembers()))
 						t.removeMember(e);
@@ -47,7 +47,7 @@ public class CmdTeam extends CbCommand {
 			
 		case "join":
 			if (args.length >= 2) {
-				CbTeam t = plugin.getCommandBlocksManager().getTeamById(plot, args[1]);
+				CbTeam t = plotCbData.getTeamById(args[1]);
 				
 				if (t == null)
 					break;
@@ -80,7 +80,7 @@ public class CmdTeam extends CbCommand {
 				int removedPlayers = 0;
 				
 				for (Entity e : list) {
-					CbTeam t = plugin.getCommandBlocksManager().getTeamOf(plot, e);
+					CbTeam t = plotCbData.getTeamOf(e);
 					if (t != null) {
 						t.removeMember(e);
 						removedPlayers++;
@@ -90,7 +90,7 @@ public class CmdTeam extends CbCommand {
 				return removedPlayers;
 				
 			}else if(sender instanceof Player) { //supression de l'équipe de l'exécutant de la commande
-				CbTeam t = plugin.getCommandBlocksManager().getTeamOf(plot, (Entity) sender);
+				CbTeam t = plotCbData.getTeamOf((Entity) sender);
 				if (t != null) {
 					t.removeMember((Player) sender);
 					return 1;	
@@ -107,19 +107,19 @@ public class CmdTeam extends CbCommand {
 				else
 					t = new CbTeam(plugin, plot, args[1], "");
 				
-				if (plugin.getCommandBlocksManager().registerTeam(plot, t))
+				if (plotCbData.registerTeam(t))
 					return 1;
 			}
 			break;
 			
 		case "remove":
 			if (args.length >= 2) {
-				for (CbTeam t : new ArrayList<CbTeam>(plugin.getCommandBlocksManager().getTeams(plot)))
+				for (CbTeam t : new ArrayList<CbTeam>(plotCbData.getTeams()))
 					
 					if (t.getId().equals(args[1])) {
 						
 						t.executeDeletionActions();
-						plugin.getCommandBlocksManager().getTeams(plot).remove(t);
+						plotCbData.getTeams().remove(t);
 						return 1;
 					}
 			}
@@ -127,7 +127,7 @@ public class CmdTeam extends CbCommand {
 			
 		case "modify"://ne modifie que le nom (prefix) de l'équipe, aucune autre personnalisation du menu "modify" n'est prise en compte.
 			if (args.length >= 3) {
-				CbTeam t = plugin.getCommandBlocksManager().getTeamById(plot, args[1]);
+				CbTeam t = plotCbData.getTeamById(args[1]);
 				
 				if (t == null)
 					return 0;	
