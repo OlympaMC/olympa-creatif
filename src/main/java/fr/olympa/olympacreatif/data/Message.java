@@ -125,7 +125,11 @@ public enum Message {
 	CB_RESULT_SUCCESS, 
 	CB_RESULT_FAILED, 
 	
-	UNKNOWN_MESSAGE,
+	UNKNOWN_MESSAGE, 
+	
+	PARAM_CB_MAX_TEAMS_PER_PLOT, 
+	PARAM_CB_MAX_OBJECTIVES_PER_PLOT, 
+	PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();
@@ -150,7 +154,11 @@ public enum Message {
 		messagesList.put(PARAM_MAX_TOTAL_ENTITIES_PER_PLOT, "10");
 		
 		messagesList.put(PARAM_CB_MAX_CMDS_LEFT, "100");
-		messagesList.put(PARAM_CB_PER_TICK_ADDED_CMDS, "10");
+		messagesList.put(PARAM_CB_PER_TICK_ADDED_CMDS, "2");
+
+		messagesList.put(Message.PARAM_CB_MAX_TEAMS_PER_PLOT, "20");
+		messagesList.put(Message.PARAM_CB_MAX_OBJECTIVES_PER_PLOT, "20");
+		messagesList.put(PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION, "4");
 	}
 	
 	public void setValue(Object s) {

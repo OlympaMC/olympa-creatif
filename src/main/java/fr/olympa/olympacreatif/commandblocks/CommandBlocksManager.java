@@ -22,6 +22,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
@@ -36,11 +37,21 @@ public class CommandBlocksManager {
 	//scoreboards inutilisés qui seront réaffectés au besoin à d'autres plots chargés ultérieurement	 
 	private List<Scoreboard> unusedScoreboards = new ArrayList<Scoreboard>();
 	
-	public final static int maxTeamsPerPlot = 20;
-	public final static int maxScoreboardsPerPlot = 20;
+	public static int maxTeamsPerPlot;
+	public static int maxObjectivesPerPlot;
+	
+	public static int maxCommandsLeft;
+	public static double perTickAddedCommandsLeft;
+	public static int minTickBetweenEachCbExecution;
 	
 	public CommandBlocksManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+
+		maxTeamsPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_TEAMS_PER_PLOT.getValue());
+		maxObjectivesPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_OBJECTIVES_PER_PLOT.getValue());
+		maxCommandsLeft = Integer.valueOf(Message.PARAM_CB_MAX_CMDS_LEFT.getValue());
+		perTickAddedCommandsLeft = Double.valueOf(Message.PARAM_CB_PER_TICK_ADDED_CMDS.getValue());
+		minTickBetweenEachCbExecution = Integer.valueOf(Message.PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue());
 
 		plugin.getServer().getPluginManager().registerEvents(new CbObjectivesListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new CbTeamsListener(plugin), plugin);
@@ -48,11 +59,11 @@ public class CommandBlocksManager {
 		Bukkit.getPluginManager().registerEvents(new CbCommandListener(plugin), plugin);
 	}
 	
-	public PlotCommandBlockData createPlotCbData() {
+	public PlotCbData createPlotCbData() {
 		if (unusedScoreboards.size() == 0)
-			return new PlotCommandBlockData(plugin, Bukkit.getScoreboardManager().getNewScoreboard());
+			return new PlotCbData(plugin, Bukkit.getScoreboardManager().getNewScoreboard());
 		else
-			return new PlotCommandBlockData(plugin, unusedScoreboards.remove(0));
+			return new PlotCbData(plugin, unusedScoreboards.remove(0));
 	}
 
 	public void addUnusedScoreboard(Scoreboard scb) {

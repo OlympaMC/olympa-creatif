@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
@@ -189,6 +190,9 @@ public class CbObjective {
 	
 	//gestion sidebar/belowname ici
 	public void set(String name, Integer value) {
+		
+		name = ChatColor.translateAlternateColorCodes('&', name);
+		
 		if (value == null)
 			values.remove(name);
 		else

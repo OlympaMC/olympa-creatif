@@ -14,6 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_15_R1.command.CraftBlockCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -22,7 +23,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
-import fr.olympa.olympacreatif.commandblocks.PlotCommandBlockData;
+import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -31,7 +32,7 @@ public abstract class CbCommand {
 
 	protected OlympaCreatifMain plugin;
 	protected Plot plot;
-	protected PlotCommandBlockData plotCbData;
+	protected PlotCbData plotCbData;
 	protected List<Entity> targetEntities = new ArrayList<Entity>();
 	protected String[] args;
 	protected CommandSender sender;
@@ -457,8 +458,8 @@ public abstract class CbCommand {
 		if (sender instanceof Entity) {
 			plot = plugin.getPlotsManager().getPlot(((Entity) sender).getLocation());	
 		}
-		if (sender instanceof CommandBlock) {
-			plot = plugin.getPlotsManager().getPlot(((CommandBlock) sender).getLocation());	
+		if (((sender instanceof CraftBlockCommandSender) && ((CraftBlockCommandSender) sender).getBlock().getState() instanceof CommandBlock)) {
+			plot = plugin.getPlotsManager().getPlot(((CraftBlockCommandSender) sender).getBlock().getState().getLocation());	
 		}
 		
 		if (args.length < 2 || plot == null)

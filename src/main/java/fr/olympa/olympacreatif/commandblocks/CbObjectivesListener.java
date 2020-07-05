@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective.ObjType;
+import fr.olympa.olympacreatif.plot.Plot;
 
 public class CbObjectivesListener implements Listener {
 
@@ -35,7 +36,12 @@ public class CbObjectivesListener implements Listener {
 		if (e.isCancelled() || !(e instanceof LivingEntity))
 			return;
 		
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getEntity().getLocation()).getCbData().getObjectives())
+		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			switch(o.getType()) {
 			case health:
 				if (((LivingEntity) e).getHealth() - e.getDamage() >= 0)
@@ -51,7 +57,12 @@ public class CbObjectivesListener implements Listener {
 		if (e.isCancelled() || !(e instanceof LivingEntity))
 			return;
 		
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getEntity().getLocation()).getCbData().getObjectives())
+		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			switch(o.getType()) {
 			case health:
 				o.set(e.getEntity(), (int) ((LivingEntity)e).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()*2);
@@ -61,8 +72,13 @@ public class CbObjectivesListener implements Listener {
 	
 	@EventHandler
 	public void onEntityDeathEvent(EntityDeathEvent e) {
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (plot == null)
+			return;
 
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getEntity().getLocation()).getCbData().getObjectives())
+		for (CbObjective o : plot.getCbData().getObjectives())
 			switch(o.getType()) {
 			case deathCount:
 				if (e.getEntityType() == EntityType.PLAYER)
@@ -93,42 +109,78 @@ public class CbObjectivesListener implements Listener {
 	
 	@EventHandler
 	public void onDrop(PlayerDropItemEvent e) {
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getPlayer().getLocation()).getCbData().getObjectives())
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			if (o.getType() == ObjType.minecraft_dropped && e.getItemDrop().getItemStack().getType() == o.getParamType())
 				o.add(e.getPlayer(), 1);		
 	}
 	
 	@EventHandler
 	public void onDrop(EntityPickupItemEvent e) {
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getEntity().getLocation()).getCbData().getObjectives())
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			if (o.getType() == ObjType.minecraft_picked_up && e.getItem().getItemStack().getType() == o.getParamType())
 				o.add(e.getEntity(), 1);		
 	}
 	
 	@EventHandler
 	public void onFoodChange(FoodLevelChangeEvent e) {
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getEntity().getLocation()).getCbData().getObjectives())
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			if (o.getType() == ObjType.food)
 				o.add(e.getEntity(), 1);
 	}
 	
 	@EventHandler
 	public void onCraft(CraftItemEvent e) {
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getWhoClicked().getLocation()).getCbData().getObjectives())
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getWhoClicked().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			if (o.getType() == ObjType.minecraft_crafted && e.getRecipe().getResult().getType() == o.getParamType())
 				o.add(e.getWhoClicked(), 1);
 	}
 	
 	@EventHandler
 	public void onItemUse(PlayerInteractEvent e) {
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getPlayer().getLocation()).getCbData().getObjectives())
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			if (o.getType() == ObjType.minecraft_used && e.getItem() != null && e.getItem().getType() == o.getParamType())
 				o.add(e.getPlayer(), 1);
 	}
 	
 	@EventHandler
 	public void onItemBreak(PlayerItemBreakEvent e) {
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getPlayer().getLocation()).getCbData().getObjectives())
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			if (o.getType() == ObjType.minecraft_broken && e.getBrokenItem().getType() == o.getParamType())
 				o.add(e.getPlayer(), 1);
 	}
@@ -137,8 +189,13 @@ public class CbObjectivesListener implements Listener {
 	public void onMineBlock(BlockBreakEvent e) {
 		if (e.isCancelled())
 			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot == null)
+			return;
 
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getPlayer().getLocation()).getCbData().getObjectives())
+		for (CbObjective o : plot.getCbData().getObjectives())
 			if (o.getType() == ObjType.minecraft_mined && e.getBlock().getType() == o.getParamType())
 				o.add(e.getPlayer(), 1);		
 	}
@@ -148,14 +205,25 @@ public class CbObjectivesListener implements Listener {
 		if (e.getNewLevel() <= e.getOldLevel())
 			return;
 		
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getPlayer().getLocation()).getCbData().getObjectives())
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			if (o.getType() == ObjType.level)
 				o.add(e.getPlayer(), e.getNewLevel() - e.getOldLevel());
 	}
 	
 	@EventHandler
 	public void onExpChange(PlayerExpChangeEvent e) {
-		for (CbObjective o : plugin.getPlotsManager().getPlot(e.getPlayer().getLocation()).getCbData().getObjectives())
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot == null)
+			return;
+		
+		for (CbObjective o : plot.getCbData().getObjectives())
 			if (o.getType() == ObjType.xp)
 				o.add(e.getPlayer(), e.getAmount());
 	}

@@ -15,7 +15,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 
-public class PlotCommandBlockData {
+public class PlotCbData {
 
 	private OlympaCreatifMain plugin;
 	private List<CbCommand> queuedCommands = new ArrayList<CbCommand>();
@@ -24,11 +24,13 @@ public class PlotCommandBlockData {
 	
 	private Map<String, CbBossBar> bossbarsMap = new HashMap<String, CbBossBar>();
 	
+	private double commandsLeft;
 	private Scoreboard scb;
 	
-	PlotCommandBlockData(OlympaCreatifMain plugin, Scoreboard scb){
+	PlotCbData(OlympaCreatifMain plugin, Scoreboard scb){
 		this.plugin = plugin;
 		this.scb = scb;
+		commandsLeft = CommandBlocksManager.maxCommandsLeft;
 	}
 	
 	//GETTERS
@@ -49,6 +51,19 @@ public class PlotCommandBlockData {
 	
 	public List<CbTeam> getTeams(){
 		return teams;
+	}
+	
+	public double getCommandsLeft() {
+		return commandsLeft;
+	}
+	
+	public void removeOneCommandLeft() {
+		commandsLeft--;
+	}
+	
+	public void addOneCommandLeft() {
+		if (commandsLeft < CommandBlocksManager.maxCommandsLeft)
+			commandsLeft++;
 	}
 	
 	public CbBossBar getBossBar(String id) {
@@ -91,7 +106,7 @@ public class PlotCommandBlockData {
 				return false;
 		
 		objectives.add(obj);
-		if (objectives.size() > CommandBlocksManager.maxScoreboardsPerPlot)
+		if (objectives.size() > CommandBlocksManager.maxObjectivesPerPlot)
 			objectives.remove(0);
 		
 		return true;

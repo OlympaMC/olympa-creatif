@@ -20,7 +20,7 @@ import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
-import fr.olympa.olympacreatif.commandblocks.PlotCommandBlockData;
+import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.TileEntity;
@@ -33,9 +33,7 @@ public class Plot {
 	private PlotParameters parameters;
 	private PlotId plotId;
 	
-	private PlotCommandBlockData cbData;
-	
-	//private PlotListener listener;
+	private PlotCbData cbData;
 
 	private List<Player> playersInPlot = new ArrayList<Player>();
 	private List<Entity> entitiesInPlot = new ArrayList<Entity>();
@@ -92,7 +90,7 @@ public class Plot {
 		return plotId;
 	}
 	
-	public PlotCommandBlockData getCbData() {
+	public PlotCbData getCbData() {
 		return cbData;
 	}
 	
