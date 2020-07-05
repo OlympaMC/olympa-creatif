@@ -52,8 +52,10 @@ public class Plot {
 		members = new PlotMembers(plugin, plotId);
 
 		members.set(p, PlotRank.OWNER);
-
-		plugin.getCommandBlocksManager().registerPlot(this);
+		
+		cbData = plugin.getCommandBlocksManager().createPlotCbData();
+		
+		//plugin.getCommandBlocksManager().registerPlot(this);
 		
 		//exécution des actions d'entrée pour tous les joueurs sur le plot au moment du chargement
 		for (Player player : Bukkit.getOnlinePlayers())
@@ -67,8 +69,10 @@ public class Plot {
 		this.parameters = ap.getParameters();
 		this.members = ap.getMembers();
 		this.plotId = ap.getId();
+		
+		cbData = plugin.getCommandBlocksManager().createPlotCbData();
 
-		plugin.getCommandBlocksManager().registerPlot(this);
+		//plugin.getCommandBlocksManager().registerPlot(this);
 		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
@@ -132,6 +136,7 @@ public class Plot {
 	}
 
 	public void unload() {
-		plugin.getCommandBlocksManager().unregisterPlot(this);
+		//plugin.getCommandBlocksManager().unregisterPlot(this);
+		cbData.unload();
 	}
 }

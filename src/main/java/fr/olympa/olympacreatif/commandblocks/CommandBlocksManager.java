@@ -33,17 +33,7 @@ public class CommandBlocksManager {
 
 	private OlympaCreatifMain plugin;
 	
-	private Map<Plot, List<CbCommand>> queuedCommands = new LinkedHashMap<Plot, List<CbCommand>>();
-
-	private Map<Plot, List<CbObjective>> plotObjectives = new HashMap<Plot, List<CbObjective>>();
-	private Map<Plot, List<CbTeam>> plotTeams = new HashMap<Plot, List<CbTeam>>();
-	
-	//scoreboards utilisés pour l'affichage du belowName
-	private Map<Plot, Scoreboard> plotsScoreboards = new HashMap<Plot, Scoreboard>();
-	//scoreboards inutilisés qui seront réaffectés au besoin à d'autres plots chargés ultérieurement
-	  
-	 
-	 
+	//scoreboards inutilisés qui seront réaffectés au besoin à d'autres plots chargés ultérieurement	 
 	private List<Scoreboard> unusedScoreboards = new ArrayList<Scoreboard>();
 	
 	public final static int maxTeamsPerPlot = 20;
@@ -64,57 +54,12 @@ public class CommandBlocksManager {
 		else
 			return new PlotCommandBlockData(plugin, unusedScoreboards.remove(0));
 	}
-	
-	//création des variables nécessaires pour ce plot 
-	public void registerPlot(Plot plot) {
-		if (!queuedCommands.containsKey(plot))
-			queuedCommands.put(plot, new ArrayList<CbCommand>());
 
-		if (!plotObjectives.containsKey(plot))
-			plotObjectives.put(plot, new ArrayList<CbObjective>());
-		
-		if (!plotTeams.containsKey(plot))
-			plotTeams.put(plot, new ArrayList<CbTeam>());
-		
-		if (unusedScoreboards.size() == 0) 
-			plotsScoreboards.put(plot, Bukkit.getServer().getScoreboardManager().getNewScoreboard());
-		else 
-			plotsScoreboards.put(plot, unusedScoreboards.remove(0));
-		
+	public void addUnusedScoreboard(Scoreboard scb) {
+		unusedScoreboards.add(scb);
 	}
-	
-	//unload les données du plot pour libérer de la mémoire
-	public void unregisterPlot(Plot plot) {
-		queuedCommands.remove(plot);
-		plotObjectives.remove(plot);
-		plotTeams.remove(plot);
-		
-		//met de côté le scoreboard pour un usage ultérieur
-		Scoreboard scb = plotsScoreboards.get(plot);
-		
-		if (scb != null) {
-			if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
-				scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
-			
-			plotsScoreboards.remove(plot);
-			unusedScoreboards.add(scb);	
-		}
-		
-		//clear des teams
-		if (plotTeams.containsKey(plot))
-			for (CbTeam t : plotTeams.get(plot))
-				t.executeDeletionActions();
-		
-		if (plot.getCbData().getBossBars() != null)
-			for (CbBossBar bar : plot.getCbData().getBossBars().values())
-				bar.getBar().removeAll();
-	}
-	
-	//gestion des scoreboards (affichage sidebar/belowname)
-	
 	
 	//Actions à exécuter en entrée et sortie de plot
-	
 	public void executeJoinActions(Plot toPlot, Player p) {
 		
 		p.setExp(0);

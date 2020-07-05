@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -13,7 +14,6 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
-import fr.olympa.olympacreatif.plot.Plot;
 
 public class PlotCommandBlockData {
 
@@ -145,6 +145,28 @@ public class PlotCommandBlockData {
 				return t;			
 				
 		return null;
+	}
+
+	public void unload() {
+		for (CbObjective o : objectives) 
+			o.clearDisplaySlot();
+			
+		for (CbTeam t : teams)
+			for (Entity e : t.getMembers())
+				t.removeMember(e);
+		
+		for (Entry<String, CbBossBar> e : bossbarsMap.entrySet())
+			e.getValue().getBar().removeAll();
+
+		queuedCommands.clear();
+		objectives.clear();
+		teams.clear();
+		bossbarsMap.clear();
+		
+		if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
+			scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
+		
+		plugin.getCommandBlocksManager().addUnusedScoreboard(scb);
 	}
 	
 }
