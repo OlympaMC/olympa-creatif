@@ -56,14 +56,13 @@ public class PlotCbData {
 	public double getCommandsLeft() {
 		return commandsLeft;
 	}
-	
-	public void removeOneCommandLeft() {
-		commandsLeft--;
+
+	public void removeCommandTickets(int tickets) {
+		commandsLeft -= tickets;
 	}
 	
-	public void addOneCommandLeft() {
-		if (commandsLeft < CommandBlocksManager.maxCommandsLeft)
-			commandsLeft++;
+	public void addCommandTickets( int tickets) {
+		commandsLeft = Math.min(CommandBlocksManager.maxCommandsLeft, commandsLeft + tickets);
 	}
 	
 	public CbBossBar getBossBar(String id) {

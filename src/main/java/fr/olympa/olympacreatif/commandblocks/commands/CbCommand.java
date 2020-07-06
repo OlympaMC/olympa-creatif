@@ -477,8 +477,17 @@ public abstract class CbCommand {
 			return null;
 		
 		switch (type) {
+		case gamemode:
+			cmd = new CmdGamemode(type, sender, loc, plugin, plot, args);
+			break;
+		case gm:
+			cmd = new CmdGamemode(type, sender, loc, plugin, plot, args);
+			break;
 		case bossbar:
 			cmd = new CmdBossBar(type, sender, loc, plugin, plot, args);
+			break;
+		case setblock:
+			cmd = new CmdSetblock(type, sender, loc, plugin, plot, args);
 			break;
 		case clear:
 			cmd = new CmdClear(type, sender, loc, plugin, plot, args);
@@ -544,7 +553,10 @@ public abstract class CbCommand {
 		effect, 
 		summon, 
 		kill,
-		say,
+		say, 
+		setblock, 
+		gamemode, 
+		gm,
 		;
 		
 		public static CommandType get(String s) {

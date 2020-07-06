@@ -100,17 +100,20 @@ public class WorldEditInstance {
 		
 		if (pos1 == null || pos2 == null)
 			return WorldEditError.ERR_POS_NOT_DEFINED;
-		
+				
 		//vérification taille zone
 		if ((Math.abs(pos1.getBlockX()-pos2.getBlockX())+1) * (Math.abs(pos1.getBlockY()-pos2.getBlockY())+1) * (Math.abs(pos1.getBlockZ()-pos2.getBlockZ())+1) 
 				> Integer.valueOf(Message.PARAM_WE_MAX_BLOCKS_PER_CMD.getValue()))
 			return WorldEditError.ERR_OPERATION_TOO_BIG;
 		
+		if (pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+			return WorldEditError.NO_ERROR;
+
+		Plot p1 = plugin.getPlotsManager().getPlot(pos1);
+		Plot p2 = plugin.getPlotsManager().getPlot(pos2);
+		
 		//vérification que les deux points sont bien dans le même plot
-		if (!pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) || 
-				(pos1 != null && pos2 != null &&
-				plugin.getPlotsManager().getPlot(pos1) != null && plugin.getPlotsManager().getPlot(pos2) != null &&
-				!plugin.getPlotsManager().getPlot(pos1).equals(plugin.getPlotsManager().getPlot(pos2)) ))
+		if (p1 == null || p2 == null || !p1.equals(p2))
 			return WorldEditError.ERR_OPERATION_CROSS_PLOT;
 			
 		return WorldEditError.NO_ERROR;

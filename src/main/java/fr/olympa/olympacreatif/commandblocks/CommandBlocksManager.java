@@ -27,6 +27,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.ItemFireworks.EffectType;
 
@@ -41,8 +42,10 @@ public class CommandBlocksManager {
 	public static int maxObjectivesPerPlot;
 	
 	public static int maxCommandsLeft;
-	public static double perTickAddedCommandsLeft;
+	public static double perTickAddedCommandsTickets;
+
 	public static int minTickBetweenEachCbExecution;
+	public static int cmdTicketByCmdSetblock;
 	
 	public CommandBlocksManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -50,8 +53,10 @@ public class CommandBlocksManager {
 		maxTeamsPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_TEAMS_PER_PLOT.getValue());
 		maxObjectivesPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_OBJECTIVES_PER_PLOT.getValue());
 		maxCommandsLeft = Integer.valueOf(Message.PARAM_CB_MAX_CMDS_LEFT.getValue());
-		perTickAddedCommandsLeft = Double.valueOf(Message.PARAM_CB_PER_TICK_ADDED_CMDS.getValue());
+		perTickAddedCommandsTickets = Double.valueOf(Message.PARAM_CB_PER_TICK_ADDED_CMDS.getValue());
+		
 		minTickBetweenEachCbExecution = Integer.valueOf(Message.PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue());
+		cmdTicketByCmdSetblock = Integer.valueOf(Message.PARAM_CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK.getValue());
 
 		plugin.getServer().getPluginManager().registerEvents(new CbObjectivesListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new CbTeamsListener(plugin), plugin);
@@ -93,6 +98,10 @@ public class CommandBlocksManager {
 				pc.setCustomScoreboardValues(obj.getValues(true));
 			}	
 		}
+		
+		//op le joueur s'il ets chef de plot
+		//if (toPlot.getMembers().getPlayerRank(pc) == PlotRank.OWNER)
+		//	p.setOp(true);
 	}
 	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
@@ -112,5 +121,8 @@ public class CommandBlocksManager {
 		
 		for (CbBossBar bar : fromPlot.getCbData().getBossBars().values())
 			bar.getBar().removePlayer(p);
+		
+		//deop le joueur à la sortie de son plot
+		//p.setOp(false);
 	}
 }

@@ -1,6 +1,9 @@
 package fr.olympa.olympacreatif.commandblocks;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.BlockPosition;
@@ -31,6 +35,10 @@ public class CbCommandListener implements Listener {
 	//liste des commandblocks ayant exécuté une commande dans les PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION derniers ticks
 	Map<Location, Integer> blockedExecutionLocs = new HashMap<Location, Integer>();
 	
+	//commandes interdites pour les joueurs op (pour leur permettre d'éditer les commandblocks)
+	List<String> prohibitedCommands = new ArrayList<String>(Arrays.asList(new String[] {"gamerule", "difficulty"}));
+	
+	
 	public CbCommandListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
@@ -40,7 +48,7 @@ public class CbCommandListener implements Listener {
 			public void run() {
 				//ajoute aux plots le nombre de commandes par tick défini
 				for (Plot plot : plugin.getPlotsManager().getPlots()) 
-					plot.getCbData().addOneCommandLeft();
+					plot.getCbData().addCommandTickets((int) CommandBlocksManager.perTickAddedCommandsTickets);
 				
 				//retire de la liste les commandblocks ayant attendu le nombre de ticks nécessaires avant la prochaine commande
 				for (Entry<Location, Integer> e : blockedExecutionLocs.entrySet())
@@ -77,13 +85,19 @@ public class CbCommandListener implements Listener {
 	
 	@EventHandler //Handle commandes des joueurs
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e ) {
-		
-		if (CbCommand.getCommandType(e.getMessage()) == null)
-			return;
-
-		e.setCancelled(true);
+		//cancel commande si elle est interdite
+		for (String s : prohibitedCommands)
+			if (e.getMessage().contains(s)) {
+				e.setCancelled(true);
+				return;
+			}
 		
 		CbCommand cmd = getCommand(e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
+		
+		if (cmd == null)
+			return;
+		
+		e.setCancelled(true);
 		
 		if (cmd != null && cmd.getPlot().getMembers().getPlayerLevel(e.getPlayer()) >= 3) 
 			executeCommandBlockCommand(cmd, e.getPlayer());
@@ -104,13 +118,19 @@ public class CbCommandListener implements Listener {
 		
 		//Bukkit.broadcastMessage(cmd.getType().toString());
 
-		if (cmd.getPlot().getCbData().getCommandsLeft() < 1) {
+		int neededCmdTickets;
+		if (cmd.getType() == CommandType.setblock)
+			neededCmdTickets = CommandBlocksManager.cmdTicketByCmdSetblock;
+		else
+			neededCmdTickets = 1;
+		
+		if (cmd.getPlot().getCbData().getCommandsLeft() < neededCmdTickets) {
 			//si le plot n'a plus assez de commandes restantes, cancel exécution
 			sender.sendMessage(Message.CB_NO_COMMANDS_LEFT.getValue());
 			return;
 		}else
 			//si le plot a assez de commandes restantes, retrait d'une d'entre elles avant de passer à l'exécution
-			cmd.getPlot().getCbData().removeOneCommandLeft();
+			cmd.getPlot().getCbData().removeCommandTickets(neededCmdTickets);
 		
 		int result = cmd.execute();
 		

@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +10,11 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -34,6 +39,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
@@ -41,8 +47,11 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.Blocks;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.TileEntity;
+import net.minecraft.server.v1_15_R1.TileEntityCommand;
 
 public class PlotsInstancesListener implements Listener{
 
@@ -170,6 +179,35 @@ public class PlotsInstancesListener implements Listener{
 					e.setCancelled(true);	
 					e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 				}
+
+		//gère l'ouverture des commandblocks
+		if (playerRank == PlotRank.OWNER && e.getClickedBlock().getType() == Material.COMMAND_BLOCK) {
+			/*
+			
+			BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
+			PacketPlayOutTileEntityData packet = plugin.getWorldManager().getNmsWorld().getTileEntity(pos).getUpdatePacket();
+
+	        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
+	        nmsPlayer.playerConnection.sendPacket(packet);
+	        
+	        Bukkit.broadcastMessage(packet.toString());*/
+			
+			try {
+		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
+		        
+				BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
+		        BlockState blockState = e.getClickedBlock().getState();//plugin.getWorldManager().getNmsWorld().getTileEntity(pos).getBlock().getBlock();
+		        
+		        Method getTile = CraftBlockEntityState.class.getDeclaredMethod("getTileEntity");
+		        getTile.setAccessible(true);
+		        TileEntityCommand nmsBlock = (TileEntityCommand) getTile.invoke(blockState);
+
+		        nmsPlayer.playerConnection.sendPacket(nmsBlock.getUpdatePacket());
+		    }catch (ReflectiveOperationException err) {
+		        err.printStackTrace();
+		    }	
+		    
+		}
 	}
 	
 	

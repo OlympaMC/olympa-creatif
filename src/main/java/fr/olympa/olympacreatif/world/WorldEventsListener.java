@@ -15,6 +15,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Dropper;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -59,7 +60,9 @@ import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
+import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
 
 public class WorldEventsListener implements Listener{
 
@@ -398,5 +401,24 @@ public class WorldEventsListener implements Listener{
 			e.setLine(i, ChatColor.translateAlternateColorCodes('&', s));
 			i++;
 		}
+	}
+	
+	@EventHandler
+	public void onJoin(PlayerJoinEvent e) {
+		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
+		
+		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
+		EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
+		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
+		/*
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
+				nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
+			}
+		}.runTaskLater(plugin, 20);*/
+		
 	}
 }

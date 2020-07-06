@@ -86,7 +86,10 @@ public class WorldManager {
 	            List<String> lines = Files.readAllLines(path);
 
 	            for (String s : new ArrayList<String>(lines)) {
-	            	if (s.contains("spawn-npcs") || s.contains("spawn-animals") || s.contains("spawn-monsters") || s.contains("spawn-protection") || s.contains("allow-nether") || s.contains("enable-command-block") || s.contains("difficulty"))
+	            	if (s.contains("spawn-npcs") || s.contains("spawn-animals") || s.contains("spawn-monsters") || 
+	            			s.contains("spawn-protection") || s.contains("allow-nether") || s.contains("enable-command-block") || 
+	            			s.contains("difficulty") || s.contains("broadcast-rcon-to-ops") || s.contains("op-permission-level") ||
+	            			s.contains("broadcast-console-to-ops"))
 	            		lines.remove(s);
 	            }
 	            
@@ -97,6 +100,9 @@ public class WorldManager {
 	            lines.add("allow-nether=false");
 	            lines.add("enable-command-block=true");
 	            lines.add("difficulty=easy");
+	            lines.add("broadcast-rcon-to-ops=false");
+	            lines.add("op-permission-level=1");
+	            lines.add("broadcast-console-to-ops=false");
 	            
 	            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
 	        } catch (IOException e) {
