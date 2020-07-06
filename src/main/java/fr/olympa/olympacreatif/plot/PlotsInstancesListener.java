@@ -41,6 +41,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -69,6 +70,15 @@ public class PlotsInstancesListener implements Listener{
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		initializeProhibitemVisitorItems();
+		
+		//gère le remplacement des commandblock dans la main du joueur (après le remplacement initial pour permettre le placement du cb)
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				
+			}
+		}.runTaskTimer(plugin, 10, 1);
 	}
 
 
@@ -88,6 +98,10 @@ public class PlotsInstancesListener implements Listener{
 
 	@EventHandler //test place block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
+		
+		if(((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+			return;
+		
 		plot = plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
 		if (plot == null) {
 			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
@@ -189,20 +203,30 @@ public class PlotsInstancesListener implements Listener{
 					e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 				}
 
-		//gère l'ouverture des commandblocks
+		//gère l'ouverture & le placement des commandblocks
 		if (playerRank == PlotRank.OWNER && commandBlockTypes.contains(e.getClickedBlock().getType())) {
 			
-			BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
-			
-			NBTTagCompound tag = new NBTTagCompound();
-			plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
-			
-			PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
-			
-	        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
-	        nmsPlayer.playerConnection.sendPacket(packet);
-			
-	        Bukkit.broadcastMessage(tag.asString());
+			if (e.getPlayer().isSneaking()) {
+				
+				BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
+				
+				NBTTagCompound tag = new NBTTagCompound();
+				plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
+				
+				PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
+				
+		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
+		        nmsPlayer.playerConnection.sendPacket(packet);
+		        
+			}else {
+				e.getItem().setType(Material.DISPENSER);
+			}
+		}
+		
+		//change le type de block à un dispenser (qui sera placé à la place du commandblock car les joueurs non op 
+		//(fake op ne fonctionne pas) ne peuvent pas poser de commandblock. Choix dispenser pour conserver le blockface
+		
+	      //  Bukkit.broadcastMessage(tag.asString());
 	        
 	        /*
 			try {
@@ -220,7 +244,6 @@ public class PlotsInstancesListener implements Listener{
 		    }	
 			*/
 		    
-		}
 	}
 	
 	
