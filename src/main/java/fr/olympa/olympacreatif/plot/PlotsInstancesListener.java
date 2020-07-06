@@ -201,6 +201,9 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
+		if (((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+			return;
+		
 		if (e.getClickedBlock() == null)
 			return;
 		
