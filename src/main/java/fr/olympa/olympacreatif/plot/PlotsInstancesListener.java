@@ -2,10 +2,12 @@ package fr.olympa.olympacreatif.plot;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -50,6 +52,8 @@ import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.Blocks;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
+import net.minecraft.server.v1_15_R1.PacketPlayOutTileEntityData;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.TileEntityCommand;
 
@@ -60,6 +64,7 @@ public class PlotsInstancesListener implements Listener{
 	private Plot plot;
 	
 	private List<Material> prohibitedVisitorInteractItems = new ArrayList<Material>();
+	private List<Material> commandBlockTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
 	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -181,31 +186,35 @@ public class PlotsInstancesListener implements Listener{
 				}
 
 		//gère l'ouverture des commandblocks
-		if (playerRank == PlotRank.OWNER && e.getClickedBlock().getType() == Material.COMMAND_BLOCK) {
-			/*
+		if (playerRank == PlotRank.OWNER && commandBlockTypes.contains(e.getClickedBlock().getType())) {
 			
 			BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
-			PacketPlayOutTileEntityData packet = plugin.getWorldManager().getNmsWorld().getTileEntity(pos).getUpdatePacket();
-
+			
+			NBTTagCompound tag = new NBTTagCompound();
+			plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
+			
+			PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
+			
 	        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 	        nmsPlayer.playerConnection.sendPacket(packet);
-	        
-	        Bukkit.broadcastMessage(packet.toString());*/
 			
+	        Bukkit.broadcastMessage(tag.asString());
+	        
+	        /*
 			try {
-		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 		        
-				BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
+				//BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
 		        BlockState blockState = e.getClickedBlock().getState();//plugin.getWorldManager().getNmsWorld().getTileEntity(pos).getBlock().getBlock();
 		        
 		        Method getTile = CraftBlockEntityState.class.getDeclaredMethod("getTileEntity");
 		        getTile.setAccessible(true);
 		        TileEntityCommand nmsBlock = (TileEntityCommand) getTile.invoke(blockState);
 
-		        nmsPlayer.playerConnection.sendPacket(nmsBlock.getUpdatePacket());
+		        ((CraftPlayer) e.getPlayer()).getHandle().playerConnection.sendPacket(nmsBlock.getUpdatePacket());
 		    }catch (ReflectiveOperationException err) {
 		        err.printStackTrace();
 		    }	
+			*/
 		    
 		}
 	}
@@ -369,6 +378,10 @@ public class PlotsInstancesListener implements Listener{
 		
 		//définition de la météo
 		p.setPlayerWeather((WeatherType) plotTo.getParameters().getParameter(PlotParamType.PLOT_WEATHER));
+
+		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
+		EntityPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
+		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));		
 	}
 
 	public static void executeQuitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
@@ -389,6 +402,12 @@ public class PlotsInstancesListener implements Listener{
 		p.resetPlayerWeather();
 		
 		plugin.getCommandBlocksManager().excecuteQuitActions(plot, p);
+		
+		//fait croire au client qu'il est deop (pour ouvrir l'interface des commandblocks) sauf pour les staff
+		if (!((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE)){
+			EntityPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
+			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 24));	
+		}
 	}
 	
 	@EventHandler //cancel remove paintings et itemsframes

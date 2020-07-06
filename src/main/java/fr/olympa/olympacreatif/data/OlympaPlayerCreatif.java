@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+
 import com.google.common.collect.ImmutableMap; 
 
 import fr.olympa.api.groups.OlympaGroup;
@@ -19,6 +21,8 @@ import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
 
 public class OlympaPlayerCreatif extends OlympaPlayerObject {
 
@@ -166,6 +170,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			staffPerm.remove(perm);
 		else
 			staffPerm.add(perm);
+		
+		if (hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE)) {
+			EntityPlayer nmsPlayer = ((CraftPlayer) getPlayer()).getHandle();
+			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
+		}else {
+			EntityPlayer nmsPlayer = ((CraftPlayer) getPlayer()).getHandle();
+			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 24));	
+		}
 		
 		return true;
 	}
