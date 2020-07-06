@@ -45,10 +45,8 @@ public class WorldManager {
         
 		//chargement du monde s'il existe
 		for (World w : Bukkit.getWorlds())
-			if (w.getName().equals(Message.PARAM_WORLD_NAME.getValue())) {
-				world = w;
-				nmsWorld = ((CraftWorld) w).getHandle();
-			}
+			if (w.getName().equals(Message.PARAM_WORLD_NAME.getValue())) 
+				world = w;			
 		
 		
 		//création du monde s'il n'existe pas
@@ -112,6 +110,8 @@ public class WorldManager {
 	        
 			Bukkit.getLogger().info(plugin.getPrefixConsole() + "World fully generated ! Server restart is now needed.");
 		}
+
+		nmsWorld = ((CraftWorld) world).getHandle();
 	}
 
 	public World getWorld() {

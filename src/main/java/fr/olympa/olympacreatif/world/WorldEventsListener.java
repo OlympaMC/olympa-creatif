@@ -407,9 +407,12 @@ public class WorldEventsListener implements Listener{
 	public void onJoin(PlayerJoinEvent e) {
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 		
+		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
+		
+		
 		/*
 		new BukkitRunnable() {
 			

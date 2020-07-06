@@ -171,6 +171,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		else
 			staffPerm.add(perm);
 		
+		/*
 		if (hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE)) {
 			EntityPlayer nmsPlayer = ((CraftPlayer) getPlayer()).getHandle();
 			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
@@ -178,6 +179,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			EntityPlayer nmsPlayer = ((CraftPlayer) getPlayer()).getHandle();
 			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 24));	
 		}
+		*/
 		
 		return true;
 	}

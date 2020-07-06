@@ -120,6 +120,10 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //test break block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onBreakBlockEvent(BlockBreakEvent e) {
+		
+		if(((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+			return;
+		
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		if (plot == null) {
 			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
@@ -379,9 +383,11 @@ public class PlotsInstancesListener implements Listener{
 		//définition de la météo
 		p.setPlayerWeather((WeatherType) plotTo.getParameters().getParameter(PlotParamType.PLOT_WEATHER));
 
+		/*
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		EntityPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
 		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));		
+		*/
 	}
 
 	public static void executeQuitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
@@ -403,27 +409,39 @@ public class PlotsInstancesListener implements Listener{
 		
 		plugin.getCommandBlocksManager().excecuteQuitActions(plot, p);
 		
+		/*
 		//fait croire au client qu'il est deop (pour ouvrir l'interface des commandblocks) sauf pour les staff
 		if (!((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE)){
 			EntityPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
 			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 24));	
 		}
+		*/
 	}
 	
 	@EventHandler //cancel remove paintings et itemsframes
 	public void onItemFrameDestroy(HangingBreakByEntityEvent e) {
+		if (e.getRemover().getType() != EntityType.PLAYER) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		if (((OlympaPlayerCreatif)AccountProvider.get(e.getRemover().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+			return;
+		
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		if (plot == null)
 			return;
 		
-		if (e.getRemover().getType() != EntityType.PLAYER /* && (e.getEntity().getType() == EntityType.PAINTING || e.getEntity().getType() == EntityType.ITEM_FRAME || e.getEntity().getType() == EntityType.ARMOR_STAND)*/) {
+		/*
+		if (e.getRemover().getType() != EntityType.PLAYER  && (e.getEntity().getType() == EntityType.PAINTING || e.getEntity().getType() == EntityType.ITEM_FRAME || e.getEntity().getType() == EntityType.ARMOR_STAND)) {
 			e.setCancelled(true);
 			return;
 		}
+		*/
 		
-		if (e.getRemover().getType() == EntityType.PLAYER && plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR) {
+		if (plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR)
 			e.setCancelled(true);
-		}
+		
 	}
 	
 	@EventHandler //gestion autorisation pvp
