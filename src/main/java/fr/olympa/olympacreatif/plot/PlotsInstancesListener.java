@@ -1,11 +1,11 @@
 package fr.olympa.olympacreatif.plot;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -13,8 +13,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlockEntityState;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.CommandBlock;
+import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
@@ -22,6 +23,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -50,13 +52,10 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
-import net.minecraft.server.v1_15_R1.Blocks;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
 import net.minecraft.server.v1_15_R1.PacketPlayOutTileEntityData;
 import net.minecraft.server.v1_15_R1.TileEntity;
-import net.minecraft.server.v1_15_R1.TileEntityCommand;
 
 public class PlotsInstancesListener implements Listener{
 
@@ -66,6 +65,10 @@ public class PlotsInstancesListener implements Listener{
 	
 	private List<Material> prohibitedVisitorInteractItems = new ArrayList<Material>();
 	private List<Material> commandBlockTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
+
+	private List<Player> cbPlacementPlayer = new ArrayList<Player>();
+	private List<Location> cbPlacementLocation = new ArrayList<Location>();
+	private List<Material> cbPlacementTypeCb = new ArrayList<Material>();
 	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -77,6 +80,34 @@ public class PlotsInstancesListener implements Listener{
 			@Override
 			public void run() {
 				
+				//set command block
+				for (int i = 0 ; i < cbPlacementLocation.size() ; i++) {
+					Player p = cbPlacementPlayer.get(i);
+					Location loc = cbPlacementLocation.get(i);
+					Material mat = cbPlacementTypeCb.get(i);
+					
+					if (!commandBlockTypes.contains(mat))
+						continue;
+					
+					if (p.getInventory().getItemInMainHand().getType() != null)
+						p.getInventory().getItemInMainHand().setType(mat);
+					
+					if (plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData() instanceof Dispenser) {
+						Dispenser disp = (Dispenser) plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData();
+						BlockFace face = disp.getFacing();
+						
+						Block target = plugin.getWorldManager().getWorld().getBlockAt(loc); 
+						target.setType(mat);
+						
+						CommandBlock data = (CommandBlock) target.getBlockData();
+						data.setFacing(face);
+						target.setBlockData(data);
+					}
+				}
+				
+				cbPlacementLocation.clear();
+				cbPlacementPlayer.clear();
+				cbPlacementTypeCb.clear();
 			}
 		}.runTaskTimer(plugin, 10, 1);
 	}
@@ -94,7 +125,6 @@ public class PlotsInstancesListener implements Listener{
 			if (mat.toString().contains("EGG") || mat.toString().contains("MINECART") || mat.toString().contains("BOAT"))
 				prohibitedVisitorInteractItems.add(mat);
 	}
-
 
 	@EventHandler //test place block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
@@ -203,10 +233,14 @@ public class PlotsInstancesListener implements Listener{
 					e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 				}
 
-		//gère l'ouverture & le placement des commandblocks
-		if (playerRank == PlotRank.OWNER && commandBlockTypes.contains(e.getClickedBlock().getType())) {
+		//GESTION COMMAND BLOCKS
+		//si édition/placement du commandblock
+		if (playerRank == PlotRank.OWNER && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			Block block = e.getClickedBlock();
+			ItemStack item = e.getItem();
 			
-			if (e.getPlayer().isSneaking()) {
+			//si le block cliqué est un commandblock, ouverture interface
+			if (block != null && commandBlockTypes.contains(block.getType()) && !e.getPlayer().isSneaking()) {
 				
 				BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
 				
@@ -218,11 +252,67 @@ public class PlotsInstancesListener implements Listener{
 		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 		        nmsPlayer.playerConnection.sendPacket(packet);
 		        
-			}else {
+			//si l'item en main est un commandblock, placement de ce dernier
+			}else if (item != null && commandBlockTypes.contains(item.getType())){
+				
+				//return si le Y est trop bas ou trop haut
+				if (e.getClickedBlock().getLocation().getBlockY() < 2 || e.getClickedBlock().getLocation().getBlockY() > 254)
+					return;
+				
+				Location loc = null;
+				
+				switch(e.getBlockFace()) {
+				case DOWN:
+					loc = e.getClickedBlock().getLocation().add(0, -1, 0);
+					break;
+				case EAST:
+					loc = e.getClickedBlock().getLocation().add(1, 0, 0);
+					break;
+				case NORTH:
+					loc = e.getClickedBlock().getLocation().add(0, 0, -1);
+					break;
+				case SOUTH:
+					loc = e.getClickedBlock().getLocation().add(0, 0, 1);
+					break;
+				case UP:
+					loc = e.getClickedBlock().getLocation().add(0, 1, 0);
+					break;
+				case WEST:
+					loc = e.getClickedBlock().getLocation().add(-1, 0, 0);
+					break;
+				default:
+					return;
+				
+				}
+				
+				cbPlacementLocation.add(loc);
+				cbPlacementPlayer.add(e.getPlayer());
+				cbPlacementTypeCb.add(e.getItem().getType());
+				
 				e.getItem().setType(Material.DISPENSER);
 			}
+		}else if (playerRank == PlotRank.OWNER && e.getAction() == Action.LEFT_CLICK_BLOCK) {
+			if (commandBlockTypes.contains(e.getClickedBlock().getType()))
+				e.getClickedBlock().setType(Material.AIR);
+		}
+		/*
+		if (playerRank == PlotRank.OWNER && commandBlockTypes.contains(e.getClickedBlock().getType()) && !e.getPlayer().isSneaking()) {
+			
+			BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
+			
+			NBTTagCompound tag = new NBTTagCompound();
+			plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
+			
+			PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
+			
+	        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
+	        nmsPlayer.playerConnection.sendPacket(packet);
 		}
 		
+		if (playerRank == PlotRank.OWNER && e.getItem() != null && commandBlockTypes.contains(e.getItem().getType()) && !e.getPlayer().isSneaking()) {
+			e.getItem().setType(Material.DISPENSER);
+		}
+		*/
 		//change le type de block à un dispenser (qui sera placé à la place du commandblock car les joueurs non op 
 		//(fake op ne fonctionne pas) ne peuvent pas poser de commandblock. Choix dispenser pour conserver le blockface
 		
