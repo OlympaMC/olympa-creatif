@@ -78,7 +78,7 @@ public abstract class ClipboardEdition {
 	
 
 	//tourne le bloc de 90° suivant Y sans le sens horaire
-	private static void rotateOnY(BlockData data) {
+	public static void rotateOnY(BlockData data) {
 		if (!(data instanceof Directional))
 			return;
 		

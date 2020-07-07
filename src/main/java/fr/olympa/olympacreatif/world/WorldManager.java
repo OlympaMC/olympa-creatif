@@ -32,6 +32,9 @@ public class WorldManager {
 	private OlympaCreatifMain plugin;
 	private World world = null;
 	private net.minecraft.server.v1_15_R1.World nmsWorld = null;
+
+	public static int plotSize = 256;
+	public static int roadSize = 16;
 	
 	//TODO remplir la liste
 	private Map<Material, OlympaPermission> restrictedItems = new HashMap<Material, OlympaPermission>();
@@ -57,7 +60,8 @@ public class WorldManager {
 			worldCreator.generateStructures(false);
 			worldCreator.generator(new CustomChunkGenerator(plugin));
 
-			Bukkit.getLogger().log(Level.INFO, plugin.getPrefixConsole() + "World " + Message.PARAM_WORLD_NAME.getValue() + " not detected. Generation started. This may take a while...");
+			Bukkit.getLogger().log(Level.WARNING, plugin.getPrefixConsole() + "Creative world " + Message.PARAM_WORLD_NAME.getValue() + " not detected. Generation started. This may take a while...");
+			
 			world = worldCreator.createWorld();
 			world.setDifficulty(Difficulty.EASY);
 			world.setTime(6000);
@@ -98,15 +102,14 @@ public class WorldManager {
 	            lines.add("allow-nether=false");
 	            lines.add("enable-command-block=true");
 	            lines.add("difficulty=easy");
-	            lines.add("broadcast-rcon-to-ops=false");
 	            lines.add("op-permission-level=1");
+	            lines.add("broadcast-rcon-to-ops=false");
 	            lines.add("broadcast-console-to-ops=false");
 	            
 	            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }
-	        
 	        
 			Bukkit.getLogger().info(plugin.getPrefixConsole() + "World fully generated ! Server restart is now needed.");
 		}

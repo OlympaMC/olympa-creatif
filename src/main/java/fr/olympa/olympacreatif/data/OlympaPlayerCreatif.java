@@ -4,13 +4,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionDefault;
 
 import com.google.common.collect.ImmutableMap; 
 
@@ -19,6 +25,7 @@ import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
@@ -38,6 +45,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	private Map<Integer, String> scoreboardLines = new HashMap<Integer, String>();
 	
 	private List<StaffPerm> staffPerm = new ArrayList<StaffPerm>();
+
+	private String[] worldeditPerms = new String[] {"worldedit.selection.pos", "worldedit.region.set"};
+	private PermissionAttachment permissions;
 	
 	public OlympaPlayerCreatif(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
@@ -45,6 +55,28 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		
 		for (int i = 0 ; i < 8 ; i++)
 			scoreboardLines.put(i, null);
+	}
+
+	public void addBukkitPermissions() {
+		if (true)
+			return;
+		permissions = getPlayer().addAttachment(plugin);
+		
+		for (CommandType type : CommandType.values())
+			permissions.setPermission("minecraft.command." + type.toString(), true);
+		
+		/*
+		for (Permission perm : Bukkit.getServer().getPluginManager().getPermissions())
+			perm.setDefault(PermissionDefault.NOT_OP);
+			*/
+		
+	}
+	
+	public void removeBukkitPermissions() {
+		if (true)
+			return;
+		for (String s : permissions.getPermissions().keySet())
+			permissions.unsetPermission(s);
 	}
 	
 	@Override

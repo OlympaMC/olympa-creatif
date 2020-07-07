@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.world;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -50,6 +51,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.potion.PotionEffect;
 
 import fr.olympa.api.item.ItemUtils;
@@ -57,11 +59,13 @@ import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
+import net.minecraft.server.v1_15_R1.PacketPlayInChat;
 import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
 
 public class WorldEventsListener implements Listener{
@@ -76,6 +80,8 @@ public class WorldEventsListener implements Listener{
 	
 	int maxEntitiesPerTypePerPlot = 0;
 	int maxTotalEntitiesPerPlot = 0;
+	
+	private List<String> bukkitPerms = new ArrayList<String>(Arrays.asList(new String[] {"bukkit.command.gamemode", "bukkit.command.execute"}));
 	
 	public WorldEventsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -348,12 +354,6 @@ public class WorldEventsListener implements Listener{
 				sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
 	}
 	
-	@EventHandler //clear l'historique de sneak de ce joueur
-	public void onPlayerQuit(PlayerQuitEvent e) {
-		sneakHistory.remove(e.getPlayer().getName());
-		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
-	}
-	
 	@EventHandler //cancel téléportation par portail de l'end ou du nether
 	public void onChangeWorld(PlayerTeleportEvent e) {
 		if (e.getCause() == TeleportCause.END_PORTAL || e.getCause() == TeleportCause.NETHER_PORTAL)
@@ -402,26 +402,26 @@ public class WorldEventsListener implements Listener{
 			i++;
 		}
 	}
+
+	
+	@EventHandler //clear l'historique de sneak de ce joueur
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		sneakHistory.remove(e.getPlayer().getName());
+		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
+
+		((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).removeBukkitPermissions();
+	}
+	
+	PermissionAttachment perm;
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 		
-		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
-		
-		
-		/*
-		new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
-				nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
-			}
-		}.runTaskLater(plugin, 20);*/
-		
+
+		((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).addBukkitPermissions();
 	}
 }

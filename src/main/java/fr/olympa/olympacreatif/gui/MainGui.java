@@ -72,9 +72,7 @@ public class MainGui extends OlympaGUI {
 		//plugin.getPerksManager().getMicroBlocks().skull(consumer, p.getName(), p.getName());
 
 		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes parcelles", clickToOpenMenu));
-		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", 
-				"§eVotre monnaie : " + pc.getGameMoney(), "§eRang : " + pc.getGroupName(), "§eParcelles bonus : " + pc.getBonusPlots(), 
-				clickToOpenMenu));
+		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", clickToOpenMenu));
 		
 		if (plot != null) {
 			inv.setItem(21, ItemUtils.item(Material.PAINTING, "§6Membres parcelle", "§eNombre de membres : " + plot.getMembers().getCount(), clickToOpenMenu));

@@ -5,6 +5,8 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.lines.AnimLine;
@@ -23,6 +25,7 @@ import fr.olympa.olympacreatif.command.OcaCommand;
 import fr.olympa.olympacreatif.command.OceCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
@@ -82,6 +85,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		worldEditManager = new WorldEditManager(this);
 		perksManager  = new PerksManager(this);
 		cbManager = new CommandBlocksManager(this);
+
 		
 		/*try {
 			//OlympaCore.getInstance().getDatabase();

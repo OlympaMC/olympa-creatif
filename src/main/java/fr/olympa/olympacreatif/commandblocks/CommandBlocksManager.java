@@ -12,6 +12,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -62,6 +64,8 @@ public class CommandBlocksManager {
 		plugin.getServer().getPluginManager().registerEvents(new CbTeamsListener(plugin), plugin);
 		
 		Bukkit.getPluginManager().registerEvents(new CbCommandListener(plugin), plugin);
+		
+		//Bukkit.getServer().getPluginManager().getPermission("minecraft.command.gamemode").setDefault(PermissionDefault.TRUE);
 	}
 	
 	public PlotCbData createPlotCbData() {
@@ -98,10 +102,6 @@ public class CommandBlocksManager {
 				pc.setCustomScoreboardValues(obj.getValues(true));
 			}	
 		}
-		
-		//op le joueur s'il ets chef de plot
-		//if (toPlot.getMembers().getPlayerRank(pc) == PlotRank.OWNER)
-		//	p.setOp(true);
 	}
 	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
@@ -121,8 +121,5 @@ public class CommandBlocksManager {
 		
 		for (CbBossBar bar : fromPlot.getCbData().getBossBars().values())
 			bar.getBar().removePlayer(p);
-		
-		//deop le joueur à la sortie de son plot
-		//p.setOp(false);
 	}
 }
