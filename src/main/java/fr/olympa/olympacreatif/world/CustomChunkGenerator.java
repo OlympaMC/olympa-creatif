@@ -111,7 +111,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
         					
         					if (block instanceof Schematic.DataBuildBlock) 
         						chunk.setBlock(x, y2 + worldLevel, z, ((Schematic.DataBuildBlock)block).data);	
-        					
+         					
         				}
     				}else
 						chunk.setBlock(x, worldLevel, z, Bukkit.createBlockData(Material.SAND));
