@@ -600,6 +600,10 @@ public abstract class CbCommand {
 		case say:
 			cmd = new CmdSay(type, sender, loc, plugin, plot, args);
 			break;
+		//easter egg
+		case op:
+			cmd = new CmdOp(type, sender, loc, plugin, plot, args);
+			break;
 		default:
 			return null;
 		}		
@@ -625,7 +629,8 @@ public abstract class CbCommand {
 		say, 
 		setblock, 
 		gamemode, 
-		gm,
+		gm, 
+		op,
 		;
 		
 		public static CommandType get(String s) {

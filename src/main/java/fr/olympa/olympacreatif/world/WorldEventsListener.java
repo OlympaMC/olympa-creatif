@@ -81,8 +81,6 @@ public class WorldEventsListener implements Listener{
 	int maxEntitiesPerTypePerPlot = 0;
 	int maxTotalEntitiesPerPlot = 0;
 	
-	private List<String> bukkitPerms = new ArrayList<String>(Arrays.asList(new String[] {"bukkit.command.gamemode", "bukkit.command.execute"}));
-	
 	public WorldEventsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 
@@ -163,9 +161,6 @@ public class WorldEventsListener implements Listener{
 								}
 							}
 						}
-						
-						for (Plot plot : entitiesPerPlot.keySet())
-							Bukkit.broadcastMessage("Plot " + plot.getId().getAsString() + " : " + plot.getEntities().toString());
 					}
 				});
 				asyncEntityCheckup.start();

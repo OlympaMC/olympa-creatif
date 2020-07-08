@@ -1,0 +1,22 @@
+package fr.olympa.olympacreatif.commandblocks.commands;
+
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+
+import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.plot.Plot;
+
+public class CmdOp extends CbCommand {
+
+	public CmdOp(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot,
+			String[] commandString) {
+		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public int execute() {
+		sender.sendMessage("§i§7[Serveur : " + sender.getName() + " est maintenant opérateur du serveur]");
+		return 1;
+	}
+}
