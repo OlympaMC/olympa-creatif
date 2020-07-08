@@ -28,13 +28,13 @@ import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
 
 public class WorldManager {
-
 	private OlympaCreatifMain plugin;
 	private World world = null;
 	private net.minecraft.server.v1_15_R1.World nmsWorld = null;
 
-	public static int plotSize = 256;
-	public static int roadSize = 16;
+	public static final int plotSize = 256;
+	public static final int roadSize = 16;
+	public static final int worldLevel = 60;
 	
 	//TODO remplir la liste
 	private Map<Material, OlympaPermission> restrictedItems = new HashMap<Material, OlympaPermission>();
@@ -65,7 +65,7 @@ public class WorldManager {
 			world = worldCreator.createWorld();
 			world.setDifficulty(Difficulty.EASY);
 			world.setTime(6000);
-			world.setSpawnLocation(0, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue())+1, 0);
+			world.setSpawnLocation(0, worldLevel + 1, 0);
 
 			world.setGameRule(GameRule.DO_MOB_SPAWNING, true);
 			world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);

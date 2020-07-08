@@ -24,6 +24,7 @@ import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotParameters;
 
@@ -308,8 +309,8 @@ public class PlotParametersGui extends OlympaGUI {
 	public boolean onClose(Player p) {
 		//MAJ biome
 		if (!plot.getParameters().getParameter(PlotParamType.PLOT_BIOME).equals(newBiome)) {
-			for (int x = plot.getId().getLocation().getBlockX() ; x < plot.getId().getLocation().getBlockX() + Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) ; x++)
-				for (int z = plot.getId().getLocation().getBlockZ() ; z < plot.getId().getLocation().getBlockZ() + Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) ; z++)
+			for (int x = plot.getId().getLocation().getBlockX() ; x < plot.getId().getLocation().getBlockX() + WorldManager.plotSize ; x++)
+				for (int z = plot.getId().getLocation().getBlockZ() ; z < plot.getId().getLocation().getBlockZ() + WorldManager.plotSize ; z++)
 					for (int y = 1 ; y < 255 ; y++) 
 						plugin.getWorldManager().getWorld().getBlockAt(x, y, z).setBiome(newBiome);
 

@@ -20,6 +20,7 @@ import fr.olympa.api.utils.spigot.Schematic;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.world.WorldManager;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
@@ -34,8 +35,8 @@ public class SchematicCreator {
 	  
 	public SchematicCreator(OlympaCreatifMain plugin) {
 	    this.plugin = plugin;
-	    plotXsize = Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue());
-	    plotZsize = Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue());
+	    plotXsize = WorldManager.plotSize;
+	    plotZsize = WorldManager.plotSize;
 	}
 	    
 	public String export(Plot plot) {

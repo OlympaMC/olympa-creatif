@@ -19,6 +19,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.sk89q.jnbt.NBTUtils;
+
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
@@ -26,7 +28,9 @@ import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public abstract class CbCommand {
 
@@ -52,319 +56,276 @@ public abstract class CbCommand {
 	}
 	
 	//parse le selecteur et ses paramètres : x, y, z, dx, dy, dz, distance, name, team, scores, level, type
-	protected List<Entity> parseSelector(String s, boolean limitToPlayers){
+	@SuppressWarnings("deprecation")
+	protected List<Entity> parseSelector(String s, boolean onlyPlayers){
+		String selector = "";
+		Map<String, String> params = new HashMap<String, String>(); 
+		
 		List<Entity> list = new ArrayList<Entity>();
-		Map<String, String> parameters = new HashMap<String, String>();
-		Location selectorLoc = sendingLoc.clone();
-
-		//variable générale pour les intervalles d'entiers
-		Integer[] range = null;
 		
 		if (s.length() < 2)
 			return list;
 		
-		//cas où un pseudo est passé en paramètre
-		if (!s.contains("@")) {
+		//si le sélecteur ne contient qu'un pseudo
+		if (!s.startsWith("@")){
 			Player p = Bukkit.getPlayer(s);
-			if (p != null)
-				list.add(p);
+			if (p == null)
+				return new ArrayList<Entity>();
+			
+			list.add(p);
 			return list;
 		}
 		
-		//ajout des entités concernées par le test (joueurs (et) entités)
-		if (s.startsWith("@s")) {//ajout de l'entité exécutant la commande
-			
-			if (sender instanceof Entity) {
-				list.add((Entity) sender);	
-			}else
-				return list;
-		}else
-			list = new ArrayList<Entity>(plot.getPlayers());
+		//ajout des entités à la liste avant épuration
+		list.addAll(plot.getPlayers());
 		
-		if (s.startsWith("@e") && !limitToPlayers)
+		if (!onlyPlayers)
 			list.addAll(plot.getEntities());
 		
-		//exclusion des staff avec le mode Vanilla Commands Bypass actif
-		for (Entity e : new ArrayList<Entity>(list))
-			if (e.getType() == EntityType.PLAYER)
-				if (((OlympaPlayerCreatif) AccountProvider.get(e.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
-					list.remove(e);
 		
-		//récupération des scores en paramètre
-		if (s.contains(",scores={")) {
-			if (s.split(",scores={").length != 2)
-				return list;
+		//définition du sélecteur de base et des arguments
+		selector = s.substring(0, 2);
+		s = s.substring(2);
+		
+		if (s.length() > 2) {
+			s = s.substring(1);
+			s = s.substring(0, s.length() - 1) + ",";	
+		}
+		
+		//détecte des params sous forme de NBT pour ne pas en séparer le compound (grâce aux {...})
+		boolean isScoreTag = false;
+		String subParam = "";
+		
+		for (char c : s.toCharArray()) {
 			
-			//pour chaque score renseigné, on teste les entités
-			for (String ss : s.substring(s.indexOf(",scores={")+9, s.indexOf("}")).split(",")){
-				String[] sss = ss.split("=");
-				if (sss.length != 2)
-					return list;
+			//détection formatage NBTTagCompound pour ne pas les séparer même s'il y a des virgules
+			if (c == '{') 
+				isScoreTag = true;
+			else if (c == '}')
+				isScoreTag = false;
+			
+			//concat subArg
+			if (c != ',' || isScoreTag)
+				subParam += c;
+			
+			//extraction du paramètre et de sa valeur
+			else {
 				
-				CbObjective obj = plotCbData.getObjective(sss[0]);
-				range = getIntRange(sss[3]);
+				if (!subParam.contains("="))
+					return list; 
 				
-				if (obj != null && range != null) {
-					for (Entity e : new ArrayList<Entity>(list))
-						if (obj.get(e) < range[0] || obj.get(e) > range[2])
+				String id = subParam.substring(0, subParam.indexOf("="));
+				
+				//s'il n'y a rien après le =
+				int indexOfEqualSymbol = subParam.indexOf("=");
+				if (subParam.length() <= indexOfEqualSymbol + 1)
+					return new ArrayList<Entity>();
+				
+				//regroupement des possibles valeurs pour ce paramètre
+				if (!params.containsKey(id))
+					params.put(id, subParam.substring(indexOfEqualSymbol + 1));
+				else
+					params.put(id, params.get(id) + "," + subParam.substring(indexOfEqualSymbol + 1));
+				
+				subParam = "";
+			}
+		}
+		
+		//ajout du tags de tri (si non existant) pour @p et @r
+		if (!params.containsKey("sort"))
+			if (selector.equals("@p"))
+				params.put("sort", "nearest");
+			else if (selector.equals("@r"))
+				params.put("sort", "random");
+		
+		//--------------------------//
+		//APPLICATION DES PARAMETRES//
+		//--------------------------//
+		
+		
+		//définition de la localisation
+		
+		if (params.containsKey("x")) {
+			Integer[] i = getIntRange(params.get("x"));
+			
+			if (i != null)
+				sendingLoc.setX(i[0]);
+		}
+		if (params.containsKey("y")) {
+			Integer[] i = getIntRange(params.get("y"));
+			
+			if (i != null)
+				sendingLoc.setY(i[0]);
+		}
+		if (params.containsKey("z")) {
+			Integer[] i = getIntRange(params.get("z"));
+			
+			if (i != null)
+				sendingLoc.setZ(i[0]);
+		}
+		
+		if (!plot.getId().isInPlot(sendingLoc))
+			return new ArrayList<Entity>();
+		
+		//épuration selon distance
+		
+		if (params.containsKey("distance")) {
+			Integer[] i = getIntRange(params.get("distance"));
+			
+			if (i == null)
+				return new ArrayList<Entity>();
+			
+			for (Entity e : new ArrayList<Entity>(list)) {
+				double distance = e.getLocation().distance(sendingLoc);
+				
+				if (distance < i[0] || distance > i[1])
+					list.remove(e);
+			}
+		}
+		
+		if (params.containsKey("dx")) {
+			Integer[] i = getIntRange(params.get("dx"));
+			
+			if (i == null)
+				return new ArrayList<Entity>();
+			
+			for (Entity e : new ArrayList<Entity>(list)) {
+				double distance = e.getLocation().getX() - sendingLoc.getX();
+				
+				if (i[0] > 0)
+					if (distance > i[0])
+						list.remove(e);
+				if (i[0] < 0)
+					if (distance < i[0])
+						list.remove(e);
+			}
+		}
+		
+		if (params.containsKey("dy")) {
+			Integer[] i = getIntRange(params.get("dy"));
+			
+			if (i == null)
+				return new ArrayList<Entity>();
+			
+			for (Entity e : new ArrayList<Entity>(list)) {
+				double distance = e.getLocation().getY() - sendingLoc.getY();
+				
+				if (i[0] > 0)
+					if (distance > i[0])
+						list.remove(e);
+				if (i[0] < 0)
+					if (distance < i[0])
+						list.remove(e);
+			}
+		}
+		
+		if (params.containsKey("dz")) {
+			Integer[] i = getIntRange(params.get("dz"));
+			
+			if (i == null)
+				return new ArrayList<Entity>();
+			
+			for (Entity e : new ArrayList<Entity>(list)) {
+				double distance = e.getLocation().getZ() - sendingLoc.getZ();
+				
+				if (i[0] > 0)
+					if (distance > i[0])
+						list.remove(e);
+				if (i[0] < 0)
+					if (distance < i[0])
+						list.remove(e);
+			}
+		}
+		
+		//épuration selon niveau d'expérience
+		
+		if (params.containsKey("level")) {
+			Integer[] i = getIntRange(params.get("level"));
+			
+			if (i == null)
+				return new ArrayList<Entity>();
+
+			for (Entity e : new ArrayList<Entity>(list)) {
+				if (e.getType() != EntityType.PLAYER)
+					list.remove(e);
+				
+				if (((Player)e).getLevel() < i[0] || ((Player)e).getLevel() > i[1])
+					list.remove(e);
+			}			
+		}
+		
+		//épuration selon type d'entité
+		
+		if (params.containsKey("type")) {			
+			for (String type : params.get("type").split(",")) {
+				String nonType = getNonString(type);
+				
+				//si on ne veut pas ce cette entité
+				if (nonType != null) {
+					EntityType entType = EntityType.fromName(getUndomainedString(nonType));
+					
+					for (Entity e : new ArrayList<Entity>(list)) 
+						if (e.getType() == entType)
+							list.remove(e);
+					
+				//si on ne veut que cette entité
+				}else {
+					EntityType entType = EntityType.fromName(getUndomainedString(type));
+					
+					for (Entity e : new ArrayList<Entity>(list)) 
+						if (e.getType() != entType)
 							list.remove(e);
 				}
-				
 			}
 		}
-			
 		
-		//extraction des paramètres
-		for (String ss : s.replace("[", "").replace("]", "").split(",")) {
-			String[] sss = ss.split("="); 
-			if (sss.length == 2) {
-				
-				//regroupe les types d'entités & teams tolérées dans une seule liste du type "!pig,!cow,creeper" ou "equipebleue,!equipemechants"
-				if (sss[0].equals("type"))
-					if (parameters.containsKey("type"))
-						parameters.put("type", parameters.get("type") + "," + sss[1]);
-					else
-						parameters.put("type", sss[1]);
-				
-				else if (sss[0].equals("team"))
-					if (parameters.containsKey("team"))
-						parameters.put("team", parameters.get("team") + "," + sss[1]);
-					else
-						parameters.put("team", sss[1]);
-				
-				else
-					parameters.put(sss[0], sss[1]);	
-			}	
-		}
-
+		//épuration selon nom entité
 		
-		//définition du point d'exécution de la commande
-		if (parameters.containsValue("x")) {
-			range = getIntRange(parameters.get("x"));
-					if (range != null)
-						selectorLoc.setX(range[0]);
-		}
-		
-		if (parameters.containsValue("y")) {
-			range = getIntRange(parameters.get("y"));
-					if (range != null)
-						selectorLoc.setX(range[0]);
+		if (params.containsKey("name")) {
+			for (String name : params.get("name").split(",")) {
+				name = ChatColor.translateAlternateColorCodes('&', name);
+				String nonName = getNonString(name);
+				
+				//si on ne veut pas ce ce nom
+				if (nonName != null) {
+					for (Entity e : new ArrayList<Entity>(list)) 
+						
+						if (e.getType() == EntityType.PLAYER) {
+							if (nonName.equals(((Player)e).getName()))
+								list.remove(e);	
+						}else
+							if (nonName.equals(e.getCustomName()))
+								list.remove(e);
+					
+				//si on ne veut que ce nom d'entité	
+				}else 
+					for (Entity e : new ArrayList<Entity>(list)) 
+						
+						if (e.getType() == EntityType.PLAYER) {
+							if (!name.equals(((Player)e).getName()))
+								list.remove(e);	
+						}else
+							if (!name.equals(e.getCustomName()))
+								list.remove(e);				
+			}			
 		}
 		
-		if (parameters.containsValue("z")) {
-			range = getIntRange(parameters.get("z"));
-					if (range != null)
-						selectorLoc.setX(range[0]);
-		}
+		//épuration selon scores
 		
-		//exclusion des entités n'étant pas dans la zone de recherche
-		if (parameters.containsKey("distance")) {
-			range = getIntRange(parameters.get("distance"));
+		if (params.containsKey("scores")) {
+			NBTTagCompound tag = NbtParserUtil.getTagFromString(params.get(params.get("scores")));
 			
-			if (range == null)
-				return list;
-			
-			for (Entity ent : new ArrayList<Entity>(list))
-				if (ent.getLocation().distance(selectorLoc) < range[0] || ent.getLocation().distance(selectorLoc) > range[1])
-					list.remove(ent);
-		}else {
-			
-			//répétition pour x, y et z (test de si l'entité a la composante x, y ou z respectant le dx/y/z)
-			if (parameters.containsKey("dx")) {
-				range = getIntRange(parameters.get("dx"));
+			for (String key : tag.getKeys()) {
+				CbObjective obj = plot.getCbData().getObjective(key);
+				Integer[] i = getIntRange(tag.getString(key));
 				
-				if (range == null)
-					return list;
-
-				range[0] = selectorLoc.getBlockX();
-				range[1] = selectorLoc.getBlockX() + range[1];
+				if (obj == null || i == null)
+					return new ArrayList<Entity>();
 				
 				for (Entity e : new ArrayList<Entity>(list))
-					if (e.getLocation().getX() < range[0] || e.getLocation().getX() > range[1])
-						list.remove(e);	
+					if (obj.get(e) < i[0] || obj.get(e) > i[1])
+						list.remove(e);
 			}
-			
-
-			if (parameters.containsKey("dy")) {
-				range = getIntRange(parameters.get("dy"));
-				
-				if (range == null)
-					return list;
-
-				range[0] = selectorLoc.getBlockY();
-				range[1] = selectorLoc.getBlockY() + range[1];
-				
-				for (Entity e : new ArrayList<Entity>(list))
-					if (e.getLocation().getY() < range[0] || e.getLocation().getY() > range[1])
-						list.remove(e);	
-			}
-			
-
-			if (parameters.containsKey("dz")) {
-				range = getIntRange(parameters.get("dz"));
-				
-				if (range == null)
-					return list;
-
-				range[0] = selectorLoc.getBlockZ();
-				range[1] = selectorLoc.getBlockZ() + range[1];
-				
-				for (Entity e : new ArrayList<Entity>(list))
-					if (e.getLocation().getZ() < range[0] || e.getLocation().getZ() > range[1])
-						list.remove(e);	
-			}
-							
-		}
-		
-		//parcours tous les paramètres intermédiaires
-		for (Entry<String, String> e : parameters.entrySet())
-			switch(e.getKey()) {
-			
-			case "level":
-				range = getIntRange(e.getValue());
-				
-				if (range == null)
-					return list;
-				
-				for (Entity ent : new ArrayList<Entity>(list))
-					
-					if (ent instanceof Player) {
-						
-						if (((Player)ent).getLevel() < range[0] || ((Player)ent).getLevel() > range[1]) {
-							list.remove(ent);	
-						}	
-					}else
-						list.remove(ent);
-						
-				break;
-				
-			case "name":
-				String entityName = "";
-				String selectorName = "";
-				boolean compareAsInequal = false;
-				
-				if (e.getValue().contains("!")) {
-					compareAsInequal = true;
-					selectorName = ChatColor.translateAlternateColorCodes('&', e.getValue().replace("!", ""));
-				}else
-					selectorName = ChatColor.translateAlternateColorCodes('&', e.getValue().replace("!", ""));
-					
-				for (Entity ent : new ArrayList<Entity>(list))
-					if ((ent.getCustomName().equals(selectorName) && compareAsInequal) || (!ent.getCustomName().equals(selectorName) && !compareAsInequal))
-						list.remove(ent);
-				
-				break;
-				
-			case "type":
-				
-				for (String ss : e.getValue().split(",")) {
-					
-					boolean isTestInequality = false;
-					EntityType type = null;
-					
-					//recherche du type de l'entité
-					if (ss.contains("!")) {
-						type = EntityType.fromName(e.getValue().replace("!", ""));
-						isTestInequality = true;
-					}else
-						type = EntityType.fromName(e.getValue());						
-						
-					//test des noms différents entre minecraft et spigot
-					if (type == null) {
-						switch (e.getValue()) {
-						case "mooshroom":
-							type = EntityType.MUSHROOM_COW;
-							break;
-						case "zombie_pigman":
-							type = EntityType.PIG_ZOMBIE;
-							break;
-						default:
-							return list;
-						}
-					}
-					
-					for (Entity ent : new ArrayList<Entity>(list))
-						if ((isTestInequality && ent.getType() == type) || (!isTestInequality && ent.getType() != type))
-							list.remove(ent);
-							
-				}
-				break;
-				
-			case "team":
-				
-				for (String ss : e.getValue().split(",")) {
-				
-				boolean isTestInequality = false;
-				CbTeam team = null;
-				
-				//recherche du type de l'entité
-				if (ss.contains("!")) {
-					team = plotCbData.getTeamById(e.getValue().replace("!", ""));
-					isTestInequality = true;
-				}else
-					team = plotCbData.getTeamById(e.getValue());
-				
-				if (team == null)
-					return list;
-				
-				for (Entity ent : new ArrayList<Entity>(list))
-					if ((isTestInequality && team.isMember(ent)) || (!isTestInequality && !team.isMember(ent)))
-						list.remove(ent);
-						
-			}
-			break;
-				
-			}
-		
-		//trie le résultat
-		
-		//définition des comparateurs
-		Comparator<Entity> sortByNearest = new Comparator<Entity>() {
-			@Override
-			public int compare(Entity o1, Entity o2) {
-				return (int) (o1.getLocation().distance(selectorLoc) -  o2.getLocation().distance(selectorLoc));
-			}
-		};
-		
-		if (!parameters.containsKey("sort")) {
-			if (s.startsWith("@p"))
-				parameters.put("sort", "nearest");
-			if (s.startsWith("@r"))
-				parameters.put("sort", "random");
-		}
-		
-		if (parameters.containsKey("sort"))
-			switch(parameters.get("sort")) {
-			case "nearest":
-				list.sort(sortByNearest);
-				break;
-			case "furthest":
-				list.sort(sortByNearest);
-				Collections.reverse(list);
-				break;
-			case "random":
-				List<Entity> listBis = new ArrayList<Entity>();
-				
-				while (list.size() > 0) 
-					listBis.add(list.get(plugin.random.nextInt(list.size())));
-				
-				list = listBis;
-				break;
-			}
-		
-		//limite le nombre de sorties au paramètre "limit" si fourni, ou à 1 en cas de @s ou @p
-		if (parameters.containsKey("limit")) {
-			range = getIntRange(parameters.get("limit"));
-			
-			if (range == null)
-				return list;
-			
-			List<Entity> listBis = new ArrayList<Entity>(list);
-			Collections.reverse(listBis);
-			
-			for (Entity e : listBis)
-				if (list.size() > range[0])
-					list.remove(e);
 		}
 		
 		return list;
@@ -372,31 +333,41 @@ public abstract class CbCommand {
 	
 	//renvoie deux entiers resprésentant les bornes du string (qui doit être sur le modèle 4..7)
 	public Integer[] getIntRange(String s) {
-		Integer[] response = new Integer[2];
 		
-		
-		String[] ss = s.split("..");
-		
-		//plage avec min <> max
-		if (ss.length == 2) {
-			if (StringUtils.isNumeric(ss[0]))
-				response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
-			else
-				return null;
+		try {
+			Integer[] response = new Integer[2];
 			
-			if (StringUtils.isNumeric(ss[1]))				
+			String[] ss = s.split("..");
+			
+			response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
+			
+			//plage avec min <> max
+			if (ss.length == 2)
 				response[1] = Math.abs((int)(double)Double.valueOf(ss[1]));
-			else
-				return null;
+			else 
+				response[1] = response[0];	
 			
-		}else
-			if (StringUtils.isNumeric(ss[0])) {
-				response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
-				response[1] = response[0];
-			}else
-				return null;
-		
-		return response;
+			return response;
+		}catch(NumberFormatException e) {
+			return null;
+		}
+	}
+	
+	//retourne le paramètre string moins le '!' s'il en contenait un, null sinon
+	public static String getNonString(String value) {
+		if (value.startsWith("!"))
+			return value.substring(1);
+		else
+			return null;
+	}
+	
+	
+	//retourne un string en majuscules sans le "minecraft:"
+	public String getUndomainedString(String s) {
+		if (s.contains("minecraft:"))
+			return s.substring(9).toUpperCase();
+		else
+			return s.toUpperCase();
 	}
 	
 	

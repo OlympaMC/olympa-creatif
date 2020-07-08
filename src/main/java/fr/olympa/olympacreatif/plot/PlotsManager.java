@@ -19,6 +19,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.world.WorldManager;
 
 public class PlotsManager {
 
@@ -121,9 +122,9 @@ public class PlotsManager {
 	}
 	
 	public PlotId getPlotId(int x, int z) {
-		int xSize = Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue());
-		int zSize = Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue());
-		int roadSize = Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue());
+		int xSize = WorldManager.plotSize;
+		int zSize = WorldManager.plotSize;
+		int roadSize = WorldManager.roadSize;
 		
 		int xb = Math.floorMod(x, xSize + roadSize);
 		int zb = Math.floorMod(z, zSize + roadSize);

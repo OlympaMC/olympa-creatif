@@ -45,10 +45,6 @@ public enum Message {
 	PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT,
 	PARAM_WORLDEDIT_BPS,
 	PARAM_WORLD_NAME,
-	PARAM_WORLD_LEVEL,
-	PARAM_PLOT_X_SIZE,
-	PARAM_PLOT_Z_SIZE,
-	PARAM_ROAD_SIZE,
 	PARAM_WE_MAX_QUEUED_ACTIONS_PER_PLAYER,
 
 	PLOT_RECIEVE_INVITATION,
@@ -143,11 +139,7 @@ public enum Message {
 	}
 	
 	public static void initialize() {
-		messagesList.put(PARAM_PLOT_X_SIZE, "256");
-		messagesList.put(PARAM_PLOT_Z_SIZE, "256");
-		messagesList.put(PARAM_ROAD_SIZE, "16");
 		messagesList.put(PARAM_WORLDEDIT_BPS, "1000");
-		messagesList.put(PARAM_WORLD_LEVEL, "60");
 		messagesList.put(PARAM_WORLD_NAME, "plots");
 		messagesList.put(PARAM_WE_MAX_BLOCKS_PER_CMD, "10000");
 		messagesList.put(PARAM_WE_MAX_QUEUED_ACTIONS_PER_PLAYER, "4");

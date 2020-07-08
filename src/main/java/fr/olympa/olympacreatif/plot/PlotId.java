@@ -4,6 +4,7 @@ import org.bukkit.Location;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.world.WorldManager;
 
 public class PlotId{
 
@@ -11,9 +12,9 @@ public class PlotId{
 	private int indexZ;
 	private OlympaCreatifMain plugin;
 
-	private int plotXsize = Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue());;
-	private int plotZsize = Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue());;
-	private int plotRoadSize = Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue());
+	private int plotXsize = WorldManager.plotSize;
+	private int plotZsize = WorldManager.plotSize;
+	private int plotRoadSize = WorldManager.roadSize;
 	
 	public PlotId(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -97,7 +98,10 @@ public class PlotId{
 	}
 	
 	public Location getLocation() {
-		return new Location(plugin.getWorldManager().getWorld(), indexX * (Integer.valueOf(Message.PARAM_PLOT_X_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue())) + 0.5, Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue()) + 1, indexZ * (Integer.valueOf(Message.PARAM_PLOT_Z_SIZE.getValue()) + Integer.valueOf(Message.PARAM_ROAD_SIZE.getValue())) + 0.5);
+		return new Location(plugin.getWorldManager().getWorld(), 
+				indexX * (WorldManager.plotSize + WorldManager.roadSize) + 0.5, 
+				WorldManager.worldLevel + 1, 
+				indexZ * (WorldManager.plotSize + WorldManager.roadSize) + 0.5);
 	}
 	
 	public boolean isInPlot(Location loc) {

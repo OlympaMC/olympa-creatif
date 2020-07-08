@@ -23,6 +23,7 @@ import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.world.WorldManager;
 import net.minecraft.server.v1_15_R1.TileEntity;
 
 public class Plot {
@@ -125,7 +126,7 @@ public class Plot {
 	
 	public Location getOutLoc() {
 		Location loc = plotId.getLocation().add(-3, 0, -3);
-		loc.setY(1 + Integer.valueOf(Message.PARAM_WORLD_LEVEL.getValue()));
+		loc.setY(WorldManager.worldLevel + 1);
 		return loc;
 	}
 

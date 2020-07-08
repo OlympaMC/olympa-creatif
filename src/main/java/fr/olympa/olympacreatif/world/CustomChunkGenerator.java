@@ -2,39 +2,24 @@ package fr.olympa.olympacreatif.world;
 
 import java.io.File;
 import java.util.Random;
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Stairs;
 import org.bukkit.generator.ChunkGenerator;
 import fr.olympa.api.utils.spigot.Schematic;
-import fr.olympa.api.utils.spigot.Schematic.EmptyBuildBlock;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 
 public class CustomChunkGenerator extends ChunkGenerator {
 
 	private OlympaCreatifMain plugin;
-	private int plotXwidth;
-	private int plotZwidth;
-	private int roadWidth;
-	private int worldLevel;
 
 	Schematic roadXschem = null;
 	Schematic roadZschem = null;
 	
     public CustomChunkGenerator(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-
-		plotXwidth = Integer.parseInt(Message.PARAM_PLOT_X_SIZE.getValue());
-		plotZwidth = Integer.parseInt(Message.PARAM_PLOT_Z_SIZE.getValue());
-		roadWidth = Integer.parseInt(Message.PARAM_ROAD_SIZE.getValue());
-		worldLevel = Integer.parseInt(Message.PARAM_WORLD_LEVEL.getValue());
 
 		File fileX = new File(plugin.getDataFolder() + "/roadX.schem");
 		File fileZ = new File(plugin.getDataFolder() + "/roadZ.schem");
@@ -69,100 +54,100 @@ public class CustomChunkGenerator extends ChunkGenerator {
         		boolean onXroad = false;
         		boolean onZroad = false;
 
-    			if ((Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) >= plotXwidth && 
-    					Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) < plotXwidth + roadWidth))
+    			if ((Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) >= WorldManager.plotSize && 
+    					Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) < WorldManager.plotSize + WorldManager.roadSize))
     				onZroad = true;
     			
-    			if ((Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) >= plotZwidth && 
-    					Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) < plotZwidth + roadWidth))
+    			if ((Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) >= WorldManager.plotSize && 
+    					Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) < WorldManager.plotSize + WorldManager.roadSize))
     				onXroad = true;
     			
     			//placement blocks en dessous de la route
     			if (onXroad || onZroad)
-    				for (int y = 1 ; y < worldLevel ; y++)
+    				for (int y = 1 ; y < WorldManager.worldLevel - 1 ; y++)
     					chunk.setBlock(x, y, z, Bukkit.createBlockData(Material.STONE));
     			
     			if (onXroad) {
     				if (roadXschem != null) {
         				//placement blocs de route selon sens schematic
         				int xRoadBlockIndex = Math.floorMod(chunkX*16+x + 1, roadXschem.width);
-        				int zRoadBlockIndex = Math.floorMod(Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) - plotZwidth, roadXschem.length);
+        				int zRoadBlockIndex = Math.floorMod(Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) - WorldManager.plotSize, roadXschem.length);
         				
         				for (int y2 = 0 ; y2 < roadXschem.height ; y2++) {
         					Schematic.EmptyBuildBlock block = roadXschem.blocks[xRoadBlockIndex][y2][zRoadBlockIndex];
         					
         					if (block instanceof Schematic.DataBuildBlock)
-        						chunk.setBlock(x, y2 + worldLevel, z, ((Schematic.DataBuildBlock)block).data);
+        						chunk.setBlock(x, y2 + WorldManager.worldLevel - 1, z, ((Schematic.DataBuildBlock)block).data);
         					
         				}
     				}else
-						chunk.setBlock(x, worldLevel, z, Bukkit.createBlockData(Material.SAND));
+						chunk.setBlock(x, WorldManager.worldLevel, z, Bukkit.createBlockData(Material.SAND));
     					
     					
     					
     			}else if (onZroad) {
     				if (roadZschem != null) {
         				//placement blocs de route selon sens schematic
-        				int xRoadBlockIndex = Math.floorMod(Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) - plotXwidth, roadXschem.width);
-        				int zRoadBlockIndex = Math.floorMod(chunkZ*16+z + 1, roadXschem.length);
+        				int xRoadBlockIndex = Math.floorMod(Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) - WorldManager.plotSize, roadXschem.width);
+        				int zRoadBlockIndex = Math.floorMod(chunkZ*16+z + 1, roadZschem.length);
         				
         				for (int y2 = 0 ; y2 < roadZschem.height ; y2++) {
         					Schematic.EmptyBuildBlock block = roadZschem.blocks[xRoadBlockIndex][y2][zRoadBlockIndex];
         					
         					if (block instanceof Schematic.DataBuildBlock) 
-        						chunk.setBlock(x, y2 + worldLevel, z, ((Schematic.DataBuildBlock)block).data);	
+        						chunk.setBlock(x, y2 + WorldManager.worldLevel - 1, z, ((Schematic.DataBuildBlock)block).data);	
          					
         				}
     				}else
-						chunk.setBlock(x, worldLevel, z, Bukkit.createBlockData(Material.SAND));
+						chunk.setBlock(x, WorldManager.worldLevel, z, Bukkit.createBlockData(Material.SAND));
     				
     				
     			}else {
     				//placement blocs d'herbe du plot
-            		for (int y = 1 ; y < worldLevel ; y++) {
+            		for (int y = 1 ; y < WorldManager.worldLevel ; y++) {
             			chunk.setBlock(x, y, z, Material.DIRT);
             		}
-            		chunk.setBlock(x, worldLevel, z, Material.GRASS_BLOCK);
+            		chunk.setBlock(x, WorldManager.worldLevel, z, Material.GRASS_BLOCK);
     			}
     			
     			
     			/*
-    			if ((Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) >= plotXwidth && 
-    					Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) < plotXwidth + roadWidth) || 
-    					(Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) >= plotZwidth && 
-    					Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) < plotZwidth + roadWidth)) {
+    			if ((Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) >= WorldManager.plotSize && 
+    					Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) < WorldManager.plotSize + WorldManager.roadSize) || 
+    					(Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) >= WorldManager.plotSize && 
+    					Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) < WorldManager.plotSize + WorldManager.roadSize)) {
     				
     				//set stone pour les routes
     				//si un schematic est fourni
     				if (roadSchem == null)
-    					for (int y = 1 ; y <= worldLevel ; y++) 
+    					for (int y = 1 ; y <= WorldManager.worldLevel ; y++) 
     						chunk.setBlock(x, y, z, Material.STONE);
     				
             		
     			}else { //si plot, set terre et herbe pour les plots
     				
-            		for (int y = 1 ; y < worldLevel ; y++) {
+            		for (int y = 1 ; y < WorldManager.worldLevel ; y++) {
             			chunk.setBlock(x, y, z, Material.DIRT);
             		}
-            		chunk.setBlock(x, worldLevel, z, Material.GRASS_BLOCK);
+            		chunk.setBlock(x, WorldManager.worldLevel, z, Material.GRASS_BLOCK);
     			
     			}*/
     			
     			//si bord de plot, set demies dalles
     			
     			/*
-        		if (((Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) == plotXwidth || 
-        				Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) == plotXwidth + roadWidth - 1) && 
-    					!(Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) > plotZwidth && 
-    					Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) < plotZwidth + roadWidth)) || 
-        				((Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) == plotZwidth || 
-        				Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) == plotZwidth + roadWidth - 1) && 
-    					!(Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) > plotXwidth && 
-    					Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) < plotXwidth + roadWidth)) ||
-    					(Math.floorMod(chunkX*16+x, plotXwidth + roadWidth) == plotXwidth + roadWidth - 1 && 
-    					Math.floorMod(chunkZ*16+z, plotZwidth + roadWidth) == plotZwidth + roadWidth - 1)) {
+        		if (((Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) == WorldManager.plotSize || 
+        				Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) == WorldManager.plotSize + WorldManager.roadSize - 1) && 
+    					!(Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) > WorldManager.plotSize && 
+    					Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) < WorldManager.plotSize + WorldManager.roadSize)) || 
+        				((Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) == WorldManager.plotSize || 
+        				Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) == WorldManager.plotSize + WorldManager.roadSize - 1) && 
+    					!(Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) > WorldManager.plotSize && 
+    					Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) < WorldManager.plotSize + WorldManager.roadSize)) ||
+    					(Math.floorMod(chunkX*16+x, WorldManager.plotSize + WorldManager.roadSize) == WorldManager.plotSize + WorldManager.roadSize - 1 && 
+    					Math.floorMod(chunkZ*16+z, WorldManager.plotSize + WorldManager.roadSize) == WorldManager.plotSize + WorldManager.roadSize - 1)) {
             		
-        			chunk.setBlock(x, worldLevel+1, z, Material.GRANITE_SLAB);
+        			chunk.setBlock(x, WorldManager.worldLevel+1, z, Material.GRANITE_SLAB);
         		}
         		*/
         		
