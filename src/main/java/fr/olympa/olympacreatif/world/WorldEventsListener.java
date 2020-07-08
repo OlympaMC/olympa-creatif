@@ -95,7 +95,7 @@ public class WorldEventsListener implements Listener{
 			
 			Thread asyncEntityCheckup = null;
 			
-			private int getTotalEntities(Map<EntityType, Integer> map) {
+			int getTotalEntities(Map<EntityType, Integer> map) {
 				int i = 0;
 				for (Entry<EntityType, Integer> e : map.entrySet())
 					i += e.getValue();
@@ -143,31 +143,29 @@ public class WorldEventsListener implements Listener{
 								if (entity.getType() != EntityType.ARMOR_STAND && entity.getType() != EntityType.PAINTING && entity.getType() != EntityType.ITEM_FRAME) {
 									entitiesToRemove.add(entity);	
 								}	
-							}
-							else {
-								//si l'entité n'est pas un teamnahe holder, les tests de limitation d'entités sont effectués
-								if (!plugin.getPerksManager().getLinesOnHeadUtil().isTextHolder(entity)){
-									if (entitiesPerPlot.keySet().contains(plot)) //ajout de l'entité à la liste des entités du plot, si la liste n'existe pas pour ce plot on la crée
-										
-										//si l'entité n'est pas référencée, on le fait
-										if (entitiesPerPlot.get(plot).containsKey(entity.getType())) {
-											entitiesPerPlot.get(plot).put(entity.getType(), entitiesPerPlot.get(plot).get(entity.getType()) + 1);
-											
-											//si le nb d'entités pour ce type ou si le nb total d'entités est dépassé, on la supprime
-											if (entitiesPerPlot.get(plot).get(entity.getType()) >= maxEntitiesPerTypePerPlot || getTotalEntities(entitiesPerPlot.get(plot)) >= maxTotalEntitiesPerPlot)
-												
-												entitiesToRemove.add(entity);
-										}else {
-											entitiesPerPlot.get(plot).put(entity.getType(), 1);
-											plot.addEntityInPlot(entity);
-										}
-									else {
-										entitiesPerPlot.put(plot, new HashMap<EntityType, Integer>());
-										plot.addEntityInPlot(entity);	
-									}	
+							}else {
+								//création de la liste pour le plot si elle n'existe pas encore
+								if (!entitiesPerPlot.containsKey(plot))
+									entitiesPerPlot.put(plot, new HashMap<EntityType, Integer>());
+								
+								Map<EntityType, Integer> plotEntities = entitiesPerPlot.get(plot);
+								
+								//création de l'entrée pour le type d'entitité d'entity si n'existe pas encore
+								if (!plotEntities.containsKey(entity.getType()))
+									plotEntities.put(entity.getType(), 0);
+
+								//supression de l'entité OU ajout à la liste des entités du plot
+								if (plotEntities.get(entity.getType()) >= maxEntitiesPerTypePerPlot || getTotalEntities(plotEntities) >= maxTotalEntitiesPerPlot) {
+									entitiesToRemove.add(entity);
+								}else {
+									plotEntities.put(entity.getType(), plotEntities.get(entity.getType()) + 1);
+									plot.addEntityInPlot(entity);
 								}
 							}
 						}
+						
+						for (Plot plot : entitiesPerPlot.keySet())
+							Bukkit.broadcastMessage("Plot " + plot.getId().getAsString() + " : " + plot.getEntities().toString());
 					}
 				});
 				asyncEntityCheckup.start();

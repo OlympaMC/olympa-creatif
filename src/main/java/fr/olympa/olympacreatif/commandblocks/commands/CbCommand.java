@@ -82,6 +82,7 @@ public abstract class CbCommand {
 		if (!onlyPlayers)
 			list.addAll(plot.getEntities());
 		
+		Bukkit.broadcastMessage("Parse '" + s + " : " + list.toString());
 		
 		//définition du sélecteur de base et des arguments
 		selector = s.substring(0, 2);
@@ -131,12 +132,19 @@ public abstract class CbCommand {
 			}
 		}
 		
-		//ajout du tags de tri (si non existant) pour @p et @r
+		//ajout du tag de tri (si non existant) pour @p et @r
 		if (!params.containsKey("sort"))
 			if (selector.equals("@p"))
 				params.put("sort", "nearest");
 			else if (selector.equals("@r"))
 				params.put("sort", "random");
+		
+		//ajout du tag de limite (si non existant) pour @p et @r 
+		if (!params.containsKey("limit"))
+			if (selector.equals("@p"))
+				params.put("limit", "1");
+			else if (selector.equals("@r"))
+				params.put("limit", "1");
 		
 		//--------------------------//
 		//APPLICATION DES PARAMETRES//
@@ -328,6 +336,88 @@ public abstract class CbCommand {
 			}
 		}
 		
+		if (params.containsKey("team")) {
+			for (String team : params.get("team").split(",")) {
+				String nonTeam = getNonString(team);
+				
+				//si on ne veut pas cette équipe
+				if (nonTeam != null) {
+					
+					CbTeam nonTeamCb = plot.getCbData().getTeamById(nonTeam);
+					
+					//return si la team n'existe pas ou si le joueur n'as pas entré "team=!"
+					if (nonTeamCb == null && !nonTeam.equals(""))
+						return new ArrayList<Entity>();
+					
+					for (Entity e : new ArrayList<Entity>(list)) 
+						//remove entité si appartenant à une équipe
+						if (nonTeamCb == null) {
+							if (plot.getCbData().getTeamOf(e) != null)
+								list.remove(e);
+						//remove entité si appartenant à l'équipe cible
+						}else {
+							if (nonTeamCb.isMember(e))
+								list.remove(e);
+						}					
+					
+				//si on ne veut que ce nom d'équipe
+				}else {
+					CbTeam teamCb = plot.getCbData().getTeamById(team);
+					if (team == null)
+						return new ArrayList<Entity>();
+					
+					for (Entity e : new ArrayList<Entity>(list)) 
+						if (!teamCb.isMember(e))
+							list.remove(e);
+				}		
+			}
+		}
+		
+		//tri des résultats et limitation du nombre de sorties
+		
+		if (params.containsKey("sort")) {
+			switch(params.get("sort")) {
+			case "random":
+				list.sort(new Comparator<Entity>() {
+					@Override
+					public int compare(Entity o1, Entity o2) {
+						if (plugin.random.nextBoolean())
+							return 1;
+						else
+							return -1;
+					}
+				});
+				break;
+			case "nearest":
+				list.sort(new Comparator<Entity>() {
+					@Override
+					public int compare(Entity o1, Entity o2) {
+						return (int) (o1.getLocation().distance(sendingLoc) - o2.getLocation().distance(sendingLoc)); 
+					}
+				});
+				break;
+			case "furthest":
+				list.sort(new Comparator<Entity>() {
+					@Override
+					public int compare(Entity o1, Entity o2) {
+						return (int) (o2.getLocation().distance(sendingLoc) - o1.getLocation().distance(sendingLoc)); 
+					}
+				});
+				break;
+			default:
+				return new ArrayList<Entity>();
+			}
+		}
+		
+		if (params.containsKey("limit")) {
+			Integer[] i = getIntRange(params.get("limit"));
+			
+			if (i == null)
+				return new ArrayList<Entity>();
+			
+			list = list.subList(0, i[0]);
+		}
+		
 		return list;
 	}
 	
@@ -339,13 +429,21 @@ public abstract class CbCommand {
 			
 			String[] ss = s.split("..");
 			
-			response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
-			
-			//plage avec min <> max
-			if (ss.length == 2)
+			if (ss.length == 1) 
+				if (s.startsWith("..")) {
+					response[0] = -100000000;
+					response[1] = Math.abs((int)(double)Double.valueOf(ss[0]));
+				}else if (s.endsWith("..")) {
+					response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
+					response[1] = 100000000;
+				}else {
+					response[0] = Math.abs((int)(double)Double.valueOf(s));
+					response[1] = response[0]; 
+				}
+			else {
+				response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
 				response[1] = Math.abs((int)(double)Double.valueOf(ss[1]));
-			else 
-				response[1] = response[0];	
+			}
 			
 			return response;
 		}catch(NumberFormatException e) {

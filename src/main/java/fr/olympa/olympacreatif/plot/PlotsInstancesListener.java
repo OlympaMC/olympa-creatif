@@ -60,12 +60,15 @@ import net.minecraft.server.v1_15_R1.TileEntity;
 public class PlotsInstancesListener implements Listener{
 
 	private OlympaCreatifMain plugin;
-	private static Map<Plot, Map<Player, List<ItemStack>>> inventoryStorage = new HashMap<Plot, Map<Player, List<ItemStack>>>();
+	private static Map<Player, List<ItemStack>> inventoryStorage = new HashMap<Player, List<ItemStack>>();
 	private Plot plot;
 	
 	private List<Material> prohibitedVisitorInteractItems = new ArrayList<Material>();
+	private Map<Player, List<ItemStack>> itemsToKeepOnDeath = new HashMap<Player, List<ItemStack>>();
+	
 	private List<Material> commandBlockTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
 
+	//gère le placement des commandblocks
 	private List<Player> cbPlacementPlayer = new ArrayList<Player>();
 	private List<Location> cbPlacementLocation = new ArrayList<Location>();
 	private List<Material> cbPlacementTypeCb = new ArrayList<Material>();
@@ -428,6 +431,9 @@ public class PlotsInstancesListener implements Listener{
 
 	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
 	public void onQuitEvent(PlayerQuitEvent e) {
+		itemsToKeepOnDeath.remove(e.getPlayer());
+		inventoryStorage.remove(e.getPlayer());
+		
 		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		if (plot == null)
 			return;
@@ -471,10 +477,7 @@ public class PlotsInstancesListener implements Listener{
 				list.add(it);
 			}
 			
-			if (!inventoryStorage.containsKey(plotTo))
-				inventoryStorage.put(plotTo, new HashMap<Player, List<ItemStack>>());
-			
-			inventoryStorage.get(plotTo).put(p, list);
+			inventoryStorage.put(p, list);
 			p.getInventory().clear();
 			
 			for (PotionEffect effect : p.getActivePotionEffects())
@@ -511,11 +514,11 @@ public class PlotsInstancesListener implements Listener{
 		plot.removePlayerInPlot(p);
 
 		//rendu inventaire si stocké
-		if (inventoryStorage.containsKey(plot) && inventoryStorage.get(plot).containsKey(p)) {
+		if (inventoryStorage.containsKey(p)) {
 			p.getInventory().clear();
-			for (ItemStack it : inventoryStorage.get(plot).get(p))
+			for (ItemStack it : inventoryStorage.get(p))
 				p.getInventory().addItem(it);
-			inventoryStorage.get(plot).remove(p);
+			inventoryStorage.remove(p);
 		}
 		
 		p.setGameMode(GameMode.CREATIVE);
@@ -603,22 +606,29 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //force le respawn sur le spawn de la parcelle
 	public void onRespawn(PlayerRespawnEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
 		if (plot == null)
 			e.setRespawnLocation(plugin.getWorldManager().getWorld().getSpawnLocation());
 		else
 			e.setRespawnLocation((Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC));
 		
+		if (itemsToKeepOnDeath.containsKey(e.getPlayer()))
+			e.getPlayer().getInventory().addItem((ItemStack[]) itemsToKeepOnDeath.get(e.getPlayer()).toArray());
+		
+		itemsToKeepOnDeath.remove(e.getPlayer());
 	}
 	
 	@EventHandler //gère le paramètre keepInventory de la parcelle
 	public void onDeath(PlayerDeathEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		
-		if (plot == null)
+		if (plot == null) {
 			e.getDrops().clear();
+			return;
+		}
 		
 		if ((boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH)) {
-			e.getEntity().getInventory().addItem(e.getDrops().toArray(new ItemStack[e.getDrops().size()]));
+			itemsToKeepOnDeath.put(e.getEntity(), e.getDrops());
 			e.getDrops().clear();
 		}
 	}
