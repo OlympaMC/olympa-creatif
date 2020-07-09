@@ -20,7 +20,7 @@ public class CmdSetblock extends CbCommand {
 		if (args.length < 4)
 			return 0;
 		
-		Location placingLoc = getLocation(args[0], args[1], args[2]);
+		Location placingLoc = parseLocation(args[0], args[1], args[2]);
 		
 		Material mat = null;
 		

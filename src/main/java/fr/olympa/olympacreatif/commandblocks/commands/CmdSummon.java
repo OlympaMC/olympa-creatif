@@ -36,7 +36,7 @@ public class CmdSummon extends CbCommand {
 		NBTTagCompound tag = null;
 		
 		if (args.length >= 4) {
-			Location loc = getLocation(args[1], args[2], args[3]);
+			Location loc = parseLocation(args[1], args[2], args[3]);
 			
 			if (loc != null)
 				sendingLoc = loc;

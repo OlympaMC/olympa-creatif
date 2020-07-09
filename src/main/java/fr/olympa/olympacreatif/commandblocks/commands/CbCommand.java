@@ -76,17 +76,21 @@ public abstract class CbCommand {
 			return list;
 		}
 		
-		//ajout des entités à la liste avant épuration
-		list.addAll(plot.getPlayers());
-		
-		if (!onlyPlayers)
-			list.addAll(plot.getEntities());
-		
-		Bukkit.broadcastMessage("Parse '" + s + " : " + list.toString());
-		
-		//définition du sélecteur de base et des arguments
+		//définition du sélecteur de base
 		selector = s.substring(0, 2);
 		s = s.substring(2);
+		
+		//ajout des entités à la liste avant épuration
+		if (!selector.equals("@s")) {
+			list.addAll(plot.getPlayers());
+			
+			if (!onlyPlayers)
+				list.addAll(plot.getEntities());	
+		}else
+			if (sender instanceof Entity)
+				list.add((Entity) sender);
+		
+		//définition des arguments de la commande
 		
 		if (s.length() > 2) {
 			s = s.substring(1);
@@ -146,6 +150,8 @@ public abstract class CbCommand {
 			else if (selector.equals("@r"))
 				params.put("limit", "1");
 		
+		//Bukkit.broadcastMessage("type sélecteur : " + selector + " - params : " + params.toString());
+		
 		//--------------------------//
 		//APPLICATION DES PARAMETRES//
 		//--------------------------//
@@ -154,19 +160,19 @@ public abstract class CbCommand {
 		//définition de la localisation
 		
 		if (params.containsKey("x")) {
-			Integer[] i = getIntRange(params.get("x"));
+			Double[] i = getDoubleRange(params.get("x"));
 			
 			if (i != null)
 				sendingLoc.setX(i[0]);
 		}
 		if (params.containsKey("y")) {
-			Integer[] i = getIntRange(params.get("y"));
+			Double[] i = getDoubleRange(params.get("y"));
 			
 			if (i != null)
 				sendingLoc.setY(i[0]);
 		}
 		if (params.containsKey("z")) {
-			Integer[] i = getIntRange(params.get("z"));
+			Double[] i = getDoubleRange(params.get("z"));
 			
 			if (i != null)
 				sendingLoc.setZ(i[0]);
@@ -178,7 +184,7 @@ public abstract class CbCommand {
 		//épuration selon distance
 		
 		if (params.containsKey("distance")) {
-			Integer[] i = getIntRange(params.get("distance"));
+			Double[] i = getDoubleRange(params.get("distance"));
 			
 			if (i == null)
 				return new ArrayList<Entity>();
@@ -192,7 +198,7 @@ public abstract class CbCommand {
 		}
 		
 		if (params.containsKey("dx")) {
-			Integer[] i = getIntRange(params.get("dx"));
+			Double[] i = getDoubleRange(params.get("dx"));
 			
 			if (i == null)
 				return new ArrayList<Entity>();
@@ -210,7 +216,7 @@ public abstract class CbCommand {
 		}
 		
 		if (params.containsKey("dy")) {
-			Integer[] i = getIntRange(params.get("dy"));
+			Double[] i = getDoubleRange(params.get("dy"));
 			
 			if (i == null)
 				return new ArrayList<Entity>();
@@ -228,7 +234,7 @@ public abstract class CbCommand {
 		}
 		
 		if (params.containsKey("dz")) {
-			Integer[] i = getIntRange(params.get("dz"));
+			Double[] i = getDoubleRange(params.get("dz"));
 			
 			if (i == null)
 				return new ArrayList<Entity>();
@@ -248,7 +254,7 @@ public abstract class CbCommand {
 		//épuration selon niveau d'expérience
 		
 		if (params.containsKey("level")) {
-			Integer[] i = getIntRange(params.get("level"));
+			Double[] i = getDoubleRange(params.get("level"));
 			
 			if (i == null)
 				return new ArrayList<Entity>();
@@ -325,7 +331,7 @@ public abstract class CbCommand {
 			
 			for (String key : tag.getKeys()) {
 				CbObjective obj = plot.getCbData().getObjective(key);
-				Integer[] i = getIntRange(tag.getString(key));
+				Double[] i = getDoubleRange(tag.getString(key));
 				
 				if (obj == null || i == null)
 					return new ArrayList<Entity>();
@@ -410,40 +416,40 @@ public abstract class CbCommand {
 		}
 		
 		if (params.containsKey("limit")) {
-			Integer[] i = getIntRange(params.get("limit"));
+			Double[] i = getDoubleRange(params.get("limit"));
 			
 			if (i == null)
 				return new ArrayList<Entity>();
 			
-			list = list.subList(0, i[0]);
+			list = list.subList(0, (int)(double)i[0]);
 		}
 		
 		return list;
 	}
 	
 	//renvoie deux entiers resprésentant les bornes du string (qui doit être sur le modèle 4..7)
-	public Integer[] getIntRange(String s) {
+	public Double[] getDoubleRange(String s) {
 		
 		try {
-			Integer[] response = new Integer[2];
+			Double[] response = new Double[2];
 			
-			String[] ss = s.split("..");
-			
-			if (ss.length == 1) 
-				if (s.startsWith("..")) {
-					response[0] = -100000000;
-					response[1] = Math.abs((int)(double)Double.valueOf(ss[0]));
-				}else if (s.endsWith("..")) {
-					response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
-					response[1] = 100000000;
-				}else {
-					response[0] = Math.abs((int)(double)Double.valueOf(s));
-					response[1] = response[0]; 
-				}
-			else {
-				response[0] = Math.abs((int)(double)Double.valueOf(ss[0]));
-				response[1] = Math.abs((int)(double)Double.valueOf(ss[1]));
+			if (s.contains("..")) {
+				if (s.startsWith(".."))
+					s = "-10000000" + s;
+				if (s.endsWith(".."))
+					s = s +"10000000";
+				
+				String[] ss = s.split("\\.\\.");
+
+				response[0] = Double.valueOf(ss[0]);
+				response[1] = Double.valueOf(ss[1]);
+			}else {
+				response[0] = Double.valueOf(s);
+				response[1] = response[0];	
 			}
+
+			response[0] = response[0] - 0.5;
+			response[1] = response[1] + 0.5;
 			
 			return response;
 		}catch(NumberFormatException e) {
@@ -470,7 +476,7 @@ public abstract class CbCommand {
 	
 	
 	//renvoie une localisation absolue ou relative complète (null si err de syntaxe ou si hors du plot)
-	protected Location getLocation (String x, String y, String z) {
+	protected Location parseLocation (String x, String y, String z) {
 		
 		Double xF = getUnverifiedPoint(x, sendingLoc.getX());
 		Double yF = getUnverifiedPoint(y, sendingLoc.getY());
@@ -531,7 +537,7 @@ public abstract class CbCommand {
 			plot = plugin.getPlotsManager().getPlot(((CraftBlockCommandSender) sender).getBlock().getState().getLocation());	
 		}
 		
-		if (args.length < 2 || plot == null)
+		if (plot == null)
 			return null;
 		
 		CbCommand cmd = null;
