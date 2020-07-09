@@ -178,7 +178,7 @@ public abstract class CbCommand {
 				sendingLoc.setZ(i[0]);
 		}
 		
-		if (!plot.getId().isInPlot(sendingLoc))
+		if (!plot.getLoc().isInPlot(sendingLoc))
 			return new ArrayList<Entity>();
 		
 		//épuration selon distance
@@ -484,7 +484,7 @@ public abstract class CbCommand {
 		 
 		if (xF != null && yF != null && zF != null) {
 			Location loc = new Location(plugin.getWorldManager().getWorld(), xF, yF, zF); 
-			if (plot.getId().isInPlot(loc))
+			if (plot.getLoc().isInPlot(loc))
 				return loc;
 			else
 				return null;

@@ -6,8 +6,10 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.world.WorldManager;
 
-public class PlotId{
+public class PlotLoc{
 
+	private Integer plotId = null;
+	
 	private int indexX;
 	private int indexZ;
 	private OlympaCreatifMain plugin;
@@ -16,22 +18,22 @@ public class PlotId{
 	private int plotZsize = WorldManager.plotSize;
 	private int plotRoadSize = WorldManager.roadSize;
 	
-	public PlotId(OlympaCreatifMain plugin) {
+	public PlotLoc(OlympaCreatifMain plugin, int plotId) {
 		this.plugin = plugin;
 
+		this.plotId = plotId;
+		
 		double circleIndex = 1;
 		double plotIndex = 1;
 		double lineIndex = 0;
 		double plotLineIndex = 0;
-
-		plugin.getPlotsManager().incrementTotalPlotCount();
 		
 		//recherche du premier cercle de plots non plein (plot central = indice 1)
-		while (plugin.getPlotsManager().getTotalPlotCount() > Math.pow(circleIndex*2-1, 2))
+		while (plotId > Math.pow(circleIndex*2-1, 2))
 			circleIndex++;		
 		
 		//index du plot sur le cercle en cours de remplissage (commence à 0)
-		plotIndex = (int) (Math.pow(circleIndex*2-1, 2) - plugin.getPlotsManager().getTotalPlotCount());
+		plotIndex = (int) (Math.pow(circleIndex*2-1, 2) - plotId);
 		
 		//index de la ligne sur laquelle sera placée le plot (entre 0 et 3 en commençant par le côté gauche puis sens horaire)
 		lineIndex = (int) (plotIndex / ((circleIndex-1)*2));
@@ -60,21 +62,34 @@ public class PlotId{
 		}
 	}
 	
-	public PlotId(OlympaCreatifMain plugin, int x, int z) {
+	
+	public PlotLoc(OlympaCreatifMain plugin, int x, int z) {
 		this.plugin = plugin;
 		indexX = x;
 		indexZ = z;
 	}
 	
-	//toujours appeler isIdValid avant !
-	public PlotId(OlympaCreatifMain plugin, String idAsString){
+	/*
+	
+	public PlotLoc(OlympaCreatifMain plugin, String idAsString){
 		this.plugin = plugin;
 		indexX = Integer.valueOf(idAsString.split(".")[0]);
 		indexZ = Integer.valueOf(idAsString.split(".")[1]);
 	}
 	
+	public static PlotLoc fromString(OlympaCreatifMain plugin, String id) {
+		if (id.split("\\.").length == 2)
+			try {
+				return new PlotLoc(plugin, Integer.valueOf(id.split("\\.")[0]), Integer.valueOf(id.split("\\.")[1]));
+			}catch(NumberFormatException e) {
+				return null;
+			}
+		return null;
+	}
+	*/
+	
 	public String getAsString() {
-		return indexX + "." + indexZ;
+		return PlotsManager.getPlotIdAsString(plotId);
 	}
 	
 	public int getX() {
@@ -83,18 +98,6 @@ public class PlotId{
 	
 	public int getZ() {
 		return indexZ;
-	}
-	
-	public static PlotId fromString(OlympaCreatifMain plugin, String id) {
-		if (id.split(".").length == 2)
-			try {
-				Integer.valueOf(id.split(".")[0]);
-				Integer.valueOf(id.split(".")[1]);
-				return new PlotId(plugin, id);
-			}catch(NumberFormatException e) {
-				return null;
-			}
-		return null;
 	}
 	
 	public Location getLocation() {
@@ -118,6 +121,14 @@ public class PlotId{
 	
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof PlotId && indexX == ((PlotId)obj).getX() && indexZ == ((PlotId)obj).getZ();	
+		return obj instanceof PlotLoc && indexX == ((PlotLoc)obj).getX() && indexZ == ((PlotLoc)obj).getZ();	
+	}
+
+	public static PlotLoc fromString(OlympaCreatifMain plugin, String locAsString) {
+		try{
+			return new PlotLoc(plugin, PlotsManager.getPlotIdFromString(locAsString));
+		}catch(NumberFormatException e) {
+			return null;
+		}
 	}
 }

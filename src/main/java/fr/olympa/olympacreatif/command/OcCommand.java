@@ -20,9 +20,11 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotId;
+import fr.olympa.olympacreatif.plot.PlotLoc;
+import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
+import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
@@ -64,7 +66,7 @@ public class OcCommand extends OlympaCommand {
 					if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
 						
 						plot = plugin.getPlotsManager().createPlot(p);
-						p.teleport(plot.getId().getLocation());
+						p.teleport(plot.getLoc().getLocation());
 						PlotsInstancesListener.executeEntryActions(plugin, p, plot);
 						sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue());	
 						
@@ -80,7 +82,7 @@ public class OcCommand extends OlympaCommand {
 					if (plot == null)
 						new MainGui(plugin, p, plot, "§9Menu").create(p);
 					else
-						new MainGui(plugin, p, plot, "§9Menu >> " + plot.getId().getAsString()).create(p);
+						new MainGui(plugin, p, plot, "§9Menu >> " + plot.getLoc().getAsString()).create(p);
 				}
 				break;
 				
@@ -106,8 +108,8 @@ public class OcCommand extends OlympaCommand {
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else {
 					p.sendMessage(Message.TELEPORT_PLOT_CENTER.getValue());
-					double x = plot.getId().getLocation().getX() + (double)WorldManager.plotSize/2.0;
-					double z = plot.getId().getLocation().getZ() + (double)WorldManager.plotSize/2.0;
+					double x = plot.getLoc().getLocation().getX() + (double)WorldManager.plotSize/2.0;
+					double z = plot.getLoc().getLocation().getZ() + (double)WorldManager.plotSize/2.0;
 					
 					p.teleport(new Location(plugin.getWorldManager().getWorld(), 
 							x, plugin.getWorldManager().getWorld().getHighestBlockYAt((int)x, (int)z) + 1, z));
@@ -180,7 +182,7 @@ public class OcCommand extends OlympaCommand {
 				break;
 				
 			case "tp":
-				PlotId id = PlotId.fromString(plugin, args[1]);
+				PlotLoc id = PlotLoc.fromString(plugin, args[1]);
 				if (id != null) {
 					(p).teleport(id.getLocation());
 					sender.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
@@ -199,8 +201,8 @@ public class OcCommand extends OlympaCommand {
 						if (target != null)
 							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR) {
 								pendingInvitations.put(target, plot);
-								target.sendMessage(Message.PLOT_RECIEVE_INVITATION.getValue().replace("%player%", sender.getName().replace("%plot%", plot.getId().getAsString())));
-								sender.sendMessage(Message.PLOT_SEND_INVITATION.getValue().replace("%player%", target.getName().replace("%plot%", plot.getId().getAsString())));
+								target.sendMessage(Message.PLOT_RECIEVE_INVITATION.getValue().replace("%player%", sender.getName().replace("%plot%", plot.getLoc().getAsString())));
+								sender.sendMessage(Message.PLOT_SEND_INVITATION.getValue().replace("%player%", target.getName().replace("%plot%", plot.getLoc().getAsString())));
 							}else
 								sender.sendMessage(Message.PLOT_INVITATION_TARGET_ALREADY_MEMBER.getValue());
 						else

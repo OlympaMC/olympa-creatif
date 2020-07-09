@@ -27,7 +27,7 @@ public class InteractionParametersGui extends OlympaGUI {
 	
 	@SuppressWarnings("unchecked")
 	public InteractionParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("§6Interactions du plot : " + plot.getId().getAsString(), 6);
+		super("§6Interactions du plot : " + plot.getLoc().getAsString(), 6);
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
@@ -62,7 +62,7 @@ public class InteractionParametersGui extends OlympaGUI {
 			if (plot == null)
 				new MainGui(plugin, p, plot, "§9Menu").create(p);
 			else
-				new MainGui(plugin, p, plot, "§9Menu >> " + plot.getId().getAsString()).create(p);
+				new MainGui(plugin, p, plot, "§9Menu >> " + plot.getLoc().getAsString()).create(p);
 			return true;
 		}
 		

@@ -41,7 +41,7 @@ public class PlotParametersGui extends OlympaGUI {
 	private String rainyWeather = "§eMétéo actuelle : pluvieuse";
 	
 	public PlotParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("§6Paramètres du plot : " + plot.getId().getAsString(), 2);
+		super("§6Paramètres du plot : " + plot.getLoc().getAsString(), 2);
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
@@ -189,7 +189,7 @@ public class PlotParametersGui extends OlympaGUI {
 			if (plot == null)
 				new MainGui(plugin, p, plot, "§9Menu").create(p);
 			else
-				new MainGui(plugin, p, plot, "§9Menu >> " + plot.getId().getAsString()).create(p);
+				new MainGui(plugin, p, plot, "§9Menu >> " + plot.getLoc().getAsString()).create(p);
 			return true;
 		}
 		
@@ -309,8 +309,8 @@ public class PlotParametersGui extends OlympaGUI {
 	public boolean onClose(Player p) {
 		//MAJ biome
 		if (!plot.getParameters().getParameter(PlotParamType.PLOT_BIOME).equals(newBiome)) {
-			for (int x = plot.getId().getLocation().getBlockX() ; x < plot.getId().getLocation().getBlockX() + WorldManager.plotSize ; x++)
-				for (int z = plot.getId().getLocation().getBlockZ() ; z < plot.getId().getLocation().getBlockZ() + WorldManager.plotSize ; z++)
+			for (int x = plot.getLoc().getLocation().getBlockX() ; x < plot.getLoc().getLocation().getBlockX() + WorldManager.plotSize ; x++)
+				for (int z = plot.getLoc().getLocation().getBlockZ() ; z < plot.getLoc().getLocation().getBlockZ() + WorldManager.plotSize ; z++)
 					for (int y = 1 ; y < 255 ; y++) 
 						plugin.getWorldManager().getWorld().getBlockAt(x, y, z).setBiome(newBiome);
 

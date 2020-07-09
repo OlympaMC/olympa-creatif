@@ -340,7 +340,7 @@ public class WorldEventsListener implements Listener{
 					if (plot == null)
 						new MainGui(plugin, e.getPlayer(), plot, "§9Menu").create(e.getPlayer());
 					else
-						new MainGui(plugin, e.getPlayer(), plot, "§9Menu >> " + plot.getId().getAsString()).create(e.getPlayer());	
+						new MainGui(plugin, e.getPlayer(), plot, "§9Menu >> " + plot.getLoc().getAsString()).create(e.getPlayer());	
 				}else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
 			else
