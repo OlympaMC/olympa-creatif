@@ -5,13 +5,13 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 public class AsyncPlot {
 
 	private OlympaCreatifMain plugin;
-	private PlotLoc id;
+	private PlotId id;
 	private PlotMembers members;
 	private PlotParameters params;
 	
 	private int plotId;
 	
-	public AsyncPlot(OlympaCreatifMain plugin, int plotId, PlotLoc plotLoc, PlotMembers plotMembers, PlotParameters plotParams) {
+	public AsyncPlot(OlympaCreatifMain plugin, int plotId, PlotId plotLoc, PlotMembers plotMembers, PlotParameters plotParams) {
 		this.plugin = plugin;
 		this.id = plotLoc;
 		this.members = plotMembers;
@@ -24,7 +24,7 @@ public class AsyncPlot {
 		return plugin;
 	}
 	
-	public PlotLoc getLoc() {
+	public PlotId getLoc() {
 		return id;
 	}
 	

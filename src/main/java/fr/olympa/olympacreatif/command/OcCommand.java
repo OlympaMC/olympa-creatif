@@ -20,7 +20,7 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotLoc;
+import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
@@ -182,7 +182,7 @@ public class OcCommand extends OlympaCommand {
 				break;
 				
 			case "tp":
-				PlotLoc id = PlotLoc.fromString(plugin, args[1]);
+				PlotId id = PlotId.fromString(plugin, args[1]);
 				if (id != null) {
 					(p).teleport(id.getLocation());
 					sender.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());

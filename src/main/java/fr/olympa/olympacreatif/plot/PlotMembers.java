@@ -24,7 +24,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 public class PlotMembers{
 
 	private OlympaCreatifMain plugin;
-	private PlotLoc plotId;
+	private PlotId plotId;
 	
 	//membres triés par ordre alphabétique
 	private Map<OlympaPlayerInformations, PlotRank> members = new TreeMap<OlympaPlayerInformations, PlotRank>(new Comparator<OlympaPlayerInformations>() {
@@ -35,7 +35,7 @@ public class PlotMembers{
 		}
 	});
 
-	public PlotMembers(OlympaCreatifMain plugin, PlotLoc plotId) {
+	public PlotMembers(OlympaCreatifMain plugin, PlotId plotId) {
 		this.plugin = plugin;
 		this.plotId = plotId;
 	}

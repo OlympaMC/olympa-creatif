@@ -19,7 +19,7 @@ public class PlotParameters {
 	private OlympaCreatifMain plugin;
 	private Map <PlotParamType, Object> parameters = new HashMap<PlotParamType, Object>();
 	
-	public PlotParameters(OlympaCreatifMain plugin, PlotLoc id) {
+	public PlotParameters(OlympaCreatifMain plugin, PlotId id) {
 		this.plugin = plugin;
 		for (PlotParamType param : PlotParamType.values())
 			switch (param) {

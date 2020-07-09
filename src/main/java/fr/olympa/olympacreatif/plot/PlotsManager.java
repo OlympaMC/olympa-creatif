@@ -1,24 +1,15 @@
 package fr.olympa.olympacreatif.plot;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.olympa.api.player.OlympaPlayer;
-import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
-import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 
@@ -30,7 +21,7 @@ public class PlotsManager {
 	private List<AsyncPlot> asyncPlots = new ArrayList<AsyncPlot>();
 	
 	//liste contenant les localisations 
-	private List<PlotLoc> emptyPlots = new ArrayList<PlotLoc>();
+	private List<UnaffectedPlotId> emptyPlots = new ArrayList<UnaffectedPlotId>();
 	
 	private int plotCount;
 	
@@ -88,17 +79,17 @@ public class PlotsManager {
 		}.runTaskTimer(plugin, 20, 20*60);
 	}
 
-	public void registerPlot(PlotLoc plotLoc) {
-		if (plotLoc == null)
+	public void registerPlot(UnaffectedPlotId newId) {
+		if (newId == null)
 			return;
 		
 		for (Plot plot : loadedPlots)
-			if (plot.getLoc().equals(plotLoc))
+			if (plot.getLoc().equals(newId))
 				return;
 		
 		//si le plot n'a pas encore été testé et déterminé non-existant et s'il n'est pas déjà chargé
-		if (!emptyPlots.contains(plotLoc))
-			plugin.getDataManager().loadPlot(plotLoc);
+		if (!emptyPlots.contains(newId))
+			plugin.getDataManager().loadPlot(newId);
 	}	
 	
 	public Plot createPlot(Player p) {
@@ -125,6 +116,8 @@ public class PlotsManager {
 	}
 	
 	//retourne le plotid de la localisation correspondante
+	
+	/*
 	public PlotLoc getPlotLoc(Location loc) {
 		return getPlotLoc(loc.getBlockX(), loc.getBlockZ());
 	}
@@ -141,6 +134,7 @@ public class PlotsManager {
 		else
 			return null;
 	}
+	*/
 	
 	
 	public void incrementTotalPlotCount() {
@@ -151,13 +145,13 @@ public class PlotsManager {
 		return plotCount;
 	}
 	
-	public void addAsyncPlot(AsyncPlot plot, PlotLoc plotLoc) {
+	public void addAsyncPlot(AsyncPlot plot, UnaffectedPlotId plotId) {
 		if (plot != null)
 			synchronized (asyncPlots) {
 				asyncPlots.add(plot);
 			}
 		else
-			emptyPlots.add(plotLoc);
+			emptyPlots.add(plotId);
 	}
 	
 	public static Integer getPlotIdFromString(String id) {
@@ -170,5 +164,20 @@ public class PlotsManager {
 	
 	public static String getPlotIdAsString(int id) {
 		return Integer.toString(id, 36).toUpperCase();
+	}
+
+	public UnaffectedPlotId getPlotLoc(Location loc) {
+		
+		int x = loc.getBlockX();
+		int z = loc.getBlockZ();
+		
+		int xb = Math.floorMod(x, WorldManager.plotSize + WorldManager.roadSize);
+		int zb = Math.floorMod(z, WorldManager.plotSize + WorldManager.roadSize);
+		
+		if (xb < WorldManager.plotSize && zb < WorldManager.plotSize)
+			return new UnaffectedPlotId(plugin, Math.floorDiv(x, WorldManager.plotSize + WorldManager.roadSize), 
+					Math.floorDiv(z, WorldManager.plotSize + WorldManager.roadSize));
+		else
+			return null;
 	}
 }

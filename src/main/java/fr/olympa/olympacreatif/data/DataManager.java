@@ -9,7 +9,8 @@ import java.util.Map;
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
-import fr.olympa.olympacreatif.plot.PlotLoc;
+import fr.olympa.olympacreatif.plot.PlotId;
+import fr.olympa.olympacreatif.plot.UnaffectedPlotId;
 
 public class DataManager {
 
@@ -28,9 +29,10 @@ public class DataManager {
 		
 	}
 	
-	public void loadPlot(PlotLoc plotId) {
+	public void loadPlot(UnaffectedPlotId newId) {
 		AsyncPlot plot = null;
-		plugin.getPlotsManager().addAsyncPlot(plot, plotId);			
+		
+		plugin.getPlotsManager().addAsyncPlot(plot, newId);			
 	}
 
 	private ResultSet executeRequest(String request) {

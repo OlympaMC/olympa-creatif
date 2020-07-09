@@ -6,19 +6,13 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.world.WorldManager;
 
-public class PlotLoc{
+public class PlotId extends UnaffectedPlotId{
 
-	private Integer plotId = null;
-	
-	private int indexX;
-	private int indexZ;
 	private OlympaCreatifMain plugin;
-
-	private int plotXsize = WorldManager.plotSize;
-	private int plotZsize = WorldManager.plotSize;
-	private int plotRoadSize = WorldManager.roadSize;
 	
-	public PlotLoc(OlympaCreatifMain plugin, int plotId) {
+	private final int plotId;
+	
+	public PlotId(OlympaCreatifMain plugin, int plotId) {
 		this.plugin = plugin;
 
 		this.plotId = plotId;
@@ -62,12 +56,14 @@ public class PlotLoc{
 		}
 	}
 	
-	
+	/*
 	public PlotLoc(OlympaCreatifMain plugin, int x, int z) {
 		this.plugin = plugin;
 		indexX = x;
 		indexZ = z;
 	}
+	*/
+	
 	
 	/*
 	
@@ -92,13 +88,6 @@ public class PlotLoc{
 		return PlotsManager.getPlotIdAsString(plotId);
 	}
 	
-	public int getX() {
-		return indexX;
-	}
-	
-	public int getZ() {
-		return indexZ;
-	}
 	
 	public Location getLocation() {
 		return new Location(plugin.getWorldManager().getWorld(), 
@@ -113,20 +102,22 @@ public class PlotLoc{
 	
 	public boolean isInPlot(int x, int z) {
 		
-		return x >= indexX * (plotXsize + plotRoadSize) && 
-				x < indexX * (plotXsize + plotRoadSize) + plotXsize && 
-				z >= indexZ * (plotZsize + plotRoadSize) && 
-				z < indexZ * (plotZsize + plotRoadSize) + plotZsize; 
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof PlotLoc && indexX == ((PlotLoc)obj).getX() && indexZ == ((PlotLoc)obj).getZ();	
+		return x >= indexX * (WorldManager.plotSize + WorldManager.roadSize) && 
+				x < indexX * (WorldManager.plotSize + WorldManager.roadSize) + WorldManager.plotSize && 
+				z >= indexZ * (WorldManager.plotSize + WorldManager.roadSize) && 
+				z < indexZ * (WorldManager.plotSize + WorldManager.roadSize) + WorldManager.plotSize; 
 	}
 
-	public static PlotLoc fromString(OlympaCreatifMain plugin, String locAsString) {
-		try{
-			return new PlotLoc(plugin, PlotsManager.getPlotIdFromString(locAsString));
+	//retourne null si le plot associé à cet id n'existe pas encore ou si l'id est malformé
+	public static PlotId fromString(OlympaCreatifMain plugin, String locAsString) {
+		
+		try {
+			Integer id = PlotsManager.getPlotIdFromString(locAsString);
+			
+			if (id > plugin.getPlotsManager().getTotalPlotCount())
+				return null;
+			
+			return new PlotId(plugin, id);
 		}catch(NumberFormatException e) {
 			return null;
 		}

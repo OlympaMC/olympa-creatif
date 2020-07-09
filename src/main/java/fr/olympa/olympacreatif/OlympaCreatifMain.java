@@ -31,7 +31,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.PerksManager;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotLoc;
+import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.CustomChunkGenerator;
@@ -132,7 +132,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 					if (p.getOlympaPlayer().getCustomScoreboardLines().get(1) != null)
 						return p.getOlympaPlayer().getCustomScoreboardLines().get(1);
 					else {
-						PlotLoc plotId = plugin.getPlotsManager().getPlotLoc(p.getOlympaPlayer().getPlayer().getLocation());
+						PlotId plotId = plugin.getPlotsManager().getPlot(p.getOlympaPlayer().getPlayer().getLocation()).getLoc();
 						if (plotId == null)
 							return "§7Parcelle : §eroute";
 						else

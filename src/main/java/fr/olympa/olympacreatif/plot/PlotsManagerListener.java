@@ -27,8 +27,8 @@ public class PlotsManagerListener implements Listener {
 			return;
 		
 		//si l'ancien/nouveau plot sont égaux, return, sinon chargement du plot
-		PlotLoc oldId = plugin.getPlotsManager().getPlotLoc(e.getFrom());
-		PlotLoc newId = plugin.getPlotsManager().getPlotLoc(e.getTo());
+		UnaffectedPlotId oldId = plugin.getPlotsManager().getPlotLoc(e.getFrom());
+		UnaffectedPlotId newId = plugin.getPlotsManager().getPlotLoc(e.getTo());
 		
 		if (newId != null && !newId.equals(oldId))
 			plugin.getPlotsManager().registerPlot(newId);

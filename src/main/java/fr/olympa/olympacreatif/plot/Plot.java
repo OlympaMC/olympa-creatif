@@ -32,7 +32,7 @@ public class Plot {
 	
 	private PlotMembers members;
 	private PlotParameters parameters;
-	private PlotLoc plotLoc;
+	private PlotId plotLoc;
 	
 	private PlotCbData cbData;
 
@@ -51,7 +51,7 @@ public class Plot {
 		plugin.getPlotsManager().incrementTotalPlotCount();
 		plotId = plugin.getPlotsManager().getTotalPlotCount();
 		
-		plotLoc = new PlotLoc(plugin, plotId);
+		plotLoc = new PlotId(plugin, plotId);
 		
 		parameters = new PlotParameters(plugin, plotLoc);
 		members = new PlotMembers(plugin, plotLoc);
@@ -95,7 +95,7 @@ public class Plot {
 		return members;
 	}
 	
-	public PlotLoc getLoc() {
+	public PlotId getLoc() {
 		return plotLoc;
 	}
 	
