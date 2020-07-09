@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftArmorStand;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftBee;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
@@ -45,7 +46,7 @@ public class CbTeam {
 	private Plot plot;
 	private List<Entity> members = new ArrayList<Entity>();
 	private boolean allowFriendlyFire = false;
-	private String color = "";
+	private ColorType color = null;
 
 	private String teamId;
 	private String teamName;
@@ -74,10 +75,6 @@ public class CbTeam {
 	
 	public Plot getPlot() {
 		return plot;
-	}
-	
-	public String getDisplayName() {
-		return color + teamName;
 	}
 	
 	public boolean addMember(Entity e) {
@@ -120,13 +117,29 @@ public class CbTeam {
 		return allowFriendlyFire;
 	}
 	
-	public String getColor() {
+	public ColorType getColor() {
 		return color;
 	}
 	
-	public void setColor(String colorAsString) {
-		color = ColorType.getColor(colorAsString);
+	public boolean setColor(String colorAsString) {
+		if (colorAsString == null) {
+			color = null;
+			return true;
+		}
+			
+		ColorType newColor = ColorType.getColor(colorAsString);
+		
+		if (newColor == null)
+			return false;
+		
+		for (CbTeam t : plot.getCbData().getTeams())
+			if (t.getColor() == newColor)
+				return false;
+		
+		color = newColor;
+		return true;
 	}
+	
 	
 	public enum ColorType{
 		dark_red("§4"),
@@ -156,14 +169,15 @@ public class CbTeam {
 		public String getColor() {
 			return color;
 		}
-		public static String getColor(String colorAsString) {
+		public static ColorType getColor(String colorAsString) {
 			for (ColorType c : ColorType.values())
 				if (c.toString().equals(colorAsString))
-					return c.getColor();
-			return "";
+					return c;
+			return null;
 		}
 	}
-
+	
+	
 	public void executeDeletionActions() {
 		for (Entity e : members)
 			if (e.getType() == EntityType.PLAYER)

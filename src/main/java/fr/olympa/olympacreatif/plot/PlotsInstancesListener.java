@@ -465,7 +465,7 @@ public class PlotsInstancesListener implements Listener{
 		//exécution instruction commandblock d'entrée
 		plugin.getCommandBlocksManager().executeJoinActions(plotTo, p);
 		
-		//les actions suivantes ne sont effectuées que si le joueur n'appartient pas au plot
+		//les actions suivantes ne sont effectuées que si le joueur appartient au plot
 		if (plotTo.getMembers().getPlayerRank(p) != PlotRank.VISITOR)
 			return;
 		
@@ -489,6 +489,9 @@ public class PlotsInstancesListener implements Listener{
 			p.teleport((Location) plotTo.getParameters().getParameter(PlotParamType.SPAWN_LOC));
 			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
 		}
+		
+		//set max fly speed
+		p.setFlySpeed(1);
 		
 		//définition de l'heure du joueur
 		p.setPlayerTime((int) plotTo.getParameters().getParameter(PlotParamType.PLOT_TIME), false);
@@ -628,7 +631,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		if ((boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH)) {
-			itemsToKeepOnDeath.put(e.getEntity(), e.getDrops());
+			itemsToKeepOnDeath.put(e.getEntity(), new ArrayList<ItemStack>(e.getDrops()));
 			e.getDrops().clear();
 		}
 	}

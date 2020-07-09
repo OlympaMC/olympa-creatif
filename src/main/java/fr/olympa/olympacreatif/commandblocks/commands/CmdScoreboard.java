@@ -144,8 +144,18 @@ public class CmdScoreboard extends CbCommand {
 				}
 				break;
 			case enable:
+				if (args.length == 4) {
+					CbObjective obj = plotCbData.getObjective(args[3]);
+					targetEntities = parseSelector(args[2], false);
+					
+					if (obj == null || targetEntities.size() == 0)
+						return 0;
+					
+					for (Entity e : targetEntities)
+						if (!obj.getTriggerAllowedEntities().contains(e))
+							obj.getTriggerAllowedEntities().add(e);
+				}
 				
-				//TODO
 				break;
 			case get:
 				if (args.length >= 4) {

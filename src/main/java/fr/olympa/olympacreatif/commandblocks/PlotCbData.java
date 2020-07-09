@@ -13,6 +13,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 
 public class PlotCbData {
@@ -161,6 +162,14 @@ public class PlotCbData {
 		return null;
 	}
 
+	public CbTeam getTeamByColor(ColorType color) {
+		for (CbTeam t : teams)
+			if (t.getColor() == color) 
+				return t;			
+				
+		return null;
+	}
+	
 	public void unload() {
 		for (CbObjective o : objectives) 
 			o.clearDisplaySlot();

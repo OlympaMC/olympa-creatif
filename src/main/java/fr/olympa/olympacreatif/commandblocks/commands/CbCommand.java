@@ -606,6 +606,9 @@ public abstract class CbCommand {
 		case say:
 			cmd = new CmdSay(type, sender, loc, plugin, plot, args);
 			break;
+		case trigger:
+			cmd = new CmdTrigger(type, sender, loc, plugin, plot, args);
+			break;
 		//easter egg
 		case op:
 			cmd = new CmdOp(type, sender, loc, plugin, plot, args);
@@ -637,6 +640,7 @@ public abstract class CbCommand {
 		gamemode, 
 		gm, 
 		op,
+		trigger,
 		;
 		
 		public static CommandType get(String s) {

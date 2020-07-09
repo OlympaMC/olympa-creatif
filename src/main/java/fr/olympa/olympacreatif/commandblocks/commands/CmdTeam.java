@@ -31,7 +31,7 @@ public class CmdTeam extends CbCommand {
 		case "list":
 			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getId().getAsString() + " <<<");
 			for (CbTeam t : plotCbData.getTeams())
-				sender.sendMessage("   §e> " + t.getId() + " (§r" + t.getDisplayName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
+				sender.sendMessage("   §e> " + t.getId() + " (§r" + t.getName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
 			return 1;
 			
 		case "empty":
@@ -151,11 +151,12 @@ public class CmdTeam extends CbCommand {
 					break;
 					
 				case "color":
-					if (args.length < 4)
-						t.setColor("");
-					else
-						t.setColor(args[3]);
-					return 1;
+					if (args.length < 4) {
+						t.setColor(null);
+						return 1;
+					}else if (t.setColor(args[3]))
+							return 1; 
+						
 				}
 			}
 			break;

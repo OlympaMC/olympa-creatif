@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.commandblocks;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 
@@ -35,6 +37,9 @@ public class CbObjective {
 	
 	private String objId = "";
 	private String objName = "";
+	
+	//liste des joueurs autorisés à utiliser le /trigger (si l'objectif est de type trigger)
+	private List<Entity> allowedEntitiesTrigger = new ArrayList<Entity>();
 	
 	public CbObjective(OlympaCreatifMain plugin, Plot plot, String objType, String id, String objName) {
 		this.plugin = plugin;
@@ -60,12 +65,20 @@ public class CbObjective {
 		//récupération paramètre secondaire du type de l'obj
 		switch (type) {
 		case killedByTeam:
-			if (objType.split(".").length == 2)
-				//TODO
+			if (objType.split("\\.").length == 2)
+				if (typeParamString == null)
+					return;
+			
+			typeParam = ColorType.getColor(objType.split("\\.")[1]);
+			
 			break;
 		case teamkill:
-			if (objType.split(".").length == 2)
-				//TODO
+			if (objType.split("\\.").length == 2)
+				if (typeParamString == null)
+					return;
+			
+			typeParam = ColorType.getColor(objType.split("\\.")[1]);
+			
 			break;
 		case minecraft_broken:
 			if (typeParamString == null)
@@ -135,6 +148,10 @@ public class CbObjective {
 		return objName;
 	}
 
+	public List<Entity> getTriggerAllowedEntities(){
+		return allowedEntitiesTrigger;
+	}
+	
 	public void setName(String newObjName) {
 		if (!newObjName.equals(objName)) {
 			if (displaySlot == DisplaySlot.BELOW_NAME)
@@ -292,6 +309,7 @@ public class CbObjective {
 		level,
 		food,
 		armor,
+		trigger,
 		
 		minecraft_crafted,
 		minecraft_used,

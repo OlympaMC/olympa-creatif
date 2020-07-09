@@ -19,6 +19,7 @@ import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.perks.NbtParserUtil.EntitySourceType;
@@ -41,7 +42,7 @@ public class OcoCommand extends OlympaCommand {
 		if (!(sender instanceof Player))
 			return false;
 		
-		OlympaPlayer p = AccountProvider.get(((Player)sender).getUniqueId());
+		OlympaPlayerCreatif p = AccountProvider.get(((Player)sender).getUniqueId());
 		
 		switch (args.length) {
 		case 1:
@@ -117,6 +118,26 @@ public class OcoCommand extends OlympaCommand {
 				else
 					p.getPlayer().sendMessage(Message.OCO_GIVE_INDISPONIBLE_BLOCK.getValue());
 				break;
+				
+			case "speed":
+				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
+				
+				if (plot != null)
+					if (plot.getMembers().getPlayerLevel(p) == 0)
+						p.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+				
+				int level = 1;
+				
+				try {
+					level = Math.min(Math.max(Integer.valueOf(args[1]), 0), 9);
+				}catch(NumberFormatException e) {
+				}
+				
+				p.getPlayer().setFlySpeed(level);
+				p.getPlayer().sendMessage(Message.OCO_SET_FLY_SPEED.getValue());
+				
+				break;
+				
 			default:
 				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
 				break;
@@ -174,6 +195,7 @@ public class OcoCommand extends OlympaCommand {
 			list.add("mb");
 			list.add("export");
 			list.add("give");
+			list.add("speed");
 		}
 		else if (args.length == 2 && args[0].equals("mb")) {
 			for (Entry<String, ItemStack> e : plugin.getPerksManager().getMicroBlocks().getAllMbs().entrySet())

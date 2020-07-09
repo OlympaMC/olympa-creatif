@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective.ObjType;
+import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CbObjectivesListener implements Listener {
@@ -100,9 +101,25 @@ public class CbObjectivesListener implements Listener {
 				if (e.getEntity().getKiller() != null)
 					o.add(e.getEntity().getKiller(), 1);
 				break;
+				
 			case teamkill:
+				if (e.getEntity().getKiller() == null)
+					return;
+				
+				CbTeam targetTeam = plot.getCbData().getTeamOf(e.getEntity());
+				
+				if (targetTeam != null && o.getParamType() == targetTeam.getColor())
+					o.add(e.getEntity().getKiller(), 1);
 				break;
+				
 			case killedByTeam:
+				if (e.getEntity().getType() != EntityType.PLAYER)
+					return;
+				
+				CbTeam killedTeam = plot.getCbData().getTeamOf(e.getEntity().getKiller());
+				
+				if (killedTeam != null && o.getParamType() == killedTeam.getColor())
+					o.add(e.getEntity(), 1);
 				break;
 			}
 	}
