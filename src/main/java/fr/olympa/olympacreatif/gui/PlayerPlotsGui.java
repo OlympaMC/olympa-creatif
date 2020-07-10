@@ -52,7 +52,7 @@ public class PlayerPlotsGui extends OlympaGUI {
 			
 			if (mat != null) {
 				playerPlots.add(plot);
-				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getLoc().getAsString(), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName()));	
+				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getLoc().getId(true), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName()));	
 			}
 		}
 			
@@ -63,9 +63,9 @@ public class PlayerPlotsGui extends OlympaGUI {
 		if (slot == 44) {
 			Plot plot = plugin.getPlotsManager().getPlot(p.getLocation());
 			if (plot == null)
-				new MainGui(plugin, p, plot, "§9Menu").create(p);
+				new MainGui(plugin, p, plot, "Menu").create(p);
 			else
-				new MainGui(plugin, p, plot, "§9Menu >> " + plot.getLoc().getAsString()).create(p);
+				new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc().getId(true)).create(p);
 			return true;
 		}
 		

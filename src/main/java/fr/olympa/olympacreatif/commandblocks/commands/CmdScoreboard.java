@@ -55,7 +55,7 @@ public class CmdScoreboard extends CbCommand {
 				break;
 				
 			case list:
-				sender.sendMessage("§6  >>>  Objectifs du plot " + plot.getLoc().getAsString() + " <<<");
+				sender.sendMessage("§6  >>>  Objectifs du plot " + plot.getLoc().getId(true) + " <<<");
 				for (CbObjective o : plotCbData.getObjectives()) {
 					String paramType = "";
 					if (o.getParamType() != null)

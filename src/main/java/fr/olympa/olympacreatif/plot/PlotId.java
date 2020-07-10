@@ -84,8 +84,12 @@ public class PlotId extends UnaffectedPlotId{
 	}
 	*/
 	
-	public String getAsString() {
-		return PlotsManager.getPlotIdAsString(plotId);
+	
+	public Object getId(boolean useBase36) {
+		if (useBase36) 
+			return PlotsManager.getPlotIdAsString(plotId);
+		else
+			return plotId;
 	}
 	
 	

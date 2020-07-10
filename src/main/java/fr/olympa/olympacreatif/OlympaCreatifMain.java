@@ -132,11 +132,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 					if (p.getOlympaPlayer().getCustomScoreboardLines().get(1) != null)
 						return p.getOlympaPlayer().getCustomScoreboardLines().get(1);
 					else {
-						PlotId plotId = plugin.getPlotsManager().getPlot(p.getOlympaPlayer().getPlayer().getLocation()).getLoc();
-						if (plotId == null)
-							return "§7Parcelle : §eroute";
+						Plot plot = plugin.getPlotsManager().getPlot(p.getOlympaPlayer().getPlayer().getLocation());
+						if (plot == null)
+							return "§7Parcelle : §eaucune";
 						else
-							return "§7Parcelle : §e" + plotId.getAsString();
+							return "§7Parcelle : §e" + plot.getLoc().getId(true);
 					}
 				}, plugin, 20),
 

@@ -32,4 +32,23 @@ public class UnaffectedPlotId {
 		return obj instanceof UnaffectedPlotId && indexX == ((UnaffectedPlotId)obj).getX() && indexZ == ((UnaffectedPlotId)obj).getZ();	
 	}
 
+	/*
+	public String getAsString() {
+		return indexX + "." + indexZ;
+	}
+	*/
+	
+	public static UnaffectedPlotId getFromString(OlympaCreatifMain plugin, String value) {
+		try {
+			
+			String[] splited = value.split("\\.");
+			
+			if (splited.length != 2)
+				return null;
+			
+			return new UnaffectedPlotId(plugin, Integer.valueOf(splited[0]), Integer.valueOf(splited[1]));
+		}catch(NumberFormatException e) {
+			return null;
+		}
+	}
 }

@@ -80,9 +80,9 @@ public class OcCommand extends OlympaCommand {
 				if (sender instanceof Player) {
 					plot = plugin.getPlotsManager().getPlot(p.getLocation());
 					if (plot == null)
-						new MainGui(plugin, p, plot, "§9Menu").create(p);
+						new MainGui(plugin, p, plot, "Menu").create(p);
 					else
-						new MainGui(plugin, p, plot, "§9Menu >> " + plot.getLoc().getAsString()).create(p);
+						new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc().getId(true)).create(p);
 				}
 				break;
 				
@@ -201,8 +201,8 @@ public class OcCommand extends OlympaCommand {
 						if (target != null)
 							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR) {
 								pendingInvitations.put(target, plot);
-								target.sendMessage(Message.PLOT_RECIEVE_INVITATION.getValue().replace("%player%", sender.getName().replace("%plot%", plot.getLoc().getAsString())));
-								sender.sendMessage(Message.PLOT_SEND_INVITATION.getValue().replace("%player%", target.getName().replace("%plot%", plot.getLoc().getAsString())));
+								target.sendMessage(Message.PLOT_RECIEVE_INVITATION.getValue().replace("%player%", sender.getName().replace("%plot%", (String) plot.getLoc().getId(true))));
+								sender.sendMessage(Message.PLOT_SEND_INVITATION.getValue().replace("%player%", target.getName().replace("%plot%", (String) plot.getLoc().getId(true))));
 							}else
 								sender.sendMessage(Message.PLOT_INVITATION_TARGET_ALREADY_MEMBER.getValue());
 						else

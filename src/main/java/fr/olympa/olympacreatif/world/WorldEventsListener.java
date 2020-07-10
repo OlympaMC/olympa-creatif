@@ -338,9 +338,9 @@ public class WorldEventsListener implements Listener{
 				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis()) {
 					Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 					if (plot == null)
-						new MainGui(plugin, e.getPlayer(), plot, "§9Menu").create(e.getPlayer());
+						new MainGui(plugin, e.getPlayer(), plot, "Menu").create(e.getPlayer());
 					else
-						new MainGui(plugin, e.getPlayer(), plot, "§9Menu >> " + plot.getLoc().getAsString()).create(e.getPlayer());	
+						new MainGui(plugin, e.getPlayer(), plot, "Menu >> " + plot.getLoc().getId(true)).create(e.getPlayer());	
 				}else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
 			else

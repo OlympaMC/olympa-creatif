@@ -58,7 +58,7 @@ public class CmdBossBar extends CbCommand {
 			}
 			
 		case "list":
-			sender.sendMessage("§6  >>>  Bossbars du plot " + plot.getLoc().getAsString() + " <<<");
+			sender.sendMessage("§6  >>>  Bossbars du plot " + plot.getLoc().getId(true) + " <<<");
 			for (Entry<String, CbBossBar> e : plot.getCbData().getBossBars().entrySet()) 
 				sender.sendMessage("   §e> " + e.getKey() + " (" + e.getValue().getBar().getTitle() + "§r§e) : " + e.getValue().getBar().getPlayers().size() + " joueur(s)");
 			
