@@ -154,6 +154,8 @@ public class CmdScoreboard extends CbCommand {
 					for (Entity e : targetEntities)
 						if (!obj.getTriggerAllowedEntities().contains(e))
 							obj.getTriggerAllowedEntities().add(e);
+					
+					return 1;
 				}
 				
 				break;

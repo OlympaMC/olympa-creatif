@@ -303,6 +303,11 @@ public class OcCommand extends OlympaCommand {
 				try {
 					Player plotOwner = Bukkit.getPlayer(args[1]);
 					
+					if (plotOwner == null) {
+						sender.sendMessage(Message.PLAYER_TARGET_OFFLINE.getValue());
+						break;
+					}
+					
 					List<Plot> plots = plugin.getPlotsManager().getPlotsOf(plotOwner, true);
 					
 					int index = Integer.valueOf(args[2]) - 1;

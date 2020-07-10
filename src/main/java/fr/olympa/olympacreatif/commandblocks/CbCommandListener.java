@@ -91,21 +91,17 @@ public class CbCommandListener implements Listener {
 				e.setCancelled(true);
 				return;
 			}
-		
-		//cancel commande si c'est une commande de commandblock et que le joueur n'est pas dans un plot
-		if (false && CbCommand.getCommandType(e.getMessage()) != null)
-			if (plugin.getPlotsManager().getPlot(e.getPlayer().getLocation()) == null)
-				e.setCancelled(true);
-			
-		
+
 		CbCommand cmd = getCommand(e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
 		
-		if (cmd == null)
+		//cancel commande si c'est une commande de commandblock et que le joueur n'est pas dans un plot
+		if (cmd != null)
+			e.setCancelled(true);
+		else
 			return;
 		
-		e.setCancelled(true);
-		
-		if (cmd != null && cmd.getPlot().getMembers().getPlayerLevel(e.getPlayer()) >= 3) 
+		//exécution de la commande si l'exécutant est au minimum co-prop ou si la commandes est un /trigger
+		if (cmd.getPlot().getMembers().getPlayerLevel(e.getPlayer()) >= 3 || cmd.getType() == CommandType.trigger) 
 			executeCommandBlockCommand(cmd, e.getPlayer());
 		else
 			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
