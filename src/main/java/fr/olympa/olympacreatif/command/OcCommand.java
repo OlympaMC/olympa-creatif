@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
@@ -184,7 +185,7 @@ public class OcCommand extends OlympaCommand {
 			case "tp":
 				PlotId id = PlotId.fromString(plugin, args[1]);
 				if (id != null) {
-					(p).teleport(id.getLocation());
+					p.teleport(id.getLocation());
 					sender.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
 				}else {
 					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
@@ -290,6 +291,34 @@ public class OcCommand extends OlympaCommand {
 					sender.sendMessage(Message.PLOT_CANT_UNBAN_PLAYER.getValue());
 				
 				break;
+			default:
+				sender.sendMessage(Message.COMMAND_HELP.getValue());
+				break;
+			}
+			break;
+			
+		case 3:
+			switch(args[0]) {
+			case "tp":
+				try {
+					Player plotOwner = Bukkit.getPlayer(args[1]);
+					
+					List<Plot> plots = plugin.getPlotsManager().getPlotsOf(plotOwner, true);
+					
+					int index = Integer.valueOf(args[2]) - 1;
+					
+					if (index < plots.size()) {
+						p.teleport((Location) plots.get(index).getParameters().getParameter(PlotParamType.SPAWN_LOC));
+						p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
+					}else
+						sender.sendMessage(Message.INVALID_PLOT_ID.getValue());						
+						
+				}catch(NumberFormatException e) {
+					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
+				}
+				
+				break;
+				
 			default:
 				sender.sendMessage(Message.COMMAND_HELP.getValue());
 				break;

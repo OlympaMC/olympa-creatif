@@ -112,18 +112,18 @@ public class PlotId extends UnaffectedPlotId{
 				z < indexZ * (WorldManager.plotSize + WorldManager.roadSize) + WorldManager.plotSize; 
 	}
 
-	//retourne null si le plot associé à cet id n'existe pas encore ou si l'id est malformé
+	//retourne un PlotId si un plot est affecté à cet id (chargé ou non)
 	public static PlotId fromString(OlympaCreatifMain plugin, String locAsString) {
 		
 		try {
 			Integer id = PlotsManager.getPlotIdFromString(locAsString);
 			
-			if (id > plugin.getPlotsManager().getTotalPlotCount())
-				return null;
+			if (id <= plugin.getPlotsManager().getTotalPlotCount())			
+				return new PlotId(plugin, id);
 			
-			return new PlotId(plugin, id);
 		}catch(NumberFormatException e) {
-			return null;
 		}
+		
+		return null;
 	}
 }

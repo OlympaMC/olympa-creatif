@@ -149,10 +149,11 @@ public class PlotMembers{
 		}
 	}
 
+	
 	public OlympaPlayerInformations getOwner() {
 		for (Entry<OlympaPlayerInformations, PlotRank> e : members.entrySet())
 			if (e.getValue() == PlotRank.OWNER)
 				return e.getKey();
 		return null;
-	}
+	}	
 }

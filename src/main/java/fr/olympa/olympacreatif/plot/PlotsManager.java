@@ -114,6 +114,22 @@ public class PlotsManager {
 				return plot;
 		return null;
 	}
+
+	public List<Plot> getPlotsOf(Player p, boolean onlyOwnedPlots) {
+		List<Plot> list = new ArrayList<Plot>();
+		
+		for (Plot plot : loadedPlots) {
+			PlotRank rank = plot.getMembers().getPlayerRank(p);
+			if (onlyOwnedPlots) {
+				if (rank == PlotRank.OWNER)
+					list.add(plot);	
+			}else
+				if (rank != PlotRank.VISITOR)
+					list.add(plot);
+		}
+		
+		return list;
+	}
 	
 	//retourne le plotid de la localisation correspondante
 	

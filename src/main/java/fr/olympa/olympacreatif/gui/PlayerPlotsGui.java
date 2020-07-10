@@ -29,24 +29,22 @@ public class PlayerPlotsGui extends OlympaGUI {
 		super("§6Plots du joueur " + p.getDisplayName(), 5);
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
-
-		inv.setItem(44, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 		
 		//recherche des plots du joueur
 		for (Plot plot : plugin.getPlotsManager().getPlots()) {
 			Material mat = null;
 			switch(plot.getMembers().getPlayerRank(pc)) {
-			case CO_OWNER:
-				mat = Material.DIAMOND_BLOCK;
-				break;
-			case MEMBER:
-				mat = Material.IRON_BLOCK;
-				break;
 			case OWNER:
 				mat = Material.EMERALD_BLOCK;
 				break;
+			case CO_OWNER:
+				mat = Material.DIAMOND_BLOCK;
+				break;
 			case TRUSTED:
 				mat = Material.GOLD_BLOCK;
+				break;
+			case MEMBER:
+				mat = Material.IRON_BLOCK;
 				break;
 			}
 			
@@ -55,6 +53,8 @@ public class PlayerPlotsGui extends OlympaGUI {
 				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getLoc().getId(true), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName()));	
 			}
 		}
+
+		inv.setItem(44, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 			
 	}
 
