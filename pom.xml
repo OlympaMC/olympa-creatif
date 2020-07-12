@@ -30,6 +30,7 @@
 	      <enabled>true</enabled> <!-- snapshots enabled: we declare a SNAPSHOT repository because we need to download a SNAPSHOT dependency -->
 	    </snapshots>
 	  </repository>
+	  
 	</repositories>
 	
 	
@@ -52,6 +53,12 @@
             <version>7.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+	    <dependency>
+	        <groupId>net.luckperms</groupId>
+	        <artifactId>api</artifactId>
+	        <version>5.1</version>
+	        <scope>provided</scope>
+	    </dependency>
 	</dependencies>
 
 	<build>

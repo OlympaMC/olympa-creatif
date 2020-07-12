@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -64,7 +65,7 @@ public class PlotsInstancesListener implements Listener{
 	private Plot plot;
 	
 	private List<Material> prohibitedVisitorInteractItems = new ArrayList<Material>();
-	private Map<Player, List<ItemStack>> itemsToKeepOnDeath = new HashMap<Player, List<ItemStack>>();
+	private Map<UUID, List<ItemStack>> itemsToKeepOnDeath = new HashMap<UUID, List<ItemStack>>();
 	
 	private List<Material> commandBlockTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
 
@@ -382,7 +383,7 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	@SuppressWarnings("unchecked")
-	@EventHandler //édite destination téléport si joueur banni du plot
+	@EventHandler //modifie la destination téléport si joueur banni du plot
 	public void onTeleportEvent(PlayerTeleportEvent e) {
 		Player p = e.getPlayer();
 		Plot plot = plugin.getPlotsManager().getPlot(p.getLocation());
@@ -395,7 +396,8 @@ public class PlotsInstancesListener implements Listener{
 				e.setTo(plot.getOutLoc());
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());	
 			}
-		}
+		}else
+			executeEntryActions(plugin, p, plot);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -491,7 +493,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		//set max fly speed
-		p.setFlySpeed(1);
+		p.setFlySpeed(0.1f);
 		
 		//définition de l'heure du joueur
 		p.setPlayerTime((int) plotTo.getParameters().getParameter(PlotParamType.PLOT_TIME), false);
@@ -615,10 +617,10 @@ public class PlotsInstancesListener implements Listener{
 		else
 			e.setRespawnLocation((Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC));
 		
-		if (itemsToKeepOnDeath.containsKey(e.getPlayer()))
-			e.getPlayer().getInventory().addItem((ItemStack[]) itemsToKeepOnDeath.get(e.getPlayer()).toArray());
+		if (itemsToKeepOnDeath.containsKey(e.getPlayer().getUniqueId()))
+			e.getPlayer().getInventory().addItem((ItemStack[]) itemsToKeepOnDeath.get(e.getPlayer().getUniqueId()).toArray());
 		
-		itemsToKeepOnDeath.remove(e.getPlayer());
+		itemsToKeepOnDeath.remove(e.getPlayer().getUniqueId());
 	}
 	
 	@EventHandler //gère le paramètre keepInventory de la parcelle
@@ -631,8 +633,10 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		if ((boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH)) {
-			itemsToKeepOnDeath.put(e.getEntity(), new ArrayList<ItemStack>(e.getDrops()));
-			e.getDrops().clear();
+			if (e.getDrops() != null && e.getDrops().size() > 0) {
+				itemsToKeepOnDeath.put(e.getEntity().getUniqueId(), new ArrayList<ItemStack>(e.getDrops()));
+				e.getDrops().clear();	
+			}
 		}
 	}
 	

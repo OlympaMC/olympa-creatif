@@ -17,7 +17,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.utils.NBTutil;
+import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import fr.olympa.olympacreatif.utils.NbtParserUtil;
 import fr.olympa.olympacreatif.world.WorldEventsListener;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
@@ -69,7 +69,7 @@ public class CmdGive extends CbCommand {
 				//Bukkit.broadcastMessage("tag avant check : " + tag.asString());
 				//Bukkit.broadcastMessage("tag après check : " + NbtParserUtil.getValidItem(tag).asString());
 				
-				nmsItem.setTag(NBTutil.getValidTags(tag));
+				nmsItem.setTag(NBTcontrollerUtil.getValidTags(tag));
 				
 				item = CraftItemStack.asBukkitCopy(nmsItem);
 			}		

@@ -50,9 +50,12 @@ public class CbCommandListener implements Listener {
 					plot.getCbData().addCommandTickets((int) CommandBlocksManager.perTickAddedCommandsTickets);
 				
 				//retire de la liste les commandblocks ayant attendu le nombre de ticks nécessaires avant la prochaine commande
-				for (Entry<Location, Integer> e : blockedExecutionLocs.entrySet())
-					if (e.getValue() + CommandBlocksManager.minTickBetweenEachCbExecution <= MinecraftServer.currentTick)
-						blockedExecutionLocs.remove(e.getKey());
+				if (blockedExecutionLocs == null)
+					blockedExecutionLocs = new HashMap<Location, Integer>();
+				else
+					for (Entry<Location, Integer> e : blockedExecutionLocs.entrySet())
+						if (e.getValue() + CommandBlocksManager.minTickBetweenEachCbExecution <= MinecraftServer.currentTick)
+							blockedExecutionLocs.remove(e.getKey());
 					
 			}
 		}.runTaskTimer(plugin, 10, 1);
@@ -88,12 +91,16 @@ public class CbCommandListener implements Listener {
 		//cancel commande si c'est une commande commandblock
 		if (CbCommand.getCommandType(e.getMessage()) != null)
 			e.setCancelled(true);
+		else
+			return;
 		
 		CbCommand cmd = getCommand(e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
 		
 		//return si la commande est nulle
-		if (cmd == null)
-			return;
+		if (cmd == null) {
+			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+			return;	
+		}
 		
 		//exécution de la commande si l'exécutant est au minimum co-prop ou si la commandes est un /trigger
 		if (cmd.getPlot().getMembers().getPlayerLevel(e.getPlayer()) >= 3 || cmd.getType() == CommandType.trigger) 

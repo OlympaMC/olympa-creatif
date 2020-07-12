@@ -15,7 +15,7 @@ import net.minecraft.server.v1_15_R1.NBTTagLong;
 import net.minecraft.server.v1_15_R1.NBTTagShort;
 import net.minecraft.server.v1_15_R1.NBTTagString;
 
-public class NBTutil {
+public class NBTcontrollerUtil {
 
 	private final static int recurIndexMax = 50;
 	

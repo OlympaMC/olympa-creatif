@@ -421,7 +421,7 @@ public abstract class CbCommand {
 			if (i == null)
 				return new ArrayList<Entity>();
 			
-			list = list.subList(0, Math.min((int)(double)i[1] - 1, list.size()));
+			list = list.subList(0, Math.min((int)(double)i[1], list.size()));
 		}
 		
 		return list;
@@ -606,6 +606,9 @@ public abstract class CbCommand {
 		case say:
 			cmd = new CmdSay(type, sender, loc, plugin, plot, args);
 			break;
+		case me:
+			cmd = new CmdSay(type, sender, loc, plugin, plot, args);
+			break;
 		case trigger:
 			cmd = new CmdTrigger(type, sender, loc, plugin, plot, args);
 			break;
@@ -636,6 +639,7 @@ public abstract class CbCommand {
 		summon, 
 		kill,
 		say, 
+		me, 
 		setblock, 
 		gamemode, 
 		gm, 

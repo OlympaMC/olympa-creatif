@@ -1,10 +1,14 @@
 package fr.olympa.olympacreatif.gui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
@@ -20,13 +24,11 @@ import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.plot.PlotParamType;
-import fr.olympa.olympacreatif.plot.PlotParameters;
 
 public class PlotParametersGui extends OlympaGUI {
 
@@ -39,6 +41,8 @@ public class PlotParametersGui extends OlympaGUI {
 	
 	private String clearWeather = "§eMétéo actuelle : ensoleillée";
 	private String rainyWeather = "§eMétéo actuelle : pluvieuse";
+	
+	private Map<ItemStack, PlotParamType> switchButtons = new LinkedHashMap<ItemStack, PlotParamType>(); 
 	
 	public PlotParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
 		super("Paramètres du plot : " + plot.getLoc().getId(true), 2);
@@ -63,48 +67,16 @@ public class PlotParametersGui extends OlympaGUI {
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(0,it);
-		
-		//1 : Autorisation fly
-		it = ItemUtils.item(Material.FEATHER, "§6Vol des visiteurs");
-		
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
 
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(1,it);
-
-		//2 : Forcer spawn zone
-		it = ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Forcer le spawn parcelle");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(2,it);
-
-		//3 : Autorisation allumer tnt
-		it = ItemUtils.item(Material.TNT, "§6Amorçage de la TNT");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(3,it);
-
-		//4 : Heure du plot
+		//1 : Heure du plot
 		it = ItemUtils.item(Material.SUNFLOWER, "§6Heure de la parcelle");
 		it = ItemUtils.lore(it, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME))/1000 + "h");
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
 		
-		inv.setItem(4,it);
-
-		//5 : Clear inventaire joueur
-		it = ItemUtils.item(Material.CAULDRON, "§6Clear des visiteurs");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(5,it);
-
-		//6 : Sélection du biome
+		inv.setItem(1,it);
+		
+		//2 : Sélection du biome
 		it = ItemUtils.item(Material.BOOKSHELF, "§6Biome de la parcelle");
 		for (Biome biome : PlotParamType.getAllPossibleBiomes())
 			if (biome == plot.getParameters().getParameter(PlotParamType.PLOT_BIOME))
@@ -114,33 +86,9 @@ public class PlotParametersGui extends OlympaGUI {
 		
 		if (plot.getMembers().getPlayerRank(pc) == PlotRank.OWNER)
 			it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(6,it);
+		inv.setItem(2,it);
 
-		//7 : Autoriser les potions splash
-		it = ItemUtils.item(Material.SPLASH_POTION, "§6Utilisation des potions jetables");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_SPLASH_POTIONS));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(7,it);
-
-		//8 : Autoriser le pvp
-		it = ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du PvP");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVP));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(8,it);
-
-		//9 : Autoriser le pvp
-		it = ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_ENVIRONMENT_DAMAGE));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(9,it);
-
-		//10 : Définir la météo
+		//3 : Définir la météo
 		it = ItemUtils.item(Material.SUNFLOWER, "§6Météo de la parcelle");
 		if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR)
 			it = ItemUtils.lore(it, clearWeather);
@@ -148,41 +96,30 @@ public class PlotParametersGui extends OlympaGUI {
 			it = ItemUtils.lore(it, rainyWeather);
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(10,it);
+		inv.setItem(3,it);
 
-		//11 : Autoriser le pvp
-		it = ItemUtils.item(Material.DROPPER, "§6Drop des items");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(11,it);
-
-		//12 : Autoriser le pvp
-		it = ItemUtils.item(Material.COOKED_BEEF, "§6Satiété maximale permanente");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(12,it);
-
-		//13 : Autoriser le pvp
-		it = ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVE));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(13,it);
-
-		//14 : Gamerule keepInventory
-		it = ItemUtils.item(Material.BUCKET, "§6Conservation items à la mort");
-
-		it = setSwitchState(it, (boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH));
-
-		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(14,it);
+		switchButtons.put(ItemUtils.item(Material.BUCKET, "§6Conservation items à la mort"), PlotParamType.KEEP_INVENTORY_ON_DEATH);
+		switchButtons.put(ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE"), PlotParamType.ALLOW_PVE);
+		switchButtons.put(ItemUtils.item(Material.COOKED_BEEF, "§6Satiété maximale permanente"), PlotParamType.KEEP_MAX_FOOD_LEVEL);
+		switchButtons.put(ItemUtils.item(Material.DROPPER, "§6Drop des items"), PlotParamType.ALLOW_DROP_ITEMS);
+		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamType.ALLOW_ENVIRONMENT_DAMAGE);
+		switchButtons.put(ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du PvP"), PlotParamType.ALLOW_PVP);
+		switchButtons.put(ItemUtils.item(Material.SPLASH_POTION, "§6Utilisation des potions jetables"), PlotParamType.ALLOW_SPLASH_POTIONS);
+		switchButtons.put(ItemUtils.item(Material.CAULDRON, "§6Clear des visiteurs"), PlotParamType.CLEAR_INCOMING_PLAYERS);
+		switchButtons.put(ItemUtils.item(Material.TNT, "§6Amorçage de la TNT"), PlotParamType.ALLOW_PRINT_TNT);
+		switchButtons.put(ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Forcer le spawn parcelle"), PlotParamType.FORCE_SPAWN_LOC);
+		switchButtons.put(ItemUtils.item(Material.FEATHER, "§6Vol des visiteurs"), PlotParamType.ALLOW_FLY_INCOMING_PLAYERS);
+		
+		Map<ItemStack, PlotParamType> switches = new HashMap<ItemStack, PlotParamType>();
+		
+		for(Entry<ItemStack, PlotParamType> e : switchButtons.entrySet()) {
+			switches.put(setSwitchState(e.getKey(), (boolean)plot.getParameters().getParameter(e.getValue())), e.getValue());
+		}
+		
+		switchButtons = switches;
+		inv.addItem(switches.keySet().toArray(new ItemStack[switches.keySet().size()]));
 	}
-
+	
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		if (slot == 17) {
@@ -217,29 +154,13 @@ public class PlotParametersGui extends OlympaGUI {
 			current = ItemUtils.loreAdd(current, clickToChange);
 			break;
 		case 1:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS, getSwitchState(current));
-			break;
-		case 2:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.FORCE_SPAWN_LOC, getSwitchState(current));
-			break;
-		case 3:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.ALLOW_PRINT_TNT, getSwitchState(current));
-			break;
-		case 4:
 			plot.getParameters().setParameter(PlotParamType.PLOT_TIME, ((int) plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
 			current = ItemUtils.lore(current, "§eHeure actuelle : " + (int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME)/1000 + "h");
 			current = ItemUtils.loreAdd(current, clickToChange);
 			for (Player pp : plot.getPlayers())
 				pp.setPlayerTime(current.getAmount()*1000, true);
 			break;
-		case 5:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.CLEAR_INCOMING_PLAYERS, getSwitchState(current));
-			break;
-		case 6:
+		case 2:
 			//édition du biome réservée au propriétaire
 			if (plot.getMembers().getPlayerRank(pc) != PlotRank.OWNER)
 				return true;
@@ -256,19 +177,7 @@ public class PlotParametersGui extends OlympaGUI {
 			
 			current = ItemUtils.loreAdd(current, clickToChange);			
 			break;
-		case 7:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.ALLOW_SPLASH_POTIONS, getSwitchState(current));
-			break;
-		case 8:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.ALLOW_PVP, getSwitchState(current));
-			break;
-		case 9:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.ALLOW_ENVIRONMENT_DAMAGE, getSwitchState(current));
-			break;
-		case 10:
+		case 3:
 			if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR) {
 				plot.getParameters().setParameter(PlotParamType.PLOT_WEATHER, WeatherType.DOWNFALL);
 				current = ItemUtils.lore(current, rainyWeather);	
@@ -279,21 +188,18 @@ public class PlotParametersGui extends OlympaGUI {
 			}
 			current = ItemUtils.loreAdd(current, clickToChange);
 			break;
-		case 11:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.ALLOW_DROP_ITEMS, getSwitchState(current));
-			break;
-		case 12:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL, getSwitchState(current));
-			break;
-		case 13:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.ALLOW_PVE, getSwitchState(current));
-			break;
-		case 14:
-			current = setSwitchState(current, !getSwitchState(current));
-			plot.getParameters().setParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH, getSwitchState(current));
+		default:
+			if (slot - 4 <= switchButtons.size()) {
+				PlotParamType param = switchButtons.get(current);
+				switchButtons.remove(current);
+				
+				Bukkit.broadcastMessage("param" + param);
+				
+				current = setSwitchState(current, !getSwitchState(current));
+				switchButtons.put(current, param);
+				
+				plot.getParameters().setParameter(param, getSwitchState(current));
+			}
 			break;
 		}
 		

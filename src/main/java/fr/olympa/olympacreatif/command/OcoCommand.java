@@ -126,10 +126,10 @@ public class OcoCommand extends OlympaCommand {
 					if (plot.getMembers().getPlayerLevel(p) == 0)
 						p.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				
-				int level = 1;
+				float level = 0.1f;
 				
 				try {
-					level = Math.min(Math.max(Integer.valueOf(args[1]), 0), 9);
+					level = Math.min(Math.max(Float.valueOf(args[1])/9f, 0.1f), 1f);
 				}catch(NumberFormatException e) {
 				}
 				
