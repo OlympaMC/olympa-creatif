@@ -15,9 +15,10 @@ import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
+import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
-import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.NbtParserUtil;
 
 public class CmdTeam extends CbCommand {
 	
@@ -30,8 +31,20 @@ public class CmdTeam extends CbCommand {
 		switch (args[0]) {
 		case "list":
 			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getLoc().getId(true) + " <<<");
-			for (CbTeam t : plotCbData.getTeams())
-				sender.sendMessage("   §e> " + t.getId() + " (§r" + t.getName() + "§r§e) : " + t.getMembers().size() + " membre(s)");
+			for (CbTeam t : plotCbData.getTeams()) {
+				
+				ColorType color = t.getColor();
+				
+				String colorParam = "";
+				
+				if (color != null)
+					colorParam = " de couleur " + t.getColor().getColorCode() + t.getColor() + "§r";
+					
+				sender.sendMessage("   §e> " + t.getId() + " (§r" + t.getName() + "§r§e)" + colorParam +
+						" §e: " + t.getMembers().size() + " membre(s)");
+				
+			}
+			
 			return 1;
 			
 		case "empty":

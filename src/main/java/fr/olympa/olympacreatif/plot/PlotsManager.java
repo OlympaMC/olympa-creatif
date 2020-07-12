@@ -57,7 +57,7 @@ public class PlotsManager {
 			public void run() {
 				//pour tous les plots
 				synchronized (loadedPlots) {
-					for (Plot plot : loadedPlots) {
+					for (Plot plot : new ArrayList<Plot>(loadedPlots)) {
 						boolean hasMemberOnline = false;
 						
 						//s'il n'y a aucun joueur sur la parcelle

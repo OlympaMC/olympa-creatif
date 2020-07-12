@@ -77,6 +77,7 @@ public class WorldManager {
 			world.setGameRule(GameRule.DISABLE_RAIDS, true);
 			world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
 			world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+			world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
 			world.setPVP(true);
 			
 

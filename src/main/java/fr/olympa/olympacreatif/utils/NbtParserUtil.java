@@ -1,9 +1,8 @@
-package fr.olympa.olympacreatif.perks;
+package fr.olympa.olympacreatif.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -11,38 +10,44 @@ import org.json.simple.parser.ParseException;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
-import net.minecraft.server.v1_15_R1.NBTBase;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
 
 public class NbtParserUtil {
 
-	private static List<String> tagsCopyValue = new ArrayList<String>();
+	private static List<String> copyValue = new ArrayList<String>();
 	
 	public NbtParserUtil() {
-		tagsCopyValue.add("CustomNameVisible");
-		tagsCopyValue.add("NoAI");
-		tagsCopyValue.add("Glowing");
-		tagsCopyValue.add("Health");
-		tagsCopyValue.add("HandDropChances");
-		tagsCopyValue.add("ArmorDropChances");
-		tagsCopyValue.add("Invulnerable");
-		tagsCopyValue.add("Silent");
-		tagsCopyValue.add("powered");
-		tagsCopyValue.add("PersistenceRequired");
-		tagsCopyValue.add("NoGravity");
-		tagsCopyValue.add("ShowParticles");
+		copyValue.add("CustomNameVisible");
+		copyValue.add("NoAI");
+		copyValue.add("Glowing");
+		copyValue.add("Health");
+		copyValue.add("HandDropChances");
+		copyValue.add("ArmorDropChances");
+		copyValue.add("Invulnerable");
+		copyValue.add("Silent");
+		copyValue.add("powered");
+		copyValue.add("PersistenceRequired");
+		copyValue.add("NoGravity");
+		copyValue.add("ShowParticles");
 
-		tagsCopyValue.add("VillagerData");
+		copyValue.add("VillagerData");
 		
-		tagsCopyValue.add("generic.knockbackResistance");
-		tagsCopyValue.add("generic.maxHealth");
-		tagsCopyValue.add("generic.attackDamage");
-		tagsCopyValue.add("generic.armor");
-		tagsCopyValue.add("generic.armorToughness");
+		copyValue.add("generic.knockbackResistance");
+		copyValue.add("generic.maxHealth");
+		copyValue.add("generic.attackDamage");
+		copyValue.add("generic.armor");
+		copyValue.add("generic.armorToughness");
+
+		copyValue.add("id");
+		copyValue.add("Count");
+		copyValue.add("Unbreakable");
+		copyValue.add("HideFlags");
+		copyValue.add("AttributeModifiers");
+		copyValue.add("CanPlaceOn");
+		copyValue.add("CanDestroy");
 	}
 	
 	public static NBTTagCompound getEntityNbtData(NBTTagCompound oldTag, EntitySourceType sourceType) {
@@ -57,7 +62,7 @@ public class NbtParserUtil {
 				oldTag = oldTag.getCompound("SpawnData");
 			
 			//copie des tags qui n'ont pas à être modifiés
-			for (String s : tagsCopyValue)
+			for (String s : copyValue)
 				if (oldTag.hasKey(s))
 					newTag.set(s, oldTag.get(s));
 			
@@ -185,7 +190,7 @@ public class NbtParserUtil {
 		if (!oldTag.hasKey("Base") || !oldTag.hasKey("Name"))
 			return newTag;
 		
-		for (String s : tagsCopyValue)
+		for (String s : copyValue)
 			if (oldTag.getString("Name").equals(s)) {
 				newTag.setString("Name", s);
 				newTag.set("Base", oldTag.get("Base"));
@@ -205,21 +210,30 @@ public class NbtParserUtil {
 		return newTag;
 	}
 	
-
+	//TODO
 	public static NBTTagCompound getValidItem(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
 
-		if (oldTag.hasKey("id"))
-			newTag.set("id", oldTag.get("id"));
-		
-		if (oldTag.hasKey("Count"))
-			newTag.setInt("Count", Math.min(oldTag.getInt("Count"), 64));
-		
-		if (oldTag.hasKey("HideFlags"))
-			newTag.set("HideFlags", oldTag.get("HideFlags"));
+		for (String s : copyValue)
+			if (oldTag.hasKey(s))
+				newTag.set(s, oldTag.get(s));
 		
 		if (oldTag.hasKey("tag"))
-			if (oldTag.getCompound("tag").hasKey("display"))
+			if (oldTag.getCompound("tag").hasKey("display")) {
+				NBTTagCompound tagDisplay = oldTag.getCompound("tag").getCompound("display");
+				
+				JSONObject jsonName = null;
+
+				//recopiage nom
+				if (tagDisplay.hasKey("Name")) {
+					String nameTag = oldTag.getCompound("tag").getCompound("display").getString("Name");
+					
+					try {
+						jsonName = (JSONObject) new JSONParser().parse(nameTag);
+					} catch (ParseException e) {
+					}
+				}
+			}
 				if (oldTag.getCompound("tag").getCompound("display").hasKey("Name")) {
 					NBTTagCompound tag1 = new NBTTagCompound();
 					NBTTagCompound tag2 = new NBTTagCompound();
@@ -231,7 +245,7 @@ public class NbtParserUtil {
 					try {
 						json = (JSONObject) new JSONParser().parse(nameTag);
 					} catch (ParseException e) {
-						return null;
+						return new NBTTagCompound();
 					}
 					
 					//ajout lore
@@ -317,13 +331,12 @@ public class NbtParserUtil {
 	
 	public static NBTTagCompound getTagFromString(String arg) {
 		try {
-			String tag = arg;
-			if (!tag.contains("{") || !tag.contains("}")) 
+			if (!arg.contains("{") || !arg.contains("}")) 
 				return new NBTTagCompound();
 			
-			tag = tag.substring(tag.indexOf("{"), tag.lastIndexOf("}")+1);
+			arg = arg.substring(arg.indexOf("{"), arg.lastIndexOf("}")+1);
 			
-			return MojangsonParser.parse(tag);
+			return MojangsonParser.parse(arg);
 		} catch (CommandSyntaxException e) {
 			return new NBTTagCompound();
 		}

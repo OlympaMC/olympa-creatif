@@ -32,9 +32,9 @@ public class CbObjectivesListener implements Listener {
 		this.plugin = plugin;
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler
 	public void onDamage(EntityDamageEvent e) {
-		if (e.isCancelled() || !(e instanceof LivingEntity))
+		if (!(e instanceof LivingEntity))
 			return;
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
@@ -202,10 +202,8 @@ public class CbObjectivesListener implements Listener {
 				o.add(e.getPlayer(), 1);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler
 	public void onMineBlock(BlockBreakEvent e) {
-		if (e.isCancelled())
-			return;
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		

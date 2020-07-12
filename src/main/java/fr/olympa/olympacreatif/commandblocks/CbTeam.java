@@ -27,9 +27,9 @@ import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.NbtParserUtil;
 import net.minecraft.server.v1_15_R1.ChatMessage;
 import net.minecraft.server.v1_15_R1.EntityArmorStand;
 import net.minecraft.server.v1_15_R1.EntityBee;
@@ -166,7 +166,7 @@ public class CbTeam {
 			color = s;
 		}
 		
-		public String getColor() {
+		public String getColorCode() {
 			return color;
 		}
 		public static ColorType getColor(String colorAsString) {

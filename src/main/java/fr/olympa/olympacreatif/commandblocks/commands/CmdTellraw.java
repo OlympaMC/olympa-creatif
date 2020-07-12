@@ -11,8 +11,8 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
-import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.NbtParserUtil;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
 

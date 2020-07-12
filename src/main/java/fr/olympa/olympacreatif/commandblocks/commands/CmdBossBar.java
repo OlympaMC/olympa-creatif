@@ -14,8 +14,8 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
-import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.NbtParserUtil;
 
 public class CmdBossBar extends CbCommand {
 	

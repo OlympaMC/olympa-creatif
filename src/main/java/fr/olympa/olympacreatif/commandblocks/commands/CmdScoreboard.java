@@ -15,8 +15,8 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
-import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.NbtParserUtil;
 
 public class CmdScoreboard extends CbCommand {
 
@@ -117,8 +117,12 @@ public class CmdScoreboard extends CbCommand {
 					CbObjective obj = plotCbData.getObjective(args[3]);
 					
 					int value = 0;
-					if (StringUtils.isNumeric(args[4]))
-						value = (int)(double)Double.valueOf(args[4]);
+					
+					try {
+						value = Integer.valueOf(args[4]);
+					}catch (NumberFormatException e) {
+						return 0;
+					}
 					
 					if (obj != null) {
 						
@@ -261,8 +265,12 @@ public class CmdScoreboard extends CbCommand {
 					CbObjective obj = plotCbData.getObjective(args[3]);
 					
 					int value = 0;
-					if (StringUtils.isNumeric(args[4]))
-						value = (int)(double)Double.valueOf(args[4]);
+					
+					try {
+						value = Integer.valueOf(args[4]);
+					}catch (NumberFormatException e) {
+						return 0;
+					}
 					
 					if (obj != null) {
 						

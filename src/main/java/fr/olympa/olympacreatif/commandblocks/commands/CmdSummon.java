@@ -15,9 +15,9 @@ import org.bukkit.entity.EntityType;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
-import fr.olympa.olympacreatif.perks.NbtParserUtil;
-import fr.olympa.olympacreatif.perks.NbtParserUtil.EntitySourceType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.NbtParserUtil;
+import fr.olympa.olympacreatif.utils.NbtParserUtil.EntitySourceType;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public class CmdSummon extends CbCommand {

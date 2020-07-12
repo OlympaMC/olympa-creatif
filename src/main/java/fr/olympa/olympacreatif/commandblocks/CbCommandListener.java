@@ -18,10 +18,13 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
@@ -33,11 +36,7 @@ public class CbCommandListener implements Listener {
 	private OlympaCreatifMain plugin;
 	
 	//liste des commandblocks ayant exécuté une commande dans les PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION derniers ticks
-	Map<Location, Integer> blockedExecutionLocs = new HashMap<Location, Integer>();
-	
-	//commandes interdites pour les joueurs op (pour leur permettre d'éditer les commandblocks)
-	List<String> prohibitedCommands = new ArrayList<String>(Arrays.asList(new String[] {"gamerule", "difficulty"}));
-	
+	Map<Location, Integer> blockedExecutionLocs = new HashMap<Location, Integer>();	
 	
 	public CbCommandListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -63,7 +62,7 @@ public class CbCommandListener implements Listener {
 	@EventHandler //Handle commandes des commandsblocks
 	public void onPreprocessCommandServer(ServerCommandEvent e) {
 		
-		if (!(e.getSender() instanceof CraftBlockCommandSender) || !(((CraftBlockCommandSender) e.getSender()).getBlock().getState() instanceof CommandBlock))
+		if (!(e.getSender() instanceof CraftBlockCommandSender))
 			return;
 		
 		e.setCancelled(true);
@@ -85,19 +84,15 @@ public class CbCommandListener implements Listener {
 	
 	@EventHandler //Handle commandes des joueurs
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e ) {
-		//cancel commande si elle est interdite
-		for (String s : prohibitedCommands)
-			if (e.getMessage().contains(s)) {
-				e.setCancelled(true);
-				return;
-			}
 
+		//cancel commande si c'est une commande commandblock
+		if (CbCommand.getCommandType(e.getMessage()) != null)
+			e.setCancelled(true);
+		
 		CbCommand cmd = getCommand(e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
 		
-		//cancel commande si c'est une commande de commandblock et que le joueur n'est pas dans un plot
-		if (cmd != null)
-			e.setCancelled(true);
-		else
+		//return si la commande est nulle
+		if (cmd == null)
 			return;
 		
 		//exécution de la commande si l'exécutant est au minimum co-prop ou si la commandes est un /trigger

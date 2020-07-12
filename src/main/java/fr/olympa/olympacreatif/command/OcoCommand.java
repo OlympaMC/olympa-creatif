@@ -21,10 +21,10 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
-import fr.olympa.olympacreatif.perks.NbtParserUtil;
-import fr.olympa.olympacreatif.perks.NbtParserUtil.EntitySourceType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.utils.NbtParserUtil;
+import fr.olympa.olympacreatif.utils.NbtParserUtil.EntitySourceType;
 import net.minecraft.server.v1_15_R1.IMaterial;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 

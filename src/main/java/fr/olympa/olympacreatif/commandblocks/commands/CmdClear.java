@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
+import net.minecraft.server.v1_15_R1.TagRegistry;
 
 public class CmdClear extends CbCommand {
 
@@ -24,7 +25,11 @@ public class CmdClear extends CbCommand {
 	public CmdClear(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(type, sender, loc, plugin, plot, args);
 		
-		targetEntities = parseSelector(args[0], true);
+		if (args.length > 0)
+			targetEntities = parseSelector(args[0], true);
+		else
+			if (sender instanceof Player)
+				targetEntities.add((Player) sender);
 		
 		switch (args.length) {
 		case 2:

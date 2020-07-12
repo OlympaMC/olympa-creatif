@@ -28,8 +28,8 @@ import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
-import fr.olympa.olympacreatif.perks.NbtParserUtil;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.NbtParserUtil;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public abstract class CbCommand {
@@ -84,7 +84,7 @@ public abstract class CbCommand {
 		if (!selector.equals("@s")) {
 			list.addAll(plot.getPlayers());
 			
-			if (!onlyPlayers)
+			if (!onlyPlayers && selector.equals("@e"))
 				list.addAll(plot.getEntities());	
 		}else
 			if (sender instanceof Entity)
@@ -150,7 +150,7 @@ public abstract class CbCommand {
 			else if (selector.equals("@r"))
 				params.put("limit", "1");
 		
-		//Bukkit.broadcastMessage("type sélecteur : " + selector + " - params : " + params.toString());
+		Bukkit.broadcastMessage("type sélecteur : " + selector + " - params : " + params.toString());
 		
 		//--------------------------//
 		//APPLICATION DES PARAMETRES//
@@ -327,7 +327,7 @@ public abstract class CbCommand {
 		//épuration selon scores
 		
 		if (params.containsKey("scores")) {
-			NBTTagCompound tag = NbtParserUtil.getTagFromString(params.get(params.get("scores")));
+			NBTTagCompound tag = NbtParserUtil.getTagFromString(params.get("scores").replace("=", ":"));
 			
 			for (String key : tag.getKeys()) {
 				CbObjective obj = plot.getCbData().getObjective(key);
@@ -421,7 +421,7 @@ public abstract class CbCommand {
 			if (i == null)
 				return new ArrayList<Entity>();
 			
-			list = list.subList(0, (int)(double)i[0]);
+			list = list.subList(0, Math.min((int)(double)i[1] - 1, list.size()));
 		}
 		
 		return list;
