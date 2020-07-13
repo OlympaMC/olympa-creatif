@@ -20,6 +20,7 @@ import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -187,13 +188,10 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //cancel splash potion sin interdites dans le plot
 	public void onPotionThrows(PotionSplashEvent e) {
-		Location loc = null;
-		if (e.getHitBlock() == null)
-			loc = e.getHitEntity().getLocation();
-		else
-			loc = e.getHitBlock().getLocation();
-
-		plot = plugin.getPlotsManager().getPlot(loc);
+		if (e.getAffectedEntities().size() == 0)
+			return;
+		
+		plot = plugin.getPlotsManager().getPlot(((Entity) e.getAffectedEntities().toArray()[0]).getLocation());
 		
 		if (e.isCancelled() || plot == null)
 			return;

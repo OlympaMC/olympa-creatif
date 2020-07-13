@@ -7,9 +7,9 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.ChunkGenerator;
+
 import fr.olympa.api.utils.spigot.Schematic;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
 
 public class CustomChunkGenerator extends ChunkGenerator {
 
@@ -94,7 +94,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
         				for (int y2 = 0 ; y2 < roadZschem.height ; y2++) {
         					Schematic.EmptyBuildBlock block = roadZschem.blocks[xRoadBlockIndex][y2][zRoadBlockIndex];
         					
-        					if (block instanceof Schematic.DataBuildBlock) 
+        					if (block != null && block instanceof Schematic.DataBuildBlock) 
         						chunk.setBlock(x, y2 + WorldManager.worldLevel - 1, z, ((Schematic.DataBuildBlock)block).data);	
          					
         				}

@@ -41,8 +41,9 @@ public class WorldManager {
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-		
+
 		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
+		plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);
 		generateRestrictedItems();
         
         

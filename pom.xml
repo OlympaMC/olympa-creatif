@@ -20,6 +20,11 @@
           <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
       </repository>
       
+      <repository>
+	    <id>papermc</id>
+	    <url>https://papermc.io/repo/repository/maven-public/</url>
+	  </repository>
+	  
 	  <repository>
 	    <id>sk89q-snapshots</id>
 	    <url>http://maven.sk89q.com/artifactory/repo</url>
@@ -36,23 +41,33 @@
 	
 	<dependencies>
 		<dependency>
+		    <groupId>com.destroystokyo.paper</groupId>
+		    <artifactId>paper-api</artifactId>
+		    <version>1.15.2-R0.1-SNAPSHOT</version>
+		    <scope>provided</scope>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot</artifactId>
 			<version>1.15.2-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>fr.olympa</groupId>
 			<artifactId>olympa-api</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+		
 		<dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        
 	    <dependency>
 	        <groupId>net.luckperms</groupId>
 	        <artifactId>api</artifactId>

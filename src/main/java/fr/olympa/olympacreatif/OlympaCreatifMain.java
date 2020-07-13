@@ -35,6 +35,7 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.CustomChunkGenerator;
+import fr.olympa.olympacreatif.world.PacketListener;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.WorldEditManager;
 
@@ -85,7 +86,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		worldEditManager = new WorldEditManager(this);
 		perksManager  = new PerksManager(this);
 		cbManager = new CommandBlocksManager(this);
-
 		
 		/*try {
 			//OlympaCore.getInstance().getDatabase();

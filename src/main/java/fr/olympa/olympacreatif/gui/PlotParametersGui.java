@@ -98,19 +98,19 @@ public class PlotParametersGui extends OlympaGUI {
 		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(3,it);
 
-		switchButtons.put(ItemUtils.item(Material.BUCKET, "§6Conservation items à la mort"), PlotParamType.KEEP_INVENTORY_ON_DEATH);
+		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamType.ALLOW_ENVIRONMENT_DAMAGE);
 		switchButtons.put(ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE"), PlotParamType.ALLOW_PVE);
+		switchButtons.put(ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du PvP"), PlotParamType.ALLOW_PVP);
+		switchButtons.put(ItemUtils.item(Material.BUCKET, "§6Conservation items à la mort"), PlotParamType.KEEP_INVENTORY_ON_DEATH);
 		switchButtons.put(ItemUtils.item(Material.COOKED_BEEF, "§6Satiété maximale permanente"), PlotParamType.KEEP_MAX_FOOD_LEVEL);
 		switchButtons.put(ItemUtils.item(Material.DROPPER, "§6Drop des items"), PlotParamType.ALLOW_DROP_ITEMS);
-		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamType.ALLOW_ENVIRONMENT_DAMAGE);
-		switchButtons.put(ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du PvP"), PlotParamType.ALLOW_PVP);
 		switchButtons.put(ItemUtils.item(Material.SPLASH_POTION, "§6Utilisation des potions jetables"), PlotParamType.ALLOW_SPLASH_POTIONS);
 		switchButtons.put(ItemUtils.item(Material.CAULDRON, "§6Clear des visiteurs"), PlotParamType.CLEAR_INCOMING_PLAYERS);
 		switchButtons.put(ItemUtils.item(Material.TNT, "§6Amorçage de la TNT"), PlotParamType.ALLOW_PRINT_TNT);
 		switchButtons.put(ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Forcer le spawn parcelle"), PlotParamType.FORCE_SPAWN_LOC);
 		switchButtons.put(ItemUtils.item(Material.FEATHER, "§6Vol des visiteurs"), PlotParamType.ALLOW_FLY_INCOMING_PLAYERS);
 		
-		Map<ItemStack, PlotParamType> switches = new HashMap<ItemStack, PlotParamType>();
+		Map<ItemStack, PlotParamType> switches = new LinkedHashMap<ItemStack, PlotParamType>();
 		
 		for(Entry<ItemStack, PlotParamType> e : switchButtons.entrySet()) {
 			switches.put(setSwitchState(e.getKey(), (boolean)plot.getParameters().getParameter(e.getValue())), e.getValue());
@@ -192,8 +192,6 @@ public class PlotParametersGui extends OlympaGUI {
 			if (slot - 4 <= switchButtons.size()) {
 				PlotParamType param = switchButtons.get(current);
 				switchButtons.remove(current);
-				
-				Bukkit.broadcastMessage("param" + param);
 				
 				current = setSwitchState(current, !getSwitchState(current));
 				switchButtons.put(current, param);
