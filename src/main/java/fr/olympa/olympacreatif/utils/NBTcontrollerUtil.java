@@ -18,12 +18,12 @@ import net.minecraft.server.v1_15_R1.NBTTagString;
 public class NBTcontrollerUtil {
 
 	private final static int recurIndexMax = 50;
+	private final static int maxListSize = 10;
 	
 	private final static TagsValues allowedTags = new TagsValues();
 	
-	private final static int maxListSize = 20;
-	
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
+		Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
 		return getValidTags(tag, 0);
 	}
 	
@@ -48,8 +48,8 @@ public class NBTcontrollerUtil {
 				if (params == null)
 					return new NBTTagCompound();
 				
-				Bukkit.broadcastMessage("tag : " + tag.get(key).asString() + " - " + params.toString());
-				Bukkit.broadcastMessage("classe : " + tag.get(key).getClass().getName());
+				//Bukkit.broadcastMessage("tag : " + tag.get(key).asString() + " - " + params.toString());
+				//Bukkit.broadcastMessage("classe : " + tag.get(key).getClass().getName());
 				
 				//si le compound est une liste
 				if (NBTTagList.class.equals(tag.get(key).getClass()) && params.getListType() != null) {
@@ -86,14 +86,14 @@ public class NBTcontrollerUtil {
 	@SuppressWarnings("rawtypes")
 	private static boolean isValueValid(TagParams params, NBTBase value) {
 		
-		Bukkit.broadcastMessage("param value : " + params.getTagNbtClass().toString() + " - value class : " + value.getClass().toString());
+		//Bukkit.broadcastMessage("param value : " + params.getTagNbtClass().toString() + " - value class : " + value.getClass().toString());
 		
 		if (!params.getTagNbtClass().equals(value.getClass()))
 			return false;
 		
 		Class tagClass = value.getClass();
 		
-		Bukkit.broadcastMessage("tag : " + value.asString() + " - paramType : " + params.getTagNbtClass().toString());
+		//Bukkit.broadcastMessage("tag : " + value.asString() + " - paramType : " + params.getTagNbtClass().toString());
 		
 		if (tagClass.equals(NBTTagInt.class))
 			if (((NBTTagInt)value).asInt() >= (Integer)params.getMin() && ((NBTTagInt)value).asInt() <= (Integer)params.getMax())

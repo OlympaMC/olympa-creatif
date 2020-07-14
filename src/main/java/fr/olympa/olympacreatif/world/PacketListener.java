@@ -70,7 +70,7 @@ public class PacketListener implements Listener {
             	if (packet instanceof PacketPlayInSetCreativeSlot) 
             		((PacketPlayInSetCreativeSlot) packet).getItemStack().setTag(NBTcontrollerUtil.getValidTags(((PacketPlayInSetCreativeSlot) packet).getItemStack().getTag()));	
             	
-            	
+            	/*
             	if (packet instanceof PacketPlayOutSetSlot) {
                     Field field = PacketPlayOutSetSlot.class.getDeclaredField("c");
                     field.setAccessible(true);
@@ -81,6 +81,7 @@ public class PacketListener implements Listener {
                         field.set(packet, item);	
                     }
             	}
+            	*/
             	
             	if (!cancelPacket)
             		super.channelRead(channelHandlerContext, packet);

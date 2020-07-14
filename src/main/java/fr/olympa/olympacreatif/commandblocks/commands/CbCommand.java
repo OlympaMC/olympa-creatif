@@ -12,13 +12,17 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_15_R1.command.CraftBlockCommandSender;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.jnbt.NBTUtils;
 
 import fr.olympa.api.provider.AccountProvider;
@@ -29,7 +33,9 @@ import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import fr.olympa.olympacreatif.utils.NbtParserUtil;
+import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public abstract class CbCommand {
@@ -465,15 +471,52 @@ public abstract class CbCommand {
 			return null;
 	}
 	
-	
-	//retourne un string en majuscules sans le "minecraft:"
+
+	//retourne un string en majuscules, sans le tag et sans le "minecraft:"
 	public String getUndomainedString(String s) {
-		if (s.contains("minecraft:"))
-			return s.substring(9).toUpperCase();
+		s = s.toUpperCase();
+		if (s.contains("MINECRAFT:"))
+			s = s.substring(9).toUpperCase();
 		else
-			return s.toUpperCase();
+			s = s.toUpperCase();
+
+		//get material
+		return s.split("\\{")[0].toUpperCase();
 	}
 	
+	//get item from string, prend en compte material et tags
+	public ItemStack getItemFromString(String s) {
+		if (s == null)
+			return null;
+		
+		String matStr = "";
+		
+		if (s.contains("minecraft:"))
+			matStr = s.substring(9);
+		else
+			matStr = s;
+
+		Material mat = Material.valueOf(matStr.split("\\{")[0].toUpperCase());
+		
+		if (mat == null)
+			return null;
+		
+		ItemStack item = new ItemStack(mat);
+		
+		if (!s.contains("{"))  
+			return item;
+		
+		try {
+			NBTTagCompound tag = NBTcontrollerUtil.getValidTags(MojangsonParser.parse(s.substring(s.indexOf("{"))));
+			net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+			nmsItem.setTag(tag);
+			item = CraftItemStack.asBukkitCopy(nmsItem);
+		} catch (CommandSyntaxException e) {
+			return null;
+		}
+		
+		return item;
+	}
 	
 	//renvoie une localisation absolue ou relative complète (null si err de syntaxe ou si hors du plot)
 	protected Location parseLocation (String x, String y, String z) {
@@ -612,6 +655,9 @@ public abstract class CbCommand {
 		case trigger:
 			cmd = new CmdTrigger(type, sender, loc, plugin, plot, args);
 			break;
+		case replaceitem:
+			cmd = new CmdReplaceitem(type, sender, loc, plugin, plot, args);
+			break;
 		//easter egg
 		case op:
 			cmd = new CmdOp(type, sender, loc, plugin, plot, args);
@@ -645,6 +691,7 @@ public abstract class CbCommand {
 		gm, 
 		op,
 		trigger,
+		replaceitem,
 		;
 		
 		public static CommandType get(String s) {
