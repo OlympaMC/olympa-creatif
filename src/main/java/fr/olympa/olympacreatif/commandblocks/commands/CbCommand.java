@@ -436,6 +436,9 @@ public abstract class CbCommand {
 	//renvoie deux entiers resprésentant les bornes du string (qui doit être sur le modèle 4..7)
 	public Double[] getDoubleRange(String s) {
 		
+		if (s == null)
+			return null;
+		
 		try {
 			Double[] response = new Double[2];
 			
@@ -492,11 +495,11 @@ public abstract class CbCommand {
 		String matStr = "";
 		
 		if (s.contains("minecraft:"))
-			matStr = s.substring(9);
+			matStr = s.substring(10);
 		else
 			matStr = s;
 
-		Material mat = Material.valueOf(matStr.split("\\{")[0].toUpperCase());
+		Material mat = Material.getMaterial(matStr.split("\\{")[0].toUpperCase());
 		
 		if (mat == null)
 			return null;
@@ -506,7 +509,7 @@ public abstract class CbCommand {
 		if (!s.contains("{"))  
 			return item;
 		
-		try {
+		try {			
 			NBTTagCompound tag = NBTcontrollerUtil.getValidTags(MojangsonParser.parse(s.substring(s.indexOf("{"))));
 			net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 			nmsItem.setTag(tag);
@@ -571,7 +574,6 @@ public abstract class CbCommand {
 	
 	public static CbCommand getCommand(OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {
 		Plot plot = null;
-		String[] args = fullCommand.split(" ");
 
 		if (sender instanceof Entity) {
 			plot = plugin.getPlotsManager().getPlot(((Entity) sender).getLocation());	
@@ -586,10 +588,38 @@ public abstract class CbCommand {
 		CbCommand cmd = null;
 		
 		CommandType type = getCommandType(fullCommand);
+
+		//extraction des arguments de la commande
+		String[] args = fullCommand.split(" ");
 		
 		List<String> list = new ArrayList<String>(Arrays.asList(args));
-		list.remove(0);
-		args = list.toArray(new String[list.size()]);
+		List<String> concatList = new ArrayList<String>();
+		
+		//conctat les tags en plusieurs morceaux
+		int accoladesCount = 0;
+		int crochetsCount = 0;
+		String concat = "";
+		
+		for (String s : list) {
+			
+			if (concat.equals(""))
+				concat += s;
+			else
+				concat += " " + s;
+			
+			accoladesCount += StringUtils.countMatches(s, "{");
+			crochetsCount += StringUtils.countMatches(s, "[");
+			accoladesCount -= StringUtils.countMatches(s, "}");
+			crochetsCount -= StringUtils.countMatches(s, "]");
+			
+			if (accoladesCount == 0 && crochetsCount == 0) {
+				concatList.add(concat);
+				concat = "";
+			}
+		}
+		
+		concatList.remove(0);
+		args = concatList.toArray(new String[concatList.size()]);
 		
 		if (type == null)
 			return null;

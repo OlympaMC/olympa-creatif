@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,11 +16,13 @@ import org.bukkit.inventory.ItemStack;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.TagRegistry;
 
 public class CmdClear extends CbCommand {
 
 	private Material matToRemove = null;
+	private NBTTagCompound tagToRemove = null;
 	int removedItemLimit = 1000000;
 	
 	public CmdClear(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
@@ -30,20 +33,17 @@ public class CmdClear extends CbCommand {
 		else
 			if (sender instanceof Player)
 				targetEntities.add((Player) sender);
-		
-		switch (args.length) {
-		case 2:
-			if (args[1].split(":").length == 2)
-				matToRemove = Material.getMaterial(args[1].split(":")[1].toUpperCase());
-			break;
-		case 3:
-			if (args[1].split(":").length == 2)
-				matToRemove = Material.getMaterial(args[1].split(":")[1].toUpperCase());
+
+		if (args.length >=2) {
+			ItemStack item = getItemFromString(args[1]);
 			
+			matToRemove = item.getType();
+			tagToRemove = CraftItemStack.asNMSCopy(item).getTag();
+		}
+		
+		if (args.length >=3)
 			if (StringUtils.isNumeric(args[2]))
 				removedItemLimit = (int) (double) Double.valueOf(args[2]);
-			break;
-		}
 	}
 	
 	@Override
@@ -56,8 +56,17 @@ public class CmdClear extends CbCommand {
 			
 			playerItemsToRemove = removedItemLimit;
 			
-			for (ItemStack it : ((Player) e).getInventory().getContents())
-				if (playerItemsToRemove > 0 && it != null && (matToRemove == null || it.getType() == matToRemove)) {
+			for (ItemStack it : ((Player) e).getInventory().getContents()) {
+				
+				if (it == null)
+					continue;
+				
+				if (playerItemsToRemove > 0 && it != null && (matToRemove == null ||
+				//si le tag est nul et que les material correspondent
+				(it.getType() == matToRemove && tagToRemove == null) ||
+				//si le tag n'est pas nul et que les matériaux correspondent
+				(it.getType() == matToRemove && tagToRemove.equals(CraftItemStack.asNMSCopy(it).getTag())) )) {
+					
 					if (it.getAmount() < playerItemsToRemove) {
 						
 						playerItemsToRemove -= it.getAmount();
@@ -68,6 +77,8 @@ public class CmdClear extends CbCommand {
 						playerItemsToRemove = 0;
 					}
 				}
+			}
+			
 			totalRemovedItems += removedItemLimit - playerItemsToRemove;
 		}
 		return totalRemovedItems;

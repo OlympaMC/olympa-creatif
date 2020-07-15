@@ -1,5 +1,9 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -29,8 +33,14 @@ public class CmdGive extends CbCommand {
 		
 		int amount = 1;
 		
+		//Bukkit.broadcastMessage("args cmd : " + new ArrayList<String>(Arrays.asList(args)).toString());
+		
 		if (args.length == 3) {
 			Double[] range = getDoubleRange(args[2]);
+			
+			//Bukkit.broadcastMessage("arg 2 : " + args[2]);
+			//Bukkit.broadcastMessage("range : " + range[0] + " " + range[1]);
+			
 			if (range != null)
 				amount = (int)(double)range[1];
 		}

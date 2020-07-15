@@ -1,7 +1,12 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -22,10 +27,12 @@ public class CmdReplaceitem extends CbCommand {
 	
 	@Override
 	public int execute() {
-		if (args.length <= 1)
+		if (args.length == 0)
 			return 0;
 		
-		if (args[1].equals("entity") && args.length > 4) {
+		Bukkit.broadcastMessage("args : " + new ArrayList<String>(Arrays.asList(args)).toString());
+		
+		if (args[0].equals("entity") && args.length >= 4) {
 			
 			int amount = 1;
 			
@@ -46,6 +53,8 @@ public class CmdReplaceitem extends CbCommand {
 			
 			item.setAmount(amount);
 			
+			Bukkit.broadcastMessage("item : " + item.toString());
+			
 			//set item sur slot
 			targetEntities = parseSelector(args[1], false);
 			
@@ -56,24 +65,30 @@ public class CmdReplaceitem extends CbCommand {
 			return targetEntities.size();	
 		
 		//set item pour un bloc
-		}else if (args[1].equals("block") && args.length > 5) {
+		}else if (args[0].equals("block") && args.length >= 6) {
 			
 			//définition loc block et item à set
 			Location loc = parseLocation(args[1], args[2], args[3]);
-			ItemStack item = getItemFromString(args[4]);
+			ItemStack item = getItemFromString(args[5]);
+			
+			Bukkit.broadcastMessage("loc : " + loc.toString());
+			Bukkit.broadcastMessage("item : " +item.toString());
 			
 			if (loc == null || item == null)
 				return 0;
 			
-			Block block = plugin.getWorldManager().getWorld().getBlockAt(loc);
+			BlockState block = plugin.getWorldManager().getWorld().getBlockAt(loc).getState();
+			
+			Bukkit.broadcastMessage("block : " + block.toString());
 			
 			if (!(block instanceof Container))
 				return 0;
-			
+
+			//définition quantité item à set
 			int amount = 1;
 			
-			if (args.length == 6) {
-				Double[] range = getDoubleRange(args[5]);
+			if (args.length == 7) {
+				Double[] range = getDoubleRange(args[6]);
 				
 				if (range == null)
 					return 0;
@@ -97,7 +112,8 @@ public class CmdReplaceitem extends CbCommand {
 			if (slot < 0 || slot >= ((Container)block).getInventory().getSize())
 				return 0;
 			
-			if (((Container)block).getInventory().getItem(slot).equals(item))
+			//si l'item existe déjà sur ce slot
+			if (item.equals(((Container)block).getInventory().getItem(slot)))
 				return 0;
 			else
 				((Container)block).getInventory().setItem(slot, item);
@@ -111,7 +127,7 @@ public class CmdReplaceitem extends CbCommand {
 	private void setItemEntityOnSlot(LivingEntity e, ItemStack item, String slot) {
 		
 		switch(slot) {
-		case "armor.helmet":
+		case "armor.head":
 			e.getEquipment().setHelmet(item);
 			break;
 		case "armor.chest":
