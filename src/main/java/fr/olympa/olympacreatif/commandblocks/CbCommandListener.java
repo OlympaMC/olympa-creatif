@@ -1,9 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -18,13 +16,10 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.data.Message;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
@@ -36,10 +31,12 @@ public class CbCommandListener implements Listener {
 	private OlympaCreatifMain plugin;
 	
 	//liste des commandblocks ayant exécuté une commande dans les PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION derniers ticks
-	Map<Location, Integer> blockedExecutionLocs = new HashMap<Location, Integer>();	
+	Map<Location, Integer> blockedExecutionLocs;	
 	
 	public CbCommandListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		
+		blockedExecutionLocs =  new HashMap<Location, Integer>();
 		
 		new BukkitRunnable() {
 			
@@ -50,15 +47,14 @@ public class CbCommandListener implements Listener {
 					plot.getCbData().addCommandTickets((int) CommandBlocksManager.perTickAddedCommandsTickets);
 				
 				//retire de la liste les commandblocks ayant attendu le nombre de ticks nécessaires avant la prochaine commande
-				if (blockedExecutionLocs == null)
-					blockedExecutionLocs = new HashMap<Location, Integer>();
-				else
-					for (Entry<Location, Integer> e : blockedExecutionLocs.entrySet())
-						if (e.getValue() + CommandBlocksManager.minTickBetweenEachCbExecution <= MinecraftServer.currentTick)
-							blockedExecutionLocs.remove(e.getKey());
-					
+				Iterator<Entry<Location, Integer>> iter = blockedExecutionLocs.entrySet().iterator();
+				while(iter.hasNext()) {
+					Entry<Location, Integer> e = iter.next();
+					if (e.getValue() + CommandBlocksManager.minTickBetweenEachCbExecution / 2 <= MinecraftServer.currentTick)
+						iter.remove();
+				}					
 			}
-		}.runTaskTimer(plugin, 10, 1);
+		}.runTaskTimer(plugin, 10, 2);
 	}
 	
 	

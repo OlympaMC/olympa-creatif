@@ -156,7 +156,7 @@ public abstract class CbCommand {
 			else if (selector.equals("@r"))
 				params.put("limit", "1");
 		
-		Bukkit.broadcastMessage("type sélecteur : " + selector + " - params : " + params.toString());
+		//Bukkit.broadcastMessage("type sélecteur : " + selector + " - params : " + params.toString());
 		
 		//--------------------------//
 		//APPLICATION DES PARAMETRES//
@@ -375,7 +375,7 @@ public abstract class CbCommand {
 				//si on ne veut que ce nom d'équipe
 				}else {
 					CbTeam teamCb = plot.getCbData().getTeamById(team);
-					if (team == null)
+					if (teamCb == null)
 						return new ArrayList<Entity>();
 					
 					for (Entity e : new ArrayList<Entity>(list)) 

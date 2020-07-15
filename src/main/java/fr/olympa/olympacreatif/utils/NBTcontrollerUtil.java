@@ -23,8 +23,8 @@ public class NBTcontrollerUtil {
 	private final static TagsValues allowedTags = new TagsValues();
 	
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
-		Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
-		return getValidTags(tag, 0);
+		//Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
+		return getValidTags(getValidTags(tag, 0), 0);
 	}
 	
 	private static NBTTagCompound getValidTags(NBTTagCompound tag, int recurIndex) {
