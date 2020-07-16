@@ -132,11 +132,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 					if (p.getOlympaPlayer().getCustomScoreboardLines().get(1) != null)
 						return p.getOlympaPlayer().getCustomScoreboardLines().get(1);
 					else {
-						Plot plot = plugin.getPlotsManager().getPlot(p.getOlympaPlayer().getPlayer().getLocation());
+						PlotId plot = PlotId.fromLoc(this, p.getOlympaPlayer().getPlayer().getLocation());
 						if (plot == null)
 							return "§7Parcelle : §eaucune";
 						else
-							return "§7Parcelle : §e" + plot.getLoc().getId(true);
+							return "§7Parcelle : §e" + plot.getId(true);
 					}
 				}, plugin, 20),
 
@@ -190,14 +190,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 						return p.getOlympaPlayer().getCustomScoreboardLines().get(7);
 					else
 						return "§7Kumars : §6" + p.getOlympaPlayer().getGameMoneyFormated();
-				}, plugin, 20)/*,
-	
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {				
-					if (p.getOlympaPlayer().getCustomScoreboardLines().get(8) != null)
-						return p.getOlympaPlayer().getCustomScoreboardLines().get(8);
-					else
-						return "§7Omégas : §6" + p.getOlympaPlayer().getgetStoreMoney().getFormatted();
-				}, plugin, 20)*/
+				}, plugin, 20)
 		);
 		
 		scm.addFooters(

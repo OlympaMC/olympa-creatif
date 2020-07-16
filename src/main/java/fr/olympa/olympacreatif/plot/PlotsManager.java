@@ -15,6 +15,8 @@ import fr.olympa.olympacreatif.world.WorldManager;
 
 public class PlotsManager {
 
+	public static final int maxPlotsPerPlayer = 36;
+	
 	private OlympaCreatifMain plugin;
 	private List<Plot> loadedPlots = new ArrayList<Plot>();
 	

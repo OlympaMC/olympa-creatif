@@ -28,6 +28,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotsManager;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
 
@@ -45,9 +46,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	private Map<Integer, String> scoreboardLines = new HashMap<Integer, String>();
 	
 	private List<StaffPerm> staffPerm = new ArrayList<StaffPerm>();
-
-	private String[] worldeditPerms = new String[] {"worldedit.selection.pos", "worldedit.region.set"};
-	private PermissionAttachment permissions;
 	
 	public OlympaPlayerCreatif(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
@@ -55,28 +53,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		
 		for (int i = 0 ; i < 8 ; i++)
 			scoreboardLines.put(i, null);
-	}
-
-	public void addBukkitPermissions() {
-		if (true)
-			return;
-		permissions = getPlayer().addAttachment(plugin);
-		
-		for (CommandType type : CommandType.values())
-			permissions.setPermission("minecraft.command." + type.toString(), true);
-		
-		/*
-		for (Permission perm : Bukkit.getServer().getPluginManager().getPermissions())
-			perm.setDefault(PermissionDefault.NOT_OP);
-			*/
-		
-	}
-	
-	public void removeBukkitPermissions() {
-		if (true)
-			return;
-		for (String s : permissions.getPermissions().keySet())
-			permissions.unsetPermission(s);
 	}
 	
 	@Override
@@ -127,9 +103,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	//renvoie le nombre de plot dispo selon le rang
 	public int getPlotsSlots(boolean onlyOwnedPlots) {
 		if (!onlyOwnedPlots)
-			return 36;
+			return PlotsManager.maxPlotsPerPlayer;
 		
-		int i = 1 + bonusPlots;
+		int i = 100 + bonusPlots;
 
 		if (getGroup() == OlympaGroup.CREA_CREATOR)
 			i += 10;
@@ -142,6 +118,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	}
 	
 	//définit une ligne de scoreboard custom
+	/*
 	@Deprecated
 	private void setCustomScoreboardLine(int line, String text) {
 		
@@ -155,6 +132,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			else
 				scoreboardLines.put(line, "§" + line);
 	}
+	*/
 	
 	public void setCustomScoreboardTitle(String title) {
 		if (scoreboardLines.get(0) == null) 
@@ -176,9 +154,11 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 				scoreboardLines.put(i, "§" + i);
 	}
 	
+	
 	public Map<Integer, String> getCustomScoreboardLines(){
 		return Collections.unmodifiableMap(scoreboardLines);
 	}
+	
 	
 	public void clearCustomScoreboard() {
 		for (int i = 0 ; i < scoreboardLines.size() ; i++)

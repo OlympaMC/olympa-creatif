@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.plot;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -23,7 +24,7 @@ public class PlotId {
 		
 		int circleIndex = 1;
 		int lineSize = 0;
-		int plotIndex = 1;
+		int plotIndex = 0;
 		int lineIndex = 0;
 		int plotLineIndex = 0;
 		
@@ -31,23 +32,35 @@ public class PlotId {
 		while (plotId > Math.pow(circleIndex*2-1, 2))
 			circleIndex++;		
 		
+		//Bukkit.broadcastMessage("ID : " + plotId + " - CircleIndex : " + circleIndex);
+		
+		/*
 		if (circleIndex == 1) {
 			indexX = 0;
 			indexZ = 0;
 			loc = new Location(plugin.getWorldManager().getWorld(), 0, WorldManager.worldLevel, 0);
 			return;	
 		}
+		*/
 		
 		//nombre de plots par ligne de tour (4 par cercle)
-		lineSize = (int) Math.pow(circleIndex - 1, 2);
+		lineSize = circleIndex * 2 - 2;//(int) Math.pow(circleIndex - 1, 2);
 		
 		//index du plot sur le cercle en cours de remplissage (commence à 0)
-		plotIndex = plotId - lineSize - 1;//(int) (Math.pow(circleIndex*2-1, 2) - plotId);
+		if (circleIndex > 1)
+			plotIndex = (int) (plotId - Math.pow((circleIndex - 1) * 2 - 1, 2)) - 1;//(int) (Math.pow(circleIndex*2-1, 2) - plotId);
+		
+		if (lineSize > 0)
+			while (plotIndex >= lineSize * (lineIndex + 1))
+				lineIndex++;
 		
 		//index de la ligne sur laquelle sera placée le plot (entre 0 et 3 en commençant par le côté en haut à gauche puis sens horaire)
-		lineIndex = (int) (plotIndex / ((circleIndex * 2) - 2));//(int) (plotIndex / ((circleIndex-1)*2));
+		//if (circleIndex > 1)
+		//	lineIndex = (int) (plotIndex / ((circleIndex * 2) - 2));//(int) (plotIndex / ((circleIndex-1)*2));
 		
 		plotLineIndex = plotIndex - lineIndex * lineSize;
+		
+		//Bukkit.broadcastMessage("lineSize = " + lineSize + " - plotIndex = " + plotIndex + " - lineIndex = " + lineIndex + " - plotLineIndex = " + plotLineIndex);
 		
 		switch(lineIndex) {
 		case 0:
@@ -67,6 +80,18 @@ public class PlotId {
 			indexZ = - circleIndex + 1 + plotLineIndex;
 			break;
 		}
+		
+		loc = new Location(plugin.getWorldManager().getWorld(), 
+				indexX * (WorldManager.plotSize + WorldManager.roadSize) + 0.5, 
+				WorldManager.worldLevel + 1, 
+				indexZ * (WorldManager.plotSize + WorldManager.roadSize) + 0.5);
+	}
+	
+	private PlotId(OlympaCreatifMain plugin, int id, int x, int z) {
+		this.plugin = plugin;
+		plotId = id;
+		indexX = x;
+		indexZ = z;
 		
 		loc = new Location(plugin.getWorldManager().getWorld(), 
 				indexX * (WorldManager.plotSize + WorldManager.roadSize) + 0.5, 
@@ -110,17 +135,21 @@ public class PlotId {
 		//return null si route
 		if (x >= WorldManager.plotSize || z >= WorldManager.plotSize)
 			return null;
+		
+		//Bukkit.broadcastMessage("x = " + x + " - z = " + z);
 
 		//recherche de l'id du plot selon ses coords
-		int plotId = 1;
+		int plotId = 0;
 		
 		int plotX = Math.floorDiv(loc.getBlockX(), WorldManager.plotSize + WorldManager.roadSize);
 		int plotZ = Math.floorDiv(loc.getBlockZ(), WorldManager.plotSize + WorldManager.roadSize);
 		
 		int circleIndex = Math.max(Math.abs(plotX), Math.abs(plotZ)) + 1;
-		plotId += Math.pow(circleIndex - 1, 2);
+		plotId += Math.pow((circleIndex - 1) * 2 - 1, 2);
 		
-		int plotsPerLine = (circleIndex - 1) * 2;
+		int plotsPerLine = circleIndex * 2 - 2;
+		
+		//Bukkit.broadcastMessage("circleIndex = " + circleIndex + " - plotsPerLine = " + plotsPerLine);
 		
 		int lineIndex = -1;
 		//recherche de l'indice de la rangée du plot (entre 0 et 3)
@@ -132,6 +161,8 @@ public class PlotId {
 			lineIndex = 2;
 		else if (plotZ >= -circleIndex + 1 && plotZ <= circleIndex - 2 && plotX == -circleIndex + 1)
 			lineIndex = 3;
+		
+		//Bukkit.broadcastMessage("lineIndex = " + lineIndex);
 		
 		plotId += lineIndex * plotsPerLine;
 		
@@ -150,8 +181,10 @@ public class PlotId {
 			break;
 		}
 		
+		//Bukkit.broadcastMessage("plotId = " + plotId);
+		
 		if (plotId <= plugin.getPlotsManager().getTotalPlotCount())
-			return new PlotId(plugin, plotId);
+			return new PlotId(plugin, plotId, plotX, plotZ);
 		else
 			return null;
 	}

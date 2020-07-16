@@ -1,6 +1,9 @@
 package fr.olympa.olympacreatif.data;
 
 import java.sql.ResultSet;
+
+import org.bukkit.Bukkit;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -19,7 +22,7 @@ public class DataManager {
 	
 	public void loadPlayerPlots(OlympaPlayerCreatif p) {
 		//TODO charger plots joueur
-		
+		Bukkit.broadcastMessage("TODO : chargement plots joueurs à la connexion (DataManager)");
 	}
 	
 	public void loadPlot(PlotId newId) {

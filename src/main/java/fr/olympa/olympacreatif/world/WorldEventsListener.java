@@ -402,11 +402,7 @@ public class WorldEventsListener implements Listener{
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		sneakHistory.remove(e.getPlayer().getName());
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
-
-		((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).removeBukkitPermissions();
 	}
-	
-	PermissionAttachment perm;
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
@@ -415,7 +411,5 @@ public class WorldEventsListener implements Listener{
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
-
-		((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).addBukkitPermissions();
 	}
 }
