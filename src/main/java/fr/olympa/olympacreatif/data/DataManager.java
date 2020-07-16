@@ -1,12 +1,6 @@
 package fr.olympa.olympacreatif.data;
 
 import java.sql.ResultSet;
-import org.bukkit.entity.Player;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
 import fr.olympa.olympacreatif.plot.PlotId;
