@@ -20,9 +20,6 @@ public class PlotsManager {
 	
 	private List<AsyncPlot> asyncPlots = new ArrayList<AsyncPlot>();
 	
-	//liste contenant les localisations 
-	private List<UnaffectedPlotId> emptyPlots = new ArrayList<UnaffectedPlotId>();
-	
 	private int plotCount;
 	
 	public PlotsManager(OlympaCreatifMain plugin) {
@@ -40,11 +37,9 @@ public class PlotsManager {
 			@Override
 			public void run() {
 				synchronized (asyncPlots) {
-					for (AsyncPlot ap : asyncPlots) {
-						Plot plot = new Plot(ap);
-						loadedPlots.add(plot);
-						emptyPlots.remove(plot.getLoc());
-					}
+					for (AsyncPlot ap : asyncPlots)
+						loadedPlots.add(new Plot(ap));
+					
 					asyncPlots.clear();	
 				}
 			}
@@ -79,7 +74,7 @@ public class PlotsManager {
 		}.runTaskTimer(plugin, 20, 20*60);
 	}
 
-	public void registerPlot(UnaffectedPlotId newId) {
+	public void registerPlot(PlotId newId) {
 		if (newId == null)
 			return;
 		
@@ -87,15 +82,13 @@ public class PlotsManager {
 			if (plot.getLoc().equals(newId))
 				return;
 		
-		//si le plot n'a pas encore été testé et déterminé non-existant et s'il n'est pas déjà chargé
-		if (!emptyPlots.contains(newId))
-			plugin.getDataManager().loadPlot(newId);
+		//si le plot existe mais n'est pas encore chargé
+		plugin.getDataManager().loadPlot(newId);
 	}	
 	
 	public Plot createPlot(Player p) {
 		Plot plot = new Plot(plugin, AccountProvider.get(p.getUniqueId()).getInformation());
-		
-		emptyPlots.remove(plot.getLoc());		
+				
 		loadedPlots.add(plot);
 		return plot;
 	}
@@ -161,13 +154,11 @@ public class PlotsManager {
 		return plotCount;
 	}
 	
-	public void addAsyncPlot(AsyncPlot plot, UnaffectedPlotId plotId) {
+	public void addAsyncPlot(AsyncPlot plot, PlotId plotId) {
 		if (plot != null)
 			synchronized (asyncPlots) {
 				asyncPlots.add(plot);
 			}
-		else
-			emptyPlots.add(plotId);
 	}
 	
 	public static Integer getPlotIdFromString(String id) {
@@ -180,20 +171,5 @@ public class PlotsManager {
 	
 	public static String getPlotIdAsString(int id) {
 		return Integer.toString(id, 36).toUpperCase();
-	}
-
-	public UnaffectedPlotId getPlotLoc(Location loc) {
-		
-		int x = loc.getBlockX();
-		int z = loc.getBlockZ();
-		
-		int xb = Math.floorMod(x, WorldManager.plotSize + WorldManager.roadSize);
-		int zb = Math.floorMod(z, WorldManager.plotSize + WorldManager.roadSize);
-		
-		if (xb < WorldManager.plotSize && zb < WorldManager.plotSize)
-			return new UnaffectedPlotId(plugin, Math.floorDiv(x, WorldManager.plotSize + WorldManager.roadSize), 
-					Math.floorDiv(z, WorldManager.plotSize + WorldManager.roadSize));
-		else
-			return null;
 	}
 }

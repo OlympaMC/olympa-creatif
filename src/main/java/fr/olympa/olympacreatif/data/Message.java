@@ -153,7 +153,7 @@ public enum Message {
 
 		messagesList.put(Message.PARAM_CB_MAX_TEAMS_PER_PLOT, "20");
 		messagesList.put(Message.PARAM_CB_MAX_OBJECTIVES_PER_PLOT, "20");
-		messagesList.put(Message.PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION, "4");
+		messagesList.put(Message.PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION, "5");
 		
 		messagesList.put(Message.PARAM_CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK, "5");
 	}

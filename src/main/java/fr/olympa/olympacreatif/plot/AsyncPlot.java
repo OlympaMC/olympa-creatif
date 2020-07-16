@@ -9,22 +9,18 @@ public class AsyncPlot {
 	private PlotMembers members;
 	private PlotParameters params;
 	
-	private int plotId;
-	
-	public AsyncPlot(OlympaCreatifMain plugin, int plotId, PlotId plotLoc, PlotMembers plotMembers, PlotParameters plotParams) {
+	public AsyncPlot(OlympaCreatifMain plugin, PlotId plotLoc, PlotMembers plotMembers, PlotParameters plotParams) {
 		this.plugin = plugin;
 		this.id = plotLoc;
 		this.members = plotMembers;
 		this.params = plotParams;
-		
-		this.plotId = plotId;
 	}
 	
 	public OlympaCreatifMain getPlugin() {
 		return plugin;
 	}
 	
-	public PlotId getLoc() {
+	public PlotId getId() {
 		return id;
 	}
 	
@@ -34,9 +30,5 @@ public class AsyncPlot {
 	
 	public PlotParameters getParameters() {
 		return params;
-	}
-	
-	public int getId() {
-		return plotId;
 	}
 }

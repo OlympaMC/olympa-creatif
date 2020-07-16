@@ -32,7 +32,7 @@ public class Plot {
 	
 	private PlotMembers members;
 	private PlotParameters parameters;
-	private PlotId plotLoc;
+	private PlotId plotId;
 	
 	private PlotCbData cbData;
 
@@ -41,20 +41,14 @@ public class Plot {
 	
 	private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
-	//identifiant unique du plot
-	private final int plotId;
-	
 	//constructeur pour un plot n'existant pas encore
 	public Plot(OlympaCreatifMain plugin, OlympaPlayerInformations p) {
 		this.plugin = plugin;
 		
-		plugin.getPlotsManager().incrementTotalPlotCount();
-		plotId = plugin.getPlotsManager().getTotalPlotCount();
+		plotId = PlotId.createNew(plugin);
 		
-		plotLoc = new PlotId(plugin, plotId);
-		
-		parameters = new PlotParameters(plugin, plotLoc);
-		members = new PlotMembers(plugin, plotLoc);
+		parameters = new PlotParameters(plugin, plotId);
+		members = new PlotMembers(plugin, plotId);
 		
 		members.set(p, PlotRank.OWNER);
 		
@@ -64,7 +58,7 @@ public class Plot {
 		
 		//exécution des actions d'entrée pour tous les joueurs sur le plot au moment du chargement
 		for (Player player : Bukkit.getOnlinePlayers())
-			if (plotLoc.isInPlot(player.getLocation()))
+			if (plotId.isInPlot(player.getLocation()))
 				PlotsInstancesListener.executeEntryActions(plugin, player, this);
 	}
 	
@@ -73,8 +67,6 @@ public class Plot {
 		this.plugin = ap.getPlugin();
 		this.parameters = ap.getParameters();
 		this.members = ap.getMembers();
-		this.plotLoc = ap.getLoc();
-		
 		this.plotId = ap.getId();
 		
 		cbData = plugin.getCommandBlocksManager().createPlotCbData();
@@ -83,7 +75,7 @@ public class Plot {
 		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
-			if (plotLoc.isInPlot(p.getLocation()))
+			if (plotId.isInPlot(p.getLocation()))
 				PlotsInstancesListener.executeEntryActions(plugin, p, this);
 	}
 	
@@ -96,7 +88,7 @@ public class Plot {
 	}
 	
 	public PlotId getLoc() {
-		return plotLoc;
+		return plotId;
 	}
 	
 	public PlotCbData getCbData() {
@@ -133,7 +125,7 @@ public class Plot {
 	}
 	
 	public Location getOutLoc() {
-		Location loc = plotLoc.getLocation().add(-3, 0, -3);
+		Location loc = plotId.getLocation().add(-3, 0, -3);
 		loc.setY(WorldManager.worldLevel + 1);
 		return loc;
 	}
@@ -146,7 +138,7 @@ public class Plot {
 		cbData.unload();
 	}
 
-	public int getPlotId() {
+	public PlotId getPlotId() {
 		return plotId;
 	}
 }

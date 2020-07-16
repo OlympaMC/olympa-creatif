@@ -10,7 +10,6 @@ import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
 import fr.olympa.olympacreatif.plot.PlotId;
-import fr.olympa.olympacreatif.plot.UnaffectedPlotId;
 
 public class DataManager {
 
@@ -29,7 +28,7 @@ public class DataManager {
 		
 	}
 	
-	public void loadPlot(UnaffectedPlotId newId) {
+	public void loadPlot(PlotId newId) {
 		AsyncPlot plot = null;
 		
 		plugin.getPlotsManager().addAsyncPlot(plot, newId);			
