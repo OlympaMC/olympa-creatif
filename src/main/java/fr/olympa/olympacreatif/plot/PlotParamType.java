@@ -37,7 +37,10 @@ public enum PlotParamType {
 	PLOT_TIME("plot_time", 6000),
 
 	PROTECTED_ZONE_POS1("protected_zone_pos1", null),
-	PROTECTED_ZONE_POS2("protected_zone_pos2", null),  
+	PROTECTED_ZONE_POS2("protected_zone_pos2", null),
+	
+	//niveaux de stoplag : 0 aucun, 1 activé, 2 activé et bloqué jusqu'à vérif par un staff
+	STOPLAG_STATUS("stoplag_level", 0),
 	;
 	
 	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();

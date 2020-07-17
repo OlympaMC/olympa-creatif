@@ -4,33 +4,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.permissions.PermissionDefault;
-
 import com.google.common.collect.ImmutableMap; 
 
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;
-import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
-import net.minecraft.server.v1_15_R1.EntityPlayer;
-import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
 
 public class OlympaPlayerCreatif extends OlympaPlayerObject {
 
@@ -66,7 +54,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		statement.setInt(1, bonusPlots);
 		statement.setInt(2, gameMoney);
 	}
-
 	
 	public void addGameMoney(int i) {
 		gameMoney += Math.max(i, 0);
@@ -105,14 +92,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		if (!onlyOwnedPlots)
 			return PlotsManager.maxPlotsPerPlayer;
 		
-		int i = 100 + bonusPlots;
+		int i = 1 + bonusPlots;
 
 		if (getGroup() == OlympaGroup.CREA_CREATOR)
-			i += 10;
+			i += 9;
 		else if(getGroup() == OlympaGroup.CREA_ARCHITECT)
-			i += 6;
+			i += 5;
 		else if(getGroup() == OlympaGroup.CREA_CONSTRUCTOR)
-			i += 4;
+			i += 2;
 		
 		return i;
 	}

@@ -5,10 +5,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +27,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -196,7 +195,7 @@ public class PlotsInstancesListener implements Listener{
 		if (e.isCancelled() || plot == null)
 			return;
 		
-		if(!(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_SPLASH_POTIONS))
+		if(!(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_SPLASH_POTIONS) || plot.hasStoplag())
 			e.setCancelled(true);
 	}
 	
@@ -300,45 +299,6 @@ public class PlotsInstancesListener implements Listener{
 			if (commandBlockTypes.contains(e.getClickedBlock().getType()))
 				e.getClickedBlock().setType(Material.AIR);
 		}
-		/*
-		if (playerRank == PlotRank.OWNER && commandBlockTypes.contains(e.getClickedBlock().getType()) && !e.getPlayer().isSneaking()) {
-			
-			BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
-			
-			NBTTagCompound tag = new NBTTagCompound();
-			plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
-			
-			PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
-			
-	        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
-	        nmsPlayer.playerConnection.sendPacket(packet);
-		}
-		
-		if (playerRank == PlotRank.OWNER && e.getItem() != null && commandBlockTypes.contains(e.getItem().getType()) && !e.getPlayer().isSneaking()) {
-			e.getItem().setType(Material.DISPENSER);
-		}
-		*/
-		//change le type de block à un dispenser (qui sera placé à la place du commandblock car les joueurs non op 
-		//(fake op ne fonctionne pas) ne peuvent pas poser de commandblock. Choix dispenser pour conserver le blockface
-		
-	      //  Bukkit.broadcastMessage(tag.asString());
-	        
-	        /*
-			try {
-		        
-				//BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
-		        BlockState blockState = e.getClickedBlock().getState();//plugin.getWorldManager().getNmsWorld().getTileEntity(pos).getBlock().getBlock();
-		        
-		        Method getTile = CraftBlockEntityState.class.getDeclaredMethod("getTileEntity");
-		        getTile.setAccessible(true);
-		        TileEntityCommand nmsBlock = (TileEntityCommand) getTile.invoke(blockState);
-
-		        ((CraftPlayer) e.getPlayer()).getHandle().playerConnection.sendPacket(nmsBlock.getUpdatePacket());
-		    }catch (ReflectiveOperationException err) {
-		        err.printStackTrace();
-		    }	
-			*/
-		    
 	}
 	
 	
@@ -366,6 +326,12 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (plot == null)
 			return;
+		
+		if (plot.hasStoplag()) {
+			e.setCancelled(true);
+			return;
+		}
+		
 		if (e.getPlayer() == null || (e.getCause() != IgniteCause.ARROW && e.getCause() != IgniteCause.FLINT_AND_STEEL)) {
 			e.setCancelled(true);
 			return;
@@ -384,18 +350,17 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //modifie la destination téléport si joueur banni du plot
 	public void onTeleportEvent(PlayerTeleportEvent e) {
 		Player p = e.getPlayer();
-		Plot plot = plugin.getPlotsManager().getPlot(p.getLocation());
+		Plot plot = plugin.getPlotsManager().getPlot(e.getTo());
 		
 		if (plot == null)
 			return;
 		
-		if (((List<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId())) {
-			if (((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
+		if (((List<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId()))
+			if ( ! ((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
 				e.setTo(plot.getOutLoc());
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());	
-			}
-		}else
-			executeEntryActions(plugin, p, plot);
+			}else
+				executeEntryActions(plugin, p, plot);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -413,12 +378,13 @@ public class PlotsInstancesListener implements Listener{
 
 		//expulse les joueurs bannis
 		if (plotTo != null) {
-			if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(e.getPlayer().getUniqueId()).getId())) {
-				e.setCancelled(true);
-				//e.getPlayer().setVelocity(e.getPlayer().getVelocity().multiply(-1));
-				//e.getPlayer().teleport(new Location(e.getPlayer().getWorld(), 5 * (e.getTo().getX() - e.getFrom().getX()), 0, 5 * (e.getTo().getZ() - e.getFrom().getZ())));
-				e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
-				return;
+			OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
+			if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
+				if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
+					e.setCancelled(true);
+					e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
+					return;	
+				}
 			}
 			
 			executeEntryActions(plugin, e.getPlayer(), plotTo);	
@@ -431,7 +397,7 @@ public class PlotsInstancesListener implements Listener{
 
 	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
 	public void onQuitEvent(PlayerQuitEvent e) {
-		itemsToKeepOnDeath.remove(e.getPlayer());
+		itemsToKeepOnDeath.remove(e.getPlayer().getUniqueId());
 		inventoryStorage.remove(e.getPlayer());
 		
 		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
@@ -554,13 +520,6 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 		
-		/*
-		if (e.getRemover().getType() != EntityType.PLAYER  && (e.getEntity().getType() == EntityType.PAINTING || e.getEntity().getType() == EntityType.ITEM_FRAME || e.getEntity().getType() == EntityType.ARMOR_STAND)) {
-			e.setCancelled(true);
-			return;
-		}
-		*/
-		
 		if (plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR)
 			e.setCancelled(true);
 		
@@ -638,18 +597,6 @@ public class PlotsInstancesListener implements Listener{
 		}
 	}
 	
-	/*
-	private void tpPlayerToPlotSpawnOnDeath(EntityDamageEvent e, Plot plot) {
-		Player p =  (Player) e.getEntity();
-		if (((Player)e.getEntity()).getHealth() - e.getDamage() <= 0) {
-			e.getEntity().teleport((Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC));
-			e.setCancelled(true);
-			p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
-			p.setFoodLevel(20);
-		}
-	}	
-	*/
-	
 	@EventHandler //empêche le drop d'items si interdit sur le plot (et cancel si route)
 	public void onDropItem(PlayerDropItemEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
@@ -677,5 +624,16 @@ public class PlotsInstancesListener implements Listener{
 		
 		if ((boolean) plot.getParameters().getParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL))
 			e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onRedstoneChange(BlockRedstoneEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null)
+			e.setNewCurrent(0);
+		else
+			if (plot.hasStoplag())
+				e.setNewCurrent(0);		
 	}
 }

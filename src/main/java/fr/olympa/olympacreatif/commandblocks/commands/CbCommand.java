@@ -478,13 +478,12 @@ public abstract class CbCommand {
 	//retourne un string en majuscules, sans le tag et sans le "minecraft:"
 	public String getUndomainedString(String s) {
 		s = s.toUpperCase();
-		if (s.contains("MINECRAFT:"))
-			s = s.substring(9).toUpperCase();
-		else
-			s = s.toUpperCase();
+		
+		if (s.startsWith("MINECRAFT:"))
+			s = s.substring(10);
 
 		//get material
-		return s.split("\\{")[0].toUpperCase();
+		return s.split("\\{")[0];
 	}
 	
 	//get item from string, prend en compte material et tags

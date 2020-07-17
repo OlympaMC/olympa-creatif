@@ -76,8 +76,9 @@ public class CbCommandListener implements Listener {
 		
 		CbCommand cmd = getCommand(e.getSender(), cb.getLocation(), e.getCommand());
 		
-		if (cmd != null) 
-			executeCommandBlockCommand(cmd, e.getSender());			
+		if (cmd != null)
+			if (!cmd.getPlot().hasStoplag())
+				executeCommandBlockCommand(cmd, e.getSender());			
 		
 	}
 	

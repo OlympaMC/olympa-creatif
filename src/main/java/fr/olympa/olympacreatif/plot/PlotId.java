@@ -224,6 +224,6 @@ public class PlotId {
 	
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof PlotId && indexX == ((PlotId)obj).getX() && indexZ == ((PlotId)obj).getZ();	
+		return obj instanceof PlotId && plotId == (int)((PlotId)obj).getId(false);	
 	}
 }

@@ -25,6 +25,7 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -41,6 +42,7 @@ public class PlotParametersGui extends OlympaGUI {
 	
 	private String clearWeather = "§eMétéo actuelle : ensoleillée";
 	private String rainyWeather = "§eMétéo actuelle : pluvieuse";
+	private String[] stoplagLevels = {"§eEtat : §ainactif", "§eEtat : §cactif", "§eEtat : §cforcé §4(contacter un staff)"};
 	
 	private Map<ItemStack, PlotParamType> switchButtons = new LinkedHashMap<ItemStack, PlotParamType>(); 
 	
@@ -98,6 +100,11 @@ public class PlotParametersGui extends OlympaGUI {
 		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(3,it);
 
+		//4 : Etat stoplag
+		it = ItemUtils.item(Material.COMMAND_BLOCK, "§6Blocage tâches intensives (redstone & cb)");
+		ItemUtils.lore(it, stoplagLevels[(int) plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)]);
+		inv.setItem(4, it);
+		
 		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamType.ALLOW_ENVIRONMENT_DAMAGE);
 		switchButtons.put(ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE"), PlotParamType.ALLOW_PVE);
 		switchButtons.put(ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du PvP"), PlotParamType.ALLOW_PVP);
@@ -188,8 +195,26 @@ public class PlotParametersGui extends OlympaGUI {
 			}
 			current = ItemUtils.loreAdd(current, clickToChange);
 			break;
+			
+		case 4:
+			int mod = 2;
+			if (pc.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
+				mod = 3;
+			
+			int currentState = (int) plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS);
+			
+			//si le plot est en stoplag forcé et que le joueur n'a pas la perm staff FAKE OWNER EVERYWHERE, return
+			if (currentState == 2 && mod == 2)
+				break;
+			
+			plot.getParameters().setParameter(PlotParamType.STOPLAG_STATUS, Math.floorMod(currentState + 1, mod));
+			
+			current = ItemUtils.lore(current, stoplagLevels[(int)plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)]);
+			current = ItemUtils.loreAdd(current, clickToChange);
+			break;
+			
 		default:
-			if (slot - 4 <= switchButtons.size()) {
+			if (slot - 5 <= switchButtons.size()) {
 				PlotParamType param = switchButtons.get(current);
 				switchButtons.remove(current);
 				

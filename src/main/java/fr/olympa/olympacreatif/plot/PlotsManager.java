@@ -81,7 +81,7 @@ public class PlotsManager {
 			return;
 		
 		for (Plot plot : loadedPlots)
-			if (plot.getLoc().equals(newId))
+			if (plot.getPlotId().equals(newId))
 				return;
 		
 		//si le plot existe mais n'est pas encore chargé
@@ -100,13 +100,15 @@ public class PlotsManager {
 	}
 
 	public Plot getPlot(Location loc) {
-		return getPlot(loc.getBlockX(), loc.getBlockZ());
-	}
-	
-	public Plot getPlot(int x, int z) {
-		for (Plot plot : getPlots())
-			if (plot.getLoc().isInPlot(x, z))
+		PlotId id = PlotId.fromLoc(plugin, loc);
+		
+		if (id == null)
+			return null;
+		
+		for (Plot plot : loadedPlots)
+			if (plot.getPlotId().equals(id))
 				return plot;
+		
 		return null;
 	}
 

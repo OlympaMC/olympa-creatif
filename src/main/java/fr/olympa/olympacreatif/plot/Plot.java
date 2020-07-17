@@ -141,4 +141,11 @@ public class Plot {
 	public PlotId getPlotId() {
 		return plotId;
 	}
+	
+	public boolean hasStoplag() {
+		if ((int)parameters.getParameter(PlotParamType.STOPLAG_STATUS) == 0)
+			return false;
+		else
+			return true;
+	}
 }

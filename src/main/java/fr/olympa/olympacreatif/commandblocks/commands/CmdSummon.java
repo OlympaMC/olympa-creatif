@@ -47,10 +47,7 @@ public class CmdSummon extends CbCommand {
 		if (args.length >= 5) 			
 			tag = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.SUMMON);
 		
-		EntityType type = null;
-		
-		if (args[0].split(":").length > 1 && EnumUtils.isValidEnum(EntityType.class, args[0].split(":")[1].toUpperCase()))
-			type = EntityType.valueOf(args[0].split(":")[1].toUpperCase());
+		EntityType type = EntityType.fromName(getUndomainedString(args[0]));
 		
 		if (type == null || !allowedEntities.contains(type)) 
 			return 0;
@@ -69,7 +66,8 @@ public class CmdSummon extends CbCommand {
 	private void instanciateAllowedEntities() {
 		if (allowedEntities.size() > 0)
 			return;
-		
+
+		allowedEntities.add(EntityType.ARMOR_STAND);
 		allowedEntities.add(EntityType.BAT);
 		allowedEntities.add(EntityType.BEE);
 		allowedEntities.add(EntityType.BLAZE);
