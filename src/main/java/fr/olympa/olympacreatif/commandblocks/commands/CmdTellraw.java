@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -40,7 +41,10 @@ public class CmdTellraw extends CbCommand {
 		mark.addExtra("[CB] ");
 		text.addExtra(mark);
 		
-		String listAsString = args[1].replace("\"\",", "").replace(",\"\"", "").replace("\\n", "\\\\n");
+		String listAsString = StringEscapeUtils.unescapeJava(args[1].replace("\"\",", "").replace(",\"\"", ""));//.replace("\\", "\\\\");
+		
+		Bukkit.broadcastMessage("listAsString : " + listAsString);
+		
 		if (!listAsString.startsWith("["))
 			listAsString = "{rawText:[" + listAsString + "]}";
 		else

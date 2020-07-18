@@ -182,7 +182,7 @@ public class OcCommand extends OlympaCommand {
 				}
 				break;
 				
-			case "tp":
+			case "visit":
 				PlotId id = PlotId.fromString(plugin, args[1]);
 				if (id != null) {
 					p.teleport(id.getLocation());
@@ -299,7 +299,7 @@ public class OcCommand extends OlympaCommand {
 			
 		case 3:
 			switch(args[0]) {
-			case "tp":
+			case "visit":
 				try {
 					Player plotOwner = Bukkit.getPlayer(args[1]);
 					
@@ -351,7 +351,7 @@ public class OcCommand extends OlympaCommand {
 			list.add("setspawn");
 			list.add("invite");
 			list.add("accept");
-			list.add("tp");
+			list.add("visit");
 			list.add("kick");
 			list.add("ban");
 			list.add("unban");

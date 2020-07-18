@@ -115,15 +115,12 @@ public class PlotId {
 
 	//retourne un PlotId si un plot est affecté à cet id (chargé ou non)
 	public static PlotId fromString(OlympaCreatifMain plugin, String idAsString) {
+
+		Integer id = PlotsManager.getPlotIdFromString(idAsString);
 		
-		try {
-			Integer id = PlotsManager.getPlotIdFromString(idAsString);
-			
-			if (id <= plugin.getPlotsManager().getTotalPlotCount())			
-				return new PlotId(plugin, id);
-			
-		}catch(NumberFormatException e) {
-		}
+		if (id != null && id <= plugin.getPlotsManager().getTotalPlotCount())			
+			return new PlotId(plugin, id);
+		
 		return null;
 	}
 	

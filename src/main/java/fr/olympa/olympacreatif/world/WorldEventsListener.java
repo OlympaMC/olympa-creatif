@@ -236,21 +236,33 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler //cancel rétractation piston si un bloc affecté se trouve sur une route
 	public void onPistonRetractEvent(BlockPistonRetractEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null || plot.hasStoplag()) {
+			e.setCancelled(true);
+			return;	
+		}
+		
 		for (Block block : e.getBlocks())
-			if (PlotId.fromLoc(plugin, block.getLocation()) == null)
+			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation())))
 				e.setCancelled(true);
 	}
 	
 	@EventHandler //cancel poussée piston si un bloc affecté se trouve sur une route
 	public void onPistonPushEvent(BlockPistonExtendEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null || plot.hasStoplag()) {
+			e.setCancelled(true);
+			return;	
+		}
+		
 		for (Block block : e.getBlocks()) {
-			PlotId id = PlotId.fromLoc(plugin, block.getLocation());
-
-			if (id == null) {
+			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation()))) {
 				e.setCancelled(true);
 				return;
 			}
-			else if (id.isOnInteriorDiameter(block.getLocation())) {
+			else if (plot.getPlotId().isOnInteriorDiameter(block.getLocation())) {
 				e.setCancelled(true);
 				return;
 			}
