@@ -24,7 +24,7 @@ public class CmdTrigger extends CbCommand {
 		
 		CbObjective obj = plotCbData.getObjective(args[0]);
 		
-		if (obj == null || obj.getType() != ObjType.trigger || obj.getTriggerAllowedEntities().contains(sender))
+		if (obj == null || obj.getType() != ObjType.trigger || !obj.getTriggerAllowedEntities().contains(sender))
 			return 0;
 		
 		Double[] values = getDoubleRange(args[2]);

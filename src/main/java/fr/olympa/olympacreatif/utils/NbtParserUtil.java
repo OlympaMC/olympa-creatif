@@ -378,6 +378,7 @@ public class NbtParserUtil {
 	}
 	
 	//renvoie un NBTTagList à partir d'arguments d'une commande
+	/*
 	public static NBTTagList getListCompoundFromString(String[] args) {
 		String concat = "";
 		int k = 0;
@@ -391,6 +392,7 @@ public class NbtParserUtil {
 		
 		return getListCompoundFromString(concat);
 	}
+	*/
 
 	//renvoie un NBTTagList à partir d'arguments d'un string json
 	public static NBTTagList getListCompoundFromString(String concat) {
