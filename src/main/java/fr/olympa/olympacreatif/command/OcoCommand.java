@@ -129,7 +129,7 @@ public class OcoCommand extends OlympaCommand {
 				float level = 0.1f;
 				
 				try {
-					level = Math.min(Math.max(Float.valueOf(args[1])/9f, 0.1f), 1f);
+					level = Math.min(Math.max(Float.valueOf(args[1])/18f, 0.1f), 1f);
 				}catch(NumberFormatException e) {
 				}
 				

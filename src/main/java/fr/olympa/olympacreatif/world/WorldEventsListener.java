@@ -64,6 +64,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotId;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.PacketPlayInChat;
@@ -236,15 +237,24 @@ public class WorldEventsListener implements Listener{
 	@EventHandler //cancel rétractation piston si un bloc affecté se trouve sur une route
 	public void onPistonRetractEvent(BlockPistonRetractEvent e) {
 		for (Block block : e.getBlocks())
-			if (plugin.getPlotsManager().getPlot(block.getLocation()) == null)
+			if (PlotId.fromLoc(plugin, block.getLocation()) == null)
 				e.setCancelled(true);
 	}
 	
 	@EventHandler //cancel poussée piston si un bloc affecté se trouve sur une route
 	public void onPistonPushEvent(BlockPistonExtendEvent e) {
-		for (Block block : e.getBlocks())
-			if (plugin.getPlotsManager().getPlot(block.getLocation()) == null)
+		for (Block block : e.getBlocks()) {
+			PlotId id = PlotId.fromLoc(plugin, block.getLocation());
+
+			if (id == null) {
 				e.setCancelled(true);
+				return;
+			}
+			else if (id.isOnInteriorDiameter(block.getLocation())) {
+				e.setCancelled(true);
+				return;
+			}
+		}
 	}
 	
 	@EventHandler //cancel explosion TNT
