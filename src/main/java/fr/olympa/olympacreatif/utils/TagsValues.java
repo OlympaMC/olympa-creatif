@@ -7,8 +7,10 @@ import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
 
 import com.sk89q.worldedit.extent.clipboard.io.NBTSchematicReader;
 
+import net.minecraft.server.v1_15_R1.NBTTagByte;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
 import net.minecraft.server.v1_15_R1.NBTTagList;
+import net.minecraft.server.v1_15_R1.NBTTagShort;
 import net.minecraft.server.v1_15_R1.NBTTagString;
 
 public class TagsValues {
@@ -18,6 +20,10 @@ public class TagsValues {
 	public TagsValues() {
 		tags.put("Name", new TagParams(NBTTagString.class, 0, 200, null));
 		tags.put("Lore", new TagParams(NBTTagString.class, 0, 200, NBT.TAG_STRING));
+
+		tags.put("CustomName", new TagParams(NBTTagString.class, 0, 200, null));
+		tags.put("CustomNameVisible", new TagParams(NBTTagInt.class, 0, 1, null));
+		tags.put("Invulnerable", new TagParams(NBTTagInt.class, 0, 1, null));
 	}
 	
 	public TagParams getTagParams(String key) {

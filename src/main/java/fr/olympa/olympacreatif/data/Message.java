@@ -128,7 +128,8 @@ public enum Message {
 	PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION, 
 	PARAM_CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK, 
 	
-	OCO_SET_FLY_SPEED,
+	OCO_SET_FLY_SPEED, 
+	ERROR_PLOT_NOT_LOADED,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();
@@ -149,7 +150,7 @@ public enum Message {
 		messagesList.put(PARAM_MAX_TOTAL_ENTITIES_PER_PLOT, "10");
 		
 		messagesList.put(PARAM_CB_MAX_CMDS_LEFT, "400");
-		messagesList.put(PARAM_CB_PER_TICK_ADDED_CMDS, "5");
+		messagesList.put(PARAM_CB_PER_TICK_ADDED_CMDS, "10");
 
 		messagesList.put(Message.PARAM_CB_MAX_TEAMS_PER_PLOT, "20");
 		messagesList.put(Message.PARAM_CB_MAX_OBJECTIVES_PER_PLOT, "20");

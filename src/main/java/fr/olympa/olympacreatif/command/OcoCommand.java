@@ -18,13 +18,16 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.utils.NbtParserUtil;
 import fr.olympa.olympacreatif.utils.NbtParserUtil.EntitySourceType;
+import fr.olympa.olympacreatif.world.WorldManager;
 import net.minecraft.server.v1_15_R1.IMaterial;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
@@ -55,6 +58,8 @@ public class OcoCommand extends OlympaCommand {
 				p.getPlayer().sendMessage(Message.OCO_HAT_SUCCESS.getValue());
 				p.getPlayer().getInventory().setHelmet(new ItemStack(p.getPlayer().getInventory().getItemInMainHand().getType()));
 				break;
+				
+				
 			case "mb":
 				/*if (!p.hasPermission(PermissionsList.USE_MICRO_BLOCKS)) {
 					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_MICRO_BLOCKS.getGroup().getName(p.getGender())));
@@ -62,6 +67,8 @@ public class OcoCommand extends OlympaCommand {
 				}*/
 				plugin.getPerksManager().getMicroBlocks().openGui(p.getPlayer());
 				break;
+				
+				
 			case "export":
 				/*if (!p.hasPermission(PermissionsList.USE_PLOT_EXPORTATION)) {
 					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_PLOT_EXPORTATION.getGroup().getName(p.getGender())));
@@ -74,6 +81,24 @@ public class OcoCommand extends OlympaCommand {
 				}else
 					p.getPlayer().sendMessage(Message.OCO_EXPORT_FAILED.getValue());					
 					
+				break;
+				
+				
+			case "debug":
+				Plot plot2 = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
+				if (plot2 == null) {
+					sender.sendMessage(Message.ERROR_PLOT_NOT_LOADED.getValue());
+					break;
+				}
+				
+				String debug = "\n   §6>>> Débug plot " + plot2.getPlotId() + " :";
+				debug += "\n   §e> Joueurs : §a" + plot2.getPlayers().size();
+				debug += "\n   §e> Entités : §a" + plot2.getEntities().size() + "/" + WorldManager.maxTotalEntitiesPerPlot;
+				debug += "\n   §e> Equipes : §a" + plot2.getCbData().getTeams().size() + "/" + CommandBlocksManager.maxTeamsPerPlot;
+				debug += "\n   §e> Objectifs : §a" + plot2.getCbData().getObjectives().size() + "/" + CommandBlocksManager.maxObjectivesPerPlot;
+				debug += "\n   §e> Tickets commandblocks : §a" + plot2.getCbData().getCommandsTicketsLeft() + "/" + CommandBlocksManager.maxCommandsTicketst;
+				
+				sender.sendMessage(debug);
 				break;
 			default:
 				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
@@ -196,6 +221,7 @@ public class OcoCommand extends OlympaCommand {
 			list.add("export");
 			list.add("give");
 			list.add("speed");
+			list.add("debug");
 		}
 		else if (args.length == 2 && args[0].equals("mb")) {
 			for (Entry<String, ItemStack> e : plugin.getPerksManager().getMicroBlocks().getAllMbs().entrySet())

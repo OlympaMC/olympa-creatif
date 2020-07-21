@@ -22,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -31,6 +32,7 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -578,6 +580,8 @@ public class PlotsInstancesListener implements Listener{
 			e.getPlayer().getInventory().addItem((ItemStack[]) itemsToKeepOnDeath.get(e.getPlayer().getUniqueId()).toArray());
 		
 		itemsToKeepOnDeath.remove(e.getPlayer().getUniqueId());
+		
+		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
 	}
 	
 	@EventHandler //gère le paramètre keepInventory de la parcelle
@@ -635,5 +639,15 @@ public class PlotsInstancesListener implements Listener{
 		else
 			if (plot.hasStoplag())
 				e.setNewCurrent(0);		
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH) //si spawn d'entité, ajout à la liste des entités du plot
+	public void onEntitySpawn(EntitySpawnEvent e) {
+		if (e.isCancelled())
+			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
+		if (plot != null)
+			plot.addEntityInPlot(e.getEntity());
 	}
 }

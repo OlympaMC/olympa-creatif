@@ -1,35 +1,29 @@
 package fr.olympa.olympacreatif.world;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Dropper;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -38,12 +32,12 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -52,46 +46,35 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.potion.PotionEffect;
 
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
-import net.minecraft.server.v1_15_R1.EntityPlayer;
-import net.minecraft.server.v1_15_R1.MinecraftServer;
-import net.minecraft.server.v1_15_R1.PacketPlayInChat;
-import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
+import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
 
 public class WorldEventsListener implements Listener{
 
 	OlympaCreatifMain plugin;
 	Map<String, Long> sneakHistory = new HashMap<String, Long>();
-	
-	List<Entity> entities = new ArrayList<Entity>(); 
-	List<Entity> entitiesToRemove = new ArrayList<Entity>();
 
 	Map<Plot, Integer> spawnEntities = new HashMap<Plot, Integer>();
 	
-	int maxEntitiesPerTypePerPlot = 0;
-	int maxTotalEntitiesPerPlot = 0;
+	//List<EntityType> protectedEntities = Collections.unmodifiableList(new ArrayList<EntityType>(Arrays.asList(EntityType.PAINTING, EntityType.ARMOR_STAND, EntityType.ITEM_FRAME)));
+
+	List<Entity> entities = new ArrayList<Entity>(); 
+	List<Entity> entitiesToRemove = new ArrayList<Entity>();
 	
 	public WorldEventsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-
-		maxEntitiesPerTypePerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue());
-		maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
 		
-		//gestion des entités (remove si plot null ou si nb par plot > 100) et update de la liste des entités dans chaque plot (amélioration res performances du sélecteur @ dans les commandes)
+		//gestion des entités (remove si id null ou si nb par plot > 100) et update de la liste des entités dans chaque plot (amélioration res performances du sélecteur @ dans les commandes)
 		new BukkitRunnable() {
-			
 			
 			Thread asyncEntityCheckup = null;
 			
@@ -119,7 +102,7 @@ public class WorldEventsListener implements Listener{
 				//lancement du thread de test
 				asyncEntityCheckup = new Thread(new Runnable() {
 
-					Map<Plot, Map<EntityType, Integer>> entitiesPerPlot = new HashMap<Plot, Map<EntityType,Integer>>(); 
+					Map<String, Map<EntityType, Integer>> entitiesPerPlot = new HashMap<String, Map<EntityType,Integer>>(); 
 					
 					@Override
 					public void run() {
@@ -133,36 +116,39 @@ public class WorldEventsListener implements Listener{
 						while (iterator.hasPrevious()) {
 							entity = iterator.previous();
 							
-							Plot plot = plugin.getPlotsManager().getPlot(entity.getLocation());
-							
 							if (entity.getType() == EntityType.PLAYER)
 								continue;
 							
+							PlotId id = PlotId.fromLoc(plugin, entity.getLocation());
+							
 							//supprime l'entité si en dehors d'un plot (sauf si armorstand, peinture ou cadre) ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
-							if (plot == null) {
-								if (entity.getType() != EntityType.ARMOR_STAND && entity.getType() != EntityType.PAINTING && entity.getType() != EntityType.ITEM_FRAME) {
-									entitiesToRemove.add(entity);	
-								}	
+							if (id == null) {
+								entitiesToRemove.add(entity);
 							}else {
 								//création de la liste pour le plot si elle n'existe pas encore
-								if (!entitiesPerPlot.containsKey(plot))
-									entitiesPerPlot.put(plot, new HashMap<EntityType, Integer>());
+								if (!entitiesPerPlot.containsKey(id.toString()))
+									entitiesPerPlot.put(id.toString(), new HashMap<EntityType, Integer>());
 								
-								Map<EntityType, Integer> plotEntities = entitiesPerPlot.get(plot);
+								Map<EntityType, Integer> plotEntities = entitiesPerPlot.get(id.toString());
 								
 								//création de l'entrée pour le type d'entitité d'entity si n'existe pas encore
 								if (!plotEntities.containsKey(entity.getType()))
 									plotEntities.put(entity.getType(), 0);
 
 								//supression de l'entité OU ajout à la liste des entités du plot
-								if (plotEntities.get(entity.getType()) >= maxEntitiesPerTypePerPlot || getTotalEntities(plotEntities) >= maxTotalEntitiesPerPlot) {
+								if (plotEntities.get(entity.getType()) >= WorldManager.maxEntitiesPerTypePerPlot || getTotalEntities(plotEntities) >= WorldManager.maxTotalEntitiesPerPlot) {
 									entitiesToRemove.add(entity);
 								}else {
 									plotEntities.put(entity.getType(), plotEntities.get(entity.getType()) + 1);
-									plot.addEntityInPlot(entity);
+									
+									Plot plot = plugin.getPlotsManager().getPlot(id);
+									if (plot != null)
+										plot.addEntityInPlot(entity);
 								}
 							}
 						}
+						//Bukkit.broadcastMessage("entitiesPerPlot : " + entitiesPerPlot);
+						//Bukkit.broadcastMessage("toRemove : " + entitiesToRemove);
 					}
 				});
 				asyncEntityCheckup.start();
@@ -200,6 +186,7 @@ public class WorldEventsListener implements Listener{
 			e.setCancelled(true);
 	}
 	
+	/*
 	@EventHandler //cancel évent si trop grand nombre spawnées simultanément dans un plot donné
 	public void onEntitySpawn(EntitySpawnEvent e) {
 		if (e.isCancelled() || e.getEntityType() == EntityType.PLAYER)
@@ -214,12 +201,12 @@ public class WorldEventsListener implements Listener{
 		
 		if (spawnEntities.containsKey(plot)) {
 			spawnEntities.put(plot, spawnEntities.get(plot)+1);
-			if (spawnEntities.get(plot) > maxEntitiesPerTypePerPlot)
+			if (spawnEntities.get(plot) > WorldManager.maxEntitiesPerTypePerPlot)
 				e.setCancelled(true);
 		}else
 			spawnEntities.put(plot, 1);
-		
 	}
+	*/
 
 	@EventHandler
 	public void onFireSpread(BlockSpreadEvent e) {
@@ -363,7 +350,7 @@ public class WorldEventsListener implements Listener{
 					if (plot == null)
 						new MainGui(plugin, e.getPlayer(), plot, "Menu").create(e.getPlayer());
 					else
-						new MainGui(plugin, e.getPlayer(), plot, "Menu >> " + plot.getLoc().getId(true)).create(e.getPlayer());	
+						new MainGui(plugin, e.getPlayer(), plot, "Menu >> " + plot.getLoc()).create(e.getPlayer());	
 				}else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
 			else
@@ -390,21 +377,27 @@ public class WorldEventsListener implements Listener{
 		
 	}
 	
-	@EventHandler //chat de plot
+	@EventHandler(priority = EventPriority.HIGHEST) //chat de plot
 	public void onChat(AsyncPlayerChatEvent e) {
 		if (e.isCancelled())
 			return;
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		
+		//e.setFormat(String.format(e.getFormat(), "pseudoTest", e.getMessage()));
+		
 		if (e.getMessage().startsWith("@") || plot == null)
 			e.setMessage(e.getMessage().replaceFirst("@", ""));
 		else {
 			e.getRecipients().clear();
-			e.setFormat("§7[Plot] §r" + e.getPlayer().getDisplayName() + " : " + e.getMessage());
+			e.setFormat("§7[Parcelle " + plot.getPlotId() + "] §r" + 
+			AccountProvider.get(e.getPlayer().getUniqueId()).getGroupNameColored() + " " + e.getPlayer().getName() +
+			" §r§7: " + e.getMessage());
+			
 			for (Player p : plot.getPlayers())
 				e.getRecipients().add(p);
 		}
+		
 	}
 	
 	@EventHandler //color sur pancartes
@@ -431,7 +424,6 @@ public class WorldEventsListener implements Listener{
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
-		EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
-		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
+		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
 	}
 }

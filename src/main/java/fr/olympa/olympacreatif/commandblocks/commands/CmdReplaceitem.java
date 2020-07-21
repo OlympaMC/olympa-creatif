@@ -30,7 +30,7 @@ public class CmdReplaceitem extends CbCommand {
 		if (args.length == 0)
 			return 0;
 		
-		Bukkit.broadcastMessage("args : " + new ArrayList<String>(Arrays.asList(args)).toString());
+		//Bukkit.broadcastMessage("args : " + new ArrayList<String>(Arrays.asList(args)).toString());
 		
 		if (args[0].equals("entity") && args.length >= 4) {
 			
@@ -53,7 +53,7 @@ public class CmdReplaceitem extends CbCommand {
 			
 			item.setAmount(amount);
 			
-			Bukkit.broadcastMessage("item : " + item.toString());
+			//Bukkit.broadcastMessage("item : " + item.toString());
 			
 			//set item sur slot
 			targetEntities = parseSelector(args[1], false);
@@ -71,8 +71,8 @@ public class CmdReplaceitem extends CbCommand {
 			Location loc = parseLocation(args[1], args[2], args[3]);
 			ItemStack item = getItemFromString(args[5]);
 			
-			Bukkit.broadcastMessage("loc : " + loc.toString());
-			Bukkit.broadcastMessage("item : " +item.toString());
+			//Bukkit.broadcastMessage("loc : " + loc.toString());
+			//Bukkit.broadcastMessage("item : " +item.toString());
 			
 			if (loc == null || item == null)
 				return 0;

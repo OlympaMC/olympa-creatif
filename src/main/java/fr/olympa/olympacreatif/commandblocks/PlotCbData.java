@@ -25,13 +25,13 @@ public class PlotCbData {
 	
 	private Map<String, CbBossBar> bossbarsMap = new HashMap<String, CbBossBar>();
 	
-	private double commandsLeft;
+	private int commandsLeft;
 	private Scoreboard scb;
 	
 	PlotCbData(OlympaCreatifMain plugin, Scoreboard scb){
 		this.plugin = plugin;
 		this.scb = scb;
-		commandsLeft = CommandBlocksManager.maxCommandsLeft;
+		commandsLeft = CommandBlocksManager.maxCommandsTicketst;
 	}
 	
 	//GETTERS
@@ -54,7 +54,7 @@ public class PlotCbData {
 		return teams;
 	}
 	
-	public double getCommandsLeft() {
+	public int getCommandsTicketsLeft() {
 		return commandsLeft;
 	}
 
@@ -63,7 +63,7 @@ public class PlotCbData {
 	}
 	
 	public void addCommandTickets( int tickets) {
-		commandsLeft = Math.min(CommandBlocksManager.maxCommandsLeft, commandsLeft + tickets);
+		commandsLeft = Math.min(CommandBlocksManager.maxCommandsTicketst, commandsLeft + tickets);
 	}
 	
 	public CbBossBar getBossBar(String id) {

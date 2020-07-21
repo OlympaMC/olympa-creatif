@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -22,6 +23,7 @@ import org.bukkit.event.player.PlayerLevelChangeEvent;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective.ObjType;
 import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
+import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CbObjectivesListener implements Listener {
@@ -177,7 +179,7 @@ public class CbObjectivesListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onItemUse(PlayerInteractEvent e) {
+	public void onItemUse(BlockPlaceEvent e) {
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		
@@ -185,7 +187,7 @@ public class CbObjectivesListener implements Listener {
 			return;
 		
 		for (CbObjective o : plot.getCbData().getObjectives())
-			if (o.getType() == ObjType.minecraft_used && e.getItem() != null && e.getItem().getType() == o.getParamType())
+			if (o.getType() == ObjType.minecraft_used && e.getBlockPlaced() != null && e.getBlockPlaced().getType() == o.getParamType())
 				o.add(e.getPlayer(), 1);
 	}
 	

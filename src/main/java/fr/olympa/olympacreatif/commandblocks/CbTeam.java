@@ -26,6 +26,7 @@ import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CmdTellraw;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -55,7 +56,7 @@ public class CbTeam {
 		this.plugin = plugin;
 		this.plot = plot;
 		this.teamId = id;
-		this.teamName = name;
+		setName(name);
 	}
 	
 	public String getName() {
@@ -67,7 +68,10 @@ public class CbTeam {
 	}
 	
 	public void setName(String newTeamName) {
-		teamName = newTeamName;
+		if (newTeamName == null)
+			return;
+		
+		teamName = CmdTellraw.getJsonText(null, newTeamName).getText();
 		for (Entity e : members)
 			if (e.getType() == EntityType.PLAYER)
 				OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
@@ -84,8 +88,8 @@ public class CbTeam {
 		CbTeam quittedTeam = plot.getCbData().getTeamOf(e);
 		if (quittedTeam != null)
 			quittedTeam.removeMember(e);
-		else
-			members.add(e);
+		
+		members.add(e);
 		
 		if (e.getType() == EntityType.PLAYER) 
 			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");

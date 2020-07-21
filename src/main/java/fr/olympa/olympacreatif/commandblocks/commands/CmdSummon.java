@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import fr.olympa.olympacreatif.utils.NbtParserUtil;
 import fr.olympa.olympacreatif.utils.NbtParserUtil.EntitySourceType;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -45,7 +46,7 @@ public class CmdSummon extends CbCommand {
 		}
 		
 		if (args.length >= 5) 			
-			tag = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.SUMMON);
+			tag = NBTcontrollerUtil.getValidTags(args[4]);
 		
 		EntityType type = EntityType.fromName(getUndomainedString(args[0]));
 		
@@ -53,7 +54,7 @@ public class CmdSummon extends CbCommand {
 			return 0;
 		
 		Entity e = plugin.getWorldManager().getWorld().spawnEntity(sendingLoc, type);
-
+		
 		//application du tag
 		if (tag != null) {
 			((CraftEntity)e).getHandle().f(tag);

@@ -196,11 +196,13 @@ public class PlotId {
 		return indexZ;
 	}
 	
-	public Object getId(boolean useBase36) {
-		if (useBase36) 
-			return PlotsManager.getPlotIdAsString(plotId);
-		else
-			return plotId;
+	public int getId() {
+		return plotId;
+	}
+	
+	@Override
+	public String toString() {
+		return PlotsManager.getPlotIdAsString(plotId);
 	}
 	
 	public Location getLocation() {
@@ -235,6 +237,6 @@ public class PlotId {
 	
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof PlotId && plotId == (int)((PlotId)obj).getId(false);	
+		return obj instanceof PlotId && plotId == ((PlotId)obj).getId();	
 	}
 }

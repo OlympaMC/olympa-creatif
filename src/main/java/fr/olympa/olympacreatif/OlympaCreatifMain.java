@@ -124,7 +124,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 						if (plot == null)
 							return "§7Parcelle : §eaucune";
 						else
-							return "§7Parcelle : §e" + plot.getId(true);
+							return "§7Parcelle : §e" + plot;
 					}
 				}, plugin, 20),
 

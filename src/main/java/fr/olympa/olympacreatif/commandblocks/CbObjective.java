@@ -14,12 +14,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
+import fr.olympa.olympacreatif.commandblocks.commands.CmdTellraw;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 
@@ -33,7 +35,10 @@ public class CbObjective {
 	
 	private DisplaySlot displaySlot = null;
 	
-	private Map<String, Integer> values = new HashMap<String, Integer>();
+	//private Map<String, Integer> values = new HashMap<String, Integer>();
+
+	private Map<Entity, Integer> entityHolders = new HashMap<Entity, Integer>();
+	private Map<String, Integer> stringHolders = new HashMap<String, Integer>();
 	
 	private String objId = "";
 	private String objName = "";
@@ -45,7 +50,9 @@ public class CbObjective {
 		this.plugin = plugin;
 		this.plot = plot;
 		this.objId = id.substring(0, Math.min(15, id.length()));
-		this.objName = objName;
+
+		setName(objName);
+		
 		type = ObjType.get(objType);
 		
 		if (type == null)
@@ -153,6 +160,11 @@ public class CbObjective {
 	}
 	
 	public void setName(String newObjName) {
+		if (newObjName == null)
+			return;
+		
+		newObjName = CmdTellraw.getJsonText(null, newObjName).getText();
+		
 		if (!newObjName.equals(objName)) {
 			if (displaySlot == DisplaySlot.BELOW_NAME)
 				plot.getCbData().getObjectiveBelowName().setDisplayName(newObjName);
@@ -171,6 +183,17 @@ public class CbObjective {
 	}
 	
 	public Map<String, Integer> getValues(boolean sortValues){
+		Map<String, Integer> values = new HashMap<String, Integer>(stringHolders);
+		
+		for (Entry<Entity, Integer> e : entityHolders.entrySet())
+			if (e.getKey().getType() == EntityType.PLAYER)
+				values.put((AccountProvider.get(e.getKey().getUniqueId())).getGroupNameColored() + " " + e.getKey().getName(), e.getValue());
+			else
+				if (e.getKey().getCustomName() != null)
+					values.put(e.getKey().getCustomName(), e.getValue());
+				else
+					values.put(e.getKey().getName(), e.getValue());
+		
 		if (!sortValues)
 			return values;
 	   
@@ -192,22 +215,24 @@ public class CbObjective {
 	   return result;
 	}
 	
+	//ADD et SET POUR STRINGS
+	
 	public void add(String name, int value) {
-		if (!values.containsKey(name))
+		if (!stringHolders.containsKey(name))
 			set(name, value);
 		else
-			set(name, values.get(name) + value);
+			set(name, stringHolders.get(name) + value);
 	}
 	
 	//gestion sidebar/belowname ici
 	public void set(String name, Integer value) {
 		
-		name = ChatColor.translateAlternateColorCodes('&', name);
+		name = ChatColor.translateAlternateColorCodes('&', name).replace("_", " ");
 		
 		if (value == null)
-			values.remove(name);
+			stringHolders.remove(name);
 		else
-			values.put(name, value);
+			stringHolders.put(name, value);
 		
 		//affichage scoreboard sidebar
 		if (displaySlot == DisplaySlot.SIDEBAR) {
@@ -218,11 +243,13 @@ public class CbObjective {
 	}
 
 	public int get(String name) {
-		if (values.containsKey(name))
-			return values.get(name);
+		if (stringHolders.containsKey(name))
+			return stringHolders.get(name);
 		else
 			return 0;
 	}
+	
+	//ADD et SET POUR ENTITIES
 	
 	public void add(Entity e, int value) {
 		set(e, value + get(e));
@@ -231,14 +258,7 @@ public class CbObjective {
 	@SuppressWarnings("deprecation")
 	public void set(Entity e, Integer value) {
 		
-		//définition string portant le score
-		String scoreHolder = "";
-		
-		if (e instanceof Player)
-			scoreHolder = ((Player) e).getDisplayName();
-		else
-			scoreHolder = e.getCustomName();
-		
+		//définition string portant le score		
 		if (displaySlot == DisplaySlot.BELOW_NAME && e.getType() == EntityType.PLAYER) {
 			Objective obj = plot.getCbData().getObjectiveBelowName();
 			
@@ -248,14 +268,17 @@ public class CbObjective {
 				obj.getScore((Player) e).setScore(value);
 		}
 		
-		set(scoreHolder, value);
+		if (value == null)
+			entityHolders.remove(e);
+		else
+			entityHolders.put(e, value);
 	}
 	
 	public int get(Entity e) {
-		if (e instanceof Player)
-			return get(((Player) e).getDisplayName());
+		if (entityHolders.containsKey(e))
+			return entityHolders.get(e);
 		else
-			return get(e.getCustomName());
+			return 0;
 	}
 	
 	public int setDisplaySlot(DisplaySlot newDisplaySlot) {

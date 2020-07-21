@@ -3,7 +3,10 @@ package fr.olympa.olympacreatif.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import fr.olympa.olympacreatif.utils.TagsValues.TagParams;
+import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTBase;
 import net.minecraft.server.v1_15_R1.NBTTagByte;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -21,8 +24,17 @@ public class NBTcontrollerUtil {
 	private final static int maxListSize = 10;
 	
 	private final static TagsValues allowedTags = new TagsValues();
+
+	public static NBTTagCompound getValidTags(String string) {
+		try {
+			return getValidTags(MojangsonParser.parse(string));
+		} catch (CommandSyntaxException e) {
+			return new NBTTagCompound();
+		}
+	}
 	
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
+		//Bukkit.broadcastMessage("Tag initial : " + tag);
 		//Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
 		return getValidTags(getValidTags(tag, 0), 0);
 	}
@@ -56,7 +68,7 @@ public class NBTcontrollerUtil {
 					NBTTagList oldList = tag.getList(key, params.getListType());
 					NBTTagList newList = new NBTTagList();
 					
-					Bukkit.broadcastMessage("LIST : " + oldList.asString());
+					//Bukkit.broadcastMessage("LIST : " + oldList.asString());
 					
 					//pour chaque élément de la liste, vérification
 					for (int i = 0 ; i < Math.min(oldList.size(), maxListSize) ; i++) 
@@ -65,7 +77,7 @@ public class NBTcontrollerUtil {
 							//Bukkit.broadcastMessage("tag liste : " + oldList.getCompound(i).asString() + " - " + getValidTags(oldList.getCompound(i)).asString());
 							newList.add(getValidTags(oldList.getCompound(i), recurIndex + 1));	
 						}else {
-							Bukkit.broadcastMessage("list contains : " + oldList.get(i).asString());
+							//Bukkit.broadcastMessage("list contains : " + oldList.get(i).asString());
 							if (isValueValid(params, oldList.get(i)))
 								newList.add(oldList.get(i));
 					

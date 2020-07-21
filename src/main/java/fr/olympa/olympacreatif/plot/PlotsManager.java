@@ -128,26 +128,15 @@ public class PlotsManager {
 		return list;
 	}
 	
-	//retourne le plotid de la localisation correspondante
-	
-	/*
-	public PlotLoc getPlotLoc(Location loc) {
-		return getPlotLoc(loc.getBlockX(), loc.getBlockZ());
-	}
-	
-	
-	public PlotLoc getPlotLoc(int x, int z) {
-		
-		int xb = Math.floorMod(x, WorldManager.plotSize + WorldManager.roadSize);
-		int zb = Math.floorMod(z, WorldManager.plotSize + WorldManager.roadSize);
-		
-		if (xb < WorldManager.plotSize && zb < WorldManager.plotSize)
-			return new PlotLoc(plugin, Math.floorDiv(x, WorldManager.plotSize + WorldManager.roadSize), 
-					Math.floorDiv(z, WorldManager.plotSize + WorldManager.roadSize));
-		else
+	public Plot getPlot(PlotId id) {
+		if (id == null)
 			return null;
+		
+		for (Plot plot : loadedPlots)
+			if (plot.getPlotId().equals(id))
+				return plot;
+		return null;
 	}
-	*/
 	
 	
 	public void incrementTotalPlotCount() {

@@ -22,6 +22,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.jnbt.NBTUtils;
 
@@ -333,12 +337,23 @@ public abstract class CbCommand {
 		//épuration selon scores
 		
 		if (params.containsKey("scores")) {
-			NBTTagCompound tag = NbtParserUtil.getTagFromString(params.get("scores").replace("=", ":"));
+			JsonObject json;
+
+			try {
+				json = new JsonParser().parse(params.get("scores")).getAsJsonObject();	
+			}catch(Exception e) {
+				json = new JsonObject();
+			}
+			//Bukkit.broadcastMessage("TAG : " + json);
 			
-			for (String key : tag.getKeys()) {
-				CbObjective obj = plot.getCbData().getObjective(key);
-				Double[] i = getDoubleRange(tag.getString(key));
+			for (Entry<String, JsonElement> elt : json.entrySet()) {
+				CbObjective obj = plot.getCbData().getObjective(elt.getKey());
+				Double[] i = null;
+				if (elt.getValue().isJsonPrimitive())
+					i = getDoubleRange(elt.getValue().getAsString());
 				
+				//Bukkit.broadcastMessage(obj + " " + i);
+				//Bukkit.broadcastMessage("list : " + list);
 				if (obj == null || i == null)
 					return new ArrayList<Entity>();
 				

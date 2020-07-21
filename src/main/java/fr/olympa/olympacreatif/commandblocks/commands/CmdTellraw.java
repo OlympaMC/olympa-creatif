@@ -13,6 +13,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbCommandListener;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.md_5.bungee.api.ChatColor;
@@ -43,19 +44,25 @@ public class CmdTellraw extends CbCommand {
 		
 		String listAsString = StringEscapeUtils.unescapeJava(args[1].replace("\"\",", "").replace(",\"\"", ""));//.replace("\\", "\\\\");
 		
-		Bukkit.broadcastMessage("listAsString : " + listAsString);
+		//Bukkit.broadcastMessage("listAsString : " + listAsString);
+		text.addExtra(getJsonText(this, listAsString));
+	}
+
+	public static TextComponent getJsonText(CbCommand cmd, String component) {
 		
-		if (!listAsString.startsWith("["))
-			listAsString = "{rawText:[" + listAsString + "]}";
+		TextComponent text = new TextComponent();
+		
+		if (!component.startsWith("["))
+			component = "{rawText:[" + component + "]}";
 		else
-			listAsString = "{rawText:" + listAsString + "}";
+			component = "{rawText:" + component + "}";
 
 		
 		//Bukkit.broadcastMessage("basic string tag : " + listAsString);
 		
 		try {
 			
-			NBTTagList mainTag = MojangsonParser.parse(listAsString).getList("rawText", NBT.TAG_COMPOUND);
+			NBTTagList mainTag = MojangsonParser.parse(component).getList("rawText", NBT.TAG_COMPOUND);
 			
 			//Bukkit.broadcastMessage("tags : " + mainTag.asString());
 			
@@ -69,7 +76,7 @@ public class CmdTellraw extends CbCommand {
 					textPart.addExtra(tag.getString("text"));
 
 					//ajout HoverEvent
-					if (tag.hasKey("hoverEvent")) {
+					if (tag.hasKey("hoverEvent") && cmd != null) {
 						NBTTagCompound subTag = tag.getCompound("hoverEvent");
 						
 						if (subTag == null)
@@ -84,7 +91,7 @@ public class CmdTellraw extends CbCommand {
 					}
 					
 					//ajout ClickEvent
-					if (tag.hasKey("clickEvent")) {
+					if (tag.hasKey("clickEvent") && cmd != null) {
 						NBTTagCompound subTag = tag.getCompound("clickEvent");
 						
 						if (subTag == null)
@@ -98,8 +105,8 @@ public class CmdTellraw extends CbCommand {
 						textPart.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, value));
 					}
 					
-				}else if (tag.hasKey("selector")) {
-					List<Entity> list = parseSelector(tag.getString("selector"), false);
+				}else if (tag.hasKey("selector") && cmd != null) {
+					List<Entity> list = cmd.parseSelector(tag.getString("selector"), false);
 					String concat = "";
 					for (int j = 0 ; j < list.size() - 1 ; j++)
 						if (list.get(j).getType() == EntityType.PLAYER)
@@ -122,7 +129,7 @@ public class CmdTellraw extends CbCommand {
 					//Bukkit.broadcastMessage("selector : '" + concat + "'");
 					textPart.addExtra(concat);
 					
-				}else if (tag.hasKey("score")) {
+				}else if (tag.hasKey("score") && cmd != null) {
 					NBTTagCompound subTag = tag.getCompound("score");
 					
 					if (subTag == null)
@@ -134,8 +141,8 @@ public class CmdTellraw extends CbCommand {
 					if (name == null || obj == null)
 						continue;
 
-					List<Entity> list = parseSelector(name, false);
-					CbObjective cbObj = plot.getCbData().getObjective(obj);
+					List<Entity> list = cmd.parseSelector(name, false);
+					CbObjective cbObj = cmd.getPlot().getCbData().getObjective(obj);
 					
 					if (list.size() == 0 || cbObj == null)
 						continue;
@@ -149,11 +156,12 @@ public class CmdTellraw extends CbCommand {
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
+		
+		return text;
 	}
-
-	private TextComponent applyUniversalTags(NBTTagCompound tag) {
+	
+	private static TextComponent applyUniversalTags(NBTTagCompound tag) {
 		TextComponent subText = new TextComponent();
 		
 		//Bukkit.broadcastMessage("tag : " + tag.asString());

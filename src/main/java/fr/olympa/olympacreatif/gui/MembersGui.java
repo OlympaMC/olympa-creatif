@@ -30,7 +30,7 @@ public class MembersGui extends OlympaGUI {
 	private OlympaPlayerCreatif pc;
 	
 	public MembersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("§6Membres du plot : " + plot.getLoc().getId(true), 3);
+		super("§6Membres du plot : " + plot.getLoc(), 3);
 		
 		this.plugin = plugin;
 		this.p = p;
@@ -77,7 +77,7 @@ public class MembersGui extends OlympaGUI {
 			if (plot == null)
 				new MainGui(plugin, p, plot, "Menu").create(p);
 			else
-				new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc().getId(true)).create(p);
+				new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc()).create(p);
 			return true;
 		}
 

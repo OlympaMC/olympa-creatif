@@ -5,7 +5,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.command.CommandSender;
@@ -43,6 +45,9 @@ public class CbCommandListener implements Listener {
 			@Override
 			public void run() {
 				//ajoute aux plots le nombre de commandes par tick défini
+
+				//for (Plot plot : plugin.getPlotsManager().getPlots())
+					//Bukkit.broadcastMessage("plot : " + plot.getPlotId() + " - " + plot.getCbData().getCommandsLeft());
 				for (Plot plot : plugin.getPlotsManager().getPlots()) 
 					plot.getCbData().addCommandTickets((int) CommandBlocksManager.perTickAddedCommandsTickets);
 				
@@ -50,11 +55,11 @@ public class CbCommandListener implements Listener {
 				Iterator<Entry<Location, Integer>> iter = blockedExecutionLocs.entrySet().iterator();
 				while(iter.hasNext()) {
 					Entry<Location, Integer> e = iter.next();
-					if (e.getValue() + CommandBlocksManager.minTickBetweenEachCbExecution / 2 <= MinecraftServer.currentTick)
+					if (e.getValue() + CommandBlocksManager.minTickBetweenEachCbExecution <= MinecraftServer.currentTick)
 						iter.remove();
 				}					
 			}
-		}.runTaskTimer(plugin, 10, 2);
+		}.runTaskTimer(plugin, 10, 1);
 	}
 	
 	
@@ -68,17 +73,25 @@ public class CbCommandListener implements Listener {
 		
 		CommandBlock cb = ((CommandBlock)((CraftBlockCommandSender)e.getSender()).getBlock().getState());
 		
-		//si le commandblock va trop vite, cancel de la commande
-		if (blockedExecutionLocs.containsKey(cb.getLocation()))
-			return;
-		else
-			blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
-		
 		CbCommand cmd = getCommand(e.getSender(), cb.getLocation(), e.getCommand());
 		
 		if (cmd != null)
-			if (!cmd.getPlot().hasStoplag())
-				executeCommandBlockCommand(cmd, e.getSender());			
+			if (!cmd.getPlot().hasStoplag()) {
+				
+				//si le commandblock va trop vite, cancel de la commande
+				if (blockedExecutionLocs.containsKey(cb.getLocation()))
+					return;
+				else
+					//commandblock lents, max 1 cmd/s
+					if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
+						blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - CommandBlocksManager.minTickBetweenEachCbExecution);
+					else
+						blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
+				
+				//Bukkit.broadcastMessage("CB : " + cb.getLocation() + " - " + blockedExecutionLocs.get(cb.getLocation()));
+				
+				executeCommandBlockCommand(cmd, e.getSender());		
+			}	
 		
 	}
 	
@@ -125,7 +138,7 @@ public class CbCommandListener implements Listener {
 		else
 			neededCmdTickets = 1;
 		
-		if (cmd.getPlot().getCbData().getCommandsLeft() < neededCmdTickets) {
+		if (cmd.getPlot().getCbData().getCommandsTicketsLeft() < neededCmdTickets) {
 			//si le plot n'a plus assez de commandes restantes, cancel exécution
 			sender.sendMessage(Message.CB_NO_COMMANDS_LEFT.getValue());
 			return;

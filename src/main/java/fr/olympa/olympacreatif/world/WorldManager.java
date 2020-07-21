@@ -38,9 +38,14 @@ public class WorldManager {
 	
 	//TODO remplir la liste
 	private Map<Material, OlympaPermission> restrictedItems = new HashMap<Material, OlympaPermission>();
+	public static int maxEntitiesPerTypePerPlot;
+	public static int maxTotalEntitiesPerPlot;
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+
+		maxEntitiesPerTypePerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue());
+		maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
 
 		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);

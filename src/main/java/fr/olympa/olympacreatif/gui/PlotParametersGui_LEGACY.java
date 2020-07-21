@@ -41,7 +41,7 @@ public class PlotParametersGui_LEGACY extends OlympaGUI {
 	private String rainyWeather = "§eMétéo actuelle : pluvieuse";
 	
 	public PlotParametersGui_LEGACY(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("Paramètres du plot : " + plot.getLoc().getId(true), 2);
+		super("Paramètres du plot : " + plot.getLoc(), 2);
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
@@ -189,7 +189,7 @@ public class PlotParametersGui_LEGACY extends OlympaGUI {
 			if (plot == null)
 				new MainGui(plugin, p, plot, "Menu").create(p);
 			else
-				new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc().getId(true)).create(p);
+				new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc()).create(p);
 			return true;
 		}
 		

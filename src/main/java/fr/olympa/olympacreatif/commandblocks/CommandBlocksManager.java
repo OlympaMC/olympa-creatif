@@ -10,6 +10,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.boss.BossBar;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -30,7 +31,9 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
+import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
 import net.minecraft.server.v1_15_R1.ItemFireworks.EffectType;
 
 public class CommandBlocksManager {
@@ -43,7 +46,7 @@ public class CommandBlocksManager {
 	public static int maxTeamsPerPlot;
 	public static int maxObjectivesPerPlot;
 	
-	public static int maxCommandsLeft;
+	public static int maxCommandsTicketst;
 	public static double perTickAddedCommandsTickets;
 
 	public static int minTickBetweenEachCbExecution;
@@ -54,7 +57,7 @@ public class CommandBlocksManager {
 
 		maxTeamsPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_TEAMS_PER_PLOT.getValue());
 		maxObjectivesPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_OBJECTIVES_PER_PLOT.getValue());
-		maxCommandsLeft = Integer.valueOf(Message.PARAM_CB_MAX_CMDS_LEFT.getValue());
+		maxCommandsTicketst = Integer.valueOf(Message.PARAM_CB_MAX_CMDS_LEFT.getValue());
 		perTickAddedCommandsTickets = Double.valueOf(Message.PARAM_CB_PER_TICK_ADDED_CMDS.getValue());
 		
 		minTickBetweenEachCbExecution = Integer.valueOf(Message.PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue());
@@ -121,5 +124,10 @@ public class CommandBlocksManager {
 		
 		for (CbBossBar bar : fromPlot.getCbData().getBossBars().values())
 			bar.getBar().removePlayer(p);
+	}
+
+	public void setFakeOp(Player player) {
+		EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
 	}
 }

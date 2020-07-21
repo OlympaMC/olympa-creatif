@@ -12,9 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.NbtParserUtil;
 
@@ -55,7 +53,7 @@ public class CmdScoreboard extends CbCommand {
 				break;
 				
 			case list:
-				sender.sendMessage("§6  >>>  Objectifs du plot " + plot.getLoc().getId(true) + " <<<");
+				sender.sendMessage("§6  >>>  Objectifs du plot " + plot.getLoc() + " <<<");
 				for (CbObjective o : plotCbData.getObjectives()) {
 					String paramType = "";
 					if (o.getParamType() != null)
@@ -98,7 +96,7 @@ public class CmdScoreboard extends CbCommand {
 					if (obj == null)
 						return 0;
 					
-					obj.setName(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
+					obj.setName(args[4]);
 					return 1;
 				}
 				break;
@@ -234,6 +232,7 @@ public class CmdScoreboard extends CbCommand {
 							for (Entity e : list) {
 								obj.add(e, value);
 							}	
+							
 							return list.size();	
 						}else {
 							obj.add(args[2], value);
@@ -244,17 +243,20 @@ public class CmdScoreboard extends CbCommand {
 				break;
 				
 			case reset:
-				if (args.length >= 3) {
+				if (args.length >= 4) {
+					CbObjective obj = plotCbData.getObjective(args[3]);
+					if (obj == null)
+						return 0;
 					
 					if (args[2].startsWith("@")) {
 						List<Entity> list = parseSelector(args[2], false);
+
+						for (Entity e : list)
+							obj.set(e, null);
 						
-						for (CbObjective o : plotCbData.getObjectives())
-							for (Entity e : list)
-								o.set(e, null);
+						return list.size();
 					}else {
-						for (CbObjective o : plotCbData.getObjectives())
-							o.set(args[2], null);
+						obj.set(args[2], null);
 					}
 					return 1;
 				}
@@ -264,6 +266,9 @@ public class CmdScoreboard extends CbCommand {
 				if (args.length >= 5) {
 					CbObjective obj = plotCbData.getObjective(args[3]);
 					
+					if (obj == null) 
+						return 0;
+					
 					int value = 0;
 					
 					try {
@@ -271,27 +276,25 @@ public class CmdScoreboard extends CbCommand {
 					}catch (NumberFormatException e) {
 						return 0;
 					}
-					
-					if (obj != null) {
+
+					//ajout du score aux entités sélectionnées si un sélecteur a bien été utilisé
+					if (args[2].startsWith("@")) {
+						List<Entity> list = parseSelector(args[2], false);
 						
-						//ajout du score aux entités sélectionnées si un sélecteur a bien été utilisé
-						if (args[2].startsWith("@")) {
-							List<Entity> list = parseSelector(args[2], false);
-							
-							for (Entity e : list) {
-								obj.set(e, value);
-							}	
-							return list.size();	
-						}else {
-							Player p = Bukkit.getPlayer(args[2]);
-							
-							if (p != null && plot.getPlayers().contains(p))
-								obj.set(p, value);
-							else
-								obj.set(args[2], value);
-							
-							return 1;
-						}
+						for (Entity e : list) {
+							obj.set(e, value);
+						}	
+						
+						return list.size();	
+					}else {
+						Player p = Bukkit.getPlayer(args[2]);
+						
+						if (p != null && plot.getPlayers().contains(p))
+							obj.set(p, value);
+						else
+							obj.set(args[2], value);
+						
+						return 1;
 					}
 				}
 				break;

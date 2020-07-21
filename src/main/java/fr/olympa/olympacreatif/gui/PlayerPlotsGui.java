@@ -50,7 +50,7 @@ public class PlayerPlotsGui extends OlympaGUI {
 			
 			if (mat != null) {
 				playerPlots.add(plot);
-				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getLoc().getId(true), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName()));	
+				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getLoc(), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName()));	
 			}
 		}
 
@@ -65,7 +65,7 @@ public class PlayerPlotsGui extends OlympaGUI {
 			if (plot == null)
 				new MainGui(plugin, p, plot, "Menu").create(p);
 			else
-				new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc().getId(true)).create(p);
+				new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc()).create(p);
 			return true;
 		}
 		
