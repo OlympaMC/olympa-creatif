@@ -116,9 +116,9 @@ public class CmdTeam extends CbCommand {
 				CbTeam t;
 				
 				if (args.length >= 3)
-					t = new CbTeam(plugin, plot, args[1], NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
+					t = new CbTeam(plugin, plot, args[1], args[2]);
 				else
-					t = new CbTeam(plugin, plot, args[1], "");
+					t = new CbTeam(plugin, plot, args[1], null);
 				
 				if (plotCbData.registerTeam(t))
 					return 1;

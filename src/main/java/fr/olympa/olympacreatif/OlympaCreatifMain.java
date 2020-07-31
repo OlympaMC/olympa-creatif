@@ -2,7 +2,10 @@ package fr.olympa.olympacreatif;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.generator.ChunkGenerator;
+
+import fr.olympa.api.lines.DynamicLine;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
 import fr.olympa.api.permission.OlympaPermission;
@@ -42,10 +45,12 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	
 	public Random random = new Random();
 	
+	/*
 	@Override //retourne le générateur de chunks custom
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
 		return new CustomChunkGenerator(this);
 	}
+	*/
 	
 	public static OlympaCreatifMain getMainClass() {
 		return plugin;
@@ -107,86 +112,72 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		
 		
 		//initialisation lignes de base scoreboard
-		scm.addLines(
-				
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {
-					if (p.getOlympaPlayer().getCustomScoreboardLines().get(0) != null)
-						return p.getOlympaPlayer().getCustomScoreboardLines().get(0);
-					else
-						return "§1";
-				}, plugin, 20),
-
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {			
-					if (p.getOlympaPlayer().getCustomScoreboardLines().get(1) != null)
-						return p.getOlympaPlayer().getCustomScoreboardLines().get(1);
-					else {
-						PlotId plot = PlotId.fromLoc(this, p.getOlympaPlayer().getPlayer().getLocation());
-						if (plot == null)
-							return "§7Parcelle : §eaucune";
-						else
-							return "§7Parcelle : §e" + plot;
-					}
-				}, plugin, 20),
-
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {			
-					if (p.getOlympaPlayer().getCustomScoreboardLines().get(2) != null)
-						return p.getOlympaPlayer().getCustomScoreboardLines().get(2);
-					else {
-						Plot plot = plugin.getPlotsManager().getPlot(p.getOlympaPlayer().getPlayer().getLocation());
-						if (plot == null)
-							return "§7Proprio : §eaucun";
-						else
-							return "§7Proprio : §e" + plot.getMembers().getOwner().getName();
-					}
-				}, plugin, 20),
-
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {			
-					if (p.getOlympaPlayer().getCustomScoreboardLines().get(3) != null)
-						return p.getOlympaPlayer().getCustomScoreboardLines().get(3);
-					else
-						return "§2";
-				}, plugin, 20),
-				
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {				
-					if (p.getOlympaPlayer().getCustomScoreboardLines().get(4) != null)
-						return p.getOlympaPlayer().getCustomScoreboardLines().get(4);
-					else
-						return "§7Grade : " + p.getOlympaPlayer().getGroupNameColored();
-				}, plugin, 20),
-	
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {			
-					if (p.getOlympaPlayer().getCustomScoreboardLines().get(5) != null)
-						return p.getOlympaPlayer().getCustomScoreboardLines().get(5);
-					else {
-						Plot plot = plugin.getPlotsManager().getPlot(p.getOlympaPlayer().getPlayer().getLocation());
-						if (plot == null)
-							return "§7Rang : " + PlotRank.VISITOR.getRankName();
-						else
-							return "§7Rang : " + plot.getMembers().getPlayerRank(p.getOlympaPlayer()).getRankName();
-					}
-				}, plugin, 20),
-	
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {				
-					if (p.getOlympaPlayer().getCustomScoreboardLines().get(6) != null)
-						return p.getOlympaPlayer().getCustomScoreboardLines().get(6);
-					else
-						return "§3";
-				}, plugin, 20),
-	
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {			
-					if (p.getOlympaPlayer().getCustomScoreboardLines().get(7) != null)
-						return p.getOlympaPlayer().getCustomScoreboardLines().get(7);
-					else
-						return "§7Kumars : §6" + p.getOlympaPlayer().getGameMoneyFormated();
-				}, plugin, 20)
-		);
-		
+		for (int i = 0 ; i < OlympaPlayerCreatif.scoreboardLinesSize ; i++) {
+			final int line = i;
+			
+			scm.addLines(
+					new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {
+						return getLine(p.getOlympaPlayer(), line);
+					}, plugin, 20)
+				);	
+		}
 		scm.addFooters(
 				FixedLine.EMPTY_LINE,
 				//new AnimLine<LinesHolder<T>>(plugin, animation, ticksAmount, ticksBetween)
-				//AnimLine.olympaAnimation(plugin)
+				//AnimLine.olympaAnimation(plugin),
 				new FixedLine<Scoreboard<OlympaPlayerCreatif>>("§6play.olympa.fr")
 				);
+	}
+	
+	public String getLine(OlympaPlayerCreatif p, int i) {
+		 
+		//Bukkit.broadcastMessage(message)
+		
+		if (p.getCustomScoreboardLines().size() > i) {
+			Bukkit.broadcastMessage("ligne " + i + " : " + p.getCustomScoreboardLines().get(i));
+			return p.getCustomScoreboardLines().get(i);	
+		}
+		
+		Plot plot;
+		switch (i) {
+		case 0:
+			return "§1";
+			
+		case 1:
+			PlotId plotId = PlotId.fromLoc(this, p.getPlayer().getLocation());
+			if (plotId == null)
+				return "§7Parcelle : §eaucune";
+			else
+				return "§7Parcelle : §e" + plotId;
+			
+		case 2:
+			plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
+			if (plot == null)
+				return "§7Proprio : §eaucun";
+			else
+				return "§7Proprio : §e" + plot.getMembers().getOwner().getName();
+			
+		case 3:
+			return "§2";
+			
+		case 4:
+			return "§7Grade : " + p.getGroupNameColored();
+			
+		case 5:
+			plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
+			if (plot == null)
+				return "§7Rang : " + PlotRank.VISITOR.getRankName();
+			else
+				return "§7Rang : " + plot.getMembers().getPlayerRank(p).getRankName();
+			
+		case 6:
+			return "§3";
+			
+		case 7:
+			return "§7Kumars : §6" + p.getGameMoneyFormated();
+			
+		}
+		return "";
 	}
 
 	public WorldManager getWorldManager() {

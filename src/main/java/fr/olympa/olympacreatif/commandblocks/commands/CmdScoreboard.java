@@ -40,9 +40,9 @@ public class CmdScoreboard extends CbCommand {
 				if (args.length >= 4) {
 					CbObjective obj = null;
 					if (args.length >= 5)
-						obj = new CbObjective(plugin, plot, args[3], args[2], NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
+						obj = new CbObjective(plugin, plot, args[3], args[2], args[4]);
 					else
-						obj = new CbObjective(plugin, plot, args[3], args[2], args[2]);
+						obj = new CbObjective(plugin, plot, args[3], args[2], null);
 					
 					if (obj.getType() == null)
 						return 0;
@@ -256,7 +256,12 @@ public class CmdScoreboard extends CbCommand {
 						
 						return list.size();
 					}else {
-						obj.set(args[2], null);
+						Player p = Bukkit.getPlayer(args[2]);
+						
+						if (p == null)
+							obj.set(args[2], null);
+						else
+							obj.set(p, null);
 					}
 					return 1;
 				}

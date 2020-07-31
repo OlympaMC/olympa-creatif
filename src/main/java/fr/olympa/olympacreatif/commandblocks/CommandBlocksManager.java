@@ -102,7 +102,7 @@ public class CommandBlocksManager {
 			if (obj.getDisplaySlot() == DisplaySlot.SIDEBAR) {
 				
 				pc.setCustomScoreboardTitle(obj.getName());
-				pc.setCustomScoreboardValues(obj.getValues(true));
+				pc.setCustomScoreboardLines(obj.getValues(true));
 			}	
 		}
 	}

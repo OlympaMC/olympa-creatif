@@ -30,6 +30,7 @@ import fr.olympa.olympacreatif.commandblocks.commands.CmdTellraw;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.JSONtextUtil;
 import fr.olympa.olympacreatif.utils.NbtParserUtil;
 import net.minecraft.server.v1_15_R1.ChatMessage;
 import net.minecraft.server.v1_15_R1.EntityArmorStand;
@@ -69,12 +70,16 @@ public class CbTeam {
 	
 	public void setName(String newTeamName) {
 		if (newTeamName == null)
-			return;
+			teamName = "";
+		else
+			teamName = JSONtextUtil.getJsonText(newTeamName).toLegacyText();
 		
-		teamName = CmdTellraw.getJsonText(null, newTeamName).getText();
 		for (Entity e : members)
 			if (e.getType() == EntityType.PLAYER)
-				OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
+				if (teamName.equals(""))
+					OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
+				else
+					OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
 	}
 	
 	public Plot getPlot() {
@@ -91,7 +96,7 @@ public class CbTeam {
 		
 		members.add(e);
 		
-		if (e.getType() == EntityType.PLAYER) 
+		if (e.getType() == EntityType.PLAYER && !teamName.equals("")) 
 			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
 		
 		

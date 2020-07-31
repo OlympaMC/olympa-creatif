@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -24,6 +25,7 @@ import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.commandblocks.commands.CmdTellraw;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.JSONtextUtil;
 
 public class CbObjective {
 
@@ -161,9 +163,9 @@ public class CbObjective {
 	
 	public void setName(String newObjName) {
 		if (newObjName == null)
-			return;
-		
-		newObjName = CmdTellraw.getJsonText(null, newObjName).getText();
+			newObjName = objId;
+		else		
+			newObjName = JSONtextUtil.getJsonText(newObjName).toLegacyText();
 		
 		if (!newObjName.equals(objName)) {
 			if (displaySlot == DisplaySlot.BELOW_NAME)
@@ -183,7 +185,11 @@ public class CbObjective {
 	}
 	
 	public Map<String, Integer> getValues(boolean sortValues){
-		Map<String, Integer> values = new HashMap<String, Integer>(stringHolders);
+		Map<String, Integer> values = new HashMap<String, Integer>();
+		
+		for (Entry<String, Integer> e : stringHolders.entrySet())
+			//values.put(ChatColor.translateAlternateColorCodes('&', e.getKey().replace("_", " ")), e.getValue());
+			values.put(e.getKey(), e.getValue());
 		
 		for (Entry<Entity, Integer> e : entityHolders.entrySet())
 			if (e.getKey().getType() == EntityType.PLAYER)
@@ -227,7 +233,7 @@ public class CbObjective {
 	//gestion sidebar/belowname ici
 	public void set(String name, Integer value) {
 		
-		name = ChatColor.translateAlternateColorCodes('&', name).replace("_", " ");
+		//name = ChatColor.translateAlternateColorCodes('&', name.replace("_", " "));
 		
 		if (value == null)
 			stringHolders.remove(name);
@@ -236,9 +242,12 @@ public class CbObjective {
 		
 		//affichage scoreboard sidebar
 		if (displaySlot == DisplaySlot.SIDEBAR) {
-
+			Map<String, Integer> values = getValues(true);
+			
 			for (Player p : plot.getPlayers()) 
-				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardValues(getValues(true));	
+				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(values);
+			
+			//Bukkit.broadcastMessage("SCORES " + objId + " : " + values);	
 		}
 	}
 
@@ -272,6 +281,14 @@ public class CbObjective {
 			entityHolders.remove(e);
 		else
 			entityHolders.put(e, value);
+		
+		//affichage scoreboard sidebar
+		if (displaySlot == DisplaySlot.SIDEBAR) {
+			Map<String, Integer> values = getValues(true);
+			
+			for (Player p : plot.getPlayers()) 
+				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(values);	
+		}
 	}
 	
 	public int get(Entity e) {
@@ -301,7 +318,7 @@ public class CbObjective {
 				OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 				
 				pc.setCustomScoreboardTitle(getName());
-				pc.setCustomScoreboardValues(scores);
+				pc.setCustomScoreboardLines(scores);
 			}	
 		}
 		return 1;

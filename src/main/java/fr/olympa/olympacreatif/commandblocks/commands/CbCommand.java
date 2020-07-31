@@ -67,7 +67,7 @@ public abstract class CbCommand {
 	
 	//parse le selecteur et ses paramètres : x, y, z, dx, dy, dz, distance, name, team, scores, level, type
 	@SuppressWarnings("deprecation")
-	protected List<Entity> parseSelector(String s, boolean onlyPlayers){
+	public List<Entity> parseSelector(String s, boolean onlyPlayers){
 		String selector = "";
 		Map<String, String> params = new HashMap<String, String>(); 
 		
