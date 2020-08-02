@@ -139,9 +139,13 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		
 		for (int i = 1 ; i < scoreboardLinesSize ; i++)
 			if (keys.size() >= i)
-				scoreboardLines.set(i, keys.get(i - 1) + " §r: " + values.get(i - 1));
+				//si le string commence et finit par %, on n'affiche pas le score
+				if (keys.get(i - 1).startsWith("%") && keys.get(i - 1).endsWith("%"))
+					scoreboardLines.set(i, keys.get(i - 1));
+				else
+					scoreboardLines.set(i, keys.get(i - 1) + "§r§7 : " + values.get(i - 1));
 			else
-				scoreboardLines.set(i, "&" + i);
+				scoreboardLines.set(i, "§" + i);
 		
 		//Bukkit.broadcastMessage("Set CS : " + scoreboardLines);
 	}
@@ -154,7 +158,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	private void initCustomScoreboard() {
 		if (scoreboardLines.size() == 0)
 			for (int i = 0 ; i < scoreboardLinesSize ; i++)
-				scoreboardLines.add("&" + i);
+				scoreboardLines.add("§" + i);
 	}
 	
 	public void clearCustomScoreboard() {

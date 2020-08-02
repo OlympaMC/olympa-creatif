@@ -187,14 +187,18 @@ public class CbObjective {
 	public Map<String, Integer> getValues(boolean sortValues){
 		Map<String, Integer> values = new HashMap<String, Integer>();
 		
+		//copie valeurs strings
 		for (Entry<String, Integer> e : stringHolders.entrySet())
-			//values.put(ChatColor.translateAlternateColorCodes('&', e.getKey().replace("_", " ")), e.getValue());
-			values.put(e.getKey(), e.getValue());
+			values.put(ChatColor.translateAlternateColorCodes('&', e.getKey().replace("_", " ")), e.getValue());
+			//values.put(e.getKey(), e.getValue());
 		
+		//copie valeurs entités
 		for (Entry<Entity, Integer> e : entityHolders.entrySet())
+			//si joueur, copie nom avec grade
 			if (e.getKey().getType() == EntityType.PLAYER)
 				values.put((AccountProvider.get(e.getKey().getUniqueId())).getGroupNameColored() + " " + e.getKey().getName(), e.getValue());
 			else
+				//si entité, copie custom name ou type entité par défaut
 				if (e.getKey().getCustomName() != null)
 					values.put(e.getKey().getCustomName(), e.getValue());
 				else

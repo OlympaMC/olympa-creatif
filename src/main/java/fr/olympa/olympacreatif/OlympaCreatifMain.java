@@ -101,17 +101,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	//crée le scoreboard du joueur avec des lignes dynamiques, pour afficher le scoreboard custom du plot si besoin
 	@SuppressWarnings("unchecked")
 	private void createScoreboard() {
-		scm = new ScoreboardManager<OlympaPlayerCreatif>(plugin, "§6Olympa Créatif");
-/*
-		scm.addLines(new TimerLine<OlympaPlayerCreatif>( p -> {
-						if (p.getCustomScoreboardLines().get(0) != null)
-							return p.getCustomScoreboardLines().get(0);
-						else
-							return "super test";
-					}, plugin, 20));*/
+		scm = new ScoreboardManager<OlympaPlayerCreatif>(plugin, "§6Olympa Créatif");		
 		
-		
-		//initialisation lignes de base scoreboard
+		//initialisation lignes scoreboard
 		for (int i = 0 ; i < OlympaPlayerCreatif.scoreboardLinesSize ; i++) {
 			final int line = i;
 			
@@ -122,9 +114,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 				);	
 		}
 		scm.addFooters(
-				FixedLine.EMPTY_LINE,
-				//new AnimLine<LinesHolder<T>>(plugin, animation, ticksAmount, ticksBetween)
-				//AnimLine.olympaAnimation(plugin),
+
+				new TimerLine<Scoreboard<OlympaPlayerCreatif>>( p -> {
+					return getLine(p.getOlympaPlayer(), OlympaPlayerCreatif.scoreboardLinesSize + 1);
+				}, plugin, 20),
+				
 				new FixedLine<Scoreboard<OlympaPlayerCreatif>>("§6play.olympa.fr")
 				);
 	}
@@ -133,18 +127,18 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		 
 		//Bukkit.broadcastMessage(message)
 		
-		if (p.getCustomScoreboardLines().size() > i) {
-			Bukkit.broadcastMessage("ligne " + i + " : " + p.getCustomScoreboardLines().get(i));
+		if (p.getCustomScoreboardLines().size() > i) 
 			return p.getCustomScoreboardLines().get(i);	
-		}
+		
 		
 		Plot plot;
+		PlotId plotId;
 		switch (i) {
 		case 0:
 			return "§1";
 			
 		case 1:
-			PlotId plotId = PlotId.fromLoc(this, p.getPlayer().getLocation());
+			plotId = PlotId.fromLoc(this, p.getPlayer().getLocation());
 			if (plotId == null)
 				return "§7Parcelle : §eaucune";
 			else
@@ -176,6 +170,13 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		case 7:
 			return "§7Kumars : §6" + p.getGameMoneyFormated();
 			
+		case 8:
+			plotId = PlotId.fromLoc(this, p.getPlayer().getLocation());
+			
+			if (p.getCustomScoreboardLines().size() > 0 && plotId != null)
+				return "§8Sidebar plot " + plotId;
+			else
+				return "§4";
 		}
 		return "";
 	}
