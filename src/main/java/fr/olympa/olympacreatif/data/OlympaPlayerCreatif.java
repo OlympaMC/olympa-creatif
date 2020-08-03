@@ -28,19 +28,19 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	public static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
 			.put("bonusPlots", "INT NOT NULL DEFAULT 0")
 			.put("gameMoney", "INT NOT NULL DEFAULT 0")
-			.put("hasRedstoneKit", "BOOLEAN NOT NULL DEFAULT FALSE")
-			.put("hasPeacefulMobsKit", "BOOLEAN NOT NULL DEFAULT FALSE")
-			.put("hasHostileMobsKit", "BOOLEAN NOT NULL DEFAULT FALSE")
-			.put("hasFluidKit", "BOOLEAN NOT NULL DEFAULT FALSE")
-			.put("hasCommandblockKit", "BOOLEAN NOT NULL DEFAULT FALSE")
-			.put("hasAdminKit", "BOOLEAN NOT NULL DEFAULT FALSE")
+			.put("hasRedstoneKit", "TINYINT NOT NULL DEFAULT 0")
+			.put("hasPeacefulMobsKit", "TINYINT NOT NULL DEFAULT 0")
+			.put("hasHostileMobsKit", "TINYINT NOT NULL DEFAULT 0")
+			.put("hasFluidKit", "TINYINT NOT NULL DEFAULT 0")
+			.put("hasCommandblockKit", "TINYINT NOT NULL DEFAULT 0")
+			.put("hasAdminKit", "TINYINT NOT NULL DEFAULT 0")
 			.build();
 	
 	private OlympaCreatifMain plugin;
 	private int gameMoney = 0;
 	private int bonusPlots = 0;
 
-	private Map<KitType, Boolean> kits = new HashMap<KitType, Boolean>();
+	private List<KitType> kits = new ArrayList<KitType>();
 	
 	private List<String> scoreboardLines = new ArrayList<String>();
 	public static final int scoreboardLinesSize = 8;
@@ -59,9 +59,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		
 		for (KitType kit : KitType.values())
 			if (resultSet.getBoolean(kit.getBddKey()))
-				kits.put(kit, true);
-			else
-				kits.put(kit, false);
+				kits.add(kit);
 	}
 	
 	@Override
@@ -70,8 +68,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		statement.setInt(2, gameMoney);
 
 		for (int i = 3 ; i < 3 + KitType.values().length ; i++)
-			if (kits.containsKey(KitType.values()[i - 3]))
-				statement.setBoolean(i, kits.get(KitType.values()[i - 3]));
+			if (kits.contains(KitType.values()[i - 3]))
+				statement.setBoolean(i, true);
 			else
 				statement.setBoolean(i, false);
 	}
@@ -97,7 +95,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	}
 	
 	public boolean hasKit(KitType kit) {
-		return kits.get(kit);
+		return kits.contains(kit);
 	}
 	
 	//renvoie la liste des plots où le joueur est membre
@@ -120,11 +118,11 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		int i = 1 + bonusPlots;
 
 		if (getGroup() == OlympaGroup.CREA_CREATOR)
-			i += 9;
+			i += 3;
 		else if(getGroup() == OlympaGroup.CREA_ARCHITECT)
-			i += 5;
+			i += 3;
 		else if(getGroup() == OlympaGroup.CREA_CONSTRUCTOR)
-			i += 2;
+			i += 1;
 
 		return i;
 	}

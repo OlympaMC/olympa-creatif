@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,10 +27,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -45,18 +40,20 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
 import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.KitsManager.KitType;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
-import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
 
 public class WorldEventsListener implements Listener{
 
@@ -121,7 +118,7 @@ public class WorldEventsListener implements Listener{
 							
 							PlotId id = PlotId.fromLoc(plugin, entity.getLocation());
 							
-							//supprime l'entité si en dehors d'un plot (sauf si armorstand, peinture ou cadre) ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
+							//supprime l'entité si en dehors d'un plot ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
 							if (id == null) {
 								entitiesToRemove.add(entity);
 							}else {
@@ -185,28 +182,6 @@ public class WorldEventsListener implements Listener{
 				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG)
 			e.setCancelled(true);
 	}
-	
-	/*
-	@EventHandler //cancel évent si trop grand nombre spawnées simultanément dans un plot donné
-	public void onEntitySpawn(EntitySpawnEvent e) {
-		if (e.isCancelled() || e.getEntityType() == EntityType.PLAYER)
-			return;
-		
-		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
-		
-		if (plot == null) {
-			e.setCancelled(true);
-			return;
-		}
-		
-		if (spawnEntities.containsKey(plot)) {
-			spawnEntities.put(plot, spawnEntities.get(plot)+1);
-			if (spawnEntities.get(plot) > WorldManager.maxEntitiesPerTypePerPlot)
-				e.setCancelled(true);
-		}else
-			spawnEntities.put(plot, 1);
-	}
-	*/
 
 	@EventHandler
 	public void onFireSpread(BlockSpreadEvent e) {
@@ -279,53 +254,9 @@ public class WorldEventsListener implements Listener{
 		e.setCurrentItem(ItemUtils.name(e.getCurrentItem(), ChatColor.translateAlternateColorCodes('&',	e.getCurrentItem().getItemMeta().getDisplayName())));
 	}
 	
-	//Gestion des items restreints
-	
-	@EventHandler //test dans inventaires
-	public void onLimitedItemInventory(InventoryClickEvent e) {
-		if (!(e.getWhoClicked() instanceof Player))
-			return;
-		
-		OlympaPlayer p = AccountProvider.get(e.getWhoClicked().getUniqueId());
-		
-		if (e.getCurrentItem() != null)
-			if (!plugin.getWorldManager().hasPlayerPermissionFor(p, e.getCurrentItem().getType(), false)){
-				e.setCancelled(true);
-			}
-	}
-	
-	
-	@EventHandler //cancel pickup item restreint
-	public void onPickup(EntityPickupItemEvent e) {
-		if (e.getEntityType() != EntityType.PLAYER)
-			return;
-
-		if (!plugin.getWorldManager().hasPlayerPermissionFor(AccountProvider.get(e.getEntity().getUniqueId()), e.getItem().getItemStack().getType(), false))
-			e.setCancelled(true);
-	}
-	
-	@EventHandler //cancel interact item restreint
-	public void onInterract(PlayerInteractEvent e) {
-		if (e.getItem() == null)
-			return;
-		
-		if (!plugin.getWorldManager().hasPlayerPermissionFor(AccountProvider.get(e.getPlayer().getUniqueId()), e.getItem().getType(), true)){
-			e.setCancelled(true);
-			e.getItem().setType(Material.STONE);
-		}
-	}
-	
-	
-	
 	@EventHandler //cancel potions jetables si effet >5
 	public void onSplashPotionEvent(PotionSplashEvent e) {
 		for (PotionEffect effect : e.getPotion().getEffects())
-			if (effect.getAmplifier() >= 5)
-				e.setCancelled(true);
-	}
-	@EventHandler //cancel potions persistantes si effet >5
-	public void onLingeringPotionEvent(LingeringPotionSplashEvent e) {
-		for (PotionEffect effect : e.getAreaEffectCloud().getCustomEffects())
 			if (effect.getAmplifier() >= 5)
 				e.setCancelled(true);
 	}
@@ -425,5 +356,32 @@ public class WorldEventsListener implements Listener{
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits
+	public void onInterract(PlayerInteractEvent e) {
+		
+		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
+		
+		//retrictions dues aux kits
+		if (!plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getMaterial())) {
+			e.setCancelled(true);
+			e.getPlayer().getInventory().setItem(e.getHand(), plugin.getPerksManager().getKitsManager().getNoKitPermItem(e.getMaterial()));
+			return;
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits
+	public void onItemPickup(EntityPickupItemEvent e) {
+		if (e.getEntityType() != EntityType.PLAYER)
+			return;
+		
+		OlympaPlayerCreatif p = AccountProvider.get(e.getEntity().getUniqueId());
+		
+		//retrictions dues aux kits
+		if (!plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getItem().getItemStack().getType())) {
+			e.getItem().setItemStack(plugin.getPerksManager().getKitsManager().getNoKitPermItem(e.getItem().getItemStack().getType()));
+			return;
+		}
 	}
 }

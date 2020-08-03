@@ -21,6 +21,7 @@ import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -32,6 +33,7 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -41,6 +43,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -56,6 +59,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_15_R1.ItemPickaxe;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.PacketPlayOutTileEntityData;
 import net.minecraft.server.v1_15_R1.TileEntity;
@@ -134,6 +138,8 @@ public class PlotsInstancesListener implements Listener{
 
 	@EventHandler //test place block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
+		if (e.isCancelled())
+			return;
 		
 		if(((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
 			return;
@@ -204,15 +210,15 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
-		if (((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
-			return;
+		
+		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		
 		if (e.getClickedBlock() == null)
 			return;
 		
 		plot = plugin.getPlotsManager().getPlot(e.getClickedBlock().getLocation());
 
-		if (plot == null) {
+		if (plot == null && !p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 			return;
@@ -241,68 +247,70 @@ public class PlotsInstancesListener implements Listener{
 
 		//GESTION COMMAND BLOCKS
 		//si édition/placement du commandblock
-		if (playerRank == PlotRank.OWNER && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			Block block = e.getClickedBlock();
-			ItemStack item = e.getItem();
+		if (plot.getMembers().getPlayerLevel(p) >= 3 && plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getMaterial())) {
 			
-			//si le block cliqué est un commandblock, ouverture interface
-			if (block != null && commandBlockTypes.contains(block.getType()) && !e.getPlayer().isSneaking()) {
+			if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+				Block block = e.getClickedBlock();
+				ItemStack item = e.getItem();
 				
-				BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
-				
-				NBTTagCompound tag = new NBTTagCompound();
-				plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
-				
-				PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
-				
-		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
-		        nmsPlayer.playerConnection.sendPacket(packet);
-		        
-			//si l'item en main est un commandblock, placement de ce dernier
-			}else if (item != null && commandBlockTypes.contains(item.getType())){
-				
-				//return si le Y est trop bas ou trop haut
-				if (e.getClickedBlock().getLocation().getBlockY() < 2 || e.getClickedBlock().getLocation().getBlockY() > 254)
-					return;
-				
-				Location loc = null;
-				
-				switch(e.getBlockFace()) {
-				case DOWN:
-					loc = e.getClickedBlock().getLocation().add(0, -1, 0);
-					break;
-				case EAST:
-					loc = e.getClickedBlock().getLocation().add(1, 0, 0);
-					break;
-				case NORTH:
-					loc = e.getClickedBlock().getLocation().add(0, 0, -1);
-					break;
-				case SOUTH:
-					loc = e.getClickedBlock().getLocation().add(0, 0, 1);
-					break;
-				case UP:
-					loc = e.getClickedBlock().getLocation().add(0, 1, 0);
-					break;
-				case WEST:
-					loc = e.getClickedBlock().getLocation().add(-1, 0, 0);
-					break;
-				default:
-					return;
-				
+				//si le block cliqué est un commandblock, ouverture interface
+				if (block != null && commandBlockTypes.contains(block.getType()) && !e.getPlayer().isSneaking()) {
+					
+					BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
+					
+					NBTTagCompound tag = new NBTTagCompound();
+					plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
+					
+					PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
+					
+			        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
+			        nmsPlayer.playerConnection.sendPacket(packet);
+			        
+				//si l'item en main est un commandblock, placement de ce dernier
+				}else if (item != null && commandBlockTypes.contains(item.getType())){
+					
+					//return si le Y est trop bas ou trop haut
+					if (e.getClickedBlock().getLocation().getBlockY() < 2 || e.getClickedBlock().getLocation().getBlockY() > 254)
+						return;
+					
+					Location loc = null;
+					
+					switch(e.getBlockFace()) {
+					case DOWN:
+						loc = e.getClickedBlock().getLocation().add(0, -1, 0);
+						break;
+					case EAST:
+						loc = e.getClickedBlock().getLocation().add(1, 0, 0);
+						break;
+					case NORTH:
+						loc = e.getClickedBlock().getLocation().add(0, 0, -1);
+						break;
+					case SOUTH:
+						loc = e.getClickedBlock().getLocation().add(0, 0, 1);
+						break;
+					case UP:
+						loc = e.getClickedBlock().getLocation().add(0, 1, 0);
+						break;
+					case WEST:
+						loc = e.getClickedBlock().getLocation().add(-1, 0, 0);
+						break;
+					default:
+						return;
+					
+					}
+					
+					cbPlacementLocation.add(loc);
+					cbPlacementPlayer.add(e.getPlayer());
+					cbPlacementTypeCb.add(e.getItem().getType());
+					
+					e.getItem().setType(Material.DISPENSER);
 				}
-				
-				cbPlacementLocation.add(loc);
-				cbPlacementPlayer.add(e.getPlayer());
-				cbPlacementTypeCb.add(e.getItem().getType());
-				
-				e.getItem().setType(Material.DISPENSER);
+			}else if (e.getAction() == Action.LEFT_CLICK_BLOCK) {
+				if (commandBlockTypes.contains(e.getClickedBlock().getType()))
+					e.getClickedBlock().setType(Material.AIR);
 			}
-		}else if (playerRank == PlotRank.OWNER && e.getAction() == Action.LEFT_CLICK_BLOCK) {
-			if (commandBlockTypes.contains(e.getClickedBlock().getType()))
-				e.getClickedBlock().setType(Material.AIR);
 		}
 	}
-	
 	
 	@EventHandler //cancel interraction avec un itemframe
 	public void onInterractEntityEvent(PlayerInteractEntityEvent e) {

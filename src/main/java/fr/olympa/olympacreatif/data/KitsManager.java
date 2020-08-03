@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
+import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.KitsManager.KitType;
 
 public class KitsManager {
 
@@ -22,6 +26,32 @@ public class KitsManager {
 	public KitType getKitOf(Material mat) {
 		return kits.get(mat);
 	}
+    
+    public boolean hasPlayerPermissionFor(OlympaPlayerCreatif p, Material mat) {
+		
+		KitType kit = getKitOf(mat);
+		
+		if (kit != null && !p.hasKit(kit)) {
+			//p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue());
+			return false;
+		}else
+			return true;
+    }
+
+	public List<Material> getMaterialsOf(KitType kit) {
+		List<Material> list = new ArrayList<Material>();
+		
+		for (Entry<Material, KitType> e : kits.entrySet()) 
+			if (e.getValue() == kit)
+				list.add(e.getKey());
+		return list;
+	}
+	
+	public ItemStack getNoKitPermItem(Material mat) {
+		
+		String errorMsg = "§cLe kit §6" + getKitOf(mat) + " §cest requis pour utiliser §6" + mat;
+		return ItemUtils.item(Material.STONE, errorMsg);
+	}
 	
 	private void initKitItems() {
 		List<Material> list = new ArrayList<Material>();
@@ -30,6 +60,10 @@ public class KitsManager {
 		list.add(Material.STRUCTURE_VOID);
 		list.add(Material.STRUCTURE_BLOCK);
 		list.add(Material.LINGERING_POTION);
+		
+		list.forEach(mat -> kits.put(mat, KitType.ADMIN));
+		list.clear();
+		
 		
 		list.add(Material.REDSTONE_TORCH);
 		list.add(Material.REDSTONE_WALL_TORCH);

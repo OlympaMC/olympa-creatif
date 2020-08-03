@@ -1,9 +1,5 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -20,16 +16,23 @@ public class CmdGive extends CbCommand {
 	
 	public CmdGive(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(type, sender, loc, plugin, plot, args);
+	}
+	
+	@Override
+	public int execute() {
+		
+		if (args.length < 2)
+			return 0;
 	
 		targetEntities = parseSelector(args[0], true);
 		
-		if (args.length < 2)
-			return;
+		if (targetEntities.size() == 0)
+			return 0;
 		
 		item = getItemFromString(args[1]);
 		
 		if (item == null)
-			return;
+			return 0;
 		
 		int amount = 1;
 		
@@ -45,21 +48,16 @@ public class CmdGive extends CbCommand {
 				amount = (int)(double)range[1];
 		}
 		
-		if (item == null || amount < 0 || amount > 2500)
-			return;
-		
-		item.setAmount(amount);
-	}
-	
-	@Override
-	public int execute() {
-		if (item == null)
+		if (amount < 0 || amount > 3000)
 			return 0;
 		
-		for (Entity e : targetEntities)
-			if (plugin.getWorldManager().hasPlayerPermissionFor(AccountProvider.get(e.getUniqueId()), item.getType(), false))
-				((Player) e).getInventory().addItem(item);
+		item.setAmount(amount);
 		
+		for (Entity e : targetEntities)
+			if (plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(AccountProvider.get(e.getUniqueId()), item.getType()))
+				((Player) e).getInventory().addItem(item);
+			else
+				((Player) e).getInventory().addItem(plugin.getPerksManager().getKitsManager().getNoKitPermItem(item.getType()));
 		
 		return targetEntities.size();
 	}

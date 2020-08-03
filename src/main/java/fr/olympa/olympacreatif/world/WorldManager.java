@@ -36,7 +36,6 @@ public class WorldManager {
 	public static final int worldLevel = 60;
 	
 	//TODO remplir la liste
-	private Map<Material, OlympaPermission> restrictedItems = new HashMap<Material, OlympaPermission>();
 	public static int maxEntitiesPerTypePerPlot;
 	public static int maxTotalEntitiesPerPlot;
 	
@@ -127,21 +126,5 @@ public class WorldManager {
 	
 	public net.minecraft.server.v1_15_R1.World getNmsWorld(){
 		return nmsWorld;
-	}
-	
-	public Map<Material, OlympaPermission> getRestrictedItems(){
-		return restrictedItems;
-	}
-
-	//true si le joueur a la permission d'utiliser l'objet désigné
-	public boolean hasPlayerPermissionFor(OlympaPlayer p, Material mat, boolean setStoneInMainHand) {
-		if (plugin.getWorldManager().getRestrictedItems().keySet().contains(mat))
-			if (!plugin.getWorldManager().getRestrictedItems().get(mat).hasPermission(p.getUniqueId())) {
-				if (setStoneInMainHand)
-					if (p.getPlayer().getInventory().getItemInMainHand() != null)
-						ItemUtils.name(p.getPlayer().getInventory().getItemInMainHand(), Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", plugin.getWorldManager().getRestrictedItems().get(mat).toString().toLowerCase().replace("_", " ")));
-				return true;
-			}
-		return true;
 	}
 }

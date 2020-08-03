@@ -3,6 +3,8 @@ package fr.olympa.olympacreatif.world;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
@@ -17,6 +19,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.KitsManager.KitType;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -24,12 +27,17 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import net.minecraft.server.v1_15_R1.ItemStack;
+import net.minecraft.server.v1_15_R1.PacketPlayInBlockPlace;
+import net.minecraft.server.v1_15_R1.PacketPlayInPickItem;
 import net.minecraft.server.v1_15_R1.PacketPlayInSetCreativeSlot;
+import net.minecraft.server.v1_15_R1.PacketPlayInUseItem;
+import net.minecraft.server.v1_15_R1.PacketPlayOutBlockChange;
+import net.minecraft.server.v1_15_R1.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_15_R1.PacketPlayOutSetSlot;
 
 public class PacketListener implements Listener {
 
 	OlympaCreatifMain plugin;
-	private Map<Material, OlympaPermission> restrictedItems = new HashMap<Material, OlympaPermission>();
 	
 	public PacketListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -62,30 +70,29 @@ public class PacketListener implements Listener {
         	
             @Override
             public void channelRead(ChannelHandlerContext channelHandlerContext, Object handledPacket) throws Exception {
-            	//Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "PACKET READ: " + ChatColor.RED + packet.toString());
+            	//Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "PACKET READ: " + ChatColor.RED + handledPacket.toString());
                 
             	if (handledPacket instanceof PacketPlayInSetCreativeSlot) {
-            		
             		PacketPlayInSetCreativeSlot packet = ((PacketPlayInSetCreativeSlot) handledPacket);
             		
             		if (packet.getItemStack() != null){
                 		
-                		KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(CraftItemStack.asBukkitCopy(packet.getItemStack()).getType());
-                		
-                		if (kit != null && !p.hasKit(kit))
+                		if (!plugin.getPerksManager().getKitsManager().
+                				hasPlayerPermissionFor(p, CraftItemStack.asBukkitCopy(packet.getItemStack()).getType()))
                 			return;
                 		
                 		if (packet.getItemStack().getTag() != null)
                     		packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag()));
             		}
-            	}
-            	
+            	}            	
             	
             	super.channelRead(channelHandlerContext, handledPacket);
             }
 
             @Override
             public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception {
+            	//Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "PACKET OUTPUT: " + ChatColor.RED + packet.toString());
+            	
                 super.write(channelHandlerContext, packet, channelPromise);
             }
         };

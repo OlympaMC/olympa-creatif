@@ -18,11 +18,15 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -71,32 +75,34 @@ public class CbCommandListener implements Listener {
 		
 		e.setCancelled(true);
 		
+		if (true)
+			return;
+		
 		CommandBlock cb = ((CommandBlock)((CraftBlockCommandSender)e.getSender()).getBlock().getState());
 		
-		CbCommand cmd = getCommand(e.getSender(), cb.getLocation(), e.getCommand());
+		CbCommand cmd = CbCommand.getCommand(plugin, e.getSender(), cb.getLocation(), e.getCommand());
 		
-		if (cmd != null)
-			if (!cmd.getPlot().hasStoplag()) {
-				
-				//si le commandblock va trop vite, cancel de la commande
-				if (blockedExecutionLocs.containsKey(cb.getLocation()))
-					return;
+		if (cmd != null && !cmd.getPlot().hasStoplag()) {
+			
+			//si le commandblock va trop vite, cancel de la commande
+			if (blockedExecutionLocs.containsKey(cb.getLocation()))
+				return;
+			else
+				//commandblock lents, max 1 cmd/s
+				if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
+					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - CommandBlocksManager.minTickBetweenEachCbExecution);
 				else
-					//commandblock lents, max 1 cmd/s
-					if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
-						blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - CommandBlocksManager.minTickBetweenEachCbExecution);
-					else
-						blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
-				
-				//Bukkit.broadcastMessage("CB : " + cb.getLocation() + " - " + blockedExecutionLocs.get(cb.getLocation()));
-				
-				executeCommandBlockCommand(cmd, e.getSender());		
-			}	
+					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
+			
+			//Bukkit.broadcastMessage("CB : " + cb.getLocation() + " - " + blockedExecutionLocs.get(cb.getLocation()));
+			
+			executeCommandBlockCommand(cmd, e.getSender());		
+		}	
 		
 	}
 	
 	@EventHandler //Handle commandes des joueurs
-	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e ) {
+	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e) {
 
 		//cancel commande si c'est une commande commandblock
 		if (CbCommand.getCommandType(e.getMessage()) != null)
@@ -104,7 +110,7 @@ public class CbCommandListener implements Listener {
 		else
 			return;
 		
-		CbCommand cmd = getCommand(e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
+		CbCommand cmd = CbCommand.getCommand(plugin, e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
 		
 		//return si la commande est nulle
 		if (cmd == null) {
@@ -112,18 +118,16 @@ public class CbCommandListener implements Listener {
 			return;	
 		}
 		
-		//exécution de la commande si l'exécutant est au minimum co-prop ou si la commandes est un /trigger
-		if (cmd.getPlot().getMembers().getPlayerLevel(e.getPlayer()) >= 3 || cmd.getType() == CommandType.trigger) 
+		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
+		
+		//exécution de la commande si l'exécutant est au minimum co-prop et a le kit cb, si la commandes est un /trigger ou si c'est un give (pour permettre les oeufs et les cb)
+		if ((cmd.getPlot().getMembers().getPlayerLevel(p) >= 3 && p.hasKit(KitType.COMMANDBLOCK)) || 
+				cmd.getType() == CommandType.trigger || 
+				(cmd.getPlot().getMembers().getPlayerRank(p) != PlotRank.VISITOR && cmd.getType() == CommandType.give)) 
 			executeCommandBlockCommand(cmd, e.getPlayer());
 		else
 			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
-	}
-
-	private CbCommand getCommand(CommandSender sender, Location sendLoc, String command) {
-		return CbCommand.getCommand(plugin, sender, sendLoc, command);
-	}
-	
-	
+	}	
 	
 	//exécute la commande et si le CommandSender est un commandblock, mise à jour des ses NBTTags
 	private void executeCommandBlockCommand(CbCommand cmd, CommandSender sender) {

@@ -19,9 +19,13 @@ import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.commandblocks.commands.CmdGive;
+import fr.olympa.olympacreatif.data.KitsManager;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
@@ -100,6 +104,7 @@ public class OcoCommand extends OlympaCommand {
 				
 				sender.sendMessage(debug);
 				break;
+				
 			default:
 				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
 				break;
@@ -121,15 +126,12 @@ public class OcoCommand extends OlympaCommand {
 				break;
 				
 			case "skull":
-				/*if (!p.hasPermission(PermissionsList.USE_SKULL_COMMAND)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_SKULL_COMMAND.getGroup().getName(p.getGender())));
-					return false;
-				}*/
 				Consumer<ItemStack> consumer = sk -> p.getPlayer().getInventory().addItem(sk);
 				ItemUtils.skull(consumer, "§6Tête de " + args[1], args[1]);
 				p.getPlayer().sendMessage(Message.OCO_BLOCK_GIVED.getValue());
 				break;
-				
+			
+				/*
 			case "give":
 				args[1] = args[1].toUpperCase();
 				if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])))
@@ -143,6 +145,7 @@ public class OcoCommand extends OlympaCommand {
 				else
 					p.getPlayer().sendMessage(Message.OCO_GIVE_INDISPONIBLE_BLOCK.getValue());
 				break;
+				*/
 				
 			case "speed":
 				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
@@ -173,39 +176,6 @@ public class OcoCommand extends OlympaCommand {
 			break;
 		}
 		
-		//commande give oeuf/spawner avec nbt data 
-		if (args.length > 3 && args[0].equals("give")) {
-			//give mob eggs with custom NBTtags
-			args[1] = args[1].toUpperCase();
-			
-			if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])) && 
-					(args[1].toLowerCase().contains("_egg") || args[1].toLowerCase().contains("spawner") || args[1].toLowerCase().contains("command_block")))
-				if (true/*p.hasPermission(plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])))*/) {
-					
-					net.minecraft.server.v1_15_R1.ItemStack item = CraftItemStack.asNMSCopy(new ItemStack(Material.getMaterial(args[1])));
-					
-					NBTTagCompound nbt = new NBTTagCompound();
-					
-					if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("EGG"))
-						nbt = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.EGG);
-					else if (CraftItemStack.asBukkitCopy(item).getType().toString().contains("SPAWNER"))
-						nbt = NbtParserUtil.getEntityNbtData(NbtParserUtil.getTagFromStrings(args), EntitySourceType.SPAWNER);
-					
-					if (nbt != null) {
-						item.setTag(nbt);
-						p.getPlayer().getInventory().addItem(CraftItemStack.asBukkitCopy(item));
-						
-						p.getPlayer().sendMessage(Message.OCO_GIVE_SUCCESSFUL.getValue().replace("%item%", args[1].toLowerCase().replace("_", " ")));	
-					}else
-						p.getPlayer().sendMessage(Message.OCO_INVALID_NBT_DATA.getValue());
-				}
-				else
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", 
-							plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])).toString().toLowerCase()));
-			else
-				p.getPlayer().sendMessage(Message.OCO_GIVE_INDISPONIBLE_BLOCK.getValue());
-		}
-		
 		return false;
 	}
 
@@ -219,17 +189,12 @@ public class OcoCommand extends OlympaCommand {
 			list.add("hat");
 			list.add("mb");
 			list.add("export");
-			list.add("give");
 			list.add("speed");
 			list.add("debug");
 		}
 		else if (args.length == 2 && args[0].equals("mb")) {
 			for (Entry<String, ItemStack> e : plugin.getPerksManager().getMicroBlocks().getAllMbs().entrySet())
 				list.add(e.getKey());
-		}else if (args.length == 2 && args[0].equals("give")) {
-			for (Material mat : plugin.getWorldManager().getRestrictedItems().keySet())
-				if (mat.toString().contains("_EGG") || mat.toString().contains("COMMAND_BLOCK") || mat.toString().contains("SPAWNER"))
-					list.add(mat.toString().toLowerCase());
 		}else
 			for (Player p : Bukkit.getOnlinePlayers())
 				list.add(p.getName());
