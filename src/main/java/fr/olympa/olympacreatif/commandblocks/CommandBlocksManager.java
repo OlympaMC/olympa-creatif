@@ -1,40 +1,21 @@
 package fr.olympa.olympacreatif.commandblocks;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.boss.BossBar;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
-import fr.olympa.olympacreatif.perks.PlayerMultilineUtil.LineDataWrapper;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
-import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.PacketPlayOutEntityStatus;
-import net.minecraft.server.v1_15_R1.ItemFireworks.EffectType;
 
 public class CommandBlocksManager {
 
@@ -118,7 +99,7 @@ public class CommandBlocksManager {
 		p.getScoreboard().resetScores(p);
 		p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		
-		plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p).clearLines();
+		//plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p).clearLines();
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());
 		

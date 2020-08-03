@@ -3,16 +3,7 @@ package fr.olympa.olympacreatif.data;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 
-public class PermissionsList {
-
-	public static final OlympaPermission KIT_REDSTONE = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
-	public static final OlympaPermission KIT_MOBS = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
-	public static final OlympaPermission KIT_ANIMALS = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
-
-	public static final OlympaPermission KIT_COMMAND_BLOCKS = new OlympaPermission(OlympaGroup.CREA_CREATOR);
-	public static final OlympaPermission KIT_LAVA = new OlympaPermission(OlympaGroup.ADMIN);
-	public static final OlympaPermission KIT_ADMIN = new OlympaPermission(OlympaGroup.ADMIN);
-	
+public class PermissionsList {	
 	public static final OlympaPermission USE_WORLD_EDIT = new OlympaPermission(OlympaGroup.CREA_ARCHITECT);
 	public static final OlympaPermission USE_MICRO_BLOCKS = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	public static final OlympaPermission USE_COLORED_TEXT = new OlympaPermission(OlympaGroup.CREA_ARCHITECT);

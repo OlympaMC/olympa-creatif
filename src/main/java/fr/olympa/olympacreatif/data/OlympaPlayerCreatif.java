@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
@@ -26,12 +28,20 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	public static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
 			.put("bonusPlots", "INT NOT NULL DEFAULT 0")
 			.put("gameMoney", "INT NOT NULL DEFAULT 0")
+			.put("hasRedstoneKit", "BOOLEAN NOT NULL DEFAULT FALSE")
+			.put("hasPeacefulMobsKit", "BOOLEAN NOT NULL DEFAULT FALSE")
+			.put("hasHostileMobsKit", "BOOLEAN NOT NULL DEFAULT FALSE")
+			.put("hasFluidKit", "BOOLEAN NOT NULL DEFAULT FALSE")
+			.put("hasCommandblockKit", "BOOLEAN NOT NULL DEFAULT FALSE")
+			.put("hasAdminKit", "BOOLEAN NOT NULL DEFAULT FALSE")
 			.build();
 	
 	private OlympaCreatifMain plugin;
 	private int gameMoney = 0;
 	private int bonusPlots = 0;
 
+	private Map<KitType, Boolean> kits = new HashMap<KitType, Boolean>();
+	
 	private List<String> scoreboardLines = new ArrayList<String>();
 	public static final int scoreboardLinesSize = 8;
 	
@@ -46,12 +56,24 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	public void loadDatas(ResultSet resultSet) throws SQLException {
 		bonusPlots = resultSet.getInt("bonusPlots");
 		gameMoney = resultSet.getInt("gameMoney");
+		
+		for (KitType kit : KitType.values())
+			if (resultSet.getBoolean(kit.getBddKey()))
+				kits.put(kit, true);
+			else
+				kits.put(kit, false);
 	}
 	
 	@Override
 	public void saveDatas(PreparedStatement statement) throws SQLException {
 		statement.setInt(1, bonusPlots);
 		statement.setInt(2, gameMoney);
+
+		for (int i = 3 ; i < 3 + KitType.values().length ; i++)
+			if (kits.containsKey(KitType.values()[i - 3]))
+				statement.setBoolean(i, kits.get(KitType.values()[i - 3]));
+			else
+				statement.setBoolean(i, false);
 	}
 	
 	public void addGameMoney(int i) {
@@ -72,6 +94,10 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	public int getBonusPlots() {
 		return bonusPlots;
+	}
+	
+	public boolean hasKit(KitType kit) {
+		return kits.get(kit);
 	}
 	
 	//renvoie la liste des plots où le joueur est membre
@@ -99,7 +125,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			i += 5;
 		else if(getGroup() == OlympaGroup.CREA_CONSTRUCTOR)
 			i += 2;
-		
+
 		return i;
 	}
 	
