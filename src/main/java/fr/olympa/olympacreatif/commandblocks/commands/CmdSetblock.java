@@ -3,9 +3,14 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
+import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.TileEntity;
 
 public class CmdSetblock extends CbCommand {
 
@@ -21,19 +26,29 @@ public class CmdSetblock extends CbCommand {
 			return 0;
 		
 		Location placingLoc = parseLocation(args[0], args[1], args[2]);
+		ItemStack item = getItemFromString(args[3]);
 		
-		Material mat = null;
-		
-		if (args[3].split(":").length == 2)
-			mat = Material.getMaterial(args[3].split(":")[1].toUpperCase());
-		else
-			mat = Material.getMaterial(args[3].toUpperCase());
-		
-		if (placingLoc == null || mat == null)
+		if (placingLoc == null || item == null)
 			return 0;
 		
-		plugin.getWorldManager().getWorld().getBlockAt(placingLoc).setType(mat);
+		//return si le proprio n'a pas débloqué les spawners
+		if (!plotCbData.hasUnlockedSpawnerSetblock() && item.getType() == Material.SPAWNER)
+			return 0;
 		
+		plugin.getWorldManager().getWorld().getBlockAt(placingLoc).setType(item.getType());
+		
+		net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+		
+		if (nmsItem != null && nmsItem.getTag() != null) {
+			TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(placingLoc.getBlockX(), placingLoc.getBlockY(), placingLoc.getBlockZ()));
+			
+			NBTTagCompound tag = nmsItem.getTag();
+			tag.setInt("x", placingLoc.getBlockX());
+			tag.setInt("y", placingLoc.getBlockY());
+			tag.setInt("z", placingLoc.getBlockZ());
+			
+			tile.load(tag);	
+		}
 		return 1;
 	}
 }

@@ -105,6 +105,16 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	public void addKit(KitType kit) {
 		if (!kits.contains(kit))
 			kits.add(kit);
+		
+		if (kits.contains(KitType.HOSTILE_MOBS) && kits.contains(KitType.PEACEFUL_MOBS))
+			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
+				plot.getCbData().unlockSummon();
+		
+		if (kits.contains(KitType.HOSTILE_MOBS))
+			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
+				plot.getCbData().unlockSpawnerSetblock();
+			
+			
 	}
 	
 	public int getUpgradeLevel(UpgradeType upg) {
@@ -117,7 +127,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		//changement du cpt des plots du joueur
 		if (upg == UpgradeType.CB_LEVEL)
 			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
-				plot.getCbData().setCptLevel(upgrades.get(UpgradeType.CB_LEVEL));
+				plot.getCbData().setCpt(UpgradeType.CB_LEVEL.getValueOf(upgrades.get(UpgradeType.CB_LEVEL)));
 	}
 	
 	//renvoie la liste des plots où le joueur est membre

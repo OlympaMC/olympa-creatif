@@ -23,6 +23,7 @@ import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -54,7 +55,9 @@ public class Plot {
 		
 		members.set(p, PlotRank.OWNER);
 		
-		cbData = new PlotCbData(plugin, plugin.getCommandBlocksManager().getScoreboardForPlotCbData(), UpgradeType.CB_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.CB_LEVEL))); 
+		cbData = new PlotCbData(plugin, plugin.getCommandBlocksManager().getScoreboardForPlotCbData(), 
+				UpgradeType.CB_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.CB_LEVEL)), 
+				p.hasKit(KitType.HOSTILE_MOBS) && p.hasKit(KitType.PEACEFUL_MOBS), p.hasKit(KitType.HOSTILE_MOBS)); 
 		
 		//plugin.getCommandBlocksManager().registerPlot(this);
 		

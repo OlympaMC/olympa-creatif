@@ -29,12 +29,19 @@ public class PlotCbData {
 	private int commandsLeft;
 	private Scoreboard scb;
 	
-	private int cpt;
+	private int cpt; //commandes par tick ajoutées
 	
-	public PlotCbData(OlympaCreatifMain plugin, Scoreboard scb, int cpt){
+	private boolean hasUnlockedSummonCmd;
+	private boolean hasUnlockedSetblockSpawnerCmd;
+	
+	public PlotCbData(OlympaCreatifMain plugin, Scoreboard scb, int cpt, boolean hasUnlockedSummonCmd, boolean hasUnlockedSetblockSpawnerCmd){
 		this.plugin = plugin;
 		this.scb = scb;
 		this.cpt = cpt;
+		
+		this.hasUnlockedSetblockSpawnerCmd = hasUnlockedSummonCmd;
+		this.hasUnlockedSummonCmd = hasUnlockedSummonCmd;
+		
 		commandsLeft = CommandBlocksManager.maxCommandsTicketst;
 	}
 	
@@ -70,12 +77,28 @@ public class PlotCbData {
 		commandsLeft = Math.min(CommandBlocksManager.maxCommandsTicketst, commandsLeft + cpt);
 	}
 	
-	public void setCptLevel(int cbUpgradeLevel) {
-		cpt = UpgradeType.CB_LEVEL.getValueOf(cbUpgradeLevel);
+	public void setCpt(int newCpt) {
+		cpt = newCpt;
 	}
 	
-	public int getCptLevel() {
+	public int getCpt() {
 		return cpt;
+	}
+	
+	public boolean hasUnlockedSpawnerSetblock() {
+		return hasUnlockedSetblockSpawnerCmd;
+	}
+	
+	public boolean hasUnlockedSummon() {
+		return hasUnlockedSummonCmd;
+	}
+	
+	public void unlockSpawnerSetblock() {
+		hasUnlockedSetblockSpawnerCmd = true;
+	}
+	
+	public void unlockSummon() {
+		hasUnlockedSummonCmd = true;
 	}
 	
 	public CbBossBar getBossBar(String id) {

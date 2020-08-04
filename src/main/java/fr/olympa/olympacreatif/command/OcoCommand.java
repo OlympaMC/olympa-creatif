@@ -100,7 +100,7 @@ public class OcoCommand extends OlympaCommand {
 				debug += "\n   §e> Entités : §a" + plot2.getEntities().size() + "/" + WorldManager.maxTotalEntitiesPerPlot;
 				debug += "\n   §e> Equipes : §a" + plot2.getCbData().getTeams().size() + "/" + CommandBlocksManager.maxTeamsPerPlot;
 				debug += "\n   §e> Objectifs : §a" + plot2.getCbData().getObjectives().size() + "/" + CommandBlocksManager.maxObjectivesPerPlot;
-				debug += "\n   §e> Tickets commandblocks : §a" + plot2.getCbData().getCommandsTicketsLeft() + "/" + CommandBlocksManager.maxCommandsTicketst;
+				debug += "\n   §e> Tickets commandblocks : §a" + plot2.getCbData().getCommandsTicketsLeft() + "/" + CommandBlocksManager.maxCommandsTicketst + "(+" + plot2.getCbData().getCpt() * 20 + "/s)";
 				
 				sender.sendMessage(debug);
 				break;

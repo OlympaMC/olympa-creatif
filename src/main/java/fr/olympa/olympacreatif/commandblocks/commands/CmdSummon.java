@@ -32,7 +32,11 @@ public class CmdSummon extends CbCommand {
 	
 	@Override
 	public int execute() {
-		instanciateAllowedEntities();
+		//instanciateAllowedEntities();
+		
+		//return si le proprio du plot n'a pas débloqué le /summon
+		if (!plotCbData.hasUnlockedSummon())
+			return 0;
 		
 		NBTTagCompound tag = null;
 		
@@ -50,7 +54,7 @@ public class CmdSummon extends CbCommand {
 		
 		EntityType type = EntityType.fromName(getUndomainedString(args[0]));
 		
-		if (type == null || !allowedEntities.contains(type)) 
+		if (type == null /*|| !allowedEntities.contains(type)*/) 
 			return 0;
 		
 		Entity e = plugin.getWorldManager().getWorld().spawnEntity(sendingLoc, type);
