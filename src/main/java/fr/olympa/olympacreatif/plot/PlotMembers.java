@@ -44,6 +44,10 @@ public class PlotMembers{
 		set(AccountProvider.get(p.getUniqueId()).getInformation(), rank);
 	}
 	
+	public void set(OlympaPlayerCreatif p, PlotRank rank) {
+		set(p.getInformation(), rank);
+	}
+	
 	public void set(OlympaPlayerInformations p, PlotRank rank) {
 		if (members.size() >= 18)
 			return;

@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.plot;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 
 public class AsyncPlot {
 
@@ -8,12 +9,14 @@ public class AsyncPlot {
 	private PlotId id;
 	private PlotMembers members;
 	private PlotParameters params;
+	private PlotCbData cbData;
 	
-	public AsyncPlot(OlympaCreatifMain plugin, PlotId plotLoc, PlotMembers plotMembers, PlotParameters plotParams) {
+	public AsyncPlot(OlympaCreatifMain plugin, PlotId plotLoc, PlotMembers plotMembers, PlotParameters plotParams, PlotCbData cbData) {
 		this.plugin = plugin;
 		this.id = plotLoc;
 		this.members = plotMembers;
 		this.params = plotParams;
+		this.cbData = cbData;
 	}
 	
 	public OlympaCreatifMain getPlugin() {
@@ -30,5 +33,9 @@ public class AsyncPlot {
 	
 	public PlotParameters getParameters() {
 		return params;
+	}
+
+	public PlotCbData getCbData() {
+		return cbData;
 	}
 }

@@ -24,7 +24,7 @@ import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.KitsManager.KitType;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
@@ -53,7 +53,7 @@ public class CbCommandListener implements Listener {
 				//for (Plot plot : plugin.getPlotsManager().getPlots())
 					//Bukkit.broadcastMessage("plot : " + plot.getPlotId() + " - " + plot.getCbData().getCommandsLeft());
 				for (Plot plot : plugin.getPlotsManager().getPlots()) 
-					plot.getCbData().addCommandTickets((int) CommandBlocksManager.perTickAddedCommandsTickets);
+					plot.getCbData().addCommandTickets();
 				
 				//retire de la liste les commandblocks ayant attendu le nombre de ticks nécessaires avant la prochaine commande
 				Iterator<Entry<Location, Integer>> iter = blockedExecutionLocs.entrySet().iterator();
@@ -74,9 +74,6 @@ public class CbCommandListener implements Listener {
 			return;
 		
 		e.setCancelled(true);
-		
-		if (true)
-			return;
 		
 		CommandBlock cb = ((CommandBlock)((CraftBlockCommandSender)e.getSender()).getBlock().getState());
 		
@@ -123,7 +120,7 @@ public class CbCommandListener implements Listener {
 		//exécution de la commande si l'exécutant est au minimum co-prop et a le kit cb, si la commandes est un /trigger ou si c'est un give (pour permettre les oeufs et les cb)
 		if ((cmd.getPlot().getMembers().getPlayerLevel(p) >= 3 && p.hasKit(KitType.COMMANDBLOCK)) || 
 				cmd.getType() == CommandType.trigger || 
-				(cmd.getPlot().getMembers().getPlayerRank(p) != PlotRank.VISITOR && cmd.getType() == CommandType.give)) 
+				(cmd.getPlot().getMembers().getPlayerRank(p) != PlotRank.VISITOR && (cmd.getType() == CommandType.give || cmd.getType() == CommandType.clear))) 
 			executeCommandBlockCommand(cmd, e.getPlayer());
 		else
 			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());

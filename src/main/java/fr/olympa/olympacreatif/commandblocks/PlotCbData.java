@@ -15,6 +15,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 public class PlotCbData {
 
@@ -28,9 +29,12 @@ public class PlotCbData {
 	private int commandsLeft;
 	private Scoreboard scb;
 	
-	PlotCbData(OlympaCreatifMain plugin, Scoreboard scb){
+	private int cpt;
+	
+	public PlotCbData(OlympaCreatifMain plugin, Scoreboard scb, int cpt){
 		this.plugin = plugin;
 		this.scb = scb;
+		this.cpt = cpt;
 		commandsLeft = CommandBlocksManager.maxCommandsTicketst;
 	}
 	
@@ -62,8 +66,16 @@ public class PlotCbData {
 		commandsLeft -= tickets;
 	}
 	
-	public void addCommandTickets( int tickets) {
-		commandsLeft = Math.min(CommandBlocksManager.maxCommandsTicketst, commandsLeft + tickets);
+	public void addCommandTickets() {
+		commandsLeft = Math.min(CommandBlocksManager.maxCommandsTicketst, commandsLeft + cpt);
+	}
+	
+	public void setCptLevel(int cbUpgradeLevel) {
+		cpt = UpgradeType.CB_LEVEL.getValueOf(cbUpgradeLevel);
+	}
+	
+	public int getCptLevel() {
+		return cpt;
 	}
 	
 	public CbBossBar getBossBar(String id) {
@@ -191,5 +203,4 @@ public class PlotCbData {
 		
 		plugin.getCommandBlocksManager().addUnusedScoreboard(scb);
 	}
-	
 }

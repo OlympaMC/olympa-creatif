@@ -114,7 +114,6 @@ public enum Message {
 	PLOT_SPAWN_LOC_SET, 
 	
 	PARAM_CB_MAX_CMDS_LEFT, 
-	PARAM_CB_PER_TICK_ADDED_CMDS, 
 	
 	CB_NO_COMMANDS_LEFT, 
 	
@@ -150,7 +149,6 @@ public enum Message {
 		messagesList.put(PARAM_MAX_TOTAL_ENTITIES_PER_PLOT, "10");
 		
 		messagesList.put(PARAM_CB_MAX_CMDS_LEFT, "400");
-		messagesList.put(PARAM_CB_PER_TICK_ADDED_CMDS, "10");
 
 		messagesList.put(Message.PARAM_CB_MAX_TEAMS_PER_PLOT, "20");
 		messagesList.put(Message.PARAM_CB_MAX_OBJECTIVES_PER_PLOT, "20");

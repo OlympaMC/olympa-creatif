@@ -1,7 +1,6 @@
 package fr.olympa.olympacreatif.perks;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.KitsManager;
 
 public class PerksManager {
 
@@ -9,12 +8,14 @@ public class PerksManager {
 	private MicroBlocks mb;
 	private SchematicCreator schem;
 	private KitsManager kitsManager;
+	private UpgradesManager upgradesManager;
 	
 	public PerksManager(OlympaCreatifMain olympaCreatifMain) {
 		this.plugin = olympaCreatifMain;
 		mb = new MicroBlocks(plugin);
 		schem = new SchematicCreator(plugin);
 		kitsManager = new KitsManager(plugin);
+		upgradesManager = new UpgradesManager(plugin);
 	}
 
 	public MicroBlocks getMicroBlocks() {
@@ -27,6 +28,10 @@ public class PerksManager {
 	
 	public KitsManager getKitsManager() {
 		return kitsManager;
+	}
+	
+	public UpgradesManager getUpgradesManager() {
+		return upgradesManager;
 	}
 
 }

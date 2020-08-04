@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.data;
+package fr.olympa.olympacreatif.perks;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,16 +11,21 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.KitsManager.KitType;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 
 public class KitsManager {
 
 	OlympaCreatifMain plugin;
 	Map<Material, KitType> kits = new HashMap<Material, KitType>();
+	Map<Material, ItemStack> noKitItem = new HashMap<Material, ItemStack>();
 	
 	public KitsManager (OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		initKitItems();
+		
+		for (Material mat : kits.keySet())
+			noKitItem.put(mat, ItemUtils.item(Material.STONE, "§cLe kit §6" + getKitOf(mat).toString().toLowerCase() + " §cest requis pour utiliser §6" + mat.toString().toLowerCase().replace("_", " ")));
 	}
 	
 	public KitType getKitOf(Material mat) {
@@ -48,9 +53,7 @@ public class KitsManager {
 	}
 	
 	public ItemStack getNoKitPermItem(Material mat) {
-		
-		String errorMsg = "§cLe kit §6" + getKitOf(mat) + " §cest requis pour utiliser §6" + mat;
-		return ItemUtils.item(Material.STONE, errorMsg);
+		return noKitItem.get(mat);
 	}
 	
 	private void initKitItems() {

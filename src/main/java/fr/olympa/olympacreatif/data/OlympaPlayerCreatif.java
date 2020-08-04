@@ -18,7 +18,8 @@ import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.KitsManager.KitType;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
@@ -26,21 +27,26 @@ import fr.olympa.olympacreatif.plot.PlotsManager;
 public class OlympaPlayerCreatif extends OlympaPlayerObject {
 
 	public static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
-			.put("bonusPlots", "INT NOT NULL DEFAULT 0")
 			.put("gameMoney", "INT NOT NULL DEFAULT 0")
+			
 			.put("hasRedstoneKit", "TINYINT NOT NULL DEFAULT 0")
 			.put("hasPeacefulMobsKit", "TINYINT NOT NULL DEFAULT 0")
 			.put("hasHostileMobsKit", "TINYINT NOT NULL DEFAULT 0")
 			.put("hasFluidKit", "TINYINT NOT NULL DEFAULT 0")
 			.put("hasCommandblockKit", "TINYINT NOT NULL DEFAULT 0")
 			.put("hasAdminKit", "TINYINT NOT NULL DEFAULT 0")
+
+			.put("upgradeLevelCommandBlock", "TINYINT NOT NULL DEFAULT 0")
+			.put("upgradeLevelBonusPlots", "TINYINT NOT NULL DEFAULT 0")
+			.put("upgradeLevelBonusMembers", "TINYINT NOT NULL DEFAULT 0")
+			
 			.build();
 	
 	private OlympaCreatifMain plugin;
 	private int gameMoney = 0;
-	private int bonusPlots = 0;
 
 	private List<KitType> kits = new ArrayList<KitType>();
+	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();
 	
 	private List<String> scoreboardLines = new ArrayList<String>();
 	public static final int scoreboardLinesSize = 8;
@@ -54,24 +60,30 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	@Override
 	public void loadDatas(ResultSet resultSet) throws SQLException {
-		bonusPlots = resultSet.getInt("bonusPlots");
 		gameMoney = resultSet.getInt("gameMoney");
 		
 		for (KitType kit : KitType.values())
 			if (resultSet.getBoolean(kit.getBddKey()))
 				kits.add(kit);
+		
+		for (UpgradeType upg : UpgradeType.values())
+			upgrades.put(upg, resultSet.getInt(upg.getBddKey()));
 	}
 	
 	@Override
 	public void saveDatas(PreparedStatement statement) throws SQLException {
-		statement.setInt(1, bonusPlots);
-		statement.setInt(2, gameMoney);
+		statement.setInt(1, gameMoney);
 
-		for (int i = 3 ; i < 3 + KitType.values().length ; i++)
-			if (kits.contains(KitType.values()[i - 3]))
+		//kits
+		for (int i = 2 ; i < 2 + KitType.values().length ; i++)
+			if (kits.contains(KitType.values()[i - 2]))
 				statement.setBoolean(i, true);
 			else
 				statement.setBoolean(i, false);
+		
+		//consommables
+		for (int i = 2 + KitType.values().length ; i < 2 + KitType.values().length + UpgradeType.values().length ; i++)
+			statement.setInt(i, upgrades.get(UpgradeType.values()[i - 2 - KitType.values().length]));
 	}
 	
 	public void addGameMoney(int i) {
@@ -85,17 +97,27 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	public int getGameMoney() {
 		return gameMoney;
 	}
-
-	public void addBonusPlots(int i) {
-		bonusPlots += i;
-	}
-	
-	public int getBonusPlots() {
-		return bonusPlots;
-	}
 	
 	public boolean hasKit(KitType kit) {
 		return kits.contains(kit);
+	}
+	
+	public void addKit(KitType kit) {
+		if (!kits.contains(kit))
+			kits.add(kit);
+	}
+	
+	public int getUpgradeLevel(UpgradeType upg) {
+		return upgrades.get(upg);
+	}
+	
+	public void incrementUpgradeLevel(UpgradeType upg) {
+		upgrades.put(upg, upgrades.get(upg) + 1);
+		
+		//changement du cpt des plots du joueur
+		if (upg == UpgradeType.CB_LEVEL)
+			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
+				plot.getCbData().setCptLevel(upgrades.get(UpgradeType.CB_LEVEL));
 	}
 	
 	//renvoie la liste des plots où le joueur est membre
@@ -115,7 +137,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		if (!onlyOwnedPlots)
 			return PlotsManager.maxPlotsPerPlayer;
 		
-		int i = 1 + bonusPlots;
+		int i = UpgradeType.BONUS_PLOTS_LEVEL.getValueOf(upgrades.get(UpgradeType.BONUS_PLOTS_LEVEL));
 
 		if (getGroup() == OlympaGroup.CREA_CREATOR)
 			i += 3;
@@ -209,17 +231,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			staffPerm.remove(perm);
 		else
 			staffPerm.add(perm);
-		
-		/*
-		if (hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE)) {
-			EntityPlayer nmsPlayer = ((CraftPlayer) getPlayer()).getHandle();
-			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
-		}else {
-			EntityPlayer nmsPlayer = ((CraftPlayer) getPlayer()).getHandle();
-			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 24));	
-		}
-		*/
-		
+
 		return true;
 	}
 	

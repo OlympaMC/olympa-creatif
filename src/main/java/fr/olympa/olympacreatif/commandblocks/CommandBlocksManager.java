@@ -28,7 +28,6 @@ public class CommandBlocksManager {
 	public static int maxObjectivesPerPlot;
 	
 	public static int maxCommandsTicketst;
-	public static double perTickAddedCommandsTickets;
 
 	public static int minTickBetweenEachCbExecution;
 	public static int cmdTicketByCmdSetblock;
@@ -39,7 +38,6 @@ public class CommandBlocksManager {
 		maxTeamsPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_TEAMS_PER_PLOT.getValue());
 		maxObjectivesPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_OBJECTIVES_PER_PLOT.getValue());
 		maxCommandsTicketst = Integer.valueOf(Message.PARAM_CB_MAX_CMDS_LEFT.getValue());
-		perTickAddedCommandsTickets = Double.valueOf(Message.PARAM_CB_PER_TICK_ADDED_CMDS.getValue());
 		
 		minTickBetweenEachCbExecution = Integer.valueOf(Message.PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue());
 		cmdTicketByCmdSetblock = Integer.valueOf(Message.PARAM_CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK.getValue());
@@ -52,11 +50,11 @@ public class CommandBlocksManager {
 		//Bukkit.getServer().getPluginManager().getPermission("minecraft.command.gamemode").setDefault(PermissionDefault.TRUE);
 	}
 	
-	public PlotCbData createPlotCbData() {
+	public Scoreboard getScoreboardForPlotCbData() {
 		if (unusedScoreboards.size() == 0)
-			return new PlotCbData(plugin, Bukkit.getScoreboardManager().getNewScoreboard());
+			return Bukkit.getScoreboardManager().getNewScoreboard();
 		else
-			return new PlotCbData(plugin, unusedScoreboards.remove(0));
+			return unusedScoreboards.remove(0);
 	}
 
 	public void addUnusedScoreboard(Scoreboard scb) {

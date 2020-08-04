@@ -89,7 +89,7 @@ public class PlotsManager {
 	}	
 	
 	public Plot createPlot(Player p) {
-		Plot plot = new Plot(plugin, AccountProvider.get(p.getUniqueId()).getInformation());
+		Plot plot = new Plot(plugin, AccountProvider.get(p.getUniqueId()));
 				
 		loadedPlots.add(plot);
 		return plot;

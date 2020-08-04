@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -50,8 +51,8 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
-import fr.olympa.olympacreatif.data.KitsManager.KitType;
 import fr.olympa.olympacreatif.gui.MainGui;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 
@@ -356,6 +357,20 @@ public class WorldEventsListener implements Listener{
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
+	}
+	
+	//GESTION DES KITS
+	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits
+	public void onBlockPlace(BlockPlaceEvent e) {
+		
+		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
+		
+		//retrictions dues aux kits
+		if (!plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getBlock().getType())) {
+			e.setCancelled(true);
+			e.getPlayer().getInventory().setItem(e.getHand(), plugin.getPerksManager().getKitsManager().getNoKitPermItem(e.getBlock().getType()));
+			return;
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits
