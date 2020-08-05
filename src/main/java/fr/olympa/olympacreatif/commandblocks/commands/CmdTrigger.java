@@ -14,7 +14,8 @@ public class CmdTrigger extends CbCommand {
 	public CmdTrigger(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
 		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
-		// TODO Auto-generated constructor stub
+		
+		neededPlotLevelToExecute = 0;
 	}
 
 	@Override

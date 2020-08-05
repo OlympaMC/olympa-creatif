@@ -20,7 +20,7 @@ import net.minecraft.server.v1_15_R1.NBTTagString;
 
 public abstract class NBTcontrollerUtil {
 
-	private final static int recurIndexMax = 50;
+	private final static int recurIndexMax = 20;
 	private final static int maxListSize = 10;
 	
 	private final static TagsValues allowedTags = new TagsValues();
@@ -34,8 +34,8 @@ public abstract class NBTcontrollerUtil {
 	}
 	
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
-		//Bukkit.broadcastMessage("Tag initial : " + tag);
-		//Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
+		Bukkit.broadcastMessage("Tag initial : " + tag);
+		Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
 		return getValidTags(getValidTags(tag, 0), 0);
 	}
 	
@@ -57,8 +57,10 @@ public abstract class NBTcontrollerUtil {
 			else {
 				TagParams params = allowedTags.getTagParams(key);
 				
-				if (params == null)
-					return new NBTTagCompound();
+				if (params == null) {
+					tag.remove(key);
+					continue;
+				}
 				
 				//Bukkit.broadcastMessage("tag : " + tag.get(key).asString() + " - " + params.toString());
 				//Bukkit.broadcastMessage("classe : " + tag.get(key).getClass().getName());

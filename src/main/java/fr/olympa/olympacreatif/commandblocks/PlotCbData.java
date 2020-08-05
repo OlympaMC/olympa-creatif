@@ -141,8 +141,9 @@ public class PlotCbData {
 				return false;
 		
 		objectives.add(obj);
-		if (objectives.size() > CommandBlocksManager.maxObjectivesPerPlot)
-			objectives.remove(0);
+		if (objectives.size() > CommandBlocksManager.maxObjectivesPerPlot) {
+			objectives.remove(0).clearDisplaySlot();
+		}
 		
 		return true;
 	}

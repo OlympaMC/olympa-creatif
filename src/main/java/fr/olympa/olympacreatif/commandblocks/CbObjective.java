@@ -225,6 +225,21 @@ public class CbObjective {
 	   return result;
 	}
 	
+	//ADD ET SET POUR OBJECT
+	public void addUnknown(Object obj, int value) {
+		if (obj instanceof Entity)
+			add((Entity)obj, value);
+		else if (obj instanceof String)
+			add((String)obj, value);
+	}
+	
+	public void setUnknown(Object obj, int value) {
+		if (obj instanceof Entity)
+			set((Entity)obj, value);
+		else if (obj instanceof String)
+			set((String)obj, value);
+	}
+	
 	//ADD et SET POUR STRINGS
 	
 	public void add(String name, int value) {
@@ -253,13 +268,6 @@ public class CbObjective {
 			
 			//Bukkit.broadcastMessage("SCORES " + objId + " : " + values);	
 		}
-	}
-
-	public int get(String name) {
-		if (stringHolders.containsKey(name))
-			return stringHolders.get(name);
-		else
-			return 0;
 	}
 	
 	//ADD et SET POUR ENTITIES
@@ -295,9 +303,26 @@ public class CbObjective {
 		}
 	}
 	
+	//get score pour un objet dont on ne sait pas de quel type il est
+	public int getUnknown(Object obj) {
+		if (obj instanceof Entity)
+			return get((Entity)obj);
+		else if (obj instanceof String)
+			return get((String)obj);
+		else
+			return 0;
+	}
+	
 	public int get(Entity e) {
 		if (entityHolders.containsKey(e))
 			return entityHolders.get(e);
+		else
+			return 0;
+	}
+
+	public int get(String name) {
+		if (stringHolders.containsKey(name))
+			return stringHolders.get(name);
 		else
 			return 0;
 	}

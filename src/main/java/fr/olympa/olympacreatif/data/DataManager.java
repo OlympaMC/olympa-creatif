@@ -22,6 +22,7 @@ public class DataManager {
 	
 	public void loadPlayerPlots(OlympaPlayerCreatif p) {
 		//TODO charger plots joueur
+		//TODO update les params du plot selon les éventuelles améliorations du joueur
 		Bukkit.broadcastMessage("TODO : chargement plots joueurs à la connexion (DataManager)");
 	}
 	

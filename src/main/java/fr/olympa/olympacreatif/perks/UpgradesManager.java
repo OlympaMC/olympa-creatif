@@ -86,5 +86,7 @@ public class UpgradesManager {
 		public void onChangeRank(AsyncOlympaPlayerChangeGroupEvent e) {
 			Bukkit.broadcastMessage("(oui je sais mise en forme à revoir) Le joueur " + e.getPlayer().getName() + " a obtenu le grade secret !"); 
 		}
+		
+		//TODO changement des plots du joueur
 	}
 }

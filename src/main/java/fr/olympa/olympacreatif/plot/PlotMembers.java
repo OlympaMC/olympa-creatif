@@ -25,6 +25,7 @@ public class PlotMembers{
 
 	private OlympaCreatifMain plugin;
 	private PlotId plotId;
+	private int maxMembers;
 	
 	//membres triés par ordre alphabétique
 	private Map<OlympaPlayerInformations, PlotRank> members = new TreeMap<OlympaPlayerInformations, PlotRank>(new Comparator<OlympaPlayerInformations>() {
@@ -35,33 +36,44 @@ public class PlotMembers{
 		}
 	});
 
-	public PlotMembers(OlympaCreatifMain plugin, PlotId plotId) {
+	public PlotMembers(OlympaCreatifMain plugin, PlotId plotId, int maxMembers) {
 		this.plugin = plugin;
 		this.plotId = plotId;
+		this.maxMembers = maxMembers;
 	}
 
-	public void set(Player p, PlotRank rank) {
-		set(AccountProvider.get(p.getUniqueId()).getInformation(), rank);
+	//return false si le nombre de membres max est dépassé
+	public boolean set(Player p, PlotRank rank) {
+		return set(AccountProvider.get(p.getUniqueId()).getInformation(), rank);
 	}
 	
-	public void set(OlympaPlayerCreatif p, PlotRank rank) {
-		set(p.getInformation(), rank);
+	public boolean set(OlympaPlayerCreatif p, PlotRank rank) {
+		return set(p.getInformation(), rank);
 	}
 	
-	public void set(OlympaPlayerInformations p, PlotRank rank) {
-		if (members.size() >= 18)
-			return;
+	public boolean set(OlympaPlayerInformations p, PlotRank rank) {
+		if (members.containsKey(p)) {
+			if (rank != PlotRank.VISITOR)
+				members.put(p, rank);
+			else
+				members.remove(p);	
+			
+			return true;
+		}
 		
-		if (rank != PlotRank.VISITOR)
-			members.put(p, rank);
-		else
-			members.remove(p);
+		if (members.size() < maxMembers) {
+			members.put(p, rank);	
+			return true;
+		}
+		
+		return false;
 	}
 
+	public void setMaxMembers(int max) {
+		maxMembers = max;
+	}
 	
-	
-	
-	public PlotRank getPlayerRank(OlympaPlayerCreatif p) {			
+	public PlotRank getPlayerRank(OlympaPlayerCreatif p) {
 		if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
 			return PlotRank.OWNER;
 		
@@ -86,9 +98,10 @@ public class PlotMembers{
 		return getPlayerRank(p).getLevel();
 	}
 
-	public int getPlayerLevel(OlympaPlayerInformations key) {
-		return getPlayerRank(key).getLevel();
+	public int getPlayerLevel(OlympaPlayerInformations p) {
+		return getPlayerRank(p).getLevel();
 	}
+	
 	public int getPlayerLevel(Player p) {
 		return getPlayerRank(p).getLevel();
 	}

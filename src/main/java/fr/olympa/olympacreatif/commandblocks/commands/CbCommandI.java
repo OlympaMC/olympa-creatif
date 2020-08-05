@@ -25,6 +25,7 @@ import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public abstract class CbCommandI {
 
@@ -38,6 +39,8 @@ public abstract class CbCommandI {
 	protected Location sendingLoc;
 	protected CommandType cmdType;
 
+	protected int neededPlotLevelToExecute = PlotRank.CO_OWNER.getLevel();
+	
 	public CbCommandI(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		this.plugin = plugin;
 		this.plot = plot;
@@ -48,6 +51,9 @@ public abstract class CbCommandI {
 		this.cmdType = cmdType;
 	}
 	
+	public int getMinPlotLevelToExecute() {
+		return neededPlotLevelToExecute;
+	}
 
 	//parse le selecteur et ses paramètres : x, y, z, dx, dy, dz, distance, name, team, scores, level, type
 	@SuppressWarnings("deprecation")

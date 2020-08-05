@@ -100,7 +100,8 @@ public class OcoCommand extends OlympaCommand {
 				debug += "\n   §e> Entités : §a" + plot2.getEntities().size() + "/" + WorldManager.maxTotalEntitiesPerPlot;
 				debug += "\n   §e> Equipes : §a" + plot2.getCbData().getTeams().size() + "/" + CommandBlocksManager.maxTeamsPerPlot;
 				debug += "\n   §e> Objectifs : §a" + plot2.getCbData().getObjectives().size() + "/" + CommandBlocksManager.maxObjectivesPerPlot;
-				debug += "\n   §e> Tickets commandblocks : §a" + plot2.getCbData().getCommandsTicketsLeft() + "/" + CommandBlocksManager.maxCommandsTicketst + "(+" + plot2.getCbData().getCpt() * 20 + "/s)";
+				debug += "\n   §e> Tickets commandblocks : §a" + plot2.getCbData().getCommandsTicketsLeft() + "/" +
+						CommandBlocksManager.maxCommandsTicketst + " (+" + plot2.getCbData().getCpt() * 20 + "/s)";
 				
 				sender.sendMessage(debug);
 				break;
@@ -130,22 +131,6 @@ public class OcoCommand extends OlympaCommand {
 				ItemUtils.skull(consumer, "§6Tête de " + args[1], args[1]);
 				p.getPlayer().sendMessage(Message.OCO_BLOCK_GIVED.getValue());
 				break;
-			
-				/*
-			case "give":
-				args[1] = args[1].toUpperCase();
-				if (plugin.getWorldManager().getRestrictedItems().keySet().contains(Material.getMaterial(args[1])))
-					if (plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])).hasPermission(p.getPlayer().getUniqueId())) {
-						p.getPlayer().getInventory().addItem(new ItemStack(Material.getMaterial(args[1])));
-						p.getPlayer().sendMessage(Message.OCO_GIVE_SUCCESSFUL.getValue().replace("%item%", args[1].toLowerCase().replace("_", " ")));
-					}
-					else
-						p.getPlayer().sendMessage(Message.INSUFFICIENT_KIT_PERMISSION.getValue().replace("%kit%", 
-								plugin.getWorldManager().getRestrictedItems().get(Material.getMaterial(args[1])).toString().toLowerCase()));
-				else
-					p.getPlayer().sendMessage(Message.OCO_GIVE_INDISPONIBLE_BLOCK.getValue());
-				break;
-				*/
 				
 			case "speed":
 				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());

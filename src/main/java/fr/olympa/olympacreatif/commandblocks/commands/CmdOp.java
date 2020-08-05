@@ -9,11 +9,12 @@ import fr.olympa.olympacreatif.plot.Plot;
 //CETTE COMMANDE EST UN EASTER EGG pas de panique :)
 
 public class CmdOp extends CbCommand {
-
+	
 	public CmdOp(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot,
 			String[] commandString) {
 		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
-		// TODO Auto-generated constructor stub
+		
+		neededPlotLevelToExecute = 0;
 	}
 
 	@Override

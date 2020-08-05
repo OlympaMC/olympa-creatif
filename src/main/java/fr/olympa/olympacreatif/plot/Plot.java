@@ -51,15 +51,13 @@ public class Plot {
 		plotId = PlotId.createNew(plugin);
 		
 		parameters = new PlotParameters(plugin, plotId);
-		members = new PlotMembers(plugin, plotId);
+		members = new PlotMembers(plugin, plotId, UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)));
 		
 		members.set(p, PlotRank.OWNER);
 		
 		cbData = new PlotCbData(plugin, plugin.getCommandBlocksManager().getScoreboardForPlotCbData(), 
 				UpgradeType.CB_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.CB_LEVEL)), 
-				p.hasKit(KitType.HOSTILE_MOBS) && p.hasKit(KitType.PEACEFUL_MOBS), p.hasKit(KitType.HOSTILE_MOBS)); 
-		
-		//plugin.getCommandBlocksManager().registerPlot(this);
+				p.hasKit(KitType.HOSTILE_MOBS) && p.hasKit(KitType.PEACEFUL_MOBS), p.hasKit(KitType.HOSTILE_MOBS));
 		
 		//exécution des actions d'entrée pour tous les joueurs sur le plot au moment du chargement
 		for (Player player : Bukkit.getOnlinePlayers())

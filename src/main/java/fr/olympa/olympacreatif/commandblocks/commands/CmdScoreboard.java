@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -184,31 +185,36 @@ public class CmdScoreboard extends CbCommand {
 					CbObjective obj2 = plotCbData.getObjective(args[6]);
 					
 					if (obj1 != null && obj2 != null) {
-						String e1 = null;
+						List<Object> e1;
 						
+						//définition des deux listes d'entités/strings concernés
 						if (args[2].startsWith("@")) {
 							List<Entity> list = parseSelector(args[2], false);
 							if (list.size() != 1)
 								return 0;
 							
-							if (list.get(0) instanceof Player)
-								e1 = ((Player)list.get(0)).getDisplayName();
-							else
-								e1 = list.get(0).getCustomName();
-						}
+							e1 = new ArrayList<Object>(list);
+						}else
+							e1 = new ArrayList<Object>(Arrays.asList(args[2]));
 						
-						List<String> e2 = new ArrayList<String>();
+						List<Object> e2;
 						
 						if (args[5].startsWith("@")){
 							List<Entity> list = parseSelector(args[5], false);
-							for (Entity e : list)
-								e2.add(e.getCustomName());
-						}else {
-							e2.add(args[5]);
-						}
+							if (list.size() != 1)
+								return 0;
+
+							e2 = new ArrayList<Object>(list);
+						}else 
+							e2 = new ArrayList<Object>(Arrays.asList(args[5]));
 						
-						if (e1 != null && e2.size() > 0)
-							return evaluateOperation(obj1, obj2, args[4], e1, e2);
+						//si les deux listes ne sont pas vides, sortie de la fonction
+						if (e1.size() > 0 && e2.size() > 0) {
+							for (Object o : e1)
+								if (evaluateOperation(obj1, obj2, args[4], o, e2) == 0)
+									return 0;
+							return 1;
+						}
 						else
 							return 0;
 					}
@@ -312,68 +318,61 @@ public class CmdScoreboard extends CbCommand {
 		return 0;
 	}
 	
-	private int evaluateOperation(CbObjective obj1, CbObjective obj2, String operat, String e1, List<String> e2) {
+	private int evaluateOperation(CbObjective obj1, CbObjective obj2, String operat, Object e1, List<Object> e2List) {
 		int val = 0;
 		
 		switch(operat) {
 		case "%=":
-			if (e2.size() != 1)
-				return 0;
-			obj1.set(e1, obj1.get(e1) % obj2.get(e2.get(0)));
+			for (Object o : e2List)
+				obj1.setUnknown(e1, obj1.getUnknown(e1) % obj2.getUnknown(o));
 			return 1;
 			
 		case "*=":
-			if (e2.size() != 1)
-				return 0;
-			obj1.set(e1, obj1.get(e1) * obj2.get(e2.get(0)));
+			for (Object o : e2List)
+				obj1.setUnknown(e1, obj1.getUnknown(e1) * obj2.getUnknown(o));
 			return 1;
 			
 		case "/=":
-			if (e2.size() != 1)
-				return 0;
-			obj1.set(e1, obj1.get(e1) / obj2.get(e2.get(0)));
+			for (Object o : e2List)
+				obj1.setUnknown(e1, obj1.getUnknown(e1) / obj2.getUnknown(o));
 			return 1;
 			
 		case "+=":
-			if (e2.size() != 1)
-				return 0;
-			obj1.set(e1, obj1.get(e1) + obj2.get(e2.get(0)));
+			for (Object o : e2List)
+				obj1.setUnknown(e1, obj1.getUnknown(e1) + obj2.getUnknown(o));
 			return 1;
 			
 		case "-=":
-			if (e2.size() != 1)
-				return 0;
-			obj1.set(e1, obj1.get(e1) - obj2.get(e2.get(0)));
+			for (Object o : e2List)
+				obj1.setUnknown(e1, obj1.getUnknown(e1) - obj2.getUnknown(o));
 			return 1;
 			
 		case "<":
-			if (e2.size() == 0)
-				return 0;
+			val = obj2.getUnknown(e2List.get(0));
+			for (Object o : e2List) {
+				int valBis = obj2.getUnknown(o);
+
+				if (valBis < val)
+					val = obj2.getUnknown(o);
+			}
 			
-			val = obj2.get(e2.get(0));
-			for (String s : e2)
-				if (obj2.get(s) < val)
-					val = obj2.get(s);
-			
-			obj1.set(e1, val);
+			obj1.setUnknown(e1, val);
 			return 1;
 			
 		case ">":
-			if (e2.size() == 0)
-				return 0;
+			val = obj2.getUnknown(e2List.get(0));
+			for (Object o : e2List) {
+				int valBis = obj2.getUnknown(o);
+
+				if (valBis > val)
+					val = obj2.getUnknown(o);
+			}
 			
-			val = obj2.get(e2.get(0));
-			for (String s : e2)
-				if (obj2.get(s) > val)
-					val = obj2.get(s);
-			
-			obj1.set(e1, val);
+			obj1.setUnknown(e1, val);
 			return 1;
 			
 		case "=":
-			if (e2.size() != 1)
-				return 0;
-			obj1.set(e1, obj2.get(e2.get(0)));
+			obj1.setUnknown(e1, obj2.getUnknown(e2List.get(e2List.size() - 1)));
 			return 1;
 			
 		default:
