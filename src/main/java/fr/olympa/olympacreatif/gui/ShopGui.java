@@ -19,6 +19,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 public class ShopGui extends OlympaGUI{
 
@@ -118,15 +119,15 @@ public class ShopGui extends OlympaGUI{
 		if (askedItem == null)
 			return true;
 		
-		if (askedItem.getPrice() > p.getGameMoney())
+		if (askedItem.getPrice() == null || askedItem.getPrice() > p.getGameMoney())
 			startBuyDeniedTimer(askedItem);
 		else
 			startBuyAcceptTimer(askedItem);
 		
 		//si tentative d'achat
 		if (slot == inv.getSize() - 3)
-			if (isReadyToBuy && itemReadyToBuy != null && p.getGameMoney() >= itemReadyToBuy.getPrice()) 
-				itemReadyToBuy.buyItem();
+			if (isReadyToBuy && itemReadyToBuy != null) 
+				itemReadyToBuy.tryToItem();
 		
 		return true;
 	}
@@ -187,12 +188,32 @@ public class ShopGui extends OlympaGUI{
 		
 		private Object toBuy;
 		private ItemStack itemHolder;
-		private int price;
+		private ItemStack itemHolderCompressed;
+		private Integer price;
 		
-		public MarketItemData(Object toBuy, int price, ItemStack holder){
+		public MarketItemData(Object toBuy, Integer price, ItemStack holder){
 			this.toBuy = toBuy;
 			this.itemHolder = holder;
 			this.price = price;
+			
+			//set prix prochaine upgrade, et met à null le prix si le joueur possède déjà l'objet
+			if (price == null && toBuy instanceof UpgradeType) {
+				price = ((UpgradeType)toBuy).getPriceOf(p.getUpgradeLevel((UpgradeType)toBuy));
+				
+				if (price != null)
+					itemHolder = ItemUtils.loreAdd(itemHolder, " ", " §6Amélioration : " + 
+							((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ▶ " + 
+							((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1));
+				//else
+					//itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§cNiveau max atteint");
+				
+			}else if (hasPlayerAlreadyBought(p, toBuy))
+				price = null;
+			
+			if (price != null)
+				itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§6Prix : " + price);
+			else
+				itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§cAchat indisponible");
 		}
 		
 		public Object getItem() {
@@ -203,12 +224,16 @@ public class ShopGui extends OlympaGUI{
 			return itemHolder;
 		}
 		
-		public int getPrice() {
+		public ItemStack getCompressedHolder() {
+			return itemHolderCompressed;
+		}
+		
+		public Integer getPrice() {
 			return price;
 		}
 		
 		@SuppressWarnings("incomplete-switch")
-		public void buyItem() {
+		public void tryToItem() {
 			if (p.getGameMoney() < price)
 				return;
 			
@@ -233,11 +258,27 @@ public class ShopGui extends OlympaGUI{
 		}
 
 		private boolean hasRequiredGroup(OlympaGroup group) {
-			if (p.getGroups().containsKey(group))
+			if (hasPlayerAlreadyBought(p, group))
 				return true;
 			
 			p.getPlayer().sendMessage(Message.SHOP_ERR_PREVIOUS_RANK_NEEDED.getValue());
 			return false;
 		}
+	}
+	
+	public static boolean hasPlayerAlreadyBought(OlympaPlayerCreatif p, Object obj, int... level) {
+		if (obj instanceof OlympaGroup) {
+			if (p.getGroups().containsKey(obj))
+				return true;
+			
+		}else if (obj instanceof KitType) {
+			if (p.hasKit((KitType)obj))
+				return true;
+			
+		}else if (obj instanceof UpgradeType && level.length > 0)
+			if (p.getUpgradeLevel((UpgradeType)obj) >= level[0])
+				return true;
+		
+		return false;
 	}
 }
