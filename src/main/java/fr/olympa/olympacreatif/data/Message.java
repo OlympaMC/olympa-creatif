@@ -128,7 +128,8 @@ public enum Message {
 	PARAM_CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK, 
 	
 	OCO_SET_FLY_SPEED, 
-	ERROR_PLOT_NOT_LOADED,
+	ERROR_PLOT_NOT_LOADED, 
+	SHOP_ERR_PREVIOUS_RANK_NEEDED,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();

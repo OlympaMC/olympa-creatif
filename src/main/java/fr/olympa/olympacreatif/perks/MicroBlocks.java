@@ -4,26 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.UUID;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftItem;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -46,7 +40,7 @@ public class MicroBlocks {
 	YamlConfiguration mbConfig = new YamlConfiguration();
 	
 	private Map<String, ItemStack> microBlocks = new LinkedHashMap<String, ItemStack>();
-	private List<ItemStack> namedMicroBlocks = new ArrayList<ItemStack>();
+	//private List<ItemStack> namedMicroBlocks = new ArrayList<ItemStack>();
 	
 	public MicroBlocks(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -88,13 +82,13 @@ public class MicroBlocks {
 	}
 	
 	public void openGui(Player p){
-		new MbGuiInterface("§9Microblocks", DyeColor.ORANGE, namedMicroBlocks).create(p);
+		new MbGuiInterface("§9Microblocks", DyeColor.ORANGE, microBlocks.values()).create(p);
 	}
 	
 	private class MbGuiInterface extends PagedGUI<ItemStack>{
 
-		protected MbGuiInterface(String name, DyeColor color, List<ItemStack> objects) {
-			super(name, color, objects, 5);
+		protected MbGuiInterface(String name, DyeColor color, Collection<ItemStack> collection) {
+			super(name, color, new ArrayList<ItemStack>(Arrays.asList(collection.toArray(new ItemStack[collection.size()]))), 5);
 			// TODO Auto-generated constructor stub
 		}
 
@@ -117,8 +111,7 @@ public class MicroBlocks {
     	if (isFirstInitialization) {
     		Map <String, String> map = new HashMap<String, String>();
     		
-        	map.put("acacia_bark", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZhM2JiYTJiN2EyYjRmYTQ2OTQ1YjE0NzE3NzdhYmU0NTk5Njk1NTQ1MjI5ZTc4MjI1OWFlZDQxZDYifX19");
-        	map.put("acacia_log", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDgzYjIzYTJjMzU3ZTExNWIzMTA3NTI2NTMzYWVkNjI3MzFkNTEyNDE4OGQ5YTE1NzhmZTIzZmI1ZjI5NjkifX19");
+        	map.put("bullobily", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmE1MjdkYzAxMDM0ZGI4MDBlMGRhYjZiZDgyMWFhNzhkMTc1NWE5M2E3YzY1OGE5NTUyMmFlYTRjMWZlNzIwZSJ9fX0=");
         	
     		mbConfig.createSection("microblocks_data", map);
     		try {
@@ -133,8 +126,8 @@ public class MicroBlocks {
     		microBlocks.put(e.getKey(), ItemUtils.skullCustom(" ", (String) e.getValue()));
     		//microBlocks.put(e.getKey(), getTexturedHead((String) e.getValue()));
     		
-    	for (Entry<String, ItemStack> e : microBlocks.entrySet())
-    		namedMicroBlocks.add(ItemUtils.name(e.getValue().clone(), "§9MicroBlock : §6" + e.getKey()));
+    	//for (Entry<String, ItemStack> e : microBlocks.entrySet())
+    	//	namedMicroBlocks.add(ItemUtils.name(e.getValue().clone(), "§9MicroBlock : §6" + e.getKey()));
     }
 	
 	//renvoie une tête texturée selon le code donné

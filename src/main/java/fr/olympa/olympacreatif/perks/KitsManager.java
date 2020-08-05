@@ -169,21 +169,27 @@ public class KitsManager {
 	}
 	
 	public enum KitType{
-		REDSTONE("hasRedstoneKit"),
-		PEACEFUL_MOBS("hasPeacefulMobsKit"),
-		HOSTILE_MOBS("hasHostileMobsKit"),
-		FLUIDS("hasFluidKit"),
-		COMMANDBLOCK("hasCommandblockKit"),
-		ADMIN("hasAdminKit");
+		REDSTONE("hasRedstoneKit", "redstone"),
+		PEACEFUL_MOBS("hasPeacefulMobsKit", "animaux"),
+		HOSTILE_MOBS("hasHostileMobsKit", "monstres"),
+		FLUIDS("hasFluidKit", "fluides"),
+		COMMANDBLOCK("hasCommandblockKit", "command blocks"),
+		ADMIN("hasAdminKit", "admin");
 		
 		String bddKey;
+		String name;
 		
-		KitType(String bddKeyName){
+		KitType(String bddKeyName, String name){
 			bddKey = bddKeyName;
+			this.name = name;
 		}
 		
 		public String getBddKey() {
 			return bddKey;
+		}
+		
+		public String getName() {
+			return name;
 		}
 	}
 }

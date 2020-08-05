@@ -47,14 +47,14 @@ public class PlotParametersGui extends OlympaGUI {
 	private Map<ItemStack, PlotParamType> switchButtons = new LinkedHashMap<ItemStack, PlotParamType>(); 
 	
 	public PlotParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("Paramètres du plot : " + plot.getLoc(), 2);
+		super("Paramètres du plot : " + plot.getLoc(), 3);
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
 
 		newBiome = (Biome) plot.getParameters().getParameter(PlotParamType.PLOT_BIOME);
 		
-		inv.setItem(17, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
+		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
 		if (plot.getMembers().getPlayerLevel(pc) >= 3)
 			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs", "§7Cliquez pour changer la valeur"};

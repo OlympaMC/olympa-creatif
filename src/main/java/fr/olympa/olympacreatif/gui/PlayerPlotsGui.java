@@ -53,8 +53,8 @@ public class PlayerPlotsGui extends OlympaGUI {
 				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getLoc(), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName()));	
 			}
 		}
-
-		inv.setItem(44, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
+		
+		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 			
 	}
 

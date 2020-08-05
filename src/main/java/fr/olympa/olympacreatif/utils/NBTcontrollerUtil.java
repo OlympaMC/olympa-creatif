@@ -1,6 +1,5 @@
 package fr.olympa.olympacreatif.utils;
 
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -34,8 +33,8 @@ public abstract class NBTcontrollerUtil {
 	}
 	
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
-		Bukkit.broadcastMessage("Tag initial : " + tag);
-		Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
+		//Bukkit.broadcastMessage("Tag initial : " + tag);
+		//Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
 		return getValidTags(getValidTags(tag, 0), 0);
 	}
 	

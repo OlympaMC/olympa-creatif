@@ -37,7 +37,7 @@ public class MembersGui extends OlympaGUI {
 		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
 		
-		inv.setItem(26, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
+		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
 		//affichage des membres
 		int headIndex = -1;

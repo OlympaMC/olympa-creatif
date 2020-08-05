@@ -218,7 +218,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getClickedBlock().getLocation());
 
-		if (plot == null && !p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
+		if (plot == null || !p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 			return;
@@ -247,7 +247,8 @@ public class PlotsInstancesListener implements Listener{
 
 		//GESTION COMMAND BLOCKS
 		//si édition/placement du commandblock
-		if (plot.getMembers().getPlayerLevel(p) >= 3 && plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getMaterial())) {
+		if (plot.getMembers().getPlayerLevel(p) >= 3 && e.getClickedBlock() != null && 
+				plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getClickedBlock().getType())) {
 			
 			if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				Block block = e.getClickedBlock();

@@ -118,24 +118,40 @@ public class MainGui extends OlympaGUI {
 				p.teleport((Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC));	
 			}
 			break;
+			
+			
 		case 21:
 			if (plot != null)
 				new MembersGui(plugin, p, plot).create(p);
 			break;
+			
+			
 		case 23:
 			if (plot != null)
 				new InteractionParametersGui(plugin, p, plot).create(p);
 			break;
+			
+			
 		case 22:
 			if (plot != null)
 				new PlotParametersGui(plugin, p, plot).create(p);
 			break;
+			
+			
 		case 13:
 			new PlayerPlotsGui(plugin, p).create(p);
 			break;
+			
+			
+		case 14:
+			new ShopGui(plugin, p).create(p);
+			break;
+			
 		case 30 :
 			p.teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 			break;
+			
+			
 		case 32:
 			if (plugin.getPlotsManager().getPlots().size()>0) {
 				Plot pl = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
@@ -143,6 +159,8 @@ public class MainGui extends OlympaGUI {
 				p.sendMessage(Message.TELEPORT_TO_RANDOM_PLOT.getValue());	
 			}
 			break;
+			
+			
 		case 40:
 			Bukkit.dispatchCommand(p, "oc find");
 			break;
@@ -153,5 +171,10 @@ public class MainGui extends OlympaGUI {
 	@Override
 	public boolean onClickCursor(Player p, ItemStack current, ItemStack cursor, int slot) {
 		return true;
+	}
+	
+	//création item de retour
+	public static ItemStack getBackItem() {
+		return ItemUtils.skullCustom("§cRetour", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ==");
 	}
 }
