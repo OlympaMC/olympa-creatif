@@ -74,7 +74,7 @@ public class UpgradesManager {
 		}
 		
 		public int getMaxLevel() {
-			return values.size();
+			return values.size() - 1;
 		}
 		
 		public int getValueOf(int level) {

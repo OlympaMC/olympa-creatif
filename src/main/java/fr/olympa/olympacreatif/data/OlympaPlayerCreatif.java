@@ -149,12 +149,11 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		
 		int i = UpgradeType.BONUS_PLOTS_LEVEL.getValueOf(upgrades.get(UpgradeType.BONUS_PLOTS_LEVEL));
 
-		if (getGroup() == OlympaGroup.CREA_CREATOR)
-			i += 3;
-		else if(getGroup() == OlympaGroup.CREA_ARCHITECT)
-			i += 3;
-		else if(getGroup() == OlympaGroup.CREA_CONSTRUCTOR)
+		if (getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR))
 			i += 1;
+
+		if (getGroups().containsKey(OlympaGroup.CREA_ARCHITECT))
+			i += 2;
 
 		return i;
 	}

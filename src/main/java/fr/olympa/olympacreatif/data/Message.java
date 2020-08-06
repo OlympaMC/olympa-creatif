@@ -129,7 +129,9 @@ public enum Message {
 	
 	OCO_SET_FLY_SPEED, 
 	ERROR_PLOT_NOT_LOADED, 
-	SHOP_ERR_PREVIOUS_RANK_NEEDED,
+	SHOP_ERR_PREVIOUS_RANK_NEEDED, 
+	
+	SHOP_BUY_SUCCESS,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();
