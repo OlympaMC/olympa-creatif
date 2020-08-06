@@ -56,7 +56,8 @@
 		
 		<dependency>
 			<groupId>fr.olympa</groupId>
-			<artifactId>olympa-api</artifactId>
+			<!--TODO use olympa-api -->
+			<artifactId>olympa-core</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
