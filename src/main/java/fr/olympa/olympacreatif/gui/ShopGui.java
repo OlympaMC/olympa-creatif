@@ -37,7 +37,7 @@ public class ShopGui extends OlympaGUI{
 	private ItemStack buyProcess3 = ItemUtils.skullCustom("§73...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWQ0ZWFlMTM5MzM4NjBhNmRmNWU4ZTk1NTY5M2I5NWE4YzNiMTVjMzZiOGI1ODc1MzJhYzA5OTZiYzM3ZTUifX19");
 	private ItemStack buyProcessQuestion = ItemUtils.skullCustom("§7En attente...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19");
 	private ItemStack buyProcessAccept = ItemUtils.skullCustom("§aCliquez pour acheter", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQwNjNiYTViMTZiNzAzMGEyMGNlNmYwZWE5NmRjZDI0YjA2NDgzNmY1NzA0NTZjZGJmYzllODYxYTc1ODVhNSJ9fX0=");
-	private ItemStack buyProcessDeny = ItemUtils.skullCustom("§cPas assez de fonds", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzIwZWYwNmRkNjA0OTk3NjZhYzhjZTE1ZDJiZWE0MWQyODEzZmU1NTcxODg2NGI1MmRjNDFjYmFhZTFlYTkxMyJ9fX0=");
+	private ItemStack buyProcessDeny = ItemUtils.skullCustom("§cAchat impossible", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzIwZWYwNmRkNjA0OTk3NjZhYzhjZTE1ZDJiZWE0MWQyODEzZmU1NTcxODg2NGI1MmRjNDFjYmFhZTFlYTkxMyJ9fX0=");
 	
 	/*
 	private Map<ItemStack, OlympaGroup> ranks = ImmutableMap.<ItemStack, OlympaGroup>builder()
@@ -254,8 +254,14 @@ public class ShopGui extends OlympaGUI{
 			}
 
 			itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§ePrix : " + price);
+			
 			if (!isBuyable)
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§7Achat indisponible");
+			else if (price > p.getGameMoney())
+				itemHolder = ItemUtils.loreAdd(itemHolder, "§cFonds insuffisants");
+			else
+				itemHolder = ItemUtils.loreAdd(itemHolder, "§aAchat possible");
+				
 		}
 		
 		public Object getItem() {
@@ -287,11 +293,12 @@ public class ShopGui extends OlympaGUI{
 					return;
 				
 				p.removeGameMoney(price);
-				p.addGroup((OlympaGroup)toBuy);
+				p.removeGroup((OlympaGroup)toBuy);
 				
 				p.getPlayer().sendMessage("Acquisition : grade " + toBuy.toString());
 			}
 			
+			new ShopGui(plugin, p.getPlayer()).create(p.getPlayer());
 			new AccountProvider(p.getUniqueId()).saveToDb(p);
 		}
 
