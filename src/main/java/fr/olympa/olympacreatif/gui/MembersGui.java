@@ -19,6 +19,7 @@ import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
@@ -30,7 +31,8 @@ public class MembersGui extends OlympaGUI {
 	private OlympaPlayerCreatif pc;
 	
 	public MembersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("§6Membres du plot : " + plot.getLoc(), 3);
+		super("§6Membres parcelle " + plot.getLoc() + "(" + plot.getMembers().getCount() + "/" + 
+				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)), 3);
 		
 		this.plugin = plugin;
 		this.p = p;
