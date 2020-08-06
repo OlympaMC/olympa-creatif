@@ -177,4 +177,13 @@ public class MainGui extends OlympaGUI {
 	public static ItemStack getBackItem() {
 		return ItemUtils.skullCustom("§cRetour", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ==");
 	}
+	
+	//open main gui
+	public static void openMainGui(Player p) {
+		Plot plot = OlympaCreatifMain.getMainClass().getPlotsManager().getPlot(p.getLocation());
+		if (plot == null)
+			new MainGui(OlympaCreatifMain.getMainClass(), p, plot, "Menu").create(p);
+		else
+			new MainGui(OlympaCreatifMain.getMainClass(), p, plot, "Menu >> " + plot.getLoc()).create(p);
+	}
 }

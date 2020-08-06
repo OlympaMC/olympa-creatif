@@ -86,9 +86,9 @@ public class UpgradesManager {
 				return getValues().get(level);
 		}
 		
-		public Integer getPriceOf(int level) {
+		public int getPriceOf(int level) {
 			if (level < 0 || level >= values.size())
-				return null;
+				return 0;
 			
 			return values.get(getValueOf(level));
 		}
