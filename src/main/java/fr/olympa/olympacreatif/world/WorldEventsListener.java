@@ -375,10 +375,6 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits
 	public void onInterract(PlayerInteractEvent e) {
-		if (PlotId.fromLoc(plugin, e.getPlayer().getLocation()) == null) {
-			e.setCancelled(true);
-			return;	
-		}
 		
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		
@@ -387,6 +383,11 @@ public class WorldEventsListener implements Listener{
 			e.setCancelled(true);
 			e.getPlayer().getInventory().setItem(e.getHand(), plugin.getPerksManager().getKitsManager().getNoKitPermItem(e.getMaterial()));
 			return;
+		}
+		
+		if (PlotId.fromLoc(plugin, e.getPlayer().getLocation()) == null) {
+			e.setCancelled(true);
+			return;	
 		}
 	}
 	

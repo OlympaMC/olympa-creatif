@@ -255,9 +255,6 @@ public class ShopGui extends OlympaGUI{
 			this.toBuy = toBuy;
 			this.itemHolder = holder;
 			this.price = defaultPrice;
-
-			//Bukkit.broadcastMessage("joueur : " + this.p);
-			//Bukkit.broadcastMessage("groupes : " + this.p.getGroups());
 			
 			//Repère les objets non achetables (déjà achetés ou prérequis non validés)
 			if (toBuy instanceof OlympaGroup) {
@@ -294,7 +291,8 @@ public class ShopGui extends OlympaGUI{
 								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ▶ " + 
 								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1));
 					else
-						itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : §7maximum atteint");
+						itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
+								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ▶ §7maximum atteint");
 			}
 
 			itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§ePrix : " + price);

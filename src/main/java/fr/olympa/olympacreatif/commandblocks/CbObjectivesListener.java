@@ -24,6 +24,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective.ObjType;
 import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
+import fr.olympa.olympacreatif.plot.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CbObjectivesListener implements Listener {
@@ -83,22 +84,17 @@ public class CbObjectivesListener implements Listener {
 
 		for (CbObjective o : plot.getCbData().getObjectives())
 			switch(o.getType()) {
-			case deathCount:
-				if (e.getEntityType() == EntityType.PLAYER)
-					o.add(e.getEntity(), 1);
-				break;
+			
 			case minecraft_killed:
 				if (e.getEntityType() == o.getParamType() && e.getEntity().getKiller() != null)
 					o.add(e.getEntity().getKiller(), 1);
 				break;
+				
 			case minecraft_killed_by:
 				if (e.getEntity().getLastDamageCause().getEntity() == o.getParamType())
 					o.add(e.getEntity(), 1);
 				break;
-			case playerKillCount:
-				if (e.getEntityType() == EntityType.PLAYER && e.getEntity().getKiller() != null)
-					o.add(e.getEntity().getKiller(), 1);
-				break;
+				
 			case totalKillCount:
 				if (e.getEntity().getKiller() != null)
 					o.add(e.getEntity().getKiller(), 1);
@@ -124,6 +120,59 @@ public class CbObjectivesListener implements Listener {
 					o.add(e.getEntity(), 1);
 				break;
 			}
+	}
+	
+	@EventHandler
+	public void onFakeDeath(FakePlayerDeathEvent e) {
+		
+		Plot plot = e.getPlot();
+		
+		if (plot == null)
+			return;
+
+		for (CbObjective o : plot.getCbData().getObjectives())
+			switch(o.getType()) {
+			case minecraft_killed:
+				if (o.getParamType() == EntityType.PLAYER && e.getKiller() != null)
+					o.add(e.getKiller(), 1);
+				break;
+				
+			case minecraft_killed_by:
+				if (e.getKiller() != null && o.getParamType() == e.getKiller().getType())
+					o.add(e.getPlayer(), 1);
+				break;
+				
+			case totalKillCount:
+				if (e.getKiller() != null)
+					o.add(e.getKiller(), 1);
+				break;
+				
+			case deathCount:
+				o.add(e.getPlayer(), 1);
+				break;
+				
+			case playerKillCount:
+				if (e.getKiller() != null)
+					o.add(e.getKiller(), 1);
+				break;
+				
+			case teamkill:
+				if (e.getKiller() == null)
+					return;
+				
+				CbTeam targetTeam = plot.getCbData().getTeamOf(e.getPlayer());
+				
+				if (targetTeam != null && o.getParamType() == targetTeam.getColor())
+					o.add(e.getKiller(), 1);
+				break;
+				
+			case killedByTeam:
+				CbTeam killedTeam = plot.getCbData().getTeamOf(e.getKiller());
+				
+				if (killedTeam != null && o.getParamType() == killedTeam.getColor())
+					o.add(e.getPlayer(), 1);
+				break;
+			}		
 	}
 	
 	@EventHandler

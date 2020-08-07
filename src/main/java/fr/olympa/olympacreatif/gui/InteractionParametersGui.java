@@ -58,11 +58,8 @@ public class InteractionParametersGui extends OlympaGUI {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		if (slot == 53) {
-			if (plot == null)
-				new MainGui(plugin, p, plot, "§9Menu").create(p);
-			else
-				new MainGui(plugin, p, plot, "§9Menu >> " + plot.getLoc()).create(p);
+		if (slot == inv.getSize() - 1) {
+			MainGui.openMainGui(p);
 			return true;
 		}
 		

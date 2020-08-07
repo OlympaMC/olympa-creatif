@@ -57,9 +57,9 @@ public class PlotParametersGui extends OlympaGUI {
 		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
 		if (plot.getMembers().getPlayerLevel(pc) >= 3)
-			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs", "§7Cliquez pour changer la valeur"};
+			 clickToChange = new String[] {" ", "§7Cliquez pour changer la valeur"};
 		else
-			 clickToChange = new String[] {" ", "§7Ne concerne que les visiteurs"};
+			 clickToChange = new String[] {};
 		
 		//ajout des options
 		ItemStack it = null;
@@ -116,6 +116,8 @@ public class PlotParametersGui extends OlympaGUI {
 		switchButtons.put(ItemUtils.item(Material.TNT, "§6Amorçage de la TNT"), PlotParamType.ALLOW_PRINT_TNT);
 		switchButtons.put(ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Forcer le spawn parcelle"), PlotParamType.FORCE_SPAWN_LOC);
 		switchButtons.put(ItemUtils.item(Material.FEATHER, "§6Vol des visiteurs"), PlotParamType.ALLOW_FLY_INCOMING_PLAYERS);
+		switchButtons.put(ItemUtils.item(Material.ARROW, "§6Activation des projectiles"), PlotParamType.ALLOW_LAUNCH_PROJECTILES);
+		
 		
 		Map<ItemStack, PlotParamType> switches = new LinkedHashMap<ItemStack, PlotParamType>();
 		
@@ -129,11 +131,8 @@ public class PlotParametersGui extends OlympaGUI {
 	
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		if (slot == 17) {
-			if (plot == null)
-				new MainGui(plugin, p, plot, "Menu").create(p);
-			else
-				new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc()).create(p);
+		if (slot == inv.getSize() - 1) {
+			MainGui.openMainGui(p);
 			return true;
 		}
 		

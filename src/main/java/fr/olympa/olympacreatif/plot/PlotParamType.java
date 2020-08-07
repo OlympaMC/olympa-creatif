@@ -25,6 +25,7 @@ public enum PlotParamType {
 	ALLOW_PVE("allow_pveez", false),
 	ALLOW_ENVIRONMENT_DAMAGE("allow_environment_damage", false),
 	ALLOW_DROP_ITEMS("allow_drop_items", false),
+	ALLOW_LAUNCH_PROJECTILES("allow_drop_projectiles", false),
 	
 	KEEP_MAX_FOOD_LEVEL("keep_max_food_level", true),
 	KEEP_INVENTORY_ON_DEATH("keep_inventory_gamerule", false),

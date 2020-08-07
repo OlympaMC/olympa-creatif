@@ -31,8 +31,8 @@ public class MembersGui extends OlympaGUI {
 	private OlympaPlayerCreatif pc;
 	
 	public MembersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("§6Membres parcelle " + plot.getLoc() + "(" + plot.getMembers().getCount() + "/" + 
-				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)), 3);
+		super("Membres parcelle " + plot.getLoc() + "(" + plot.getMembers().getCount() + "/" + 
+				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3);
 		
 		this.plugin = plugin;
 		this.p = p;
@@ -53,7 +53,7 @@ public class MembersGui extends OlympaGUI {
 			Consumer<ItemStack> consumer = sk -> inv.setItem(thisHeadIndex, sk);
 			
 			List<String> lore = new ArrayList<String>();
-			lore.add("§6Rang : " + e.getValue().getRankName());
+			lore.add("e6Rang : " + e.getValue().getRankName());
 
 			//définition de son statut
 			if (Bukkit.getPlayer(e.getKey().getUUID()) != null)
@@ -75,11 +75,8 @@ public class MembersGui extends OlympaGUI {
 
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		if (slot == 26) {
-			if (plot == null)
-				new MainGui(plugin, p, plot, "Menu").create(p);
-			else
-				new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc()).create(p);
+		if (slot == inv.getSize() - 1) {
+			MainGui.openMainGui(p);
 			return true;
 		}
 
