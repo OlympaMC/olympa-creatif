@@ -111,7 +111,7 @@ public class CbCommandListener implements Listener {
 		
 		//return si la commande est nulle
 		if (cmd == null) {
-			e.getPlayer().sendMessage(Message.CB_INVALID_CMD.getValue());
+			e.getPlayer().sendMessage(Message.CB_INVALID_CMD.getValue()); 
 			return;	
 		}
 		
