@@ -60,6 +60,10 @@ public class PlotMembers{
 		return false;
 	}
 
+	public int getMaxMembers() {
+		return maxMembers;
+	}
+	
 	public void setMaxMembers(int max) {
 		maxMembers = max;
 	}

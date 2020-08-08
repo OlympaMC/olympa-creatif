@@ -90,11 +90,15 @@ public class OcCommand extends OlympaCommand {
 			case "accept":
 				if (pendingInvitations.containsKey(sender)) {
 					
+					//si le joueur a assez de slots pour rejoindre le plot
 					if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
-						
-						sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue());
-						pendingInvitations.get(sender).getMembers().set(p, PlotRank.MEMBER);
-						pendingInvitations.remove(sender);
+						//si le plot a assez de slots pour accueillir un nouveau membre
+						if (pendingInvitations.get(sender).getMembers().getMaxMembers() > pendingInvitations.get(sender).getMembers().getCount()) {
+							sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue());
+							pendingInvitations.get(sender).getMembers().set(p, PlotRank.MEMBER);
+							pendingInvitations.remove(sender);	
+						}else
+							sender.sendMessage(Message.PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS.getValue());
 						
 					}else {
 						sender.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
@@ -201,9 +205,12 @@ public class OcCommand extends OlympaCommand {
 					if (plot.getMembers().getPlayerLevel(p) >= 3)
 						if (target != null)
 							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR) {
-								pendingInvitations.put(target, plot);
-								target.sendMessage(Message.PLOT_RECIEVE_INVITATION.getValue().replace("%player%", sender.getName().replace("%plot%", ""+plot.getLoc())));
-								sender.sendMessage(Message.PLOT_SEND_INVITATION.getValue().replace("%player%", target.getName().replace("%plot%", ""+plot.getLoc())));
+								if (plot.getMembers().getMaxMembers() > plot.getMembers().getCount()) {
+									pendingInvitations.put(target, plot);
+									target.sendMessage(Message.PLOT_RECIEVE_INVITATION.getValue());
+									sender.sendMessage(Message.PLOT_SEND_INVITATION.getValue());	
+								}else
+									sender.sendMessage(Message.PLOT_INSUFFICIENT_MEMBERS_SIZE.getValue());
 							}else
 								sender.sendMessage(Message.PLOT_INVITATION_TARGET_ALREADY_MEMBER.getValue());
 						else

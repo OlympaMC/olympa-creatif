@@ -91,7 +91,7 @@ public class OcoCommand extends OlympaCommand {
 			case "debug":
 				Plot plot2 = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 				if (plot2 == null) {
-					sender.sendMessage(Message.ERROR_PLOT_NOT_LOADED.getValue());
+					sender.sendMessage(Message.PLOT_ERR_NOT_LOADED.getValue());
 					break;
 				}
 				

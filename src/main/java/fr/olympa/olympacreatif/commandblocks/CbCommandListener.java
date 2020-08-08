@@ -111,14 +111,15 @@ public class CbCommandListener implements Listener {
 		
 		//return si la commande est nulle
 		if (cmd == null) {
-			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+			e.getPlayer().sendMessage(Message.CB_INVALID_CMD.getValue());
 			return;	
 		}
 		
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		
-		//exécution de la commande si l'exécutant est au minimum co-prop et a le kit cb, si la commandes est un /trigger ou si c'est un give (pour permettre les oeufs et les cb)
-		if (cmd.getPlot().getMembers().getPlayerLevel(p) >= cmd.getMinPlotLevelToExecute()) 
+		//si la commandes est un trigger, ou si le joueur a la perm d'exécuter cette commande (selon kit et type cmd)
+		if (cmd.getType() == CommandType.trigger ||
+				cmd.getPlot().getMembers().getPlayerLevel(p) >= cmd.getMinPlotLevelToExecute() && (p.hasKit(KitType.COMMANDBLOCK) || cmd.getType() == CommandType.give))
 			executeCommandBlockCommand(cmd, e.getPlayer());
 		else
 			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
