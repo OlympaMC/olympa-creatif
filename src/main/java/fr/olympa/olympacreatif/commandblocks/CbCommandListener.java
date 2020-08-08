@@ -114,7 +114,7 @@ public class CbCommandListener implements Listener {
 			e.getPlayer().sendMessage(Message.CB_INVALID_CMD.getValue()); 
 			return;	
 		}
-		
+		 
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		 
 		//si la commandes est un trigger, ou si le joueur a la perm d'exécuter cette commande (selon kit et type cmd)
