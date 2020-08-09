@@ -39,6 +39,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			.put("upgradeLevelCommandBlock", "TINYINT NOT NULL DEFAULT 0")
 			.put("upgradeLevelBonusPlots", "TINYINT NOT NULL DEFAULT 0")
 			.put("upgradeLevelBonusMembers", "TINYINT NOT NULL DEFAULT 0")
+
+			.put("playerParamDefaultPlotChat", "TINYINT NOT NULL DEFAULT 1")
+			.put("playerParamOpenMenuOnSneak", "TINYINT NOT NULL DEFAULT 1")
 			
 			.build();
 	
@@ -47,6 +50,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 
 	private List<KitType> kits = new ArrayList<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();
+	private List<PlayerParamType> playerParams = new ArrayList<PlayerParamType>();
 	
 	private List<String> scoreboardLines = new ArrayList<String>();
 	public static final int scoreboardLinesSize = 8;
@@ -68,6 +72,10 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		
 		for (UpgradeType upg : UpgradeType.values())
 			upgrades.put(upg, resultSet.getInt(upg.getBddKey()));
+		
+		for (PlayerParamType param : PlayerParamType.values())
+			if (resultSet.getBoolean(param.getBddKey()))
+				playerParams.add(param);
 	}
 	
 	@Override
@@ -84,6 +92,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		//consommables
 		for (int i = 2 + KitType.values().length ; i < 2 + KitType.values().length + UpgradeType.values().length ; i++)
 			statement.setInt(i, upgrades.get(UpgradeType.values()[i - 2 - KitType.values().length]));
+		
+		//player params
+		for (int i = 2 + KitType.values().length  + UpgradeType.values().length ; i < 2 + KitType.values().length + UpgradeType.values().length + PlayerParamType.values().length; i++)
+			if (playerParams.contains(PlayerParamType.values()[i - 2 - KitType.values().length - UpgradeType.values().length]))
+				statement.setBoolean(i, true);
+			else
+				statement.setBoolean(i, false);
+			
 	}
 	
 	public void addGameMoney(int i) {
@@ -259,6 +275,33 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		
 		public OlympaPermission getOlympaPerm() {
 			return corePerm;
+		}
+	}
+
+	public void setPlayerParam(PlayerParamType param, boolean state) {
+		if (state) {
+			if (!playerParams.contains(param))
+				playerParams.add(param);
+		}else
+			playerParams.remove(param);
+	}
+	
+	public boolean getPlayerParam(PlayerParamType param) {
+		return playerParams.contains(param);
+	}
+	
+	public enum PlayerParamType{
+		DEFAULT_PLOT_CHAT("playerParamDefaultPlotChat"),
+		OPEN_GUI_ON_SNEAK("playerParamOpenMenuOnSneak");
+		
+		private String bddKey;
+		
+		PlayerParamType(String bddKey){
+			this.bddKey = bddKey;
+		}
+		
+		public String getBddKey() {
+			return bddKey;
 		}
 	}
 }

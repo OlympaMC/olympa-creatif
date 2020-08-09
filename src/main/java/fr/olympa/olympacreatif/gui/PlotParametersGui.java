@@ -248,7 +248,7 @@ public class PlotParametersGui extends OlympaGUI {
 		return true;
 	}
 
-	public ItemStack setSwitchState(ItemStack it, boolean newState) {
+	public static ItemStack setSwitchState(ItemStack it, boolean newState) {
 		List<String> list = it.getItemMeta().getLore();
 		if (list == null)
 			list = new ArrayList<String>();
