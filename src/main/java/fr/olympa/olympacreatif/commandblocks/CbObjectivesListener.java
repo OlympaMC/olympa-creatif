@@ -81,7 +81,7 @@ public class CbObjectivesListener implements Listener {
 		
 		if (plot == null)
 			return;
-
+		
 		for (CbObjective o : plot.getCbData().getObjectives())
 			switch(o.getType()) {
 			

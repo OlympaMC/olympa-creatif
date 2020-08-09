@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +54,8 @@ public class CmdExecute extends CbCommand {
 			}
 		}
 		
-		if (currentType == ExecuteType.cmd_run)
-			subCommands.put(currentType, subArgs);
+		//copie de la dernière sous commande du /execute
+		subCommands.put(currentType, subArgs);
 		
 		//passage de la sous commande store (s'il y en a une) tout à la fin de la liste
 		if (subCommands.keySet().contains(ExecuteType.cmd_store))
@@ -144,7 +145,14 @@ public class CmdExecute extends CbCommand {
 				
 				for (Location loc : new ArrayList<Location>(sendingLocations)) {
 					sendingLoc = loc;
-					for (Entry<CommandSender, Location> e : commandSenders.entrySet()) {
+					
+					Iterator<Entry<CommandSender, Location>> iter = commandSenders.entrySet().iterator();
+					int senderSize = commandSenders.size();
+					
+					while(iter.hasNext()) {
+						
+						Entry<CommandSender, Location> e = iter.next();
+						
 						sender = e.getKey();
 						
 						if (e.getValue() != null)
@@ -156,12 +164,18 @@ public class CmdExecute extends CbCommand {
 							return 0;
 						
 						if (result == 0)
-							sendingLocations.remove(loc);
+							if (senderSize == 1)
+								sendingLocations.remove(loc);
+							else if (sendingLocations.size() == 1)
+								iter.remove();
+							else {
+								sendingLocations.remove(loc);
+								iter.remove();
+							}
 						
-
 						cmdResults.add(result);	
 					}
-				}
+				}				
 				break;
 				
 				
@@ -170,23 +184,40 @@ public class CmdExecute extends CbCommand {
 				
 				for (Location loc : new ArrayList<Location>(sendingLocations)) {
 					sendingLoc = loc;
-					for (Entry<CommandSender, Location> e : commandSenders.entrySet()) {
+					
+					Iterator<Entry<CommandSender, Location>> iter = commandSenders.entrySet().iterator();
+					int senderSize = commandSenders.size();
+					
+					while(iter.hasNext()) {
+						
+						Entry<CommandSender, Location> e = iter.next();
+						
 						sender = e.getKey();
 						
 						if (e.getValue() != null)
 							sendingLoc = e.getValue();
 						
 						Integer result = executeIfUnlessTest(subCmd.getValue());
+						
 						if (result == null)
 							return 0;
 						
-						if (result != 0) 
-							sendingLocations.remove(loc);
+						if (result > 0)
+							if (senderSize == 1)
+								sendingLocations.remove(loc);
+							else if (sendingLocations.size() == 1)
+								iter.remove();
+							else {
+								sendingLocations.remove(loc);
+								iter.remove();
+							}
 						
-
-						cmdResults.add(result);	
+						if (result == 0)
+							cmdResults.add(1);
+						else
+							cmdResults.add(0);
 					}
-				}
+				}				
 				break;
 				
 				

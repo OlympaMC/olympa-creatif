@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -53,6 +54,8 @@ public class CmdClear extends CbCommand {
 		int playerItemsToRemove = 0;
 		
 		for (Entity e : targetEntities) {
+			if (e.getType() != EntityType.PLAYER)
+				continue;
 			
 			playerItemsToRemove = removedItemLimit;
 			
@@ -70,7 +73,7 @@ public class CmdClear extends CbCommand {
 					if (it.getAmount() < playerItemsToRemove) {
 						
 						playerItemsToRemove -= it.getAmount();
-						((Player) e).getInventory().remove(it);
+						it.setAmount(0);
 						
 					}else {
 						it.setAmount(it.getAmount() - playerItemsToRemove);

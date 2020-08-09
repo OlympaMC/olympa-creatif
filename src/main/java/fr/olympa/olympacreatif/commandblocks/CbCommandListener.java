@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.command.CommandSender;
@@ -79,12 +80,16 @@ public class CbCommandListener implements Listener {
 		
 		CbCommand cmd = CbCommand.getCommand(plugin, e.getSender(), cb.getLocation(), e.getCommand());
 		
+		//maintainCbTags(e.getSender());
+		
 		if (cmd != null && !cmd.getPlot().hasStoplag()) {
 			
-			//si le commandblock va trop vite, cancel de la commande
-			if (blockedExecutionLocs.containsKey(cb.getLocation()))
-				return;
-			else
+			//si le commandblock va trop vite, cancel de la commande et maintien des valeurs NBT du commandblock
+			if (blockedExecutionLocs.containsKey(cb.getLocation())) {
+				//if (cb.getType() == Material.REPEATING_COMMAND_BLOCK)
+				//	maintainCbTags(e.getSender());
+				return;	
+			}else
 				//commandblock lents, max 1 cmd/s
 				if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
 					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - CommandBlocksManager.minTickBetweenEachCbExecution);
@@ -157,10 +162,14 @@ public class CbCommandListener implements Listener {
 		if (!(sender instanceof CraftBlockCommandSender))
 			return;
 		
+		setCbTags(sender, result);
+		
+		/*
 		BlockState cb = (BlockState) ((CraftBlockCommandSender) sender).getBlock().getState();
 		
 		//update valeurs NBT commandblock
-			
+		CommandBlock b;
+
 		TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(
 				new BlockPosition(cb.getLocation().getX(), cb.getLocation().getY(), cb.getLocation().getZ()));
 		
@@ -171,7 +180,7 @@ public class CbCommandListener implements Listener {
 		//Bukkit.broadcastMessage(tag.asString());
 		
 		if (tag.hasKey("SuccessCount"))
-			tag.setInt("SuccessCount", Math.max(0, result));
+			tag.setInt("SuccessCount", (byte) Math.max(0, result));
 		
 		if (tag.hasKey("LastExecution"))
 			tag.setLong("LastExecution", MinecraftServer.currentTick);
@@ -183,20 +192,56 @@ public class CbCommandListener implements Listener {
 				tag.setBoolean("conditionMet", true);
 		
 		tile.load(tag);
-			
-		return;
+		*/
 	}
 	
+	private void maintainCbTags(CommandSender sender) {
+		
+		BlockState cb = (BlockState) ((CraftBlockCommandSender) sender).getBlock().getState();
+
+		TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(
+				new BlockPosition(cb.getLocation().getX(), cb.getLocation().getY(), cb.getLocation().getZ()));
+		
+		NBTTagCompound tag = new NBTTagCompound();
+		
+		tile.save(tag);
+		
+		if (tag.hasKey("SuccessCount"))
+			setCbTags(tile, tag.getInt("SuccessCount"));
+	}
 	
+	private void setCbTags(CommandSender sender, int cmdResult) {
+		
+		BlockState cb = (BlockState) ((CraftBlockCommandSender) sender).getBlock().getState();
+
+		TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(
+				new BlockPosition(cb.getLocation().getX(), cb.getLocation().getY(), cb.getLocation().getZ()));
+		
+		setCbTags(tile, cmdResult);
+	}
 	
+	private void setCbTags(TileEntity cb, int cmdResult) {
+		
+		NBTTagCompound tag = new NBTTagCompound();
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		cb.save(tag);
+		
+		//Bukkit.broadcastMessage("save tag : " + tag);
+		
+		//Bukkit.broadcastMessage(tag.asString());
+		
+		if (tag.hasKey("SuccessCount"))
+			tag.setInt("SuccessCount", (byte) Math.max(0, cmdResult));
+		
+		if (tag.hasKey("LastExecution"))
+			tag.setLong("LastExecution", MinecraftServer.currentTick);
+		
+		if (tag.hasKey("conditionMet"))
+			if (cmdResult == 0)
+				tag.setBoolean("conditionMet", false);
+			else
+				tag.setBoolean("conditionMet", true);
+		
+		cb.load(tag);
+	}
 }
