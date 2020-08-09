@@ -57,12 +57,13 @@ public class MainGui extends OlympaGUI {
 			int ownedPlotsSlots = p.getPlotsSlots(true);
 			int memberPlotsSlots = p.getPlotsSlots(false);
 			
-			sk = ItemUtils.name(sk, "§6Profil de " + player.getDisplayName());
-			sk = ItemUtils.loreAdd(sk, "§eGrade : " + p.getGroupNameColored(), 
+			sk = ItemUtils.name(sk, "§6Paramètres de " + player.getDisplayName());
+			sk = ItemUtils.lore(sk, clickToOpenMenu);
+			/*sk = ItemUtils.loreAdd(sk, "§eGrade : " + p.getGroupNameColored(), 
 					" ",
 					"§eParcelles totales : " + memberPlots + "/" + memberPlotsSlots,  
 					"§eParcelles propriétaire : " + ownedPlots + "/" + ownedPlotsSlots);
-			
+			*/
 			inv.setItem(12, sk);
 			
 		};
@@ -138,6 +139,11 @@ public class MainGui extends OlympaGUI {
 			break;
 			
 			
+		case 12:
+			new PlayerParametersGui(plugin, p).create(p);
+			break;
+			
+			
 		case 13:
 			new PlayerPlotsGui(plugin, p).create(p);
 			break;
@@ -156,7 +162,7 @@ public class MainGui extends OlympaGUI {
 			if (plugin.getPlotsManager().getPlots().size()>0) {
 				Plot pl = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
 				p.teleport((Location) pl.getParameters().getParameter(PlotParamType.SPAWN_LOC));
-				p.sendMessage(Message.TELEPORT_TO_RANDOM_PLOT.getValue());	
+				p.sendMessage(Message.TELEPORT_TO_RANDOM_PLOT.getValue());
 			}
 			break;
 			

@@ -51,10 +51,14 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ClickEvent.Action;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class WorldEventsListener implements Listener{
 
@@ -277,13 +281,16 @@ public class WorldEventsListener implements Listener{
 	public void onOpenMenu(PlayerToggleSneakEvent e) {
 		if (e.isSneaking())
 			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
-				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis()) {
-					Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
-					if (plot == null)
-						new MainGui(plugin, e.getPlayer(), plot, "Menu").create(e.getPlayer());
+				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis())
+					if (((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK))
+						MainGui.openMainGui(e.getPlayer());
 					else
-						new MainGui(plugin, e.getPlayer(), plot, "Menu >> " + plot.getLoc()).create(e.getPlayer());	
-				}else
+						e.getPlayer().spigot().sendMessage(new ComponentBuilder()
+								.color(net.md_5.bungee.api.ChatColor.GOLD).append("Ouverture du menu via double sneak désactivé. Modifiez vos paramètres ou ")
+								.color(net.md_5.bungee.api.ChatColor.GOLD).color(net.md_5.bungee.api.ChatColor.BOLD)
+								.event(new ClickEvent(Action.RUN_COMMAND, "/oc menu")).append("cliquez ici pour ouvrir le menu")
+								.create());
+				else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
 			else
 				sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
@@ -315,19 +322,17 @@ public class WorldEventsListener implements Listener{
 			return;
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		
-		//e.setFormat(String.format(e.getFormat(), "pseudoTest", e.getMessage()));
+		if (PermissionsList.USE_COLORED_TEXT.hasPermission(p))
+			e.setMessage(ChatColor.translateAlternateColorCodes('&', e.getMessage()));
 		
 		if (e.getMessage().startsWith("@") || plot == null)
 			e.setMessage(e.getMessage().replaceFirst("@", ""));
-		else {
+		
+		else if (p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)){
 			e.getRecipients().clear();
-			e.setFormat("§7[Parcelle " + plot.getPlotId() + "] §r" + 
-			AccountProvider.get(e.getPlayer().getUniqueId()).getGroupNameColored() + " " + e.getPlayer().getName() +
-			" §r§7: " + e.getMessage());
-			
-			for (Player p : plot.getPlayers())
-				e.getRecipients().add(p);
+			plot.sendMessage(p, e.getMessage());
 		}
 		
 	}

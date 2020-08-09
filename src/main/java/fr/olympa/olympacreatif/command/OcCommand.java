@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,20 +13,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.command.OlympaCommand;
-import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
-import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
-import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
@@ -52,6 +49,23 @@ public class OcCommand extends OlympaCommand {
 		Player target = null;
 		Plot plot;
 		WorldEditError err;
+		
+		if (args.length > 0 && args[0].equals("chat")) {
+			plot = plugin.getPlotsManager().getPlot(p.getLocation());
+			if (plot == null)
+				p.sendMessage(Message.PLOT_NULL_PLOT.getValue());
+			else {
+				String concat = "";
+				List<String> argsMsg = new ArrayList<String>(Arrays.asList(args));
+				argsMsg.remove(0);
+				
+				for (String s : argsMsg)
+					concat += s + " ";
+				
+				plot.sendMessage(pc, concat);
+			}
+			return false;
+		}
 		
 		switch (args.length) {
 		case 1:
@@ -341,6 +355,7 @@ public class OcCommand extends OlympaCommand {
 			sender.sendMessage(Message.COMMAND_HELP.getValue());
 			break;
 		}
+		
 		return false;
 	}
 
@@ -363,6 +378,7 @@ public class OcCommand extends OlympaCommand {
 			list.add("ban");
 			list.add("unban");
 			list.add("protectedarea");
+			list.add("chat");
 			break;
 		case 2:
 			switch(args[0]) {

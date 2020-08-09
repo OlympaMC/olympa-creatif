@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -16,13 +14,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.block.data.type.Dispenser;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -34,11 +30,8 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -46,9 +39,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -62,7 +53,6 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
-import net.minecraft.server.v1_15_R1.ItemPickaxe;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.PacketPlayOutTileEntityData;
 import net.minecraft.server.v1_15_R1.TileEntity;
@@ -73,7 +63,7 @@ public class PlotsInstancesListener implements Listener{
 	private static Map<Player, List<ItemStack>> inventoryStorage = new HashMap<Player, List<ItemStack>>();
 	private Plot plot;
 	
-	private Map<UUID, List<ItemStack>> itemsToKeepOnDeath = new HashMap<UUID, List<ItemStack>>();
+	//private Map<UUID, List<ItemStack>> itemsToKeepOnDeath = new HashMap<UUID, List<ItemStack>>();
 	
 	private List<Material> commandBlockTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
 
@@ -362,14 +352,15 @@ public class PlotsInstancesListener implements Listener{
 		Player p = e.getPlayer();
 		
 		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
-		
-		if (plotFrom != null) {
-			executeQuitActions(plugin, p, plotFrom);
-		}
-		
-		
 		Plot plotTo = plugin.getPlotsManager().getPlot(e.getTo());
 		
+		if (plotFrom != null && plotFrom.equals(plotTo))
+			return;
+		
+		if (plotFrom != null) 
+			executeQuitActions(plugin, p, plotFrom);
+		
+
 		if (plotTo != null) {
 			if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId()))
 				if ( ! ((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
@@ -414,7 +405,7 @@ public class PlotsInstancesListener implements Listener{
 
 	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
 	public void onQuitEvent(PlayerQuitEvent e) {
-		itemsToKeepOnDeath.remove(e.getPlayer().getUniqueId());
+		//itemsToKeepOnDeath.remove(e.getPlayer().getUniqueId());
 		inventoryStorage.remove(e.getPlayer());
 		
 		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
@@ -599,7 +590,10 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	//gestion fake death (le joueur ne doit jamais vraiment mourir sinon le fake op ne fonctionne plus)
-	private boolean fireFakeDeath(Player p, Entity killer, Plot plot, double damages) {
+	public static boolean fireFakeDeath(Player p, Entity killer, Plot plot, double damages) {
+
+		Bukkit.broadcastMessage("(debug) joueur " + p.getName() + " take damages : " + damages + "/" + p.getHealth()); 
+		
 		if (p.getHealth() > damages)
 			return false;
 		

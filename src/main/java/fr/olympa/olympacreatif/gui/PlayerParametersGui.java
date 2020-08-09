@@ -21,7 +21,7 @@ public class PlayerParametersGui extends OlympaGUI{
 		super("Paramètres de " + player.getName(), 1);
 		this.plugin = plugin;
 		
-		p = AccountProvider.get(p.getUniqueId());
+		p = AccountProvider.get(player.getUniqueId());
 
 		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
@@ -45,7 +45,7 @@ public class PlayerParametersGui extends OlympaGUI{
 			break;
 		case 1:
 			p.setPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK, !p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK));
-			inv.setItem(0, PlotParametersGui.setSwitchState(current, p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)));
+			inv.setItem(1, PlotParametersGui.setSwitchState(current, p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)));
 			break;
 		}
 		

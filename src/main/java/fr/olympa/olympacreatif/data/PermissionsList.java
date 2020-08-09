@@ -6,7 +6,7 @@ import fr.olympa.api.permission.OlympaPermission;
 public class PermissionsList {	
 	public static final OlympaPermission USE_WORLD_EDIT = new OlympaPermission(OlympaGroup.CREA_ARCHITECT);
 	public static final OlympaPermission USE_MICRO_BLOCKS = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
-	public static final OlympaPermission USE_COLORED_TEXT = new OlympaPermission(OlympaGroup.CREA_ARCHITECT);
+	public static final OlympaPermission USE_COLORED_TEXT = new OlympaPermission(OlympaGroup.CREA_CREATOR);
 	public static final OlympaPermission USE_PLOT_EXPORTATION = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	public static final OlympaPermission USE_PROTECTED_AREA = new OlympaPermission(OlympaGroup.CREA_CREATOR);
 	

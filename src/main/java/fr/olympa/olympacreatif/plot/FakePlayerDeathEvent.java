@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -15,6 +16,8 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class FakePlayerDeathEvent extends Event{
 
+    private static final HandlerList handlers = new HandlerList();
+	
 	Entity killer;
 	Player p;
 	Plot plot;
@@ -40,13 +43,14 @@ public class FakePlayerDeathEvent extends Event{
 			respawn = (Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC);
 			
 			if (!(boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH)) {
-				drops.addAll(Arrays.asList(p.getInventory().getContents()));
+				p.getInventory().forEach(item -> {if (item != null) drops.add(item);});
 				
 				p.getInventory().clear();
 			}
 		}
 		
-		
+		p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+		p.setFoodLevel(20);
 	}
 	
 	public Player getPlayer() {
@@ -75,7 +79,11 @@ public class FakePlayerDeathEvent extends Event{
 	
 	@Override
 	public HandlerList getHandlers() {
-		return null;
+		return handlers;
 	}
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
 
 }

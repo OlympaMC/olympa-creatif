@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -16,13 +17,16 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
+import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.player.OlympaPlayerInformations;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
@@ -149,5 +153,16 @@ public class Plot {
 			return false;
 		else
 			return true;
+	}
+	
+	public void sendMessage(OlympaPlayerCreatif pc, String msg) {
+		if (PermissionsList.USE_COLORED_TEXT.hasPermission(pc))
+			msg = ChatColor.translateAlternateColorCodes('&', msg);
+		
+		msg = "§7[Parcelle " + getPlotId() + "] §r" + 
+		pc.getGroupNameColored() + " " + pc.getPlayer().getName() + " §r§7: " + msg;
+		
+		for (Player p : getPlayers())
+			p.sendMessage(msg);
 	}
 }
