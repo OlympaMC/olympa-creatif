@@ -286,9 +286,9 @@ public class WorldEventsListener implements Listener{
 						MainGui.openMainGui(e.getPlayer());
 					else
 						e.getPlayer().spigot().sendMessage(new ComponentBuilder()
-								.color(net.md_5.bungee.api.ChatColor.GOLD).append("Ouverture du menu via double sneak désactivé. Modifiez vos paramètres ou ")
+								.color(net.md_5.bungee.api.ChatColor.GOLD).append("Ouverture du menu via double sneak désactivé. Modifiez vos paramètres ou ", ComponentBuilder.FormatRetention.NONE)
 								.color(net.md_5.bungee.api.ChatColor.GOLD).color(net.md_5.bungee.api.ChatColor.BOLD)
-								.event(new ClickEvent(Action.RUN_COMMAND, "/oc menu")).append("cliquez ici pour ouvrir le menu")
+								.event(new ClickEvent(Action.RUN_COMMAND, "/oc menu")).append("cliquez ici pour ouvrir le menu", ComponentBuilder.FormatRetention.EVENTS)
 								.create());
 				else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());

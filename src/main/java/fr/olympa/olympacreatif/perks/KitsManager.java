@@ -82,6 +82,9 @@ public class KitsManager {
 		list.add(Material.PISTON);
 		list.add(Material.STICKY_PISTON);
 		list.add(Material.PISTON_HEAD);
+
+		list.add(Material.HOPPER);
+		list.add(Material.HOPPER_MINECART);
 		
 		list.forEach(mat -> kits.put(mat, KitType.REDSTONE));
 		list.clear();

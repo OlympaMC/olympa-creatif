@@ -1,7 +1,7 @@
 package fr.olympa.olympacreatif;
 
 import java.util.Random;
-
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
@@ -25,7 +25,8 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldManager;
-import fr.olympa.olympacreatif.worldedit.WorldEditManager;
+import fr.olympa.olympacreatif.worldedit.WorldEditListener;
+import fr.olympa.olympacreatif.worldedit_legacy.WorldEditManager;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
 
@@ -88,6 +89,13 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			e.printStackTrace();
 		}*/
 		OlympaCorePermissions.GROUP_COMMAND.addAllowGroup(OlympaGroup.DEV);
+		
+		WorldEditPlugin we = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
+		
+		//Bukkit.getLogger().log(Level.SEVERE, "worldedit : " + we);
+		
+		if (we != null) 
+			we.getWorldEdit().getEventBus().register(new WorldEditListener(this));		
 	}
 
 	@Override

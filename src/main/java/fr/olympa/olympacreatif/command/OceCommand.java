@@ -14,8 +14,8 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.PermissionsList;
-import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
-import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
+import fr.olympa.olympacreatif.worldedit_legacy.ClipboardEdition.SymmetryPlan;
+import fr.olympa.olympacreatif.worldedit_legacy.WorldEditManager.WorldEditError;
 
 public class OceCommand extends OlympaCommand{
 

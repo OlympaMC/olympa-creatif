@@ -165,4 +165,9 @@ public class Plot {
 		for (Player p : getPlayers())
 			p.sendMessage(msg);
 	}
+	
+	@Override
+	public String toString() {
+		return "Plot : " + plotId.toString();
+	}
 }

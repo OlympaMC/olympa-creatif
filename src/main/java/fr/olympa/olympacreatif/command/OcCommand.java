@@ -25,7 +25,7 @@ import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
-import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
+import fr.olympa.olympacreatif.worldedit_legacy.WorldEditManager.WorldEditError;
 
 public class OcCommand extends OlympaCommand {
 

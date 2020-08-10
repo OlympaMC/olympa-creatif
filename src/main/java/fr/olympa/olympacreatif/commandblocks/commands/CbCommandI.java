@@ -487,7 +487,11 @@ public abstract class CbCommandI {
 		if (s.startsWith("MINECRAFT:"))
 			s = s.substring(10);
 
-		//get material
-		return s.split("\\{")[0];
+		//return block name sans tags nbt
+		int splitIndex = s.indexOf("{");
+		if (splitIndex > 0)
+			return s.substring(0, splitIndex);
+		else
+			return s;
 	}
 }

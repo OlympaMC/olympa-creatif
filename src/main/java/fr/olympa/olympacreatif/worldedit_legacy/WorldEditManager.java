@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.worldedit;
+package fr.olympa.olympacreatif.worldedit_legacy;
 
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
@@ -30,7 +30,7 @@ public class WorldEditManager {
 	public WorldEditManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
-		plugin.getServer().getPluginManager().registerEvents(new WorldEditListener(plugin), plugin);
+		plugin.getServer().getPluginManager().registerEvents(new WorldEditListener_legacy(plugin), plugin);
 		
 		//runnable de setblock délayé
 		new BukkitRunnable() {

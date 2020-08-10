@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.worldedit;
+package fr.olympa.olympacreatif.worldedit_legacy;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -22,9 +22,9 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
-import fr.olympa.olympacreatif.worldedit.*;
-import fr.olympa.olympacreatif.worldedit.ClipboardEdition.SymmetryPlan;
-import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
+import fr.olympa.olympacreatif.worldedit_legacy.*;
+import fr.olympa.olympacreatif.worldedit_legacy.ClipboardEdition.SymmetryPlan;
+import fr.olympa.olympacreatif.worldedit_legacy.WorldEditManager.WorldEditError;
 import io.netty.util.internal.StringUtil;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.TileEntity;

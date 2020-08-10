@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.worldedit;
+package fr.olympa.olympacreatif.worldedit_legacy;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;

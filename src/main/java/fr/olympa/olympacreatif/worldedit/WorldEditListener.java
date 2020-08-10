@@ -1,57 +1,103 @@
 package fr.olympa.olympacreatif.worldedit;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.entity.Player;
 
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.eventbus.EventHandler;
+import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
-import fr.olympa.olympacreatif.worldedit.WorldEditManager.WorldEditError;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotId;
 
-public class WorldEditListener implements Listener{
+public class WorldEditListener extends EventHandler {
 
 	private OlympaCreatifMain plugin;
 	
 	public WorldEditListener(OlympaCreatifMain plugin) {
+		super(Priority.NORMAL);
+		
 		this.plugin = plugin;
 	}
-	
-	@EventHandler //sélection de la zone
-	public void onInterract(PlayerInteractEvent e) {
-		if (e.getPlayer().getInventory().getItemInMainHand() == null || e.getClickedBlock() == null || e.getClickedBlock().getType() == Material.AIR)
-			return;
 
-		if (e.getPlayer().getInventory().getItemInMainHand().getType() != Material.WOODEN_AXE || e.getHand() != EquipmentSlot.HAND)
-			return;
-		
-		e.setCancelled(true);
-		
-		//définition des pos
-		if (e.getAction() == Action.LEFT_CLICK_BLOCK)
-			if (plugin.getWorldEditManager().getPlayerInstance(e.getPlayer()).setPos1(e.getClickedBlock().getLocation()) == WorldEditError.NO_ERROR)
-				e.getPlayer().sendMessage(Message.WE_POS_SET.getValue().replace("%pos%", "1"));
-			else
-				e.getPlayer().sendMessage(Message.WE_INSUFFICIENT_PLOT_PERMISSION.getValue());
-		else if (e.getAction() == Action.RIGHT_CLICK_BLOCK)
-			if (plugin.getWorldEditManager().getPlayerInstance(e.getPlayer()).setPos2(e.getClickedBlock().getLocation()) == WorldEditError.NO_ERROR)
-				e.getPlayer().sendMessage(Message.WE_POS_SET.getValue().replace("%pos%", "2"));
-			else
-				e.getPlayer().sendMessage(Message.WE_INSUFFICIENT_PLOT_PERMISSION.getValue());
+	@Subscribe
+	public void onEditSession(EditSessionEvent e) {
+		e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
+
+	        @Override
+	        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+	        	
+				Actor actor = e.getActor();
+				if (actor == null || !actor.isPlayer())
+					return false;
+				
+				OlympaPlayerCreatif p = AccountProvider.get(actor.getUniqueId());
+				
+				//Bukkit.broadcastMessage("actor : " + p);
+				
+				if (p == null)
+					return false;
+
+				//Bukkit.broadcastMessage("\nmin point" + getExtent().getMinimumPoint());
+				//Bukkit.broadcastMessage("max point" + getExtent().getMaximumPoint());
+				
+				Plot plotMin = plugin.getPlotsManager().getPlot(getLoc(pos));
+				Plot plotMax = plugin.getPlotsManager().getPlot(getLoc(pos));
+
+				//Bukkit.broadcastMessage("plot min : " + plotMin);
+				//Bukkit.broadcastMessage("plot max : " + plotMax);
+				
+				if (plotMin == null || !plotMin.equals(plotMax) || plotMin.getMembers().getPlayerLevel(p) < 2) 
+					return false;
+				
+				//Bukkit.broadcastMessage("block as string : " + block.getAsString());
+				//Bukkit.broadcastMessage("block name : " + block.getBlockType().);
+				
+				String blockName = CbCommand.getUndomainedString(block.getAsString());
+				int splitIndex = blockName.indexOf("[");
+				if (splitIndex >= 0)
+					blockName = blockName.substring(0, splitIndex);
+				
+				//Bukkit.broadcastMessage("block spigot : " + Material.getMaterial(blockName));
+				
+				if (plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, Material.getMaterial(blockName)))
+					return getExtent().setBlock(pos, block);
+				else
+					return false;
+	        }
+		});
 	}
 	
-	@EventHandler //ajout de l'instance pour chaque joueur qui rejoint le serveur
-	public void onJoin(PlayerJoinEvent e) {
-		plugin.getWorldEditManager().addPlayer(e.getPlayer());
+	public Location getLoc(BlockVector3 pos) {
+		return new Location(plugin.getWorldManager().getWorld(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
 	}
 	
-	@EventHandler //supresssion de l'instance pour chaque joueur qui quitte le serveur
-	public void onQuit(PlayerQuitEvent e) {
-		plugin.getWorldEditManager().removePlayer(e.getPlayer());
+	@Override
+	public void dispatch(Object event) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
