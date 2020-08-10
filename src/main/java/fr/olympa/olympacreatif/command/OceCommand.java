@@ -25,7 +25,7 @@ public class OceCommand extends OlympaCommand{
 		super(plugin, command, alias);
 		this.plugin = plugin;
 	}
-
+	/*
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player))
@@ -51,12 +51,6 @@ public class OceCommand extends OlympaCommand{
 			}
 			return false;
 			}
-				
-		//teste si le joueur a la permission we
-		/*if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.USE_WORLD_EDIT)) {
-			p.sendMessage(Message.WE_INSUFFICIENT_PERMISSION.getValue());
-			return false;
-		}*/
 		
 		WorldEditError err = null;
 		
@@ -143,8 +137,9 @@ public class OceCommand extends OlympaCommand{
 			break;
 		}
 		return false;
+		
 	}
-
+*/
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
 		List<String> list = new ArrayList<String>();
@@ -196,6 +191,11 @@ public class OceCommand extends OlympaCommand{
 				response.add(s);
 		
 		return response;
+	}
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	

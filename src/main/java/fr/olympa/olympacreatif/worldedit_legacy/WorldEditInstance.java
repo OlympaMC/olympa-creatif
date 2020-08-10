@@ -163,10 +163,11 @@ public class WorldEditInstance {
 		if (undoList.size() == 0)
 			return WorldEditError.ERR_UNDO_LIST_EMPTY;
 
-		WorldEditError err = plugin.getWorldEditManager().addToBuildingList(p, undoList.get(undoList.size()-1).getUndoData());
+		//WorldEditError err = plugin.getWorldEditManager().addToBuildingList(p, undoList.get(undoList.size()-1).getUndoData());
 		
 		undoList.remove(undoList.size()-1);
-		return err;
+		//return err;
+		return null;
 	}
 	
 	public WorldEditError setRandomBlocks(String listBlocks) {
@@ -346,12 +347,15 @@ public class WorldEditInstance {
 				return WorldEditError.ERR_PASTE_PART_ON_NULL_TARGET;
 			}
 		}
+		/*
 		err = plugin.getWorldEditManager().addToBuildingList(p, toBuild);
 		if (err == WorldEditError.NO_ERROR)
 			if (saveUndo && undo.getUndoData().size() > 0)
 				undoList.add(undo);
 		
 		return err;
+		*/
+		return null;
 	}
 
 	public Location getPos1() {

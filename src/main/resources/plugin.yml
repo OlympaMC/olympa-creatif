@@ -3,5 +3,5 @@ version: 0.1
 author: Bullobily
 main: fr.olympa.olympacreatif.OlympaCreatifMain
 depend: [OlympaCore]
-softdepend: [WorldEdit]
+softdepend: [WorldEdit, LuckPerms]
 api-version: 1.15

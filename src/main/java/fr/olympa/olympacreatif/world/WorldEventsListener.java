@@ -56,6 +56,10 @@ import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.model.data.DataMutateResult;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -354,6 +358,9 @@ public class WorldEventsListener implements Listener{
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		sneakHistory.remove(e.getPlayer().getName());
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
+
+		setWorldEditPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
+		setCommandBlockPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
 	}
 	
 	@EventHandler
@@ -362,6 +369,41 @@ public class WorldEventsListener implements Listener{
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
+		
+		setWorldEditPerms(AccountProvider.get(e.getPlayer().getUniqueId()), true);
+		setCommandBlockPerms(AccountProvider.get(e.getPlayer().getUniqueId()), true);
+	}
+	
+	public static void setWorldEditPerms(OlympaPlayerCreatif p, boolean addPerms) {
+		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
+
+		if (luckperms == null)
+			return;
+		
+		User user = luckperms.getUserManager().getUser(p.getPlayer().getUniqueId());
+		
+		//donne les groupes luckperms nécessaires au joueur 
+		if (addPerms && PermissionsList.USE_WORLD_EDIT.hasPermission(p)) 
+			user.data().add(Node.builder("group.weperms").build());
+		else 
+			user.data().remove(Node.builder("group.weperms").build());
+		luckperms.getUserManager().saveUser(user);
+	}
+	
+	public static void setCommandBlockPerms(OlympaPlayerCreatif p, boolean addPerms) {
+		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
+
+		if (luckperms == null)
+			return;
+		
+		User user = luckperms.getUserManager().getUser(p.getPlayer().getUniqueId());
+		
+		//donne les groupes luckperms nécessaires au joueur 
+		if (addPerms && p.hasKit(KitType.COMMANDBLOCK)) 
+			user.data().add(Node.builder("group.cbperms").build());
+		else 
+			user.data().remove(Node.builder("group.cbperms").build());
+		luckperms.getUserManager().saveUser(user);
 	}
 	
 	//GESTION DES KITS

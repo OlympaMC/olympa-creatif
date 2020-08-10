@@ -151,6 +151,7 @@ public class OcCommand extends OlympaCommand {
 			break;
 		case 2:
 			switch(args[0]) {
+			/*
 			case "protectedarea":
 				plot = plugin.getPlotsManager().getPlot(p.getLocation());
 				if (plot == null) {
@@ -161,11 +162,6 @@ public class OcCommand extends OlympaCommand {
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 					return false;
 				}
-				/*if (!AccountProvider.get(p.getUniqueId()).hasPermission(PermissionsList.USE_PROTECTED_AREA)) {
-					p.sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", 
-							PermissionsList.USE_PROTECTED_AREA.getGroup().getName(AccountProvider.get(p.getUniqueId()).getGender())));
-					return false;
-				}*/
 				
 				switch (args[1]) {
 				case "create":
@@ -199,6 +195,7 @@ public class OcCommand extends OlympaCommand {
 					break;
 				}
 				break;
+				*/
 				
 			case "visit":
 				PlotId id = PlotId.fromString(plugin, args[1]);

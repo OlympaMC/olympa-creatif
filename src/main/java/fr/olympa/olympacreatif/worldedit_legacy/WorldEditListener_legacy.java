@@ -22,6 +22,7 @@ public class WorldEditListener_legacy implements Listener{
 		this.plugin = plugin;
 	}
 	
+	/*
 	@EventHandler //sélection de la zone
 	public void onInterract(PlayerInteractEvent e) {
 		if (e.getPlayer().getInventory().getItemInMainHand() == null || e.getClickedBlock() == null || e.getClickedBlock().getType() == Material.AIR)
@@ -45,6 +46,7 @@ public class WorldEditListener_legacy implements Listener{
 				e.getPlayer().sendMessage(Message.WE_INSUFFICIENT_PLOT_PERMISSION.getValue());
 	}
 	
+	
 	@EventHandler //ajout de l'instance pour chaque joueur qui rejoint le serveur
 	public void onJoin(PlayerJoinEvent e) {
 		plugin.getWorldEditManager().addPlayer(e.getPlayer());
@@ -54,4 +56,5 @@ public class WorldEditListener_legacy implements Listener{
 	public void onQuit(PlayerQuitEvent e) {
 		plugin.getWorldEditManager().removePlayer(e.getPlayer());
 	}
+	*/
 }

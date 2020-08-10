@@ -135,7 +135,9 @@ public enum Message {
 	PLOT_INSUFFICIENT_MEMBERS_SIZE, 
 	PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS, 
 	
-	CB_INVALID_CMD,
+	CB_INVALID_CMD, 
+	
+	WE_ACTION_TOO_RAPID,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();

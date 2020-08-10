@@ -1,6 +1,11 @@
 package fr.olympa.olympacreatif;
 
 import java.util.Random;
+
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.RegisteredServiceProvider;
+
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.lines.FixedLine;
@@ -26,17 +31,19 @@ import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.WorldEditListener;
-import fr.olympa.olympacreatif.worldedit_legacy.WorldEditManager;
+import net.luckperms.api.LuckPerms;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	private WorldManager creativeWorldManager;
-	private WorldEditManager worldEditManager;
 	private DataManager dataManager;
 	private PlotsManager plotsManager;
 	private PerksManager perksManager;
 	private CommandBlocksManager cbManager;
 
+	private LuckPerms luckperms;
+	private WorldEditPlugin worldedit;
+	
 	private static OlympaCreatifMain plugin;
 
 	private ScoreboardManager<OlympaPlayerCreatif> scm;
@@ -75,7 +82,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		dataManager = new DataManager(this);
 		plotsManager = new PlotsManager(this);
 		creativeWorldManager = new WorldManager(this);
-		worldEditManager = new WorldEditManager(this);
+		//worldEditManager = new WorldEditManager(this);
 		perksManager = new PerksManager(this);
 		cbManager = new CommandBlocksManager(this);
 
@@ -90,12 +97,18 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		}*/
 		OlympaCorePermissions.GROUP_COMMAND.addAllowGroup(OlympaGroup.DEV);
 		
+		//get luckperms api provider
+		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+		if (provider != null) {
+			luckperms = provider.getProvider();
+		}
+		
+		//hook into worldedit
 		WorldEditPlugin we = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
-		
-		//Bukkit.getLogger().log(Level.SEVERE, "worldedit : " + we);
-		
-		if (we != null) 
-			we.getWorldEdit().getEventBus().register(new WorldEditListener(this));		
+		if (we != null) {
+			worldedit = we;
+			worldedit.getWorldEdit().getEventBus().register(new WorldEditListener(this));	
+		}		
 	}
 
 	@Override
@@ -189,8 +202,12 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		return creativeWorldManager;
 	}
 
-	public WorldEditManager getWorldEditManager() {
-		return worldEditManager;
+	public WorldEditPlugin getWorldEditManager() {
+		return worldedit;
+	}
+	
+	public LuckPerms getLuckPerms() {
+		return luckperms;
 	}
 
 	public PlotsManager getPlotsManager() {
