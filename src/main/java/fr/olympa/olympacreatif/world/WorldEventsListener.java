@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -45,6 +47,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
+import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -370,10 +373,20 @@ public class WorldEventsListener implements Listener{
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
 		
-		setWorldEditPerms(AccountProvider.get(e.getPlayer().getUniqueId()), true);
-		setCommandBlockPerms(AccountProvider.get(e.getPlayer().getUniqueId()), true);
+		plugin.getTask().runTaskLater(() -> {
+			OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId()); 
+			setWorldEditPerms(p, true);
+			setCommandBlockPerms(p, true);
+		}, 40);
 	}
 	
+	@EventHandler //add perms worldedit si achat du grade correspondant
+	public void onPlayerChangeGroupEvent(AsyncOlympaPlayerChangeGroupEvent e) {
+		if (PermissionsList.USE_WORLD_EDIT.hasPermission(e.getOlympaPlayer()))
+			setWorldEditPerms(AccountProvider.get(e.getPlayer().getUniqueId()), true);
+	}
+	
+	//ajoute/retire les perms worldedit aux joueurs
 	public static void setWorldEditPerms(OlympaPlayerCreatif p, boolean addPerms) {
 		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
 
@@ -390,6 +403,7 @@ public class WorldEventsListener implements Listener{
 		luckperms.getUserManager().saveUser(user);
 	}
 	
+	//ajoute/retire les perms commandblock aux joueurs
 	public static void setCommandBlockPerms(OlympaPlayerCreatif p, boolean addPerms) {
 		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
 

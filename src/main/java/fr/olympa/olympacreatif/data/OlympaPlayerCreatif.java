@@ -23,6 +23,7 @@ import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
+import fr.olympa.olympacreatif.world.WorldEventsListener;
 
 public class OlympaPlayerCreatif extends OlympaPlayerObject {
 
@@ -131,8 +132,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		if (kits.contains(KitType.HOSTILE_MOBS))
 			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
 				plot.getCbData().unlockSpawnerSetblock();
-			
-			
+		
+		if (kit == KitType.COMMANDBLOCK)
+			WorldEventsListener.setCommandBlockPerms(this, true);
 	}
 	
 	public int getUpgradeLevel(UpgradeType upg) {

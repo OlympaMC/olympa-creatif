@@ -137,7 +137,7 @@ public class WorldEditListener extends EventHandler implements Listener {
 				
 				if (p == null)
 					return false;
-
+				
 				if (p.getWEclipboardPlot() == null)
 					return false;
 				
