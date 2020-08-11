@@ -358,7 +358,7 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		
 		if (plotFrom != null) 
-			executeQuitActions(plugin, p, plotFrom);
+			executeExitActions(plugin, p, plotFrom);
 		
 
 		if (plotTo != null) {
@@ -400,7 +400,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		//actions de sortie de plot
 		if (plotFrom != null) 
-			executeQuitActions(plugin, e.getPlayer(), plotFrom);
+			executeExitActions(plugin, e.getPlayer(), plotFrom);
 	}
 
 	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
@@ -412,7 +412,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 
-		executeQuitActions(plugin, e.getPlayer(), plot);
+		executeExitActions(plugin, e.getPlayer(), plot);
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 	}
 
@@ -486,7 +486,7 @@ public class PlotsInstancesListener implements Listener{
 		*/
 	}
 
-	public static void executeQuitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
+	public static void executeExitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
 
 		plot.removePlayerInPlot(p);
 
@@ -504,6 +504,10 @@ public class PlotsInstancesListener implements Listener{
 		p.resetPlayerWeather();
 		
 		plugin.getCommandBlocksManager().excecuteQuitActions(plot, p);
+
+		//clear clipboard si le joueur n'en est pas le proprio
+		if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER)
+			plugin.getWorldEditManager().getSession(p).setClipboard(null);
 		
 		/*
 		//fait croire au client qu'il est deop (pour ouvrir l'interface des commandblocks) sauf pour les staff

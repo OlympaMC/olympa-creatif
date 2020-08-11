@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.worldedit;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -29,6 +31,7 @@ import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.luckperms.api.model.group.Group;
@@ -59,11 +62,26 @@ public class WorldEditListener extends EventHandler implements Listener {
 			
 			@Override
 			public void run() {
-				storedLocs.clear();
+				for (Player p : Bukkit.getOnlinePlayers())
+					plugin.getWorldEditManager().getSession(p).clearHistory();
 			}
 		}.runTaskTimer(plugin, 0, 5);*/
 	}
 
+	@org.bukkit.event.EventHandler //cancel copy si plot du joueur null
+	public void onCopyCmd(PlayerCommandPreprocessEvent e) {
+		if (!e.getMessage().contains("/copy"))
+			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot == null && ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
+			e.setCancelled(true);
+			e.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue());
+		}
+	}
+
+	/*
 	@org.bukkit.event.EventHandler //cancel copy si le joueur n'a pas la permission de copier certains des blocs de sa sélection
 	public void onCopySelection(PlayerCommandPreprocessEvent e) {
 		if (!e.getMessage().contains("/copy"))
@@ -108,6 +126,8 @@ public class WorldEditListener extends EventHandler implements Listener {
 		
 		//if (plugin.getWorldEditManager().getSession(e.getPlayer()).getSelection((World) plugin.getWorldManager().getWorld()) != null)
 	}
+	*/
+	
 	
 	@org.bukkit.event.EventHandler
 	public void onJoin(PlayerJoinEvent e) {
@@ -138,24 +158,12 @@ public class WorldEditListener extends EventHandler implements Listener {
 				if (p == null)
 					return false;
 				
-				if (p.getWEclipboardPlot() == null)
-					return false;
-				
 				lastPasteTick.put(p.getPlayer(), MinecraftServer.currentTick);
-				
-				//Bukkit.broadcastMessage("\nmin point" + getExtent().getMinimumPoint());
-				//Bukkit.broadcastMessage("max point" + getExtent().getMaximumPoint());
 				
 				Plot plot = plugin.getPlotsManager().getPlot(getLoc(pos));
 				
-				//storedLocs.put(pos, plugin.getPlotsManager().getPlot(getLoc(pos)));
-
-				//Bukkit.broadcastMessage("plot min : " + plotMin);
-				//Bukkit.broadcastMessage("plot max : " + plotMax);
-				
-				//si le joueur n'a pas la perm de paste dans le plot cible ou si sa sélection a été faite dans un plot dont il n'est pas le proprio, cancel
-				if (plot == null || plot.getMembers().getPlayerLevel(p) < 2 ||
-						(p.getWEclipboardPlot().getMembers().getPlayerRank(p) != PlotRank.OWNER && !plot.equals(p.getWEclipboardPlot()))) 
+				//si le joueur n'a pas la perm de paste dans le plot cible, cancel paste
+				if (plot == null || plot.getMembers().getPlayerLevel(p) < 2) 
 					return false;
 				
 				//cancel si le joueur n'a pas la permission pour le bloc en cours de copie

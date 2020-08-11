@@ -58,8 +58,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	private List<StaffPerm> staffPerm = new ArrayList<StaffPerm>();
 	
-	private Plot clipboardPlot = null;
-	
 	public OlympaPlayerCreatif(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
 		this.plugin = OlympaCreatifMain.getMainClass();
@@ -246,16 +244,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	public String getGameMoneyFormated() {
 		return gameMoney + "$";
 	}
-	
-	
-	
-	public void setWEclipboardPlot(Plot plot) {
-		clipboardPlot = plot;
-	}
-	
-	public Plot getWEclipboardPlot() {
-		return clipboardPlot;
-	}
+
 	
 	public boolean hasStaffPerm(StaffPerm perm) {
 		return staffPerm.contains(perm);

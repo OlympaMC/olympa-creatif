@@ -137,7 +137,9 @@ public enum Message {
 	
 	CB_INVALID_CMD, 
 	
-	WE_ACTION_TOO_RAPID,
+	WE_ACTION_TOO_RAPID, 
+	
+	WE_ERR_NULL_PLOT,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();
