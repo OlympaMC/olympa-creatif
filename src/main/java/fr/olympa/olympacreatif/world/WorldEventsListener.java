@@ -65,6 +65,7 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
+import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class WorldEventsListener implements Listener{
@@ -293,9 +294,11 @@ public class WorldEventsListener implements Listener{
 						MainGui.openMainGui(e.getPlayer());
 					else
 						e.getPlayer().spigot().sendMessage(new ComponentBuilder()
-								.color(net.md_5.bungee.api.ChatColor.GOLD).append("Ouverture du menu via double sneak désactivé. Modifiez vos paramètres ou ", ComponentBuilder.FormatRetention.NONE)
-								.color(net.md_5.bungee.api.ChatColor.GOLD).color(net.md_5.bungee.api.ChatColor.BOLD)
-								.event(new ClickEvent(Action.RUN_COMMAND, "/oc menu")).append("cliquez ici pour ouvrir le menu", ComponentBuilder.FormatRetention.EVENTS)
+								.append("Ouverture du menu via double sneak désactivé. Modifiez vos paramètres ou ")
+								.color(net.md_5.bungee.api.ChatColor.GOLD)
+								.append("cliquez ici pour ouvrir le menu", FormatRetention.FORMATTING)
+								.color(net.md_5.bungee.api.ChatColor.BOLD)
+								.event(new ClickEvent(Action.RUN_COMMAND, "/oc menu"))
 								.create());
 				else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
@@ -400,7 +403,7 @@ public class WorldEventsListener implements Listener{
 			user.data().add(Node.builder("group.weperms").build());
 		else 
 			user.data().remove(Node.builder("group.weperms").build());
-		luckperms.getUserManager().saveUser(user);
+		//luckperms.getUserManager().saveUser(user);
 	}
 	
 	//ajoute/retire les perms commandblock aux joueurs
@@ -417,7 +420,7 @@ public class WorldEventsListener implements Listener{
 			user.data().add(Node.builder("group.cbperms").build());
 		else 
 			user.data().remove(Node.builder("group.cbperms").build());
-		luckperms.getUserManager().saveUser(user);
+		//luckperms.getUserManager().saveUser(user);
 	}
 	
 	//GESTION DES KITS

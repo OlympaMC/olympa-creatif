@@ -4,7 +4,10 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.UUID;
+
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
@@ -19,10 +22,10 @@ public class PlotMembers{
 	private int maxMembers;
 	
 	//membres triés par ordre alphabétique
-	private Map<OlympaPlayerInformations, PlotRank> members = new TreeMap<OlympaPlayerInformations, PlotRank>(new Comparator<OlympaPlayerInformations>() {
+	private Map<MemberInformations, PlotRank> members = new TreeMap<MemberInformations, PlotRank>(new Comparator<MemberInformations>() {
 
 		@Override
-		public int compare(OlympaPlayerInformations o1, OlympaPlayerInformations o2) {
+		public int compare(MemberInformations o1, MemberInformations o2) {
 			return o1.getName().compareTo(o2.getName());
 		}
 	});
@@ -45,15 +48,15 @@ public class PlotMembers{
 	public boolean set(OlympaPlayerInformations p, PlotRank rank) {
 		if (members.containsKey(p)) {
 			if (rank != PlotRank.VISITOR)
-				members.put(p, rank);
+				members.put(new MemberInformations(p), rank);
 			else
-				members.remove(p);	
+				members.remove(new MemberInformations(p));	
 			
 			return true;
 		}
 		
 		if (members.size() < maxMembers) {
-			members.put(p, rank);	
+			members.put(new MemberInformations(p), rank);	
 			return true;
 		}
 		
@@ -104,7 +107,7 @@ public class PlotMembers{
 	
 	
 	
-	public Map<OlympaPlayerInformations, PlotRank> getList(){
+	public Map<MemberInformations, PlotRank> getList(){
 		return members;
 	}
 
@@ -162,10 +165,49 @@ public class PlotMembers{
 	}
 
 	
-	public OlympaPlayerInformations getOwner() {
-		for (Entry<OlympaPlayerInformations, PlotRank> e : members.entrySet())
+	public MemberInformations getOwner() {
+		for (Entry<MemberInformations, PlotRank> e : members.entrySet())
 			if (e.getValue() == PlotRank.OWNER)
 				return e.getKey();
 		return null;
-	}	
+	}
+	
+	public class MemberInformations implements OlympaPlayerInformations{
+
+		private long id;
+		private String name;
+		private UUID uuid;
+		
+		public MemberInformations(long id, String name, UUID uuid) {
+			this.id = id;
+			this.name = name;
+			this.uuid = uuid;
+		}
+		
+		public MemberInformations(OlympaPlayerInformations infos) {
+			id = infos.getId();
+			name = infos.getName();
+			uuid = infos.getUUID();
+		}
+		
+		@Override
+		public long getId() {
+			return id;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public UUID getUUID() {
+			return uuid;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof MemberInformations && ((MemberInformations)obj).getId() == id;
+		}
+	}
 }

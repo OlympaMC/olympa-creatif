@@ -21,6 +21,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class MembersGui extends OlympaGUI {
@@ -44,7 +45,7 @@ public class MembersGui extends OlympaGUI {
 		//affichage des membres
 		int headIndex = -1;
 		
-		for (Entry<OlympaPlayerInformations, PlotRank> e : plot.getMembers().getList().entrySet()) {
+		for (Entry<MemberInformations, PlotRank> e : plot.getMembers().getList().entrySet()) {
 			
 			headIndex++;
 			final int thisHeadIndex = headIndex;
@@ -84,7 +85,7 @@ public class MembersGui extends OlympaGUI {
 			return true;
 		
 		//recherche le joueur cliqué
-		for (Entry<OlympaPlayerInformations, PlotRank> e : plot.getMembers().getList().entrySet())
+		for (Entry<MemberInformations, PlotRank> e : plot.getMembers().getList().entrySet())
 			if (current != null && current.getType() != Material.AIR && ("§6" + e.getKey().getName()).equals(current.getItemMeta().getDisplayName())) {
 				boolean hasChange = false;
 				

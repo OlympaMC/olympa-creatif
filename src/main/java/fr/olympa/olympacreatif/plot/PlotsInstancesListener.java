@@ -45,11 +45,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.common.collect.ImmutableList;
+
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
@@ -71,6 +74,20 @@ public class PlotsInstancesListener implements Listener{
 	private List<Player> cbPlacementPlayer = new ArrayList<Player>();
 	private List<Location> cbPlacementLocation = new ArrayList<Location>();
 	private List<Material> cbPlacementTypeCb = new ArrayList<Material>();
+	
+	private List<Material> interractProhibitedItems = ImmutableList.<Material>builder()
+			.add(Material.ARMOR_STAND)
+			.add(Material.ITEM_FRAME)
+			.add(Material.WATER_BUCKET)
+			.add(Material.WATER)
+			.add(Material.LAVA_BUCKET)
+			.add(Material.LAVA)
+			.add(Material.HOPPER_MINECART)
+			.add(Material.FURNACE_MINECART)
+			.add(Material.CHEST_MINECART)
+			.add(Material.TNT_MINECART)
+			.add(Material.MINECART)
+			.build();
 	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -195,9 +212,11 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getClickedBlock().getLocation());
 		
-		if (plot == null && !p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
-			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
+		if (plot == null) {
+			if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
+				e.setCancelled(true);
+				e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
+			}
 			return;
 		}
 		
@@ -213,17 +232,19 @@ public class PlotsInstancesListener implements Listener{
 			
 			return;
 		}
-		/*
-		if (PlotParamType.getAllPossibleBlocksWithInteractions().contains(e.getClickedBlock().getType()))		
-			if (playerRank == PlotRank.VISITOR && 
-					!((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType()) &&
-					!plot.getProtectedZoneData().keySet().contains(e.getClickedBlock().getLocation())) {
-				e.setCancelled(true);
-				e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
-				
-				return;
-			}*/
 
+		//cancel interract si un item pouvant faire spawn une entité est utilisé
+		if (e.getItem() != null && playerRank == PlotRank.VISITOR) {
+			Material mat = e.getItem().getType();
+			KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
+			
+			if (interractProhibitedItems.contains(mat) || kit == KitType.HOSTILE_MOBS || kit == KitType.PEACEFUL_MOBS) {
+				p.getPlayer().sendMessage(Message.ITEM_PROHIBITED_USED.getValue());
+				e.setCancelled(true);
+				return;
+			}
+		}
+		
 		//GESTION COMMAND BLOCKS
 		//si édition/placement du commandblock
 		if (plot.getMembers().getPlayerLevel(p) >= 3 && e.getClickedBlock() != null && 
@@ -276,7 +297,6 @@ public class PlotsInstancesListener implements Listener{
 						break;
 					default:
 						return;
-					
 					}
 					
 					cbPlacementLocation.add(loc);
@@ -303,9 +323,9 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		}
 		
-		if ((e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE || 
-				e.getPlayer().getInventory().getItemInOffHand().getType() == Material.WOODEN_HOE) &&
-				plot.getMembers().getPlayerRank(e.getPlayer()) != PlotRank.VISITOR && !(e.getRightClicked() instanceof Player))
+		//remove entity si clic droit dessus avec une houe
+		if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && !(e.getRightClicked() instanceof Player) &&
+				plot.getMembers().getPlayerRank(e.getPlayer()) != PlotRank.VISITOR)
 			e.getRightClicked().remove();
 			
 	}

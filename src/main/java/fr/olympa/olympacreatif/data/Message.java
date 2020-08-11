@@ -139,7 +139,10 @@ public enum Message {
 	
 	WE_ACTION_TOO_RAPID, 
 	
-	WE_ERR_NULL_PLOT,
+	WE_ERR_NULL_PLOT, 
+	PLOT_CANT_INTERRACT_NULL_PLOT, 
+	
+	ITEM_PROHIBITED_USED,
 	;
 	
 	private static Map<Message, String> messagesList = new HashMap<Message, String>();

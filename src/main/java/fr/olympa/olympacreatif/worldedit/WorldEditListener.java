@@ -47,7 +47,7 @@ public class WorldEditListener extends EventHandler implements Listener {
 	//évite un usebeug possible permettant de /copy d'un plot à l'autre sans être le propriétaire du plot source :
 	//si un joueur fais un /paste puis un /copy dans le même plot juste après, le système de vérif peut être abusé et autoriser le paste alors que le
 	//joueur n'est pas proprio du plot source
-	private Map<Player, Integer> lastPasteTick = new HashMap<Player, Integer>(); 
+	//private Map<Player, Integer> lastPasteTick = new HashMap<Player, Integer>(); 
 	
 	//private Map<BlockVector3, Plot> storedLocs = new HashMap<BlockVector3, Plot>();
 	
@@ -129,6 +129,7 @@ public class WorldEditListener extends EventHandler implements Listener {
 	*/
 	
 	
+	/*
 	@org.bukkit.event.EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		lastPasteTick.put(e.getPlayer(), MinecraftServer.currentTick);	
@@ -139,6 +140,7 @@ public class WorldEditListener extends EventHandler implements Listener {
 		lastPasteTick.remove(e.getPlayer());
 		
 	}
+	*/
 	
 	@Subscribe //handle WE place block event
 	public void onEditSession(EditSessionEvent e) {
@@ -158,7 +160,12 @@ public class WorldEditListener extends EventHandler implements Listener {
 				if (p == null)
 					return false;
 				
-				lastPasteTick.put(p.getPlayer(), MinecraftServer.currentTick);
+				//lastPasteTick.put(p.getPlayer(), MinecraftServer.currentTick);
+				
+				//place block si le joueur a la perm bypass worldedit
+				if (p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+					return getExtent().setBlock(pos, block);
+				
 				
 				Plot plot = plugin.getPlotsManager().getPlot(getLoc(pos));
 				

@@ -29,16 +29,16 @@ public class StaffGui extends OlympaGUI {
 		pc = AccountProvider.get(p.getUniqueId());
 		
 		inv.setItem(0, ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Bypass kick/ban plot", "§7Permet d'entrer sur les plots même", "§7si le propriétaire vous en a banni"));
-		inv.setItem(0 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_KICK_AND_BAN.getOlympaPerm().getGroup().getName(pc.getGender())));
+		inv.setItem(0 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_KICK_AND_BAN.getOlympaPerm().getMinGroup().getName(pc.getGender())));
 		
 		inv.setItem(1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Bypass commandes vanilla", "§7Permet de ne pas être affecté par", "§7les commandes vanilla du type /kill, /tp, ..."));
-		inv.setItem(1 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_VANILLA_COMMANDS.getOlympaPerm().getGroup().getName(pc.getGender())));
+		inv.setItem(1 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_VANILLA_COMMANDS.getOlympaPerm().getMinGroup().getName(pc.getGender())));
 		
 		inv.setItem(2, ItemUtils.item(Material.WOODEN_AXE, "§6Bypass WorldEdit", "§7Permet d'utiliser les fonctionnalités WorldEdit", "§7sur tous les plots et la route"));
-		inv.setItem(2 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().getGroup().getName(pc.getGender())));
+		inv.setItem(2 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().getMinGroup().getName(pc.getGender())));
 		
 		inv.setItem(3, ItemUtils.item(Material.REDSTONE_TORCH, "§6Fake owner", "§7Permet d'éditer le plot comme si vous", "§7en étiez le propriétaire"));
-		inv.setItem(3 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().getGroup().getName(pc.getGender())));
+		inv.setItem(3 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().getMinGroup().getName(pc.getGender())));
 
 		inv.setItem(4, ItemUtils.itemSeparator(DyeColor.RED));
 		inv.setItem(4 + 9, ItemUtils.itemSeparator(DyeColor.RED));

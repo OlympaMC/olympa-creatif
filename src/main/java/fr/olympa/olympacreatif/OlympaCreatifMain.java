@@ -95,7 +95,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		}catch (SQLException e) {
 			e.printStackTrace();
 		}*/
-		OlympaCorePermissions.GROUP_COMMAND.addAllowGroup(OlympaGroup.DEV);
+		//OlympaCorePermissions.GROUP_COMMAND.allowGroup(OlympaGroup.DEV);
 		
 		//get luckperms api provider
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
