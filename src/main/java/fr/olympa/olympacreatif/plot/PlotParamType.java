@@ -11,51 +11,53 @@ import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.block.Biome;
 
+import fr.olympa.olympacreatif.OlympaCreatifMain;
+
 public enum PlotParamType {
 	
-	SPAWN_LOC("spawn_location", null),
-	FORCE_SPAWN_LOC("force_spawn_location", false),
+	FORCE_SPAWN_LOC(Boolean.class, false),
 	
-	CLEAR_INCOMING_PLAYERS("clear_incoming_players", false),
+	CLEAR_INCOMING_PLAYERS(Boolean.class, false),
 	
-	ALLOW_FLY_INCOMING_PLAYERS("flymode_incomings_players", true),
-	ALLOW_SPLASH_POTIONS("allow_splash_potions", false),
-	ALLOW_PRINT_TNT("allow_print_tnt", false),
-	ALLOW_PVP("allow_pvp", false),
-	ALLOW_PVE("allow_pveez", false),
-	ALLOW_ENVIRONMENT_DAMAGE("allow_environment_damage", false),
-	ALLOW_DROP_ITEMS("allow_drop_items", false),
-	ALLOW_LAUNCH_PROJECTILES("allow_drop_projectiles", false),
+	ALLOW_FLY_INCOMING_PLAYERS(Boolean.class, true),
+	ALLOW_SPLASH_POTIONS(Boolean.class, false),
+	ALLOW_PRINT_TNT(Boolean.class, false),
+	ALLOW_PVP(Boolean.class, false),
+	ALLOW_PVE(Boolean.class, false),
+	ALLOW_ENVIRONMENT_DAMAGE(Boolean.class, false),
+	ALLOW_DROP_ITEMS(Boolean.class, false),
+	ALLOW_LAUNCH_PROJECTILES(Boolean.class, false),
 	
-	KEEP_MAX_FOOD_LEVEL("keep_max_food_level", true),
-	KEEP_INVENTORY_ON_DEATH("keep_inventory_gamerule", false),
-	
-	PLOT_BIOME("plot_biome", Biome.PLAINS),
-	PLOT_WEATHER("plot_weather", WeatherType.CLEAR),
-	GAMEMODE_INCOMING_PLAYERS("gamemode_incomings_players", GameMode.CREATIVE),
-	LIST_ALLOWED_INTERRACTION("allowed_block_interraction", new ArrayList<Material>()),
-	BANNED_PLAYERS("banned_players", new ArrayList<Long>()),
-	PLOT_TIME("plot_time", 6000),
+	KEEP_MAX_FOOD_LEVEL(Boolean.class, true),
+	KEEP_INVENTORY_ON_DEATH(Boolean.class, false),
 
-	PROTECTED_ZONE_POS1("protected_zone_pos1", null),
-	PROTECTED_ZONE_POS2("protected_zone_pos2", null),
+	SPAWN_LOC_X(Integer.class, 0),
+	SPAWN_LOC_Y(Integer.class, 0),
+	SPAWN_LOC_Z(Integer.class, 0),
 	
+	PLOT_WEATHER(WeatherType.class, WeatherType.CLEAR),
+	GAMEMODE_INCOMING_PLAYERS(GameMode.class, GameMode.CREATIVE),
+	
+	LIST_ALLOWED_INTERRACTION(List.class, new ArrayList<Material>()),
+	BANNED_PLAYERS(List.class, new ArrayList<Long>()),
+	
+	PLOT_TIME(Integer.class, 6000),
 	//niveaux de stoplag : 0 aucun, 1 activé, 2 activé et bloqué jusqu'à vérif par un staff
-	STOPLAG_STATUS("stoplag_level", 0),
+	STOPLAG_STATUS(Integer.class, 0),
 	;
 	
 	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();
 	
-	private String id;
+	private Class paramType;
 	private Object defaultValue;
 	
-	private PlotParamType(String s, Object defaultValue) {
-		this.id = s;
+	private PlotParamType(Class type, Object defaultValue) {
+		this.paramType = type;
 		this.defaultValue = defaultValue;
 	}
 	
-	public String getId() {
-		return id;
+	public Class getType() {
+		return paramType;
 	}
 	
 	public Object getDefaultValue() {
@@ -66,6 +68,7 @@ public enum PlotParamType {
 		//TODO
 	}
 	
+	/*
 	public static PlotParamType getFromString(String s) {
 		for (PlotParamType p : PlotParamType.values())
 			if (p.getId().equals(s))
@@ -73,8 +76,9 @@ public enum PlotParamType {
 		
 		return null;
 	}
+	*/
 	
-	public static ArrayList<Material> getAllPossibleBlocksWithInteractions(){
+	public static ArrayList<Material> getAllPossibleIntaractibleBlocks(){
 		if (blocksWithInteractionsList.size() > 0)
 			return blocksWithInteractionsList;
 

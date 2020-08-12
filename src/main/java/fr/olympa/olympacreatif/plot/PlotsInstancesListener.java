@@ -49,6 +49,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
@@ -224,7 +225,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		//test si permission d'interagir avec le bloc donné
 		if (playerRank == PlotRank.VISITOR &&
-				PlotParamType.getAllPossibleBlocksWithInteractions().contains(e.getClickedBlock().getType()) &&
+				PlotParamType.getAllPossibleIntaractibleBlocks().contains(e.getClickedBlock().getType()) &&
 				!((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType())
 				) {
 			e.setCancelled(true);
@@ -480,7 +481,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		//tp au spawn de la zone
 		if ((boolean)plotTo.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-			p.teleport((Location) plotTo.getParameters().getParameter(PlotParamType.SPAWN_LOC));
+			p.teleport(plotTo.getParameters().getSpawnLoc(plugin));
 			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
 		}
 		

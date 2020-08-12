@@ -9,16 +9,18 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 public class PlotMembers{
 
-	private OlympaCreatifMain plugin;
-	private PlotId plotId;
 	private int maxMembers;
 	
 	//membres triés par ordre alphabétique
@@ -30,12 +32,16 @@ public class PlotMembers{
 		}
 	});
 
-	public PlotMembers(OlympaCreatifMain plugin, PlotId plotId, int maxMembers) {
-		this.plugin = plugin;
-		this.plotId = plotId;
+	
+	
+	public PlotMembers(int maxMembers) {
 		this.maxMembers = maxMembers;
+		
+		//set(p, PlotRank.OWNER);
 	}
 
+	
+	
 	//return false si le nombre de membres max est dépassé
 	public boolean set(Player p, PlotRank rank) {
 		return set(AccountProvider.get(p.getUniqueId()).getInformation(), rank);
@@ -46,23 +52,27 @@ public class PlotMembers{
 	}
 	
 	public boolean set(OlympaPlayerInformations p, PlotRank rank) {
+		return set(new MemberInformations(p), rank);
+	}
+	
+	public boolean set(MemberInformations p, PlotRank rank) {
 		if (members.containsKey(p)) {
 			if (rank != PlotRank.VISITOR)
-				members.put(new MemberInformations(p), rank);
+				members.put(p, rank);
 			else
-				members.remove(new MemberInformations(p));	
+				members.remove(p);	
 			
 			return true;
 		}
 		
 		if (members.size() < maxMembers) {
-			members.put(new MemberInformations(p), rank);	
+			members.put(p, rank);	
 			return true;
 		}
 		
 		return false;
 	}
-
+	
 	public int getMaxMembers() {
 		return maxMembers;
 	}
@@ -208,6 +218,18 @@ public class PlotMembers{
 		@Override
 		public boolean equals(Object obj) {
 			return obj instanceof MemberInformations && ((MemberInformations)obj).getId() == id;
+		}
+	}
+	
+	public String toJson() {
+		return new Gson().toJson(this);
+	}
+	
+	public static PlotMembers fromJson(int maxMembers, String jsonText) {
+		try {
+			return new Gson().fromJson(jsonText, PlotMembers.class);	
+		}catch(JsonSyntaxException e) {
+			return new PlotMembers(maxMembers);
 		}
 	}
 }

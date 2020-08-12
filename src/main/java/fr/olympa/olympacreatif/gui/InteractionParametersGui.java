@@ -35,7 +35,7 @@ public class InteractionParametersGui extends OlympaGUI {
 		inv.setItem(53, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
 		
 		//pour tous les items interdits possibles, ajout de l'item au gui selon son état (interdit/autorisé)
-		for (Material mat : PlotParamType.getAllPossibleBlocksWithInteractions()) {
+		for (Material mat : PlotParamType.getAllPossibleIntaractibleBlocks()) {
 			ItemStack it = new ItemStack(mat);
 			ItemMeta im = it.getItemMeta();
 			im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -64,7 +64,7 @@ public class InteractionParametersGui extends OlympaGUI {
 		}
 		
 		//changement de l'état d'autorisation de l'interraction pour le bloc cliqué si le joueur a la permission
-		if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(pc) >= 3 && slot < PlotParamType.getAllPossibleBlocksWithInteractions().size()) {
+		if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(pc) >= 3 && slot < PlotParamType.getAllPossibleIntaractibleBlocks().size()) {
 			if (((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(current.getType())) {
 				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).remove(current.getType());
 				current = ItemUtils.removeEnchant(current, Enchantment.DURABILITY);

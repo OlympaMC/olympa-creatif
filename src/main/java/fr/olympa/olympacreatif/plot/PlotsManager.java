@@ -3,6 +3,8 @@ package fr.olympa.olympacreatif.plot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -20,7 +22,7 @@ public class PlotsManager {
 	private OlympaCreatifMain plugin;
 	private List<Plot> loadedPlots = new ArrayList<Plot>();
 	
-	private List<AsyncPlot> asyncPlots = new ArrayList<AsyncPlot>();
+	private List<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
 	
 	private int plotCount;
 	

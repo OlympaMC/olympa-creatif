@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.plot;
+package fr.olympa.olympacreatif.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +13,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotParamType;
 
 public class FakePlayerDeathEvent extends Event{
 
@@ -40,7 +42,7 @@ public class FakePlayerDeathEvent extends Event{
 			respawn = OlympaCreatifMain.getMainClass().getWorldManager().getWorld().getSpawnLocation();
 		
 		else {
-			respawn = (Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC);
+			respawn = plot.getParameters().getSpawnLoc(OlympaCreatifMain.getMainClass());
 			
 			if (!(boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH)) {
 				p.getInventory().forEach(item -> {if (item != null) drops.add(item);});

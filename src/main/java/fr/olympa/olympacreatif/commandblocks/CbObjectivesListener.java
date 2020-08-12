@@ -23,8 +23,8 @@ import org.bukkit.event.player.PlayerLevelChangeEvent;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective.ObjType;
 import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
+import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
-import fr.olympa.olympacreatif.plot.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CbObjectivesListener implements Listener {

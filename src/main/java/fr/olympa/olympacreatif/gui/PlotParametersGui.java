@@ -52,7 +52,7 @@ public class PlotParametersGui extends OlympaGUI {
 		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
 
-		newBiome = (Biome) plot.getParameters().getParameter(PlotParamType.PLOT_BIOME);
+		//newBiome = (Biome) plot.getParameters().getParameter(PlotParamType.PLOT_BIOME);
 		
 		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
@@ -79,6 +79,7 @@ public class PlotParametersGui extends OlympaGUI {
 		inv.setItem(1,it);
 		
 		//2 : Sélection du biome
+		/*
 		it = ItemUtils.item(Material.BOOKSHELF, "§6Biome de la parcelle");
 		for (Biome biome : PlotParamType.getAllPossibleBiomes())
 			if (biome == plot.getParameters().getParameter(PlotParamType.PLOT_BIOME))
@@ -89,6 +90,7 @@ public class PlotParametersGui extends OlympaGUI {
 		if (plot.getMembers().getPlayerRank(pc) == PlotRank.OWNER)
 			it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(2,it);
+		*/
 
 		//3 : Définir la météo
 		it = ItemUtils.item(Material.SUNFLOWER, "§6Météo de la parcelle");
@@ -98,12 +100,12 @@ public class PlotParametersGui extends OlympaGUI {
 			it = ItemUtils.lore(it, rainyWeather);
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
-		inv.setItem(3,it);
+		inv.setItem(2,it);
 
 		//4 : Etat stoplag
 		it = ItemUtils.item(Material.COMMAND_BLOCK, "§6Blocage tâches intensives (redstone & cb)");
 		ItemUtils.lore(it, stoplagLevels[(int) plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)]);
-		inv.setItem(4, it);
+		inv.setItem(3, it);
 		
 		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamType.ALLOW_ENVIRONMENT_DAMAGE);
 		switchButtons.put(ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE"), PlotParamType.ALLOW_PVE);
@@ -166,6 +168,7 @@ public class PlotParametersGui extends OlympaGUI {
 			for (Player pp : plot.getPlayers())
 				pp.setPlayerTime(current.getAmount()*1000, true);
 			break;
+			/*
 		case 2:
 			//édition du biome réservée au propriétaire
 			if (plot.getMembers().getPlayerRank(pc) != PlotRank.OWNER)
@@ -183,7 +186,8 @@ public class PlotParametersGui extends OlympaGUI {
 			
 			current = ItemUtils.loreAdd(current, clickToChange);			
 			break;
-		case 3:
+			*/
+		case 2:
 			if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR) {
 				plot.getParameters().setParameter(PlotParamType.PLOT_WEATHER, WeatherType.DOWNFALL);
 				current = ItemUtils.lore(current, rainyWeather);	
@@ -195,7 +199,7 @@ public class PlotParametersGui extends OlympaGUI {
 			current = ItemUtils.loreAdd(current, clickToChange);
 			break;
 			
-		case 4:
+		case 3:
 			int mod = 2;
 			if (pc.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
 				mod = 3;
@@ -213,7 +217,7 @@ public class PlotParametersGui extends OlympaGUI {
 			break;
 			
 		default:
-			if (slot - 5 <= switchButtons.size()) {
+			if (slot - 4 <= switchButtons.size()) {
 				PlotParamType param = switchButtons.get(current);
 				switchButtons.remove(current);
 				
@@ -233,7 +237,8 @@ public class PlotParametersGui extends OlympaGUI {
 		return true;
 	}
 	
-	@Override
+	/*
+	@Override //Gestion du changement de biome
 	public boolean onClose(Player p) {
 		//MAJ biome
 		if (!plot.getParameters().getParameter(PlotParamType.PLOT_BIOME).equals(newBiome)) {
@@ -247,6 +252,7 @@ public class PlotParametersGui extends OlympaGUI {
 		
 		return true;
 	}
+	*/
 
 	public static ItemStack setSwitchState(ItemStack it, boolean newState) {
 		List<String> list = it.getItemMeta().getLore();

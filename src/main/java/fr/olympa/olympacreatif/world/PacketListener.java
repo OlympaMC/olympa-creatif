@@ -77,9 +77,13 @@ public class PacketListener implements Listener {
             		
             		if (packet.getItemStack() != null){
                 		
+            			Material mat = CraftItemStack.asBukkitCopy(packet.getItemStack()).getType();
+            			
                 		if (!plugin.getPerksManager().getKitsManager().
-                				hasPlayerPermissionFor(p, CraftItemStack.asBukkitCopy(packet.getItemStack()).getType()))
-                			return;
+                				hasPlayerPermissionFor(p, mat)) {
+                			p.getPlayer().getInventory().setItemInMainHand(plugin.getPerksManager().getKitsManager().getNoKitPermItem(mat));
+                			return;	
+                		}
                 		
                 		if (packet.getItemStack().getTag() != null)
                     		packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag()));

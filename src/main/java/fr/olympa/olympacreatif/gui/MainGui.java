@@ -116,7 +116,7 @@ public class MainGui extends OlympaGUI {
 			if (plot != null) {
 				p.closeInventory();
 				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
-				p.teleport((Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC));	
+				p.teleport(plot.getParameters().getSpawnLoc(plugin));	
 			}
 			break;
 			
@@ -161,7 +161,7 @@ public class MainGui extends OlympaGUI {
 		case 32:
 			if (plugin.getPlotsManager().getPlots().size()>0) {
 				Plot pl = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
-				p.teleport((Location) pl.getParameters().getParameter(PlotParamType.SPAWN_LOC));
+				p.teleport(pl.getParameters().getSpawnLoc(plugin));
 				p.sendMessage(Message.TELEPORT_TO_RANDOM_PLOT.getValue());
 			}
 			break;

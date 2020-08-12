@@ -258,6 +258,7 @@ public class WorldEditInstance {
 		Location loc1;
 		Location loc2;
 		
+		/*
 		if (plot.getParameters().getParameter(PlotParamType.PROTECTED_ZONE_POS1) != null && plot.getParameters().getParameter(PlotParamType.PROTECTED_ZONE_POS2) != null) {
 			loc1 = (Location) plot.getParameters().getParameter(PlotParamType.PROTECTED_ZONE_POS1);
 			loc2 = (Location) plot.getParameters().getParameter(PlotParamType.PROTECTED_ZONE_POS2);	
@@ -265,13 +266,14 @@ public class WorldEditInstance {
 			return WorldEditError.ERR_PROTECTED_ZONE_NOT_DEFINED;
 		}
 		
+		
 		for (int x = Math.min(loc1.getBlockX(), loc2.getBlockX()) ; x <= Math.max(loc1.getBlockX(), loc2.getBlockX()) ; x++)
 			for (int y = Math.min(loc1.getBlockY(), loc2.getBlockY()) ; y <= Math.max(loc1.getBlockY(), loc2.getBlockY()) ; y++)
 				for (int z = Math.min(loc1.getBlockZ(), loc2.getBlockZ()) ; z <= Math.max(loc1.getBlockZ(), loc2.getBlockZ()) ; z++) {
 					Location loc = new Location(plugin.getWorldManager().getWorld(), x, y, z);
 					plot.getProtectedZoneData().put(loc, new SimpleEntry<BlockData, TileEntity>(plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData(), plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(x, y, z))));
 				}
-
+*/
 		return WorldEditError.NO_ERROR;	
 	}
 	

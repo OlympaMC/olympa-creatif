@@ -139,7 +139,7 @@ public class OcCommand extends OlympaCommand {
 				if (plot == null || plot.getMembers().getPlayerLevel(p) < 3)
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else {
-					plot.getParameters().setParameter(PlotParamType.SPAWN_LOC, p.getLocation());
+					plot.getParameters().setSpawnLoc(p.getLocation());
 					p.sendMessage(Message.PLOT_SPAWN_LOC_SET.getValue());
 				}
 				
@@ -331,7 +331,7 @@ public class OcCommand extends OlympaCommand {
 					int index = Integer.valueOf(args[2]) - 1;
 					
 					if (index < plots.size()) {
-						p.teleport((Location) plots.get(index).getParameters().getParameter(PlotParamType.SPAWN_LOC));
+						p.teleport(plots.get(index).getParameters().getSpawnLoc(plugin));
 						p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
 					}else
 						sender.sendMessage(Message.INVALID_PLOT_ID.getValue());						
