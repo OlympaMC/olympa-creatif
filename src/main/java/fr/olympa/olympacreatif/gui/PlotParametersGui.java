@@ -47,7 +47,7 @@ public class PlotParametersGui extends OlympaGUI {
 	private Map<ItemStack, PlotParamType> switchButtons = new LinkedHashMap<ItemStack, PlotParamType>(); 
 	
 	public PlotParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("Paramètres du plot : " + plot.getLoc(), 3);
+		super("Paramètres du plot " + plot.getPlotId(), 3);
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;

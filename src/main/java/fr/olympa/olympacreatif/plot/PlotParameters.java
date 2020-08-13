@@ -90,7 +90,7 @@ public class PlotParameters {
 		
 		for (PlotParamType param : PlotParamType.values())
 			if (parameters.containsKey(param))
-				json.put(param.toString(), parameters.toString());
+				json.put(param.toString(), parameters.get(param).toString());
 		
 		return json.toString();
 	}

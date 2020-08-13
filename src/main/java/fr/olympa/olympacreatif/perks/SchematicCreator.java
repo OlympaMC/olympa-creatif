@@ -32,10 +32,10 @@ public class SchematicCreator {
 	}
 	    
 	public String export(Plot plot) {
-		String fileName = plot.getMembers().getOwner().getName() + "-" + plot.getLoc();
+		String fileName = plot.getMembers().getOwner().getName() + "-" + plot.getPlotId();
 		
-		return export(fileName, plot.getLoc().getLocation().getBlockX(), 1, plot.getLoc().getLocation().getBlockZ(), 
-				plot.getLoc().getLocation().getBlockX() + plotXsize - 1, 255, plot.getLoc().getLocation().getBlockZ() + plotZsize - 1);
+		return export(fileName, plot.getPlotId().getLocation().getBlockX(), 1, plot.getPlotId().getLocation().getBlockZ(), 
+				plot.getPlotId().getLocation().getBlockX() + plotXsize - 1, 255, plot.getPlotId().getLocation().getBlockZ() + plotZsize - 1);
 	}
 	
 

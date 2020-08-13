@@ -27,7 +27,7 @@ public class InteractionParametersGui extends OlympaGUI {
 	
 	@SuppressWarnings("unchecked")
 	public InteractionParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("§6Interactions du plot : " + plot.getLoc(), 6);
+		super("§6Interactions du plot " + plot.getPlotId(), 6);
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;

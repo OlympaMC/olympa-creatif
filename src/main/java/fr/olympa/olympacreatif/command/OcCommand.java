@@ -81,7 +81,7 @@ public class OcCommand extends OlympaCommand {
 					if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
 						
 						plot = plugin.getPlotsManager().createPlot(p);
-						p.teleport(plot.getLoc().getLocation());
+						p.teleport(plot.getPlotId().getLocation());
 						PlotsInstancesListener.executeEntryActions(plugin, p, plot);
 						sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue());	
 						
@@ -97,7 +97,7 @@ public class OcCommand extends OlympaCommand {
 					if (plot == null)
 						new MainGui(plugin, p, plot, "Menu").create(p);
 					else
-						new MainGui(plugin, p, plot, "Menu >> " + plot.getLoc()).create(p);
+						new MainGui(plugin, p, plot, "Menu >> " + plot.getPlotId()).create(p);
 				}
 				break;
 				
@@ -127,8 +127,8 @@ public class OcCommand extends OlympaCommand {
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else {
 					p.sendMessage(Message.TELEPORT_PLOT_CENTER.getValue());
-					double x = plot.getLoc().getLocation().getX() + (double)WorldManager.plotSize/2.0;
-					double z = plot.getLoc().getLocation().getZ() + (double)WorldManager.plotSize/2.0;
+					double x = plot.getPlotId().getLocation().getX() + (double)WorldManager.plotSize/2.0;
+					double z = plot.getPlotId().getLocation().getZ() + (double)WorldManager.plotSize/2.0;
 					
 					p.teleport(new Location(plugin.getWorldManager().getWorld(), 
 							x, plugin.getWorldManager().getWorld().getHighestBlockYAt((int)x, (int)z) + 1, z));

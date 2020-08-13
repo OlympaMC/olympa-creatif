@@ -1,7 +1,6 @@
 package fr.olympa.olympacreatif.plot;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 
 public class AsyncPlot {
 

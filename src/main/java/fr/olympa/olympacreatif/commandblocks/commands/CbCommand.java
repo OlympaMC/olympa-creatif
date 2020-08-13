@@ -33,10 +33,10 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
-import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotCbData;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import fr.olympa.olympacreatif.utils.NbtParserUtil;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
@@ -92,7 +92,7 @@ public abstract class CbCommand extends CbCommandI {
 		 
 		if (xF != null && yF != null && zF != null) {
 			Location loc = new Location(plugin.getWorldManager().getWorld(), xF, yF, zF); 
-			if (plot.getLoc().isInPlot(loc))
+			if (plot.getPlotId().isInPlot(loc))
 				return loc;
 			else
 				return null;

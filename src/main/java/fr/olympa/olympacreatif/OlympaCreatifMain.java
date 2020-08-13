@@ -117,7 +117,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		//save plots
 		for (Plot plot : getPlotsManager().getPlots())
-			getDataManager().savePlot(plot);
+			getDataManager().savePlot(plot, false);
 		
 		scm.unload();
 	}

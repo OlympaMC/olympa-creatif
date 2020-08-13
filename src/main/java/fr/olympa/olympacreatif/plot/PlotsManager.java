@@ -19,9 +19,11 @@ import fr.olympa.olympacreatif.world.WorldManager;
 
 public class PlotsManager {
 
+	private final int delayBetweenCheckup = 20 * 10;
 	public static final int maxPlotsPerPlayer = 36;
 	
 	private OlympaCreatifMain plugin;
+	
 	private List<Plot> loadedPlots = new ArrayList<Plot>();
 	
 	private List<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
@@ -58,6 +60,9 @@ public class PlotsManager {
 			public void run() {
 				//pour tous les plots
 				synchronized (loadedPlots) {
+					
+					Bukkit.broadcastMessage("Loaded plots: " + loadedPlots);
+					
 					for (Plot plot : new ArrayList<Plot>(loadedPlots)) {
 						boolean hasMemberOnline = false;
 						
@@ -71,18 +76,18 @@ public class PlotsManager {
 							}
 							if (!hasMemberOnline) {
 								plot.unload();
-								plugin.getDataManager().savePlot(plot);
+								plugin.getDataManager().savePlot(plot, false);
 								loadedPlots.remove(plot);
 							}
 						}	
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 20, 20*10);
+		}.runTaskTimer(plugin, 20, delayBetweenCheckup);
 	}
 
 	
-	public void registerPlot(PlotId newId) {
+	public void loadExistingPlot(PlotId newId) {
 		if (newId == null)
 			return;
 		
@@ -90,9 +95,10 @@ public class PlotsManager {
 			if (plot.getPlotId().equals(newId))
 				return;
 		
-		//si le plot existe mais n'est pas encore chargé
+		//si le plot existe mais n'est pas encore chargé, chargement depuis la bdd
 		plugin.getDataManager().loadPlot(newId);
 	}
+	
 	
 	
 	public Plot createPlot(Player p) {

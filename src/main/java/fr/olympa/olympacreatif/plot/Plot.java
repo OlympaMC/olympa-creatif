@@ -23,7 +23,6 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
-import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
@@ -91,10 +90,6 @@ public class Plot {
 	
 	public PlotMembers getMembers(){
 		return members;
-	}
-	
-	public PlotId getLoc() {
-		return plotId;
 	}
 	
 	public PlotCbData getCbData() {

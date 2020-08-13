@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.commandblocks;
+package fr.olympa.olympacreatif.plot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +13,10 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbBossBar;
+import fr.olympa.olympacreatif.commandblocks.CbObjective;
+import fr.olympa.olympacreatif.commandblocks.CbTeam;
+import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
@@ -219,14 +223,19 @@ public class PlotCbData {
 		for (Entry<String, CbBossBar> e : bossbarsMap.entrySet())
 			e.getValue().getBar().removeAll();
 
-		queuedCommands.clear();
-		objectives.clear();
-		teams.clear();
-		bossbarsMap.clear();
+		if (queuedCommands != null)
+			queuedCommands.clear();
+		if (objectives != null)
+			objectives.clear();
+		if (teams != null)
+			teams.clear();
+		if (bossbarsMap != null)
+			bossbarsMap.clear();
 		
-		if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
-			scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
-		
-		plugin.getCommandBlocksManager().addUnusedScoreboard(scb);
+		if (scb != null) {
+			if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
+				scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
+			plugin.getCommandBlocksManager().addUnusedScoreboard(scb);
+		}	
 	}
 }

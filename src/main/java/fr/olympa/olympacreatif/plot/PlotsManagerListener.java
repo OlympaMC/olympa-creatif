@@ -1,15 +1,8 @@
 package fr.olympa.olympacreatif.plot;
 
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
-import fr.olympa.api.groups.OlympaGroup;
-import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class PlotsManagerListener implements Listener {
@@ -31,6 +24,6 @@ public class PlotsManagerListener implements Listener {
 		PlotId newId = PlotId.fromLoc(plugin, e.getTo());
 		
 		if (newId != null && !newId.equals(oldId))
-			plugin.getPlotsManager().registerPlot(newId);
+			plugin.getPlotsManager().loadExistingPlot(newId);
 	}
 }

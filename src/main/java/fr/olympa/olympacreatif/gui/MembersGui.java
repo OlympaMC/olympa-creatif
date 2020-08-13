@@ -32,7 +32,7 @@ public class MembersGui extends OlympaGUI {
 	private OlympaPlayerCreatif pc;
 	
 	public MembersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("Membres parcelle " + plot.getLoc() + "(" + plot.getMembers().getCount() + "/" + 
+		super("Membres parcelle " + plot.getPlotId() + "(" + plot.getMembers().getCount() + "/" + 
 				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3);
 		
 		this.plugin = plugin;

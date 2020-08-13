@@ -3,6 +3,8 @@ package fr.olympa.olympacreatif.data;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 
@@ -14,11 +16,11 @@ import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
 import fr.olympa.api.sql.OlympaStatement;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotCbData;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
@@ -29,6 +31,8 @@ public class DataManager implements Listener {
 
 	private OlympaCreatifMain plugin;
 
+	private List<PlotId> loadedPlots = new ArrayList<PlotId>();
+	
 	//statements de création des tables
 	private final OlympaStatement osTableCreateMessages = new OlympaStatement(
 			"CREATE TABLE IF NOT EXISTS `creatif_messages` (" + 
@@ -130,8 +134,10 @@ public class DataManager implements Listener {
 				getPlayerPlots.setLong(1, e.getOlympaPlayer().getId());
 				ResultSet getPlayerPlotsResult = getPlayerPlots.executeQuery();
 				
-				while(getPlayerPlotsResult.next()) 
-					loadPlot(PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id")));
+				while(getPlayerPlotsResult.next()) {
+					PlotId id = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
+						loadPlot(id);
+				}
 				
 			} catch (SQLException | IllegalArgumentException e1) {
 				e1.printStackTrace();
@@ -140,8 +146,12 @@ public class DataManager implements Listener {
 	}
 
 	public void loadPlot(PlotId plotId) {
-		if (plotId == null)
+		if (plotId == null || loadedPlots.contains(plotId))
 			return;
+		
+		Bukkit.broadcastMessage("Load plot " + plotId);
+		
+		loadedPlots.add(plotId);
 		
 		plugin.getTask().runTaskAsynchronously(() -> {
 			
@@ -206,39 +216,49 @@ public class DataManager implements Listener {
 	}
 	
 	//sauvegarde les données du plot dans la db
-	public void savePlot(Plot plot) {
-		plugin.getTask().runTaskAsynchronously(() -> {
-			try {
-				int id = plot.getPlotId().getId();
-				
-				//update plot datas
-				PreparedStatement updPlotParams = osUpdatePlotDatas.getStatement();
-				updPlotParams.setInt(1, id);
-				updPlotParams.setString(2, plot.getParameters().toJson());
-				updPlotParams.executeUpdate();
-				
-				//update plot members
-				for (Entry<MemberInformations, PlotRank> e : plot.getMembers().getList().entrySet())
-					if (e.getValue() == PlotRank.VISITOR) {
-						PreparedStatement delPlotMember = osDeletePlayerPlotRank.getStatement();
-						delPlotMember.setInt(1, id);
-						delPlotMember.setLong(2, e.getKey().getId());
-						delPlotMember.executeUpdate();
-					}else {
-						PreparedStatement updPlotMember = osUpdatePlayerPlotRank.getStatement();
-						updPlotMember.setInt(1, id);
-						updPlotMember.setLong(2, e.getKey().getId());
-						updPlotMember.setString(3, e.getKey().getName());
-						updPlotMember.setString(4, e.getKey().getUUID().toString());
-						updPlotMember.setInt(5, e.getValue().getLevel());
-						updPlotMember.executeUpdate();
-					}
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		});
+	public void savePlot(Plot plot, boolean async) {
+		loadedPlots.remove(plot.getPlotId());
+		
+		if (async)
+			plugin.getTask().runTaskAsynchronously(() -> savePlotToBddSync(plot));
+		else
+			savePlotToBddSync(plot);
+	}
+	
+	private void savePlotToBddSync(Plot plot) {
+		
+		Bukkit.broadcastMessage("Save plot " + plot);
+		
+		try {
+			int id = plot.getPlotId().getId();
+			
+			//update plot datas
+			PreparedStatement updPlotParams = osUpdatePlotDatas.getStatement();
+			updPlotParams.setInt(1, id);
+			updPlotParams.setString(2, plot.getParameters().toJson());
+			updPlotParams.executeUpdate();
+			
+			//update plot members
+			for (Entry<MemberInformations, PlotRank> e : plot.getMembers().getList().entrySet())
+				if (e.getValue() == PlotRank.VISITOR) {
+					PreparedStatement delPlotMember = osDeletePlayerPlotRank.getStatement();
+					delPlotMember.setInt(1, id);
+					delPlotMember.setLong(2, e.getKey().getId());
+					delPlotMember.executeUpdate();
+				}else {
+					PreparedStatement updPlotMember = osUpdatePlayerPlotRank.getStatement();
+					updPlotMember.setInt(1, id);
+					updPlotMember.setLong(2, e.getKey().getId());
+					updPlotMember.setString(3, e.getKey().getName());
+					updPlotMember.setString(4, e.getKey().getUUID().toString());
+					updPlotMember.setInt(5, e.getValue().getLevel());
+					updPlotMember.executeUpdate();
+				}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/*

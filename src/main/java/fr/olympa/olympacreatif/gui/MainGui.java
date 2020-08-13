@@ -190,6 +190,6 @@ public class MainGui extends OlympaGUI {
 		if (plot == null)
 			new MainGui(OlympaCreatifMain.getMainClass(), p, plot, "Menu").create(p);
 		else
-			new MainGui(OlympaCreatifMain.getMainClass(), p, plot, "Menu >> " + plot.getLoc()).create(p);
+			new MainGui(OlympaCreatifMain.getMainClass(), p, plot, "Menu >> " + plot.getPlotId()).create(p);
 	}
 }

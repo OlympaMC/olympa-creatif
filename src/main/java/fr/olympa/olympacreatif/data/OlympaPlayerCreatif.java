@@ -64,6 +64,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		
 		for (UpgradeType upg : UpgradeType.values())
 			upgrades.put(upg, 0);
+
+		playerParams.add(PlayerParamType.DEFAULT_PLOT_CHAT);
+		playerParams.add(PlayerParamType.OPEN_GUI_ON_SNEAK);
 	}
 	
 	@Override
@@ -80,6 +83,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		for (PlayerParamType param : PlayerParamType.values())
 			if (resultSet.getBoolean(param.getBddKey()))
 				playerParams.add(param);
+			else
+				playerParams.remove(param);
 	}
 	
 	@Override

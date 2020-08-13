@@ -22,9 +22,9 @@ import com.google.gson.JsonParser;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
-import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotCbData;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public abstract class CbCommandI {
@@ -178,7 +178,7 @@ public abstract class CbCommandI {
 				sendingLoc.setZ(i[0]);
 		}
 		
-		if (!plot.getLoc().isInPlot(sendingLoc))
+		if (!plot.getPlotId().isInPlot(sendingLoc))
 			return new ArrayList<Entity>();
 		
 		//épuration selon distance

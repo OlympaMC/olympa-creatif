@@ -30,8 +30,12 @@ public class PlayerPlotsGui extends OlympaGUI {
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
 		
+		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
+		
+		playerPlots = pc.getPlots(false);
+		
 		//recherche des plots du joueur
-		for (Plot plot : plugin.getPlotsManager().getPlots()) {
+		for (Plot plot : playerPlots) {
 			Material mat = null;
 			switch(plot.getMembers().getPlayerRank(pc)) {
 			case OWNER:
@@ -48,13 +52,10 @@ public class PlayerPlotsGui extends OlympaGUI {
 				break;
 			}
 			
-			if (mat != null) {
-				playerPlots.add(plot);
-				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getLoc(), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName()));	
-			}
+			if (mat != null) 
+				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getPlotId().getId(), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName(), "§7Cliquez pour vous téléporter"));	
+			
 		}
-		
-		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 			
 	}
 
