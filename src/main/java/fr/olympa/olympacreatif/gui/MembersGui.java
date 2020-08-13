@@ -54,7 +54,7 @@ public class MembersGui extends OlympaGUI {
 			Consumer<ItemStack> consumer = sk -> inv.setItem(thisHeadIndex, sk);
 			
 			List<String> lore = new ArrayList<String>();
-			lore.add("e6Rang : " + e.getValue().getRankName());
+			lore.add("§6Rang : " + e.getValue().getRankName());
 
 			//définition de son statut
 			if (Bukkit.getPlayer(e.getKey().getUUID()) != null)

@@ -110,7 +110,7 @@ public class PlotParameters {
 					
 					//types booléens
 					if (type.getType().equals(Boolean.class))
-						params.setParameter(type, json.get(key));
+						params.setParameter(type, Boolean.valueOf((String) json.get(key)));
 					
 					//gestion integers
 					else if (type.getType().equals(Integer.class))

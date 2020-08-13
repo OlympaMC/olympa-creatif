@@ -78,7 +78,7 @@ public class PlotsManager {
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 20, 20*60);
+		}.runTaskTimer(plugin, 20, 20*10);
 	}
 
 	

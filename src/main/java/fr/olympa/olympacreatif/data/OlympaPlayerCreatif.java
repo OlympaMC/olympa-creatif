@@ -61,6 +61,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	public OlympaPlayerCreatif(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
 		this.plugin = OlympaCreatifMain.getMainClass();
+		
+		for (UpgradeType upg : UpgradeType.values())
+			upgrades.put(upg, 0);
 	}
 	
 	@Override
@@ -81,8 +84,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	@Override
 	public void saveDatas(PreparedStatement statement) throws SQLException {
+		
 		statement.setInt(1, gameMoney);
-
+		
 		//kits
 		for (int i = 2 ; i < 2 + KitType.values().length ; i++)
 			if (kits.contains(KitType.values()[i - 2]))
@@ -90,17 +94,23 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			else
 				statement.setBoolean(i, false);
 		
-		//consommables
-		for (int i = 2 + KitType.values().length ; i < 2 + KitType.values().length + UpgradeType.values().length ; i++)
-			statement.setInt(i, upgrades.get(UpgradeType.values()[i - 2 - KitType.values().length]));
+		int oldKeysLength = 2 + KitType.values().length;
+		
+		//améliorations
+		for (int i = oldKeysLength ; i < oldKeysLength + UpgradeType.values().length ; i++)
+			if (upgrades.get(UpgradeType.values()[i - oldKeysLength]) != null)
+				statement.setInt(i, upgrades.get(UpgradeType.values()[i - oldKeysLength]));
+			else
+				statement.setInt(i, 0);
+		
+		oldKeysLength += UpgradeType.values().length;
 		
 		//player params
-		for (int i = 2 + KitType.values().length  + UpgradeType.values().length ; i < 2 + KitType.values().length + UpgradeType.values().length + PlayerParamType.values().length; i++)
-			if (playerParams.contains(PlayerParamType.values()[i - 2 - KitType.values().length - UpgradeType.values().length]))
+		for (int i = oldKeysLength ; i < oldKeysLength + PlayerParamType.values().length; i++)
+			if (playerParams.contains(PlayerParamType.values()[i - oldKeysLength]))
 				statement.setBoolean(i, true);
 			else
 				statement.setBoolean(i, false);
-			
 	}
 	
 	public void addGameMoney(int i) {
