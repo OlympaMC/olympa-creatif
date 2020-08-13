@@ -91,14 +91,7 @@ public class PlotsManager {
 				return;
 		
 		//si le plot existe mais n'est pas encore chargé
-		plugin.getTask().runTaskAsynchronously(() -> {
-			try {
-				plugin.getDataManager().loadPlot(newId);
-			} catch (SQLException e) {
-				Bukkit.getLogger().log(Level.WARNING, "Impossible to load plot " + newId.getId() + ", error while loading form database:");
-				e.printStackTrace();
-			}
-		});
+		plugin.getDataManager().loadPlot(newId);
 	}
 	
 	

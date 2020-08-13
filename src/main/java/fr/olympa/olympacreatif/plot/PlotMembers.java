@@ -69,6 +69,10 @@ public class PlotMembers{
 	public void setMaxMembers(int max) {
 		maxMembers = max;
 	}
+
+	public PlotRank getPlayerRank(Player p) {
+		return getPlayerRank((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
+	}
 	
 	public PlotRank getPlayerRank(OlympaPlayerCreatif p) {
 		if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
@@ -77,17 +81,16 @@ public class PlotMembers{
 		return getPlayerRank(p.getInformation());
 	}
 	
-	public PlotRank getPlayerRank(OlympaPlayerInformations pi) {
-		if (members.containsKey(pi))
-			return members.get(pi);
+	public PlotRank getPlayerRank(OlympaPlayerInformations p) {
+		return getPlayerRank(new MemberInformations(p));
+	}
+	
+	public PlotRank getPlayerRank(MemberInformations p) {
+		if (members.containsKey(p))
+			return members.get(p);
 		else
 			return PlotRank.VISITOR;
 	}
-
-	public PlotRank getPlayerRank(Player p) {
-		return getPlayerRank((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
-	}
-	
 	
 	
 	
@@ -181,7 +184,7 @@ public class PlotMembers{
 		return null;
 	}
 	
-	public class MemberInformations implements OlympaPlayerInformations{
+	public class MemberInformations{
 
 		private long id;
 		private String name;
@@ -199,17 +202,14 @@ public class PlotMembers{
 			uuid = infos.getUUID();
 		}
 		
-		@Override
 		public long getId() {
 			return id;
 		}
 
-		@Override
 		public String getName() {
 			return name;
 		}
 
-		@Override
 		public UUID getUUID() {
 			return uuid;
 		}

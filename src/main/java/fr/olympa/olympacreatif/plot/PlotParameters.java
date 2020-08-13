@@ -95,6 +95,7 @@ public class PlotParameters {
 		return json.toString();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static PlotParameters fromJson(PlotId plotId, String jsonString) {
 
 		PlotParameters params = new PlotParameters(plotId);
@@ -105,21 +106,52 @@ public class PlotParameters {
 			for (Object key : json.keySet())
 				if (EnumUtils.isValidEnum(PlotParamType.class, (String)key)) {
 					
-					PlotParamType type = PlotParamType.valueOf((String)json.get(key));
-					if (type.getType().equals(Boolean.class) || type.getType().equals(Integer.class) || type.getType().equals(List.class))
+					PlotParamType type = PlotParamType.valueOf((String)key);
+					
+					//types booléens
+					if (type.getType().equals(Boolean.class))
 						params.setParameter(type, json.get(key));
 					
-					else if (type.getType().equals(GameMode.class))
+					//gestion integers
+					else if (type.getType().equals(Integer.class))
+						try {
+							params.setParameter(type, Integer.valueOf((String) json.get(key)));
+						}catch(NumberFormatException e) {
+						}
+					
+					//gestion gamemode
+					else if (type == PlotParamType.GAMEMODE_INCOMING_PLAYERS)
 						if (EnumUtils.isValidEnum(GameMode.class, (String)json.get(key)))
 							params.setParameter(type, GameMode.valueOf((String)json.get(key)));
 						else
 							params.setParameter(type, GameMode.CREATIVE);
 					
-					else if (type.getType().equals(WeatherType.class))
+					//gestion météo
+					else if (type == PlotParamType.PLOT_WEATHER)
 						if (EnumUtils.isValidEnum(WeatherType.class, (String)json.get(key)))
 							params.setParameter(type, WeatherType.valueOf((String)json.get(key)));
 						else
 							params.setParameter(type, WeatherType.CLEAR);
+					
+					//gestion listes
+					else if (type.getType().equals(List.class)) {
+						String[] args = ((String)json.get(key)).substring(1, ((String)json.get(key)).length() - 1).split(",");
+						
+						for (int i = 0 ; i < args.length ; i++) {
+							//gestion joueurs bannis du plot
+							if (type == PlotParamType.BANNED_PLAYERS)
+								try {
+									((List<Long>)params.getParameter(PlotParamType.BANNED_PLAYERS)).add(Long.valueOf(args[i]));
+								}catch(NumberFormatException e) {
+								}	
+							
+							//gestion interractions autorisées
+							else if (type == PlotParamType.LIST_ALLOWED_INTERRACTION)
+								if (Material.getMaterial(args[i]) != null)
+									((List<Material>)params.getParameter(PlotParamType.BANNED_PLAYERS)).add(Material.getMaterial(args[i]));
+						}
+					}
+						
 				}
 			
 			return params;

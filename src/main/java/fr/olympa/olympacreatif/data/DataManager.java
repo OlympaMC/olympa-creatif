@@ -33,17 +33,15 @@ public class DataManager implements Listener {
 	private final OlympaStatement osTableCreateMessages = new OlympaStatement(
 			"CREATE TABLE IF NOT EXISTS `creatif_messages` (" + 
 				"`message_id` TINYTEXT NOT NULL DEFAULT ''," + 
-				"`message_string` VARCHAR(512) NOT NULL DEFAULT '')" + 
-				"PRIMARY KEY ('message_id');"
+				"`message_string` VARCHAR(512) NOT NULL DEFAULT ''," +
+				"PRIMARY KEY (`message_id`));"
 				);
 	
 	private final OlympaStatement osTableCreatePlotParameters = new OlympaStatement(
 			"CREATE TABLE IF NOT EXISTS `creatif_plotsdatas` (" +
 					"`plot_id` INT NOT NULL," +
 					"`plot_creation_date` DATETIME NOT NULL DEFAULT NOW()," +
-					"`plot_parameters` VARCHAR(2048) NOT NULL," +
-					//"`plot_upgrade_level_commandblock` TINYINT NOT NULL," +
-					//"`plot_upgrade_level_maxmembers` TINYINT NOT NULL," +
+					"`plot_parameters` TEXT NOT NULL DEFAULT '', " +
 					"PRIMARY KEY (`plot_Id`) );"
 			);
 	
@@ -58,30 +56,34 @@ public class DataManager implements Listener {
 			);
 	
 	//statements select
-	private final OlympaStatement osSelectPlotParameters = new OlympaStatement(
-			"SELECT * FROM creatif_plotsdatas WHERE plot_id = ?;"
-			);
-	
-	private final OlympaStatement osSelectPlayerPlots = new OlympaStatement(
-			"SELECT * FROM creatif_plotsmembers WHERE player_id = ?;"
+	private final OlympaStatement osSelectPlotOwner = new OlympaStatement(
+			"SELECT * FROM creatif_plotsmembers WHERE `plot_id` = ? AND `player_plot_level` = ?;"
 			);
 	
 	private final OlympaStatement osSelectPlotPlayers = new OlympaStatement(
-			"SELECT * FROM creatif_plotsmembers WHERE plot_id = ?;"
+			"SELECT * FROM creatif_plotsmembers WHERE `plot_id` = ?;"
+			);
+	
+	private final OlympaStatement osSelectPlotParameters = new OlympaStatement(
+			"SELECT * FROM creatif_plotsdatas WHERE `plot_id` = ?;"
+			);
+	
+	private final OlympaStatement osSelectPlayerPlots = new OlympaStatement(
+			"SELECT * FROM creatif_plotsmembers WHERE `player_id` = ?;"
 			);
 	
 	private final OlympaStatement osCountPlots = new OlympaStatement(
-			"COUNT * FROM creatif_plotsdatas;"
+			"SELECT COUNT (*) FROM creatif_plotsdatas;"
 			);
 	
 	private final OlympaStatement osSelectPlayerDatas = new OlympaStatement(
-			"SELECT * FROM creatif_players WHERE player_id = ?;"			
+			"SELECT * FROM creatif_players WHERE `player_id` = ?;"			
 			);
 	
 	//statement update data
 	private final OlympaStatement osUpdatePlayerPlotRank = new OlympaStatement(
 			"INSERT INTO creatif_plotsmembers " +
-			"(plot_id, player_id, player_name, player_uuid, player_plot_level) " + 
+			"(`plot_id`, `player_id`, `player_name`, `player_uuid`, `player_plot_level`) " + 
 			"VALUES (?, ?, ?, ?, ?) " +
 			"ON DUPLICATE KEY UPDATE " + 
 			"player_name = VALUES(player_name)," +
@@ -90,12 +92,12 @@ public class DataManager implements Listener {
 			);
 	
 	private final OlympaStatement osDeletePlayerPlotRank = new OlympaStatement(
-			"DELETE FROM creatif_plotsmembers WHERE plot_id = ? AND player_id = ?;"
+			"DELETE FROM creatif_plotsmembers WHERE `plot_id`= ? AND `player_id`= ?;"
 			);
 	
 	private final OlympaStatement osUpdatePlotDatas = new OlympaStatement(
 			"INSERT INTO creatif_plotsdatas " +
-			"(plot_id, plot_parameters) " +
+			"(`plot_id`, `plot_parameters`) " +
 			"VALUES (?, ?) " + 
 			"ON DUPLICATE KEY UPDATE " +
 			"plot_parameters = VALUES(plot_parameters);"
@@ -131,61 +133,76 @@ public class DataManager implements Listener {
 				while(getPlayerPlotsResult.next()) 
 					loadPlot(PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id")));
 				
-				
 			} catch (SQLException | IllegalArgumentException e1) {
 				e1.printStackTrace();
 			}
-			
-			//TODO charger plots joueur
-			//TODO update les params du plot selon les éventuelles améliorations du joueur
-			Bukkit.broadcastMessage("TODO : chargement plots joueurs à la connexion (DataManager)");
-			
 		});
 	}
 
-	public void loadPlot(PlotId plotId) throws SQLException {
-		//CREATION DU PLOT
+	public void loadPlot(PlotId plotId) {
+		if (plotId == null)
+			return;
 		
-		//création plotParameters
-		PreparedStatement getPlotParams = osSelectPlotParameters.getStatement();
-		getPlotParams.setInt(1, plotId.getId());
-		ResultSet getPlotParamsResult = getPlotParams.executeQuery();
-		
-		getPlotParamsResult.next();
-		PlotParameters plotParams = PlotParameters.fromJson(plotId, getPlotParamsResult.getString("plot_parameters"));
-		
-		//création plotMembers
-		PlotMembers plotMembers = new PlotMembers(getPlotParamsResult.getInt("plot_upgrade_level_maxmembers"));
-		
-		PreparedStatement getPlotMembers = osSelectPlotPlayers.getStatement();
-		getPlotMembers.setInt(1, plotId.getId());
-		ResultSet getPlotPlayersResult = getPlotMembers.executeQuery();
-		
-		while (getPlotPlayersResult.next()) {
-			MemberInformations member = plotMembers.new MemberInformations(
-					getPlotPlayersResult.getLong("player_id"), 
-					getPlotPlayersResult.getString("player_name"), 
-					UUID.fromString(getPlotPlayersResult.getString("player_uuid")));
+		plugin.getTask().runTaskAsynchronously(() -> {
 			
-			plotMembers.set(member, PlotRank.getPlotRank(getPlotPlayersResult.getInt("player_plot_level")));
-		}
-		
-		//get owner data
-		PreparedStatement getPlayerDatas = osSelectPlayerDatas.getStatement();
-		getPlayerDatas.setLong(1, plotMembers.getOwner().getId());
-		ResultSet result = getPlayerDatas.executeQuery();
-		result.next();
-		
-		//création plotCbData
-		PlotCbData cbData = new PlotCbData(plugin, plugin.getCommandBlocksManager().getScoreboardForPlotCbData(), 
-				UpgradeType.CB_LEVEL.getValueOf(result.getInt(UpgradeType.CB_LEVEL.getBddKey())),
-				result.getBoolean(KitType.HOSTILE_MOBS.getBddKey()) && result.getBoolean(KitType.PEACEFUL_MOBS.getBddKey()),
-				result.getBoolean(KitType.HOSTILE_MOBS.getBddKey())
-				);
-		
-		AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData);
-		
-		plugin.getPlotsManager().addAsyncPlot(plot, plotId);
+			//CREATION DU PLOT
+			
+			//création plotParameters
+			PreparedStatement getPlotParams;
+			try {
+				getPlotParams = osSelectPlotParameters.getStatement();
+				getPlotParams.setInt(1, plotId.getId());
+				ResultSet getPlotParamsResult = getPlotParams.executeQuery();
+				
+				getPlotParamsResult.next();
+				PlotParameters plotParams = PlotParameters.fromJson(plotId, getPlotParamsResult.getString("plot_parameters"));
+				
+				//get owner id
+				PreparedStatement getPlotOwner = osSelectPlotOwner.getStatement();
+				getPlotOwner.setInt(1, plotId.getId());
+				getPlotOwner.setInt(2, 4);
+				ResultSet getPlotOwnerResult = getPlotOwner.executeQuery();
+				getPlotOwnerResult.next();
+				
+				//get owner data
+				PreparedStatement getPlayerDatas = osSelectPlayerDatas.getStatement();
+				getPlayerDatas.setLong(1, getPlotOwnerResult.getLong("player_id"));
+				ResultSet getPlotOwnerDatasResult = getPlayerDatas.executeQuery();
+				getPlotOwnerDatasResult.next();
+				
+				//création plotMembers
+				PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(
+						getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())));
+				
+				PreparedStatement getPlotMembers = osSelectPlotPlayers.getStatement();
+				getPlotMembers.setInt(1, plotId.getId());
+				ResultSet getPlotPlayersResult = getPlotMembers.executeQuery();
+				
+				while (getPlotPlayersResult.next()) {
+					MemberInformations member = plotMembers.new MemberInformations(
+							getPlotPlayersResult.getLong("player_id"), 
+							getPlotPlayersResult.getString("player_name"), 
+							UUID.fromString(getPlotPlayersResult.getString("player_uuid")));
+					
+					plotMembers.set(member, PlotRank.getPlotRank(getPlotPlayersResult.getInt("player_plot_level")));
+				}
+				
+				//création plotCbData
+				PlotCbData cbData = new PlotCbData(plugin, 
+						UpgradeType.CB_LEVEL.getValueOf(getPlotOwnerDatasResult.getInt(UpgradeType.CB_LEVEL.getBddKey())),
+						getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()) && getPlotOwnerDatasResult.getBoolean(KitType.PEACEFUL_MOBS.getBddKey()),
+						getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey())
+						);
+				
+				AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData);
+				
+				plugin.getPlotsManager().addAsyncPlot(plot, plotId);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		});
 	}
 	
 	//sauvegarde les données du plot dans la db
@@ -224,9 +241,10 @@ public class DataManager implements Listener {
 		});
 	}
 	
+	/*
 	private ResultSet executeRequest(String request) {
 		ResultSet resultSet = null;
-		/*
+		
 		try {
 			OlympaCore.getInstance().getDatabase();
 			//table  
@@ -238,12 +256,21 @@ public class DataManager implements Listener {
 		}catch (SQLException e) {
 			e.printStackTrace();
 		}
-		*/
+		
 		return resultSet;
 	}
+	*/
 
 	public int getPlotsCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		try {
+			PreparedStatement ps = osCountPlots.getStatement();
+			ResultSet result = ps.executeQuery();
+			result.next();
+			return result.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			
+			return 0;
+		}
 	}
 }

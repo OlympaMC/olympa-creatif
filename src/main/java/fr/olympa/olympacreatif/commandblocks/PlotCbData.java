@@ -34,9 +34,8 @@ public class PlotCbData {
 	private boolean hasUnlockedSummonCmd;
 	private boolean hasUnlockedSetblockSpawnerCmd;
 	
-	public PlotCbData(OlympaCreatifMain plugin, Scoreboard scb, int cpt, boolean hasUnlockedSummonCmd, boolean hasUnlockedSetblockSpawnerCmd){
+	public PlotCbData(OlympaCreatifMain plugin, int cpt, boolean hasUnlockedSummonCmd, boolean hasUnlockedSetblockSpawnerCmd){
 		this.plugin = plugin;
-		this.scb = scb;
 		this.cpt = cpt;
 		
 		this.hasUnlockedSetblockSpawnerCmd = hasUnlockedSummonCmd;
@@ -47,6 +46,9 @@ public class PlotCbData {
 	
 	//GETTERS
 	public Scoreboard getScoreboard() {
+		if (scb == null)
+			scb = plugin.getCommandBlocksManager().getScoreboardForPlotCbData();
+		
 		return scb;
 	}
 	

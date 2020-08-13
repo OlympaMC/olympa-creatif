@@ -59,7 +59,7 @@ public class Plot {
 		
 		members.set(p, PlotRank.OWNER);
 		
-		cbData = new PlotCbData(plugin, plugin.getCommandBlocksManager().getScoreboardForPlotCbData(), 
+		cbData = new PlotCbData(plugin, 
 				UpgradeType.CB_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.CB_LEVEL)), 
 				p.hasKit(KitType.HOSTILE_MOBS) && p.hasKit(KitType.PEACEFUL_MOBS), p.hasKit(KitType.HOSTILE_MOBS));
 		
