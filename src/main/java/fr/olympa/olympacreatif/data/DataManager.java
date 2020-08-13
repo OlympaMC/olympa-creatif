@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.data;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -17,6 +18,7 @@ import fr.olympa.olympacreatif.commandblocks.PlotCbData;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.AsyncPlot;
+import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
@@ -40,8 +42,8 @@ public class DataManager implements Listener {
 					"`plot_id` INT NOT NULL," +
 					"`plot_creation_date` DATETIME NOT NULL DEFAULT NOW()," +
 					"`plot_parameters` VARCHAR(2048) NOT NULL," +
-					"`plot_upgrade_level_commandblock` TINYINT NOT NULL," +
-					"`plot_upgrade_level_maxmembers` TINYINT NOT NULL," +
+					//"`plot_upgrade_level_commandblock` TINYINT NOT NULL," +
+					//"`plot_upgrade_level_maxmembers` TINYINT NOT NULL," +
 					"PRIMARY KEY (`plot_Id`) );"
 			);
 	
@@ -72,6 +74,10 @@ public class DataManager implements Listener {
 			"COUNT * FROM creatif_plotsdatas;"
 			);
 	
+	private final OlympaStatement osSelectPlayerDatas = new OlympaStatement(
+			"SELECT * FROM creatif_players WHERE player_id = ?;"			
+			);
+	
 	//statement update data
 	private final OlympaStatement osUpdatePlayerPlotRank = new OlympaStatement(
 			"INSERT INTO creatif_plotsmembers " +
@@ -87,7 +93,7 @@ public class DataManager implements Listener {
 			"DELETE FROM creatif_plotsmembers WHERE plot_id = ? AND player_id = ?;"
 			);
 	
-	private final OlympaStatement osUpdatePlotParameters = new OlympaStatement(
+	private final OlympaStatement osUpdatePlotDatas = new OlympaStatement(
 			"INSERT INTO creatif_plotsdatas " +
 			"(plot_id, plot_parameters) " +
 			"VALUES (?, ?) " + 
@@ -114,8 +120,6 @@ public class DataManager implements Listener {
 	
 	@EventHandler //charge les plots des joueurs se connectant
 	public void onJoin(OlympaPlayerLoadEvent e) {
-
-		OlympaPlayerCreatif p = e.getOlympaPlayer();
 		
 		plugin.getTask().runTaskAsynchronously(() -> {
 			try {
@@ -124,47 +128,9 @@ public class DataManager implements Listener {
 				getPlayerPlots.setLong(1, e.getOlympaPlayer().getId());
 				ResultSet getPlayerPlotsResult = getPlayerPlots.executeQuery();
 				
-				while(getPlayerPlotsResult.next()) {
-					//CREATION DU PLOT
-					
-					//création plotId
-					PlotId plotId = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
-					
-					//création plotParameters
-					PreparedStatement getPlotParams = osSelectPlotParameters.getStatement();
-					getPlotParams.setInt(1, plotId.getId());
-					ResultSet getPlotParamsResult = getPlotParams.executeQuery();
-					
-					getPlotParamsResult.next();
-					PlotParameters plotParams = PlotParameters.fromJson(plotId, getPlotParamsResult.getString("plot_parameters"));
-					
-					//création plotMembers
-					PreparedStatement getPlotMembers = osSelectPlotPlayers.getStatement();
-					getPlotMembers.setInt(1, getPlayerPlotsResult.getInt("plot_id"));
-					ResultSet getPlotPlayersResult = getPlotMembers.executeQuery();
-					
-					PlotMembers plotMembers = new PlotMembers(getPlotParamsResult.getInt("plot_upgrade_level_maxmembers"));
-					
-					while (getPlotPlayersResult.next()) {
-						MemberInformations member = plotMembers.new MemberInformations(
-								getPlotPlayersResult.getLong("player_id"), 
-								getPlotPlayersResult.getString("player_name"), 
-								UUID.fromString(getPlotPlayersResult.getString("player_uuid")));
-						
-						plotMembers.set(member, PlotRank.getPlotRank(getPlotPlayersResult.getInt("player_plot_level")));
-					}
-					
-					//création plotCbData
-					PlotCbData cbData = new PlotCbData(plugin, plugin.getCommandBlocksManager().getScoreboardForPlotCbData(), 
-							UpgradeType.CB_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.CB_LEVEL)), 
-							p.hasKit(KitType.HOSTILE_MOBS) && p.hasKit(KitType.PEACEFUL_MOBS),
-							p.hasKit(KitType.HOSTILE_MOBS)
-							);
-					
-					AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData);
-					
-					plugin.getPlotsManager().addAsyncPlot(plot, plotId);
-				}
+				while(getPlayerPlotsResult.next()) 
+					loadPlot(PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id")));
+				
 				
 			} catch (SQLException | IllegalArgumentException e1) {
 				e1.printStackTrace();
@@ -176,13 +142,88 @@ public class DataManager implements Listener {
 			
 		});
 	}
-	
-	public void loadPlot(PlotId newId) {
-		AsyncPlot plot = null;
-		
-		plugin.getPlotsManager().addAsyncPlot(plot, newId);			
-	}
 
+	public void loadPlot(PlotId plotId) throws SQLException {
+		//CREATION DU PLOT
+		
+		//création plotParameters
+		PreparedStatement getPlotParams = osSelectPlotParameters.getStatement();
+		getPlotParams.setInt(1, plotId.getId());
+		ResultSet getPlotParamsResult = getPlotParams.executeQuery();
+		
+		getPlotParamsResult.next();
+		PlotParameters plotParams = PlotParameters.fromJson(plotId, getPlotParamsResult.getString("plot_parameters"));
+		
+		//création plotMembers
+		PlotMembers plotMembers = new PlotMembers(getPlotParamsResult.getInt("plot_upgrade_level_maxmembers"));
+		
+		PreparedStatement getPlotMembers = osSelectPlotPlayers.getStatement();
+		getPlotMembers.setInt(1, plotId.getId());
+		ResultSet getPlotPlayersResult = getPlotMembers.executeQuery();
+		
+		while (getPlotPlayersResult.next()) {
+			MemberInformations member = plotMembers.new MemberInformations(
+					getPlotPlayersResult.getLong("player_id"), 
+					getPlotPlayersResult.getString("player_name"), 
+					UUID.fromString(getPlotPlayersResult.getString("player_uuid")));
+			
+			plotMembers.set(member, PlotRank.getPlotRank(getPlotPlayersResult.getInt("player_plot_level")));
+		}
+		
+		//get owner data
+		PreparedStatement getPlayerDatas = osSelectPlayerDatas.getStatement();
+		getPlayerDatas.setLong(1, plotMembers.getOwner().getId());
+		ResultSet result = getPlayerDatas.executeQuery();
+		result.next();
+		
+		//création plotCbData
+		PlotCbData cbData = new PlotCbData(plugin, plugin.getCommandBlocksManager().getScoreboardForPlotCbData(), 
+				UpgradeType.CB_LEVEL.getValueOf(result.getInt(UpgradeType.CB_LEVEL.getBddKey())),
+				result.getBoolean(KitType.HOSTILE_MOBS.getBddKey()) && result.getBoolean(KitType.PEACEFUL_MOBS.getBddKey()),
+				result.getBoolean(KitType.HOSTILE_MOBS.getBddKey())
+				);
+		
+		AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData);
+		
+		plugin.getPlotsManager().addAsyncPlot(plot, plotId);
+	}
+	
+	//sauvegarde les données du plot dans la db
+	public void savePlot(Plot plot) {
+		plugin.getTask().runTaskAsynchronously(() -> {
+			try {
+				int id = plot.getPlotId().getId();
+				
+				//update plot datas
+				PreparedStatement updPlotParams = osUpdatePlotDatas.getStatement();
+				updPlotParams.setInt(1, id);
+				updPlotParams.setString(2, plot.getParameters().toJson());
+				updPlotParams.executeUpdate();
+				
+				//update plot members
+				for (Entry<MemberInformations, PlotRank> e : plot.getMembers().getList().entrySet())
+					if (e.getValue() == PlotRank.VISITOR) {
+						PreparedStatement delPlotMember = osDeletePlayerPlotRank.getStatement();
+						delPlotMember.setInt(1, id);
+						delPlotMember.setLong(2, e.getKey().getId());
+						delPlotMember.executeUpdate();
+					}else {
+						PreparedStatement updPlotMember = osUpdatePlayerPlotRank.getStatement();
+						updPlotMember.setInt(1, id);
+						updPlotMember.setLong(2, e.getKey().getId());
+						updPlotMember.setString(3, e.getKey().getName());
+						updPlotMember.setString(4, e.getKey().getUUID().toString());
+						updPlotMember.setInt(5, e.getValue().getLevel());
+						updPlotMember.executeUpdate();
+					}
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+	}
+	
 	private ResultSet executeRequest(String request) {
 		ResultSet resultSet = null;
 		/*

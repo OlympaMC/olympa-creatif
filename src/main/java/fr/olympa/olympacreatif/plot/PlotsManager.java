@@ -1,9 +1,11 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -69,6 +71,7 @@ public class PlotsManager {
 							}
 							if (!hasMemberOnline) {
 								plot.unload();
+								plugin.getDataManager().savePlot(plot);
 								loadedPlots.remove(plot);
 							}
 						}	
@@ -78,6 +81,7 @@ public class PlotsManager {
 		}.runTaskTimer(plugin, 20, 20*60);
 	}
 
+	
 	public void registerPlot(PlotId newId) {
 		if (newId == null)
 			return;
@@ -87,8 +91,16 @@ public class PlotsManager {
 				return;
 		
 		//si le plot existe mais n'est pas encore chargé
-		plugin.getDataManager().loadPlot(newId);
-	}	
+		plugin.getTask().runTaskAsynchronously(() -> {
+			try {
+				plugin.getDataManager().loadPlot(newId);
+			} catch (SQLException e) {
+				Bukkit.getLogger().log(Level.WARNING, "Impossible to load plot " + newId.getId() + ", error while loading form database:");
+				e.printStackTrace();
+			}
+		});
+	}
+	
 	
 	public Plot createPlot(Player p) {
 		Plot plot = new Plot(plugin, AccountProvider.get(p.getUniqueId()));

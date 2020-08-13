@@ -1,23 +1,20 @@
 package fr.olympa.olympacreatif.plot;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
-import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 public class PlotMembers{
 
@@ -31,8 +28,6 @@ public class PlotMembers{
 			return o1.getName().compareTo(o2.getName());
 		}
 	});
-
-	
 	
 	public PlotMembers(int maxMembers) {
 		this.maxMembers = maxMembers;
@@ -56,17 +51,11 @@ public class PlotMembers{
 	}
 	
 	public boolean set(MemberInformations p, PlotRank rank) {
-		if (members.containsKey(p)) {
-			if (rank != PlotRank.VISITOR)
-				members.put(p, rank);
-			else
-				members.remove(p);	
-			
+		if (rank == getPlayerRank(p))
 			return true;
-		}
 		
-		if (members.size() < maxMembers) {
-			members.put(p, rank);	
+		if (rank == PlotRank.VISITOR || getCount() < maxMembers) {
+			members.put(p, rank);			
 			return true;
 		}
 		
@@ -117,12 +106,22 @@ public class PlotMembers{
 	
 	
 	
+	public Map<MemberInformations, PlotRank> getMembers(){
+		Map<MemberInformations, PlotRank> map = new HashMap<PlotMembers.MemberInformations, PlotMembers.PlotRank>();
+		
+		for (Entry<MemberInformations, PlotRank> e : members.entrySet())
+			if (e.getValue() != PlotRank.VISITOR)
+				map.put(e.getKey(), e.getValue());
+		
+		return map;
+	}
+
 	public Map<MemberInformations, PlotRank> getList(){
 		return members;
 	}
-
+	
 	public int getCount() {
-		return members.size(); 
+		return getMembers().size(); 
 	}
 
 	public enum PlotRank {
