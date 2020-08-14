@@ -5,12 +5,9 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
-import fr.olympa.api.permission.OlympaCorePermissions;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
@@ -18,7 +15,6 @@ import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.command.OcaCommand;
-import fr.olympa.olympacreatif.command.OceCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.DataManager;
@@ -75,7 +71,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		//saveDefaultConfig();
 		new OcCommand(this, "olympacreatif", new String[] { "oc" }).register();
-		new OceCommand(this, "olympacreatifedit", new String[] { "oce" }).register();
+		//new OceCommand(this, "olympacreatifedit", new String[] { "oce" }).register();
 		new OcoCommand(this, "olympacreatifother", new String[] { "oco" }).register();
 		new OcaCommand(this, "olympacreatifadmin", new String[] { "oca" }).register();
 

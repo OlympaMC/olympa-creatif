@@ -52,11 +52,6 @@ public class MainGui extends OlympaGUI {
 		Consumer<ItemStack> consumer = sk -> {
 			//Bukkit.broadcastMessage("tête chargée : " + sk.toString());
 			
-			int ownedPlots = p.getPlots(true).size();
-			int memberPlots = p.getPlots(false).size();
-			int ownedPlotsSlots = p.getPlotsSlots(true);
-			int memberPlotsSlots = p.getPlotsSlots(false);
-			
 			sk = ItemUtils.name(sk, "§6Paramètres de " + player.getDisplayName());
 			sk = ItemUtils.lore(sk, clickToOpenMenu);
 			/*sk = ItemUtils.loreAdd(sk, "§eGrade : " + p.getGroupNameColored(), 
@@ -72,7 +67,10 @@ public class MainGui extends OlympaGUI {
 		ItemUtils.skull(consumer, p.getName(), p.getName());
 		//plugin.getPerksManager().getMicroBlocks().skull(consumer, p.getName(), p.getName());
 
-		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes parcelles", clickToOpenMenu));
+		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes parcelles", 
+				"§eParcelles possédées : " + pc.getPlots(true).size() + "/" + pc.getPlotsSlots(true),
+				"§eParcelles totales : " + pc.getPlots(false).size() + "/" + pc.getPlotsSlots(false), 
+				clickToOpenMenu));
 		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", clickToOpenMenu));
 		
 		if (plot != null) {

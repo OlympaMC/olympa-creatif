@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.plot;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -19,7 +20,7 @@ import fr.olympa.olympacreatif.world.WorldManager;
 
 public class PlotsManager {
 
-	private final int delayBetweenCheckup = 20 * 10;
+	private final int delayBetweenCheckup = 20 * 30;
 	public static final int maxPlotsPerPlayer = 36;
 	
 	private OlympaCreatifMain plugin;
@@ -37,7 +38,6 @@ public class PlotsManager {
 		plugin.getServer().getPluginManager().registerEvents(new PlotsInstancesListener(plugin), plugin);
 		
 		plotCount = plugin.getDataManager().getPlotsCount();
-		//plotCount = plugin.getDataManager().getTotalPlotsCount();
 		
 		//construit les objets Plot chargés depuis la bdd de manière synchrone avec le serveur
 		new BukkitRunnable() {
@@ -61,7 +61,7 @@ public class PlotsManager {
 				//pour tous les plots
 				synchronized (loadedPlots) {
 					
-					Bukkit.broadcastMessage("Loaded plots: " + loadedPlots);
+					//Bukkit.broadcastMessage("Loaded plots: " + loadedPlots);
 					
 					for (Plot plot : new ArrayList<Plot>(loadedPlots)) {
 						boolean hasMemberOnline = false;
@@ -76,7 +76,7 @@ public class PlotsManager {
 							}
 							if (!hasMemberOnline) {
 								plot.unload();
-								plugin.getDataManager().savePlot(plot, false);
+								plugin.getDataManager().savePlot(plot, true);
 								loadedPlots.remove(plot);
 							}
 						}	

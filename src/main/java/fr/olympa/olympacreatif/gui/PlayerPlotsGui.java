@@ -1,9 +1,10 @@
 package fr.olympa.olympacreatif.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -16,8 +17,6 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotParamType;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class PlayerPlotsGui extends OlympaGUI {
 
@@ -26,13 +25,22 @@ public class PlayerPlotsGui extends OlympaGUI {
 	private List<Plot> playerPlots = new ArrayList<Plot>();
 	
 	public PlayerPlotsGui(OlympaCreatifMain plugin, Player p) {
-		super("§6Plots du joueur " + p.getDisplayName(), 5);
+		super("Plots du joueur " + p.getDisplayName(), 5);
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
 		
 		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
 		playerPlots = pc.getPlots(false);
+		
+		//tri de la liste de plots par ordre croissant d'id
+		Collections.sort(playerPlots, new Comparator<Plot>() {
+
+			@Override
+			public int compare(Plot p1, Plot p2) {
+				return p1.getPlotId().getId() - p2.getPlotId().getId();
+			}
+		});
 		
 		//recherche des plots du joueur
 		for (Plot plot : playerPlots) {

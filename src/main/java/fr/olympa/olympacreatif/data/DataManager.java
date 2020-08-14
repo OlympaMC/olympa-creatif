@@ -45,7 +45,7 @@ public class DataManager implements Listener {
 			"CREATE TABLE IF NOT EXISTS `creatif_plotsdatas` (" +
 					"`plot_id` INT NOT NULL," +
 					"`plot_creation_date` DATETIME NOT NULL DEFAULT NOW()," +
-					"`plot_parameters` TEXT NOT NULL DEFAULT '', " +
+					"`plot_parameters` VARCHAR(2048) NOT NULL DEFAULT '', " +
 					"PRIMARY KEY (`plot_Id`) );"
 			);
 	
@@ -145,11 +145,11 @@ public class DataManager implements Listener {
 		});
 	}
 
-	public void loadPlot(PlotId plotId) {
+	public synchronized void loadPlot(PlotId plotId) {
 		if (plotId == null || loadedPlots.contains(plotId))
 			return;
 		
-		Bukkit.broadcastMessage("Load plot " + plotId);
+		//Bukkit.broadcastMessage("Load plot " + plotId);
 		
 		loadedPlots.add(plotId);
 		
@@ -225,9 +225,9 @@ public class DataManager implements Listener {
 			savePlotToBddSync(plot);
 	}
 	
-	private void savePlotToBddSync(Plot plot) {
+	private synchronized void savePlotToBddSync(Plot plot) {
 		
-		Bukkit.broadcastMessage("Save plot " + plot);
+		//Bukkit.broadcastMessage("Save plot " + plot);
 		
 		try {
 			int id = plot.getPlotId().getId();
