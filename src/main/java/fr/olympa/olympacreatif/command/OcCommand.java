@@ -25,7 +25,6 @@ import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
-import fr.olympa.olympacreatif.worldedit_legacy.WorldEditManager.WorldEditError;
 
 public class OcCommand extends OlympaCommand {
 
@@ -48,12 +47,11 @@ public class OcCommand extends OlympaCommand {
 		
 		Player target = null;
 		Plot plot;
-		WorldEditError err;
 		
 		if (args.length > 0 && args[0].equals("chat")) {
 			plot = plugin.getPlotsManager().getPlot(p.getLocation());
 			if (plot == null)
-				p.sendMessage(Message.PLOT_NULL_PLOT.getValue());
+				p.sendMessage(Message.INVALID_PLOT_ID.getValue());
 			else {
 				String concat = "";
 				List<String> argsMsg = new ArrayList<String>(Arrays.asList(args));
@@ -229,7 +227,7 @@ public class OcCommand extends OlympaCommand {
 					else
 						sender.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else
-					sender.sendMessage(Message.PLOT_NULL_PLOT.getValue());
+					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
 				break;
 				
 			case "kick":

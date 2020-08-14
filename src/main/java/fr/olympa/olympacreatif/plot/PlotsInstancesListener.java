@@ -240,7 +240,7 @@ public class PlotsInstancesListener implements Listener{
 			KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
 			
 			if (interractProhibitedItems.contains(mat) || kit == KitType.HOSTILE_MOBS || kit == KitType.PEACEFUL_MOBS) {
-				p.getPlayer().sendMessage(Message.ITEM_PROHIBITED_USED.getValue());
+				p.getPlayer().sendMessage(Message.PLOT_ITEM_PROHIBITED_USED.getValue());
 				e.setCancelled(true);
 				return;
 			}

@@ -91,7 +91,7 @@ public class OcoCommand extends OlympaCommand {
 			case "debug":
 				Plot plot2 = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 				if (plot2 == null) {
-					sender.sendMessage(Message.PLOT_ERR_NOT_LOADED.getValue());
+					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
 					break;
 				}
 				
@@ -121,7 +121,7 @@ public class OcoCommand extends OlympaCommand {
 				ItemStack item = plugin.getPerksManager().getMicroBlocks().getMb(args[1]);
 				if (item != null) {
 					p.getPlayer().getInventory().addItem(item);
-					p.getPlayer().sendMessage(Message.OCO_BLOCK_GIVED.getValue());
+					p.getPlayer().sendMessage(Message.OCO_HEAD_GIVED.getValue());
 				}else
 					p.getPlayer().sendMessage(Message.OCO_UNKNOWN_MB.getValue());
 				break;
@@ -129,7 +129,7 @@ public class OcoCommand extends OlympaCommand {
 			case "skull":
 				Consumer<ItemStack> consumer = sk -> p.getPlayer().getInventory().addItem(sk);
 				ItemUtils.skull(consumer, "§6Tête de " + args[1], args[1]);
-				p.getPlayer().sendMessage(Message.OCO_BLOCK_GIVED.getValue());
+				p.getPlayer().sendMessage(Message.OCO_HEAD_GIVED.getValue());
 				break;
 				
 			case "speed":

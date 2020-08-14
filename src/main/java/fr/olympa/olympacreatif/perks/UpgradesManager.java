@@ -49,7 +49,7 @@ public class UpgradesManager {
 	public UpgradesManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
-		plugin.getServer().getPluginManager().registerEvents(new PlayerChangeRankListener(), plugin);
+		//plugin.getServer().getPluginManager().registerEvents(new PlayerChangeRankListener(), plugin);
 	}
 	
 	public enum UpgradeType{
@@ -92,16 +92,5 @@ public class UpgradesManager {
 			
 			return values.get(getValueOf(level));
 		}
-	}
-	
-	//listener change player rank (pour message chat)
-	class PlayerChangeRankListener implements Listener{
-		
-		@EventHandler
-		public void onChangeRank(AsyncOlympaPlayerChangeGroupEvent e) {
-			Bukkit.broadcastMessage("(oui je sais mise en forme à revoir) Le joueur " + e.getPlayer().getName() + " a obtenu le grade secret !"); 
-		}
-		
-		//TODO changement des plots du joueur
 	}
 }

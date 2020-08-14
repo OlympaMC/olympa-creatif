@@ -18,11 +18,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent.ChangeType;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.plugin.OlympaSpigot;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.core.spigot.redis.RedisSpigotSend;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -74,7 +76,14 @@ public class ShopGui extends OlympaGUI{
 		//init rangs
 		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CONSTRUCTOR, 10, ItemUtils.item(Material.IRON_PICKAXE, "§6Grade " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()), "descriptions à faire")));
 		ranks.add(new MarketItemData(p, OlympaGroup.CREA_ARCHITECT, 20, ItemUtils.item(Material.GOLDEN_PICKAXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), "descriptions à faire")));
-		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 30, ItemUtils.item(Material.DIAMOND_PICKAXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), "descriptions à faire")));
+		
+		//ajout du grade créateur si les prérequis sont respectés
+		boolean hasAllKits = true;
+		for (KitType kit : KitType.values())
+			if (!p.hasKit(kit))
+				hasAllKits = false;
+		if (p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) && hasAllKits)
+			ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 30, ItemUtils.item(Material.DIAMOND_PICKAXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), "descriptions à faire")));
 
 		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 10, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks")));
 		kits.add(new MarketItemData(p, KitType.REDSTONE, 10, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone")));
@@ -344,6 +353,10 @@ public class ShopGui extends OlympaGUI{
 				
 				p.removeGameMoney(price);
 				p.addGroup((OlympaGroup)toBuy);
+				RedisSpigotSend.sendOlympaGroupChange(p, (OlympaGroup)toBuy, 0, ChangeType.ADD, null);
+				
+				if ((OlympaGroup)toBuy == OlympaGroup.CREA_CREATOR)
+					Bukkit.broadcastMessage("§6 Le joueur " + p.getName() + " a découvert le grade secret, félicitations à lui !");
 				
 			}else if (toBuy instanceof KitType) {
 				if (p.hasKit((KitType)toBuy))

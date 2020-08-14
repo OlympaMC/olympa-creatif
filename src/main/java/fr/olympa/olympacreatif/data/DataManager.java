@@ -6,15 +6,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
 import fr.olympa.api.sql.OlympaStatement;
-import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
@@ -60,6 +61,10 @@ public class DataManager implements Listener {
 			);
 	
 	//statements select
+	private final OlympaStatement osSelectMessages = new OlympaStatement(
+			"SELECT * FROM creatif_messages;"
+			);
+	
 	private final OlympaStatement osSelectPlotOwner = new OlympaStatement(
 			"SELECT * FROM creatif_plotsmembers WHERE `plot_id` = ? AND `player_plot_level` = ?;"
 			);
@@ -117,11 +122,20 @@ public class DataManager implements Listener {
 			osTableCreateMessages.getStatement().execute();
 			osTableCreatePlotParameters.getStatement().execute();
 			osTableCreatePlotMembers.getStatement().execute();
+			
+			ResultSet messages = osSelectMessages.getStatement().executeQuery();
+			while (messages.next()) {
+				/*Bukkit.getLogger().log(Level.INFO, "Message " + messages.getString("message_id") + " : " + 
+						messages.getString("message_string"));*/
+				
+				if (EnumUtils.isValidEnum(Message.class, messages.getString("message_id")))
+					Message.valueOf(messages.getString("message_id")).setValue(messages.getString("message_string"));
+			}
 		}catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		Message.initialize();
+		
 	}
 	
 	@EventHandler //charge les plots des joueurs se connectant
