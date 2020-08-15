@@ -105,7 +105,7 @@ public class CbCommandListener implements Listener {
 	
 	@EventHandler //Handle commandes des joueurs
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e) {
-
+		
 		//cancel commande si c'est une commande commandblock
 		if (CbCommand.getCommandType(e.getMessage()) != null)
 			e.setCancelled(true);

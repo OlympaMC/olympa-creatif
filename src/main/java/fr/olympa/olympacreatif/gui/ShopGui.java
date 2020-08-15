@@ -22,6 +22,7 @@ import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent.ChangeType;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.player.Gender;
 import fr.olympa.api.plugin.OlympaSpigot;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.redis.RedisSpigotSend;
@@ -353,12 +354,14 @@ public class ShopGui extends OlympaGUI{
 				
 				p.removeGameMoney(price);
 				p.addGroup((OlympaGroup)toBuy);
-				//RedisSpigotSend.sendOlympaGroupChange(p, (OlympaGroup)toBuy, 0, ChangeType.ADD, null);
+				RedisSpigotSend.sendOlympaGroupChange(p, (OlympaGroup)toBuy, 0, ChangeType.ADD, null);
+				
+				String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";
 				
 				if ((OlympaGroup)toBuy == OlympaGroup.CREA_CREATOR)
-					Bukkit.broadcastMessage("§6----------------------------------------------\n"
-							+ "§eLe joueur §c" + p.getName() + " §ea découvert le grade secret ! \nFélicitations à lui !"
-							+ "\n----------------------------------------------");
+					Bukkit.broadcastMessage("§6----------------------------------------------\n\n"
+							+ "Le joueur §c" + p.getName() + " §6a découvert le grade secret ! \nFélicitations à " + genreType + " !"
+							+ "\n\n§6----------------------------------------------");
 
 			}else if (toBuy instanceof KitType) {
 				if (p.hasKit((KitType)toBuy))
