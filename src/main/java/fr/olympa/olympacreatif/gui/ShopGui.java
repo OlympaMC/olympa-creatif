@@ -354,7 +354,11 @@ public class ShopGui extends OlympaGUI{
 				
 				p.removeGameMoney(price);
 				p.addGroup((OlympaGroup)toBuy);
-				RedisSpigotSend.sendOlympaGroupChange(p, (OlympaGroup)toBuy, 0, ChangeType.ADD, null);
+				
+				OlympaCore.getInstance().getServer().getPluginManager().callEvent(new AsyncOlympaPlayerChangeGroupEvent(p.getPlayer(), ChangeType.ADD, p, (OlympaGroup) toBuy));
+				AccountProvider olympaAccount = new AccountProvider(p.getUniqueId());
+				olympaAccount.saveToRedis(p);
+				olympaAccount.saveToDb(p);
 				
 				String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";
 				
