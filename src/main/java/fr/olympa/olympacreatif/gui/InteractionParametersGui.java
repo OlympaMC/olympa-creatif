@@ -49,7 +49,7 @@ public class InteractionParametersGui extends OlympaGUI {
 				it = ItemUtils.loreAdd(it, "§eEtat : §cinterdit");
 			
 			if (plot.getMembers().getPlayerLevel(pc) >= 3)
-				it = ItemUtils.loreAdd(it, " ", "§8Clic gauche : changer l'état du bloc");
+				it = ItemUtils.loreAdd(it, " ", "§7Clic gauche : changer l'état du bloc");
 			
 			inv.addItem(it);
 		}
@@ -68,12 +68,12 @@ public class InteractionParametersGui extends OlympaGUI {
 			if (((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(current.getType())) {
 				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).remove(current.getType());
 				current = ItemUtils.removeEnchant(current, Enchantment.DURABILITY);
-				current = ItemUtils.lore(current, "§eEtat : §cinterdit", " ", "§8Clic gauche : changer l'état du bloc");
+				current = ItemUtils.lore(current, "§eEtat : §cinterdit", " ", "§7Clic gauche : changer l'état du bloc");
 			}
 			else {
 				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(current.getType());
 				current = ItemUtils.addEnchant(current, Enchantment.DURABILITY, 1);
-				current = ItemUtils.lore(current, "§eEtat : §aautorisé", " ", "§8Clic gauche : changer l'état du bloc");
+				current = ItemUtils.lore(current, "§eEtat : §aautorisé", " ", "§7Clic gauche : changer l'état du bloc");
 			}
 					
 		}

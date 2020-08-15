@@ -624,8 +624,6 @@ public class PlotsInstancesListener implements Listener{
 	
 	//gestion fake death (le joueur ne doit jamais vraiment mourir sinon le fake op ne fonctionne plus)
 	public static boolean fireFakeDeath(Player p, Entity killer, Plot plot, double damages) {
-
-		Bukkit.broadcastMessage("(debug) joueur " + p.getName() + " take damages : " + damages + "/" + p.getHealth()); 
 		
 		if (p.getHealth() > damages)
 			return false;
@@ -637,48 +635,8 @@ public class PlotsInstancesListener implements Listener{
 		
 		event.getDrops().forEach(item -> event.getDeathLoc().getWorld().dropItemNaturally(event.getDeathLoc(), item));
 		
-		Bukkit.broadcastMessage("(debug) joueur " + p.getName() + " respawn"); 
-		
 		return true;
 	}
-	
-	/*@EventHandler //force le respawn sur le spawn de la parcelle
-	
-	public void onRespawn(PlayerRespawnEvent e) {
-		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
-		
-		if (plot == null)
-			e.setRespawnLocation(plugin.getWorldManager().getWorld().getSpawnLocation());
-		else
-			e.setRespawnLocation((Location) plot.getParameters().getParameter(PlotParamType.SPAWN_LOC));
-		
-		if (itemsToKeepOnDeath.containsKey(e.getPlayer().getUniqueId()))
-			e.getPlayer().getInventory().addItem((ItemStack[]) itemsToKeepOnDeath.get(e.getPlayer().getUniqueId()).toArray());
-		
-		itemsToKeepOnDeath.remove(e.getPlayer().getUniqueId());
-		
-		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
-	}
-	*/
-	
-	/*@EventHandler //gère le paramètre keepInventory de la parcelle
-	
-	public void onDeath(PlayerDeathEvent e) {
-		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
-		
-		if (plot == null) {
-			e.getDrops().clear();
-			return;
-		}
-		
-		if ((boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH)) {
-			if (e.getDrops() != null && e.getDrops().size() > 0) {
-				itemsToKeepOnDeath.put(e.getEntity().getUniqueId(), new ArrayList<ItemStack>(e.getDrops()));
-				e.getDrops().clear();	
-			}
-		}
-	}
-	*/
 	
 	@EventHandler //empêche le drop d'items si interdit sur le plot (et cancel si route)
 	public void onDropItem(PlayerDropItemEvent e) {

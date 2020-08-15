@@ -77,7 +77,7 @@ public class PlayerPlotsGui extends OlympaGUI {
 		if (slot < playerPlots.size()) {
 			p.closeInventory();
 			p.teleport(playerPlots.get(slot).getParameters().getSpawnLoc(plugin));
-			p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
+			p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(slot)));
 		}
 		
 		return true;
