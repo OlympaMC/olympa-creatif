@@ -553,6 +553,14 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 		
+		//remove entity si joueur a un ehoue en bois dans la main
+		if (((Player)e.getRemover()).getInventory().getItemInMainHand() != null && 
+				((Player)e.getRemover()).getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && 
+				plot.getMembers().getPlayerRank((Player) e.getRemover()) != PlotRank.VISITOR) {
+			e.getEntity().remove();
+			return;
+		}
+		
 		if (plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR)
 			e.setCancelled(true);
 		

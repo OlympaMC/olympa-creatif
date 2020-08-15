@@ -80,9 +80,9 @@ public class ShopGui extends OlympaGUI{
 		//ajout du grade créateur si les prérequis sont respectés
 		boolean hasAllKits = true;
 		for (KitType kit : KitType.values())
-			if (!p.hasKit(kit))
+			if (!p.hasKit(kit) && kit != KitType.ADMIN)
 				hasAllKits = false;
-		if (p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) && hasAllKits)
+		if ((p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) || p.getGroups().containsKey(OlympaGroup.CREA_CREATOR)) && hasAllKits)
 			ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 30, ItemUtils.item(Material.DIAMOND_PICKAXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), "descriptions à faire")));
 
 		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 10, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks")));
@@ -353,11 +353,13 @@ public class ShopGui extends OlympaGUI{
 				
 				p.removeGameMoney(price);
 				p.addGroup((OlympaGroup)toBuy);
-				RedisSpigotSend.sendOlympaGroupChange(p, (OlympaGroup)toBuy, 0, ChangeType.ADD, null);
+				//RedisSpigotSend.sendOlympaGroupChange(p, (OlympaGroup)toBuy, 0, ChangeType.ADD, null);
 				
 				if ((OlympaGroup)toBuy == OlympaGroup.CREA_CREATOR)
-					Bukkit.broadcastMessage("§6 Le joueur " + p.getName() + " a découvert le grade secret, félicitations à lui !");
-				
+					Bukkit.broadcastMessage("§6----------------------------------------------\n"
+							+ "§eLe joueur §c" + p.getName() + " §ea découvert le grade secret ! \nFélicitations à lui !"
+							+ "\n----------------------------------------------");
+
 			}else if (toBuy instanceof KitType) {
 				if (p.hasKit((KitType)toBuy))
 					return;

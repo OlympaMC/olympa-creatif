@@ -380,7 +380,7 @@ public class WorldEventsListener implements Listener{
 			OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId()); 
 			setWorldEditPerms(p, true);
 			setCommandBlockPerms(p, true);
-		}, 40);
+		}, 60);
 	}
 	
 	@EventHandler //add perms worldedit si achat du grade correspondant
