@@ -1,11 +1,5 @@
 package fr.olympa.olympacreatif.data;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-
 public enum Message {
 
 	CB_INVALID_CMD,
@@ -61,7 +55,6 @@ public enum Message {
 	PLOT_UNBAN_PLAYER,
 	PROHIBITED_BLOCK_PLACED,
 	SHOP_BUY_SUCCESS,
-	SHOP_ERR_PREVIOUS_RANK_NEEDED,
 	TELEPORT_IN_PROGRESS,
 	TELEPORT_PLOT_CENTER,
 	TELEPORT_TO_RANDOM_PLOT,
@@ -71,11 +64,15 @@ public enum Message {
 	
 	private String message = null;
 	
-	public String getValue() {
+	public String getValue(Object...args) {
 		if (message == null)
 			return "§cMissing message : " + this.toString().toLowerCase();
-		else
-			return message;
+		
+		String mess = message;
+		for (int i = 0 ; i < args.length ; i++)
+			mess = mess.replace("&" + (i + 1), args[i].toString());
+		
+		return mess;
 	}
 	
 	public void setValue(String s) {

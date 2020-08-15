@@ -156,7 +156,7 @@ public class CbCommandListener implements Listener {
 		if (result > 0)
 			message = Message.CB_RESULT_SUCCESS;
 		
-		sender.sendMessage(message.getValue().replace("%command%", cmd.getType().toString().toLowerCase()).replace("%result%", result + ""));
+		sender.sendMessage(message.getValue(cmd.getType(), result));
 		
 		//mise à jour NBTTags command block
 		if (!(sender instanceof CraftBlockCommandSender))

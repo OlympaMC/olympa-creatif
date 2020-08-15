@@ -163,6 +163,6 @@ public class Plot {
 	
 	@Override
 	public String toString() {
-		return "Plot : " + plotId.toString();
+		return plotId.toString();
 	}
 }

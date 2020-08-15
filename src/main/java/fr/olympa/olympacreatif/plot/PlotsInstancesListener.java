@@ -141,14 +141,14 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
 		if (plot == null) {
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue("nul"));
 			e.setCancelled(true);
 			return;	
 		}
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !plot.getProtectedZoneData().keySet().contains(e.getBlock().getLocation())) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue(plot));
 			return;
 		}
 		
@@ -177,14 +177,14 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		if (plot == null) {
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue("nul"));
 			e.setCancelled(true);
 			return;	
 		}
 		
 		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !plot.getProtectedZoneData().keySet().contains(e.getBlock().getLocation())) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue());
+			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue(plot));
 		}
 	}
 	
@@ -386,7 +386,7 @@ public class PlotsInstancesListener implements Listener{
 			if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId()))
 				if ( ! ((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
 					e.setTo(plotTo.getOutLoc());
-					p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());	
+					p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));	
 				}else
 					executeEntryActions(plugin, p, plotTo);	
 		}
@@ -411,7 +411,7 @@ public class PlotsInstancesListener implements Listener{
 			if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
 				if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
 					e.setCancelled(true);
-					e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
+					e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));
 					return;	
 				}
 			}
@@ -449,7 +449,7 @@ public class PlotsInstancesListener implements Listener{
 		if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
 			
 			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
-				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue());
+				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));
 				plotTo.teleportOut(p);
 				return;	
 			}

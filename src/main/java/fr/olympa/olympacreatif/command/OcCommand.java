@@ -81,7 +81,7 @@ public class OcCommand extends OlympaCommand {
 						plot = plugin.getPlotsManager().createPlot(p);
 						p.teleport(plot.getPlotId().getLocation());
 						PlotsInstancesListener.executeEntryActions(plugin, p, plot);
-						sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue());	
+						sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue(plot));	
 						
 					}else
 						sender.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
@@ -106,11 +106,10 @@ public class OcCommand extends OlympaCommand {
 					if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
 						//si le plot a assez de slots pour accueillir un nouveau membre
 						if (pendingInvitations.get(sender).getMembers().getMaxMembers() > pendingInvitations.get(sender).getMembers().getCount()) {
-							sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue());
-							pendingInvitations.get(sender).getMembers().set(p, PlotRank.MEMBER);
-							pendingInvitations.remove(sender);	
+							sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue(pendingInvitations.get(sender)));
+							pendingInvitations.remove(sender).getMembers().set(p, PlotRank.MEMBER);	
 						}else
-							sender.sendMessage(Message.PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS.getValue());
+							sender.sendMessage(Message.PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS.getValue(pendingInvitations.get(sender)));
 						
 					}else {
 						sender.sendMessage(Message.MAX_PLOT_COUNT_REACHED.getValue());
@@ -138,7 +137,7 @@ public class OcCommand extends OlympaCommand {
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else {
 					plot.getParameters().setSpawnLoc(p.getLocation());
-					p.sendMessage(Message.PLOT_SPAWN_LOC_SET.getValue());
+					p.sendMessage(Message.PLOT_SPAWN_LOC_SET.getValue(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ()));
 				}
 				
 			break;
@@ -199,7 +198,7 @@ public class OcCommand extends OlympaCommand {
 				PlotId id = PlotId.fromString(plugin, args[1]);
 				if (id != null) {
 					p.teleport(id.getLocation());
-					sender.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
+					sender.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(id));
 				}else {
 					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
 				}
@@ -216,12 +215,12 @@ public class OcCommand extends OlympaCommand {
 							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR) {
 								if (plot.getMembers().getMaxMembers() > plot.getMembers().getCount()) {
 									pendingInvitations.put(target, plot);
-									target.sendMessage(Message.PLOT_RECIEVE_INVITATION.getValue());
-									sender.sendMessage(Message.PLOT_SEND_INVITATION.getValue());	
+									target.sendMessage(Message.PLOT_RECIEVE_INVITATION.getValue(plot, sender.getName()));
+									sender.sendMessage(Message.PLOT_SEND_INVITATION.getValue(target.getName()));	
 								}else
 									sender.sendMessage(Message.PLOT_INSUFFICIENT_MEMBERS_SIZE.getValue());
 							}else
-								sender.sendMessage(Message.PLOT_INVITATION_TARGET_ALREADY_MEMBER.getValue());
+								sender.sendMessage(Message.PLOT_INVITATION_TARGET_ALREADY_MEMBER.getValue(target.getName()));
 						else
 							sender.sendMessage(Message.PLAYER_TARGET_OFFLINE.getValue());
 					else
@@ -252,7 +251,7 @@ public class OcCommand extends OlympaCommand {
 					//exécution du kick					
 					plot.teleportOut(target);
 					target.sendMessage(Message.PLOT_HAVE_BEEN_KICKED.getValue());
-					sender.sendMessage(Message.PLOT_KICK_PLAYER.getValue().replace("%player%", target.getDisplayName()));
+					sender.sendMessage(Message.PLOT_KICK_PLAYER.getValue(target.getName()));
 					return false;	
 				}
 				
@@ -272,18 +271,18 @@ public class OcCommand extends OlympaCommand {
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				
 				else if (plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR || !plot.getPlayers().contains(target))
-					p.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue());
+					p.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue(target.getName()));
 				
 				else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN))
-					p.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue());
+					p.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue(target.getName()));
 				
 				else {
 					//exécution du ban
 					((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).add(AccountProvider.get(target.getUniqueId()).getId());
 					
 					plot.teleportOut(target);
-					target.sendMessage(Message.PLOT_HAVE_BEEN_BANNED.getValue());
-					sender.sendMessage(Message.PLOT_BAN_PLAYER.getValue().replace("%player%", target.getDisplayName()));
+					target.sendMessage(Message.PLOT_HAVE_BEEN_BANNED.getValue(plot, sender.getName()));
+					sender.sendMessage(Message.PLOT_BAN_PLAYER.getValue(target.getName()));
 					return false;	
 				}
 
@@ -295,16 +294,19 @@ public class OcCommand extends OlympaCommand {
 				target = Bukkit.getPlayer(args[1]);
 
 				//vérifications avant unban
-				if (plot == null)
-					p.sendMessage(Message.INVALID_PLOT_ID.getValue());
+				if (plot == null) 
+					p.sendMessage(Message.INVALID_PLOT_ID.getValue());	
+				
+				else if (target == null)
+					p.sendMessage(Message.PLAYER_TARGET_OFFLINE.getValue());
 				
 				else if (plot.getMembers().getPlayerLevel(pc) < 3)
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 
 				else if (((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).remove(AccountProvider.get(target.getUniqueId()).getId()))
-					sender.sendMessage(Message.PLOT_UNBAN_PLAYER.getValue());
+					sender.sendMessage(Message.PLOT_UNBAN_PLAYER.getValue(target.getName()));
 				else
-					sender.sendMessage(Message.PLOT_CANT_UNBAN_PLAYER.getValue());
+					sender.sendMessage(Message.PLOT_CANT_UNBAN_PLAYER.getValue(target.getName()));
 				
 				break;
 			default:
@@ -316,6 +318,11 @@ public class OcCommand extends OlympaCommand {
 		case 3:
 			switch(args[0]) {
 			case "visit":
+				if (args.length < 3) {
+					sender.sendMessage(Message.COMMAND_HELP.getValue());
+					break;
+				}
+					
 				try {
 					Player plotOwner = Bukkit.getPlayer(args[1]);
 					
@@ -330,7 +337,7 @@ public class OcCommand extends OlympaCommand {
 					
 					if (index < plots.size()) {
 						p.teleport(plots.get(index).getParameters().getSpawnLoc(plugin));
-						p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue());
+						p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(plots.get(index)));
 					}else
 						sender.sendMessage(Message.INVALID_PLOT_ID.getValue());						
 						

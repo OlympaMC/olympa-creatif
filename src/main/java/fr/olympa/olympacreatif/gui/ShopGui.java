@@ -94,7 +94,7 @@ public class ShopGui extends OlympaGUI{
 		kits.add(new MarketItemData(p, KitType.PEACEFUL_MOBS, 10, ItemUtils.item(Material.PIG_SPAWN_EGG, "§6Kit animaux")));
 		kits.add(new MarketItemData(p, KitType.HOSTILE_MOBS, 10, ItemUtils.item(Material.CREEPER_SPAWN_EGG, "§6Kit monstres")));
 
-		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_PLOTS_LEVEL, 0, ItemUtils.item(Material.GRASS_BLOCK, "§6Augmentation nombre de plots")));
+		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_PLOTS_LEVEL, 0, ItemUtils.item(Material.GRASS_BLOCK, "§6Augmentation du nombre de parcelles")));
 		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_MEMBERS_LEVEL, 0, ItemUtils.item(Material.ACACIA_DOOR, "§6Augmentation nombre membres par parcelle")));
 		upgrades.add(new MarketItemData(p, UpgradeType.CB_LEVEL, 0, ItemUtils.item(Material.REPEATING_COMMAND_BLOCK, "§6Augmentation CPS commandblocks")));
 		
@@ -300,11 +300,11 @@ public class ShopGui extends OlympaGUI{
 					
 					if (isBuyable)
 						itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
-								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ▶ " + 
+								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ➔ " + 
 								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1));
 					else
 						itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
-								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ▶ §7maximum atteint");
+								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ➔ §7maximum atteint");
 			}
 
 			itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§ePrix : " + price);
@@ -367,9 +367,9 @@ public class ShopGui extends OlympaGUI{
 				String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";
 				
 				if ((OlympaGroup)toBuy == OlympaGroup.CREA_CREATOR)
-					Bukkit.broadcastMessage("§6----------------------------------------------\n\n"
+					Bukkit.broadcastMessage("§6----------------------------------------------\n§6\n"
 							+ "Le joueur §c" + p.getName() + " §6a découvert le grade secret ! \nFélicitations à " + genreType + " !"
-							+ "\n\n§6----------------------------------------------");
+							+ "\n§6\n----------------------------------------------");
 
 			}else if (toBuy instanceof KitType) {
 				if (p.hasKit((KitType)toBuy))
@@ -385,7 +385,7 @@ public class ShopGui extends OlympaGUI{
 				p.incrementUpgradeLevel((UpgradeType)toBuy);
 			}
 			
-			p.getPlayer().sendMessage(Message.SHOP_BUY_SUCCESS.getValue());
+			p.getPlayer().sendMessage(Message.SHOP_BUY_SUCCESS.getValue(itemHolder.getItemMeta().getDisplayName().toLowerCase()));
 			new ShopGui(plugin, p.getPlayer()).create(p.getPlayer());
 			new AccountProvider(p.getUniqueId()).saveToDb(p);
 		}
