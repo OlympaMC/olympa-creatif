@@ -147,7 +147,7 @@ public class OcoCommand extends OlympaCommand {
 				}
 				
 				p.getPlayer().setFlySpeed(level);
-				p.getPlayer().sendMessage(Message.OCO_SET_FLY_SPEED.getValue(level));
+				p.getPlayer().sendMessage(Message.OCO_SET_FLY_SPEED.getValue(args[1]));
 				
 				break;
 				
