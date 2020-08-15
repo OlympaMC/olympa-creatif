@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent;
 import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent.ChangeType;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.gui.OlympaGUI;
@@ -25,6 +26,7 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.player.Gender;
 import fr.olympa.api.plugin.OlympaSpigot;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.core.spigot.redis.RedisSpigotSend;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
@@ -355,10 +357,12 @@ public class ShopGui extends OlympaGUI{
 				p.removeGameMoney(price);
 				p.addGroup((OlympaGroup)toBuy);
 				
-				OlympaCore.getInstance().getServer().getPluginManager().callEvent(new AsyncOlympaPlayerChangeGroupEvent(p.getPlayer(), ChangeType.ADD, p, (OlympaGroup) toBuy));
-				AccountProvider olympaAccount = new AccountProvider(p.getUniqueId());
-				olympaAccount.saveToRedis(p);
-				olympaAccount.saveToDb(p);
+				plugin.getTask().runTaskAsynchronously(()-> {
+					OlympaCore.getInstance().getServer().getPluginManager().callEvent(new AsyncOlympaPlayerChangeGroupEvent(p.getPlayer(), ChangeType.ADD, p, (OlympaGroup) toBuy));
+					AccountProvider olympaAccount = new AccountProvider(p.getUniqueId());
+					olympaAccount.saveToRedis(p);
+					olympaAccount.saveToDb(p);
+				});
 				
 				String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";
 				
