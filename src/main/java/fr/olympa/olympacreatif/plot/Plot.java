@@ -4,8 +4,10 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -42,8 +44,8 @@ public class Plot {
 	
 	private PlotCbData cbData;
 
-	private List<Player> playersInPlot = new ArrayList<Player>();
-	private List<Entity> entitiesInPlot = new ArrayList<Entity>();
+	private Set<Player> playersInPlot = new HashSet<Player>();
+	private Set<Entity> entitiesInPlot = new HashSet<Entity>();
 	
 	private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
@@ -113,12 +115,12 @@ public class Plot {
 		entitiesInPlot.clear();
 	}
 	
-	public List<Player> getPlayers(){
-		return Collections.unmodifiableList(playersInPlot);
+	public Set<Player> getPlayers(){
+		return Collections.unmodifiableSet(playersInPlot);
 	}
 	
-	public List<Entity> getEntities(){
-		return Collections.unmodifiableList(entitiesInPlot);
+	public Set<Entity> getEntities(){
+		return Collections.unmodifiableSet(entitiesInPlot);
 	}
 	
 	public void teleportOut(Player p) {

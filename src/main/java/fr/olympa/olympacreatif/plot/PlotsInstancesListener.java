@@ -440,8 +440,8 @@ public class PlotsInstancesListener implements Listener{
 
 	
 	
-	//actions à exécuter en entrée du plot 
-	public static void executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
+	//actions à exécuter en entrée du plot. return false si le joueur en est banni, true sinon
+	public static boolean executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
 		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		
@@ -451,18 +451,20 @@ public class PlotsInstancesListener implements Listener{
 			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));
 				plotTo.teleportOut(p);
-				return;	
+				return false;	
 			}
 		}
-
-		plotTo.addPlayerInPlot(p);
+		
+		//ajoute le joueur aux joueurs du plot s'il n'a pas la perm de bypass les commandes vanilla
+		if (!pc.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
+			plotTo.addPlayerInPlot(p);
 		
 		//exécution instruction commandblock d'entrée
 		plugin.getCommandBlocksManager().executeJoinActions(plotTo, p);
 		
 		//les actions suivantes ne sont effectuées que si le joueur appartient au plot
-		if (plotTo.getMembers().getPlayerRank(p) != PlotRank.VISITOR)
-			return;
+		//if (plotTo.getMembers().getPlayerRank(p) != PlotRank.VISITOR)
+			//return true;
 		
 		//clear les visiteurs en entrée & stockage de leur inventaire
 		if ((boolean)plotTo.getParameters().getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS)) {
@@ -499,17 +501,14 @@ public class PlotsInstancesListener implements Listener{
 		
 		//définition de la météo
 		p.setPlayerWeather((WeatherType) plotTo.getParameters().getParameter(PlotParamType.PLOT_WEATHER));
-
-		/*
-		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
-		EntityPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
-		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));		
-		*/
+		
+		return true;
 	}
 
 	public static void executeExitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
 
 		plot.removePlayerInPlot(p);
+		plugin.getCommandBlocksManager().excecuteQuitActions(plot, p);
 
 		//rendu inventaire si stocké
 		if (inventoryStorage.containsKey(p)) {
@@ -523,8 +522,6 @@ public class PlotsInstancesListener implements Listener{
 		p.setAllowFlight(true);
 		p.resetPlayerTime();
 		p.resetPlayerWeather();
-		
-		plugin.getCommandBlocksManager().excecuteQuitActions(plot, p);
 
 		//clear clipboard si le joueur n'en est pas le proprio
 		if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER)

@@ -14,7 +14,8 @@ public class CmdGamemode extends CbCommand {
 	public CmdGamemode(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
 		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
-		// TODO Auto-generated constructor stub
+		
+		neededPlotLevelToExecute = 1;
 	}
 
 	@Override

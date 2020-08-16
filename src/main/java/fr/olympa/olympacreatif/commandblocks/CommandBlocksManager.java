@@ -91,15 +91,12 @@ public class CommandBlocksManager {
 		if (team != null)
 			team.removeMember(p);
 		
-		fromPlot.getPlayers().remove(p);
-		
 		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
 		
 		//maj du scoreboard (reset du score du scoreboard du plot et réaffectation du scoreboard
 		p.getScoreboard().resetScores(p);
 		p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		
-		//plugin.getPerksManager().getLinesOnHeadUtil().getLineDataWrapper(p).clearLines();
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());
 		

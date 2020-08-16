@@ -80,7 +80,7 @@ public class OcCommand extends OlympaCommand {
 						
 						plot = plugin.getPlotsManager().createPlot(p);
 						p.teleport(plot.getPlotId().getLocation());
-						PlotsInstancesListener.executeEntryActions(plugin, p, plot);
+						//PlotsInstancesListener.executeEntryActions(plugin, p, plot);
 						sender.sendMessage(Message.PLOT_NEW_CLAIM.getValue(plot));	
 						
 					}else
@@ -90,13 +90,8 @@ public class OcCommand extends OlympaCommand {
 				break;
 				
 			case "menu":
-				if (sender instanceof Player) {
-					plot = plugin.getPlotsManager().getPlot(p.getLocation());
-					if (plot == null)
-						new MainGui(plugin, p, plot, "Menu").create(p);
-					else
-						new MainGui(plugin, p, plot, "Menu >> " + plot.getPlotId()).create(p);
-				}
+				if (sender instanceof Player) 
+					MainGui.openMainGui(p);
 				break;
 				
 			case "accept":

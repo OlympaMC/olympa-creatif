@@ -24,6 +24,8 @@ public class InteractionParametersGui extends OlympaGUI {
 	private OlympaCreatifMain plugin;
 	private OlympaPlayerCreatif pc;
 	private Plot plot;
+	private String[] stateAllowed = new String[] {" ", "§eEtat : §aautorisé", "§7Cliquez pour changer l'état. Si autorisé, les visiteurs", "§7pourront interragir avec ce bloc, sinon non."};
+	private String[] stateDenied = new String[] {" ", "§eEtat : §cinterdit", "§7Cliquez pour changer l'état. Si autorisé, les visiteurs", "§7pourront interragir avec ce bloc, sinon non."}; 
 	
 	@SuppressWarnings("unchecked")
 	public InteractionParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
@@ -42,14 +44,18 @@ public class InteractionParametersGui extends OlympaGUI {
 			it.setItemMeta(im);
 
 			if (((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(mat)) {
-				it = ItemUtils.loreAdd(it, "§eEtat : §aautorisé");
 				it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
+
+				if (plot.getMembers().getPlayerLevel(pc) < 3)
+					it = ItemUtils.loreAdd(it, "§eEtat : §aautorisé");
+				else
+					it = ItemUtils.loreAdd(it, stateAllowed);
 			}
 			else
-				it = ItemUtils.loreAdd(it, "§eEtat : §cinterdit");
-			
-			if (plot.getMembers().getPlayerLevel(pc) >= 3)
-				it = ItemUtils.loreAdd(it, " ", "§7Clic gauche : changer l'état du bloc");
+				if (plot.getMembers().getPlayerLevel(pc) < 3)
+					it = ItemUtils.loreAdd(it, "§eEtat : §cinterdit");
+				else
+					it = ItemUtils.loreAdd(it, stateDenied);
 			
 			inv.addItem(it);
 		}
@@ -68,12 +74,12 @@ public class InteractionParametersGui extends OlympaGUI {
 			if (((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(current.getType())) {
 				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).remove(current.getType());
 				current = ItemUtils.removeEnchant(current, Enchantment.DURABILITY);
-				current = ItemUtils.lore(current, "§eEtat : §cinterdit", " ", "§7Clic gauche : changer l'état du bloc");
+				current = ItemUtils.lore(current, stateDenied);
 			}
 			else {
 				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(current.getType());
 				current = ItemUtils.addEnchant(current, Enchantment.DURABILITY, 1);
-				current = ItemUtils.lore(current, "§eEtat : §aautorisé", " ", "§7Clic gauche : changer l'état du bloc");
+				current = ItemUtils.lore(current, stateAllowed);
 			}
 					
 		}

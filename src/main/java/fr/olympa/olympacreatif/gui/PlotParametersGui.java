@@ -1,14 +1,11 @@
 package fr.olympa.olympacreatif.gui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
@@ -27,8 +24,6 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
-import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 
 public class PlotParametersGui extends OlympaGUI {
@@ -72,7 +67,7 @@ public class PlotParametersGui extends OlympaGUI {
 
 		//1 : Heure du plot
 		it = ItemUtils.item(Material.SUNFLOWER, "§6Heure de la parcelle");
-		it = ItemUtils.lore(it, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME))/1000 + "h");
+		it = ItemUtils.lore(it, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 7000)/1000 + "h");
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
 		
@@ -160,14 +155,16 @@ public class PlotParametersGui extends OlympaGUI {
 			plot.getParameters().setParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS, gm);
 			current = ItemUtils.lore(current, "§eMode actuel : " + gm.toString());
 			current = ItemUtils.loreAdd(current, clickToChange);
+			plot.getPlayers().forEach(pp -> pp.setGameMode((GameMode) plot.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS)));
 			break;
+			
 		case 1:
-			plot.getParameters().setParameter(PlotParamType.PLOT_TIME, ((int) plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
-			current = ItemUtils.lore(current, "§eHeure actuelle : " + (int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME)/1000 + "h");
+			plot.getParameters().setParameter(PlotParamType.PLOT_TIME, ((int) plot.getParameters().getParameter(PlotParamType.PLOT_TIME)  - 7000 + 1000)%25000);
+			current = ItemUtils.lore(current, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 7000)/1000 + "h");
 			current = ItemUtils.loreAdd(current, clickToChange);
-			for (Player pp : plot.getPlayers())
-				pp.setPlayerTime(current.getAmount()*1000, true);
+			plot.getPlayers().forEach(pp -> pp.setPlayerTime((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME), false));
 			break;
+			
 			/*
 		case 2:
 			//édition du biome réservée au propriétaire
@@ -197,6 +194,8 @@ public class PlotParametersGui extends OlympaGUI {
 				current = ItemUtils.lore(current, clearWeather);	
 			}
 			current = ItemUtils.loreAdd(current, clickToChange);
+			plot.getPlayers().forEach(pp -> pp.setPlayerWeather((WeatherType)plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER)));
+			
 			break;
 			
 		case 3:

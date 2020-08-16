@@ -4,7 +4,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -25,7 +27,7 @@ public class PlotsManager {
 	
 	private OlympaCreatifMain plugin;
 	
-	private List<Plot> loadedPlots = new ArrayList<Plot>();
+	private Set<Plot> loadedPlots = new HashSet<Plot>();
 	
 	private List<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
 	
@@ -108,8 +110,8 @@ public class PlotsManager {
 		return plot;
 	}
 	
-	public List<Plot> getPlots(){
-		return Collections.unmodifiableList(loadedPlots);
+	public Set<Plot> getPlots(){
+		return Collections.unmodifiableSet(loadedPlots);
 	}
 
 	public Plot getPlot(Location loc) {
