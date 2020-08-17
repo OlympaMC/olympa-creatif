@@ -47,7 +47,10 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			.build();
 	
 	private OlympaCreatifMain plugin;
-	private int gameMoney = 0;
+	
+	//A CHANGER AVACE BETA OUVERTE
+	//private int gameMoney = 0;
+	private int gameMoney = 150;
 
 	private List<KitType> kits = new ArrayList<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();

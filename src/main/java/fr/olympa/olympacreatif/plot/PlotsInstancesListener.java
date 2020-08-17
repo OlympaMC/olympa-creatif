@@ -382,14 +382,9 @@ public class PlotsInstancesListener implements Listener{
 			executeExitActions(plugin, p, plotFrom);
 		
 
-		if (plotTo != null) {
-			if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(AccountProvider.get(p.getUniqueId()).getId()))
-				if ( ! ((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
-					e.setTo(plotTo.getOutLoc());
-					p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));	
-				}else
-					executeEntryActions(plugin, p, plotTo);	
-		}
+		if (plotTo != null) 
+			if (!executeEntryActions(plugin, p, plotTo))
+				e.setTo(plotTo.getOutLoc());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -405,20 +400,11 @@ public class PlotsInstancesListener implements Listener{
 		if (plotTo == plotFrom)
 			return;
 
-		//expulse les joueurs bannis
-		if (plotTo != null) {
-			OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
-			if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
-				if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
-					e.setCancelled(true);
-					e.getPlayer().sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));
-					return;	
-				}
-			}
+		//expulse les joueurs bannis & actions d'entrée de plot
+		if (plotTo != null) 
+			if (!executeEntryActions(plugin, e.getPlayer(), plotTo)) 
+				plotTo.teleportOut(e.getPlayer());
 			
-			executeEntryActions(plugin, e.getPlayer(), plotTo);	
-		}
-		
 		//actions de sortie de plot
 		if (plotFrom != null) 
 			executeExitActions(plugin, e.getPlayer(), plotFrom);
@@ -450,7 +436,7 @@ public class PlotsInstancesListener implements Listener{
 			
 			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));
-				plotTo.teleportOut(p);
+				//plotTo.teleportOut(p);
 				return false;	
 			}
 		}

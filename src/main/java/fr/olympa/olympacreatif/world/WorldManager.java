@@ -46,76 +46,63 @@ public class WorldManager {
 		maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
 
 		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
-		plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);        
-        
-		//chargement du monde s'il existe
-		for (World w : Bukkit.getWorlds())
-			if (w.getName().equals(Message.PARAM_WORLD_NAME.getValue())) 
-				world = w;			
+		plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);
+		Bukkit.setDefaultGameMode(GameMode.CREATIVE);
+
+		WorldCreator worldCreator = new WorldCreator(Message.PARAM_WORLD_NAME.getValue());
+		worldCreator.generateStructures(false);
+		worldCreator.generator(new CustomChunkGenerator(plugin));
+
+		Bukkit.getLogger().log(Level.INFO, plugin.getPrefixConsole() + "Creative world " + Message.PARAM_WORLD_NAME.getValue() + " loading...");
 		
+		world = worldCreator.createWorld();
 		
-		//création du monde s'il n'existe pas
-		if (world == null) {
-			Bukkit.setDefaultGameMode(GameMode.CREATIVE);
+		//définition des règles du monde
+		world.setDifficulty(Difficulty.EASY);
+		world.setTime(6000);
+		world.setSpawnLocation(0, worldLevel + 1, 0);
 
-			WorldCreator worldCreator = new WorldCreator(Message.PARAM_WORLD_NAME.getValue());
-			worldCreator.generateStructures(false);
-			worldCreator.generator(new CustomChunkGenerator(plugin));
+		world.setGameRule(GameRule.DO_MOB_SPAWNING, true);
+		world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
+		world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+		world.setGameRule(GameRule.MOB_GRIEFING, false);
+		world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
+		world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+		world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
+		world.setGameRule(GameRule.DISABLE_RAIDS, true);
+		world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
+		world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+		world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+		world.setPVP(true);
 
-			Bukkit.getLogger().log(Level.WARNING, plugin.getPrefixConsole() + "Creative world " + Message.PARAM_WORLD_NAME.getValue() + " not detected. Generation started. This may take a while...");
-			
-			world = worldCreator.createWorld();
-			world.setDifficulty(Difficulty.EASY);
-			world.setTime(6000);
-			world.setSpawnLocation(0, worldLevel + 1, 0);
+		//édition server.properties
+        Path path = Paths.get(plugin.getDataFolder().getParentFile().getAbsolutePath()).getParent().resolve("server.properties");
+        try {
+            List<String> lines = Files.readAllLines(path);
 
-			world.setGameRule(GameRule.DO_MOB_SPAWNING, true);
-			world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
-			world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
-			world.setGameRule(GameRule.MOB_GRIEFING, false);
-			world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
-			world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-			world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
-			world.setGameRule(GameRule.DISABLE_RAIDS, true);
-			world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
-			world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
-			world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
-			world.setPVP(true);
-			
-
-			
-
-			//édition server.properties
-	        Path path = Paths.get(plugin.getDataFolder().getParentFile().getAbsolutePath()).getParent().resolve("server.properties");
-	        try {
-	            List<String> lines = Files.readAllLines(path);
-
-	            for (String s : new ArrayList<String>(lines)) {
-	            	if (s.contains("spawn-npcs") || s.contains("spawn-animals") || s.contains("spawn-monsters") || 
-	            			s.contains("spawn-protection") || s.contains("allow-nether") || s.contains("enable-command-block") || 
-	            			s.contains("difficulty") || s.contains("broadcast-rcon-to-ops") || s.contains("op-permission-level") ||
-	            			s.contains("broadcast-console-to-ops"))
-	            		lines.remove(s);
-	            }
-	            
-	            lines.add("spawn-npcs=true");
-	            lines.add("spawn-animals=true");
-	            lines.add("spawn-monsters=true");
-	            lines.add("spawn-protection=0");
-	            lines.add("allow-nether=false");
-	            lines.add("enable-command-block=true");
-	            lines.add("difficulty=easy");
-	            lines.add("op-permission-level=1");
-	            lines.add("broadcast-rcon-to-ops=false");
-	            lines.add("broadcast-console-to-ops=false");
-	            
-	            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-	        
-			Bukkit.getLogger().info(plugin.getPrefixConsole() + "World fully generated ! Server restart is now needed.");
-		}
+            for (String s : new ArrayList<String>(lines)) {
+            	if (s.contains("spawn-npcs") || s.contains("spawn-animals") || s.contains("spawn-monsters") || 
+            			s.contains("spawn-protection") || s.contains("allow-nether") || s.contains("enable-command-block") || 
+            			s.contains("difficulty") || s.contains("broadcast-rcon-to-ops") || s.contains("op-permission-level") ||
+            			s.contains("broadcast-console-to-ops"))
+            		lines.remove(s);
+            }
+            
+            lines.add("spawn-npcs=true");
+            lines.add("spawn-animals=true");
+            lines.add("spawn-monsters=true");
+            lines.add("spawn-protection=0");
+            lines.add("allow-nether=false");
+            lines.add("enable-command-block=true");
+            lines.add("difficulty=easy");
+            lines.add("op-permission-level=1");
+            lines.add("broadcast-rcon-to-ops=false");
+            lines.add("broadcast-console-to-ops=false");
+            
+            Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 		nmsWorld = ((CraftWorld) world).getHandle();
 	}

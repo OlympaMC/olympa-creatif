@@ -123,7 +123,7 @@ public class MicroBlocks {
     	}
     	
     	for (Entry<String, Object> e : mbConfig.getConfigurationSection("microblocks_data").getValues(false).entrySet())
-    		microBlocks.put(e.getKey(), ItemUtils.skullCustom(" ", (String) e.getValue()));
+    		microBlocks.put(e.getKey(), ItemUtils.skullCustom("§9MicroBlock §6" + e.getKey(), (String) e.getValue()));
     		//microBlocks.put(e.getKey(), getTexturedHead((String) e.getValue()));
     		
     	//for (Entry<String, ItemStack> e : microBlocks.entrySet())

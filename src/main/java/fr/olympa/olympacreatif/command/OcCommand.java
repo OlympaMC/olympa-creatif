@@ -374,7 +374,7 @@ public class OcCommand extends OlympaCommand {
 			list.add("kick");
 			list.add("ban");
 			list.add("unban");
-			list.add("protectedarea");
+			//list.add("protectedarea");
 			list.add("chat");
 			break;
 		case 2:
@@ -399,11 +399,13 @@ public class OcCommand extends OlympaCommand {
 					list.add(p.getName());
 				break;
 
+				/*
 			case "protectedarea":
 				list.add("create");
 				list.add("save");
 				list.add("restore");
 				break;
+				*/
 			}
 			break;
 		}

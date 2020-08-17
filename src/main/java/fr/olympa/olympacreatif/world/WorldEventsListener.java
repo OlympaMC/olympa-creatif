@@ -264,7 +264,8 @@ public class WorldEventsListener implements Listener{
 		if (!PermissionsList.USE_COLORED_TEXT.hasPermission(e.getWhoClicked().getUniqueId()))
 			return;
 		
-		e.setCurrentItem(ItemUtils.name(e.getCurrentItem(), ChatColor.translateAlternateColorCodes('&',	e.getCurrentItem().getItemMeta().getDisplayName())));
+		if (e.getCurrentItem() != null)
+			e.setCurrentItem(ItemUtils.name(e.getCurrentItem(), ChatColor.translateAlternateColorCodes('&',	e.getCurrentItem().getItemMeta().getDisplayName())));
 	}
 	
 	@EventHandler //cancel potions jetables si effet >5
