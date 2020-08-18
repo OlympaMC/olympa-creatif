@@ -219,7 +219,7 @@ public class DataManager implements Listener {
 						);
 				
 				AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData, 
-						getPlotOwnerResult.getBoolean(KitType.FLUIDS.getBddKey()));
+						getPlotOwnerDatasResult.getBoolean(KitType.FLUIDS.getBddKey()));
 				
 				plugin.getPlotsManager().addAsyncPlot(plot, plotId);
 			} catch (SQLException e) {

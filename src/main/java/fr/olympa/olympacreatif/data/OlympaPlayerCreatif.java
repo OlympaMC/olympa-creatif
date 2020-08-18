@@ -6,8 +6,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -52,9 +54,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	//private int gameMoney = 0;
 	private int gameMoney = 150;
 
-	private List<KitType> kits = new ArrayList<KitType>();
+	private Set<KitType> kits = new HashSet<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();
-	private List<PlayerParamType> playerParams = new ArrayList<PlayerParamType>();
+	private Set<PlayerParamType> playerParams = new HashSet<PlayerParamType>();
 	
 	private List<String> scoreboardLines = new ArrayList<String>();
 	public static final int scoreboardLinesSize = 8;
@@ -304,10 +306,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	}
 
 	public void setPlayerParam(PlayerParamType param, boolean state) {
-		if (state) {
-			if (!playerParams.contains(param))
-				playerParams.add(param);
-		}else
+		if (state) 
+			playerParams.add(param);
+		else
 			playerParams.remove(param);
 	}
 	

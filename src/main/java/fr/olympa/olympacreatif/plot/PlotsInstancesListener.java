@@ -50,6 +50,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.world.World;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -514,12 +515,17 @@ public class PlotsInstancesListener implements Listener{
 
 		LocalSession weSession = plugin.getWorldEditManager().getSession(p);
 		
-		//clear clipboard si le joueur n'en est pas le proprio
-		if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER)
-			weSession.setClipboard(null);
-		
-		//reset positions worldedit
-		weSession.getRegionSelector(weSession.getSelectionWorld()).clear();
+		if (weSession != null) {
+			//clear clipboard si le joueur n'en est pas le proprio
+			if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER)
+				weSession.setClipboard(null);
+			
+			World world = weSession.getSelectionWorld();
+			
+			//reset positions worldedit
+			if (world != null && weSession.getRegionSelector(world) != null)
+				weSession.getRegionSelector(world).clear();	
+		}
 	}
 	
 	@EventHandler //cancel remove paintings et itemsframes

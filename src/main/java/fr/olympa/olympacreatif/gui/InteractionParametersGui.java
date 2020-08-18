@@ -33,8 +33,8 @@ public class InteractionParametersGui extends OlympaGUI {
 		this.plugin = plugin;
 		this.pc = AccountProvider.get(p.getUniqueId());
 		this.plot = plot;
-
-		inv.setItem(53, ItemUtils.item(Material.ACACIA_DOOR, "§cRetour", ""));
+		
+		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
 		//pour tous les items interdits possibles, ajout de l'item au gui selon son état (interdit/autorisé)
 		for (Material mat : PlotParamType.getAllPossibleIntaractibleBlocks()) {

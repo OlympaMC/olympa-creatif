@@ -38,7 +38,8 @@ public class PlotStoplagChecker {
 		this.plot = plot;
 		
 		if (currentPeriod == 0) {
-			updatePeriod.runTaskTimer(plugin, 0, periodDuration);
+			currentPeriod++;
+			updatePeriod.runTaskTimer(plugin, periodDuration, periodDuration);
 		}
 	}
 	
@@ -72,7 +73,7 @@ public class PlotStoplagChecker {
 			//message
 			plot.getPlayers().forEach(p -> {
 				if (stoplagCount < forcedStoplagStoplagCount)
-					p.sendMessage(Message.PLOT_STOPLAG_FIRED.getValue(type, forcedStoplagPeriodDuration));});
+					p.sendMessage(Message.PLOT_STOPLAG_FIRED.getValue(type, stoplagCount, forcedStoplagStoplagCount));});
 		}
 		else {
 			plot.getParameters().setParameter(PlotParamType.STOPLAG_STATUS, 2);
