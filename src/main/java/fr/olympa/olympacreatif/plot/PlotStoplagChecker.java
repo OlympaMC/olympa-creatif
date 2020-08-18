@@ -86,9 +86,9 @@ public class PlotStoplagChecker {
 	}
 
 	public enum StopLagDetect{
-		PISTON(30, "pistons"),
-		LAMP(40, "lampes de redstone"),
-		LIQUID(30, "liquides fluides"),
+		PISTON(60, "pistons"),
+		LAMP(80, "lampes de redstone"),
+		LIQUID(1000, "liquides fluides"),
 		;
 		
 		int max;

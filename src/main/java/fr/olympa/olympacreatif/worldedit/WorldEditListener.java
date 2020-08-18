@@ -68,6 +68,7 @@ public class WorldEditListener extends EventHandler implements Listener {
 		}.runTaskTimer(plugin, 0, 5);*/
 	}
 
+	/*
 	@org.bukkit.event.EventHandler //cancel copy si plot du joueur null
 	public void onCopyCmd(PlayerCommandPreprocessEvent e) {
 		if (!e.getMessage().contains("/copy"))
@@ -80,6 +81,7 @@ public class WorldEditListener extends EventHandler implements Listener {
 			e.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue());
 		}
 	}
+	*/
 
 	/*
 	@org.bukkit.event.EventHandler //cancel copy si le joueur n'a pas la permission de copier certains des blocs de sa sélection

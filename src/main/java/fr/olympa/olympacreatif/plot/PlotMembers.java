@@ -105,12 +105,16 @@ public class PlotMembers{
 	public int getPlayerLevel(Player p) {
 		return getPlayerRank(p).getLevel();
 	}
+
+	public int getPlayerLevel(MemberInformations member) {
+		return getPlayerRank(member).getLevel();
+	}
 	
 	
 	
 	
 	public Map<MemberInformations, PlotRank> getMembers(){
-		Map<MemberInformations, PlotRank> map = new HashMap<PlotMembers.MemberInformations, PlotMembers.PlotRank>();
+		Map<MemberInformations, PlotRank> map = new HashMap<MemberInformations, PlotRank>();
 		
 		for (Entry<MemberInformations, PlotRank> e : members.entrySet())
 			if (e.getValue() != PlotRank.VISITOR)
@@ -168,9 +172,14 @@ public class PlotMembers{
 		}
 		
 		public static PlotRank getPlotRank(int plotRank) {
-			for (PlotRank pr : PlotRank.values())
-				if (pr.getLevel() == plotRank)
-					return pr;
+			if (plotRank < 0)
+				return VISITOR;
+			else if (plotRank > 4)
+				return OWNER;
+			else
+				for (PlotRank pr : PlotRank.values())
+					if (pr.getLevel() == plotRank)
+						return pr;
 			
 			return VISITOR;
 		}

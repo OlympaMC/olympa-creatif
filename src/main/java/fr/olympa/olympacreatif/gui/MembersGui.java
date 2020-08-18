@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.gui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +32,8 @@ public class MembersGui extends OlympaGUI {
 	private Player p;
 	private OlympaPlayerCreatif pc;
 	
+	private List<MemberInformations> members = new ArrayList<MemberInformations>();
+	
 	public MembersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
 		super("Membres parcelle " + plot.getPlotId() + "(" + plot.getMembers().getCount() + "/" + 
 				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3);
@@ -42,7 +45,9 @@ public class MembersGui extends OlympaGUI {
 		
 		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
-		//affichage des membres
+		members = new ArrayList<MemberInformations>(plot.getMembers().getMembers().keySet());
+		
+		//index de la tête à placer
 		int headIndex = -1;
 		
 		for (Entry<MemberInformations, PlotRank> e : plot.getMembers().getMembers().entrySet()) {
@@ -51,67 +56,75 @@ public class MembersGui extends OlympaGUI {
 			final int thisHeadIndex = headIndex;
 			
 			//création de la tête du joueur
-			Consumer<ItemStack> consumer = sk -> inv.setItem(thisHeadIndex, sk);
-			
-			List<String> lore = new ArrayList<String>();
-			lore.add("§6Rang : " + e.getValue().getRankName());
+			Consumer<ItemStack> consumer = sk -> inv.setItem(thisHeadIndex, addBasicInfos(sk, e.getKey(), e.getValue()));
 
-			//définition de son statut
-			if (Bukkit.getPlayer(e.getKey().getUUID()) != null)
-				lore.add("§eStatut : §aen ligne");
-			else
-				lore.add("§eStatut : §chors ligne");
-			
-			//définition de si le joueur a la permission de promouvoir/rétrogader un membre
-			if ((plot.getMembers().getPlayerLevel(pc) == 3 && e.getValue().getLevel() < 3) || plot.getMembers().getPlayerLevel(pc) == 4 && e.getValue().getLevel() < 4) {
-				lore.add(" ");
-				lore.add("§8Clic gauche : promouvoir");
-				lore.add("§8Clic droit : rétrograder");	
-			}
-
-			consumer.accept(ItemUtils.item(Material.PLAYER_HEAD, "§6" + e.getKey().getName(), (String[]) lore.toArray(new String[lore.size()])));
-			ItemUtils.skull(consumer, "§6" + e.getKey().getName(), e.getKey().getName(), (String[]) lore.toArray(new String[lore.size()]));
+			consumer.accept(ItemUtils.item(Material.PLAYER_HEAD, "§6" + e.getKey().getName()));
+			ItemUtils.skull(consumer, "§6" + e.getKey().getName(), e.getKey().getName());
 		}
 	}
+	
+	private ItemStack addBasicInfos(ItemStack item, MemberInformations member, PlotRank rank) {
+		item = ItemUtils.lore(item, "§6Rang : " + rank.getRankName());
+		if (Bukkit.getPlayer(member.getUUID()) != null)
+			item = ItemUtils.loreAdd(item, "§6Statut : §aen ligne");
+		else
+			item = ItemUtils.loreAdd(item, "§6Statut : §chors ligne");
 
+		boolean promote = canPromote(member);
+		boolean demote = canDemote(member);
+		
+		if (promote || demote) {
+			item = ItemUtils.loreAdd(item, " ");
+			if (promote)
+				item = ItemUtils.loreAdd(item, "§7Clic gauche : promouvoir");
+			if (demote)
+				item = ItemUtils.loreAdd(item, "§7Clic droit : rétrograder");
+		}
+		
+		return item;
+	}
+	
+	private boolean canDemote(MemberInformations member) {
+		int playerLevel = plot.getMembers().getPlayerLevel(pc);
+		int memberLevel = plot.getMembers().getPlayerLevel(member);
+		
+		if (playerLevel >= 3 && memberLevel > 0 && memberLevel < 4)
+			return true;
+		else
+			return false;
+	}
+
+	private boolean canPromote(MemberInformations member) {
+		int playerLevel = plot.getMembers().getPlayerLevel(pc);
+		int memberLevel = plot.getMembers().getPlayerLevel(member);
+		
+		if (playerLevel >= 3 && playerLevel > memberLevel + 1)
+			return true;
+		else
+			return false;
+	}
+	
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		if (slot == inv.getSize() - 1) {
 			MainGui.openMainGui(p);
 			return true;
 		}
-
-		if (plot.getMembers().getPlayerLevel(pc) < 3) 
+		
+		MemberInformations target = null;
+		if (slot >= 0 && slot < members.size())
+			target = members.get(slot);
+		else
 			return true;
 		
-		//recherche le joueur cliqué
-		for (Entry<MemberInformations, PlotRank> e : plot.getMembers().getMembers().entrySet())
-			if (current != null && current.getType() != Material.AIR && ("§6" + e.getKey().getName()).equals(current.getItemMeta().getDisplayName())) {
-				boolean hasChange = false;
-				
-				//promote le joueur
-				if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(pc) > e.getValue().getLevel() + 1) {
-					hasChange = true;
-					plot.getMembers().set(e.getKey(), PlotRank.getPlotRank(e.getValue().getLevel() + 1));	
-				}
-				
-				//démote le joueur
-				if (click == ClickType.RIGHT && plot.getMembers().getPlayerLevel(pc) > e.getValue().getLevel() && e.getValue() != PlotRank.VISITOR) {
-					hasChange = true;
-					plot.getMembers().set(e.getKey(), PlotRank.getPlotRank(e.getValue().getLevel() - 1));	
-				}
-				
-				current = ItemUtils.lore(current, "§6Rang : " + plot.getMembers().getPlayerRank(e.getKey()).getRankName());
-				
-				//définition de son statut
-				if (Bukkit.getPlayer(e.getKey().getUUID()) != null)
-					current = ItemUtils.loreAdd(current, "§eStatut : §aen ligne");
-				else
-					current = ItemUtils.loreAdd(current, "§eStatut : §chors ligne");
-				
-				if (hasChange)
-					current = ItemUtils.loreAdd(current, " ", "§8Clic gauche : promouvoir", "§8Clic droit : rétrograder");	
-			}
+		if (click == ClickType.LEFT && canPromote(target))
+			plot.getMembers().set(target, PlotRank.getPlotRank(plot.getMembers().getPlayerLevel(target) + 1));
+		
+		else if (click == ClickType.RIGHT && canDemote(target))
+			plot.getMembers().set(target, PlotRank.getPlotRank(plot.getMembers().getPlayerLevel(target) - 1));
+		
+		inv.setItem(slot, addBasicInfos(current, target, plot.getMembers().getPlayerRank(target)));
+		
 		return true;
 	}
 	
