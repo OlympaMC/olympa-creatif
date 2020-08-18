@@ -149,6 +149,10 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
 				plot.getCbData().unlockSpawnerSetblock();
 		
+		if (kit == KitType.FLUIDS)
+			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
+				plot.setAllowLiquidFlow();
+		
 		if (kit == KitType.COMMANDBLOCK)
 			WorldEventsListener.setCommandBlockPerms(this, true);
 	}

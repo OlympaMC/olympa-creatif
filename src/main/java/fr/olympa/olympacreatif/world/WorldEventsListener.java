@@ -201,49 +201,6 @@ public class WorldEventsListener implements Listener{
 		e.setCancelled(true);
 	}
 	
-	@EventHandler //cancel lava/water flow en dehors du plot. Cancel aussi toute téléportation d'un oeuf de dragon
-	public void onLiquidFlow(BlockFromToEvent e) {
-		if (e.getBlock() != null && (e.getBlock().getType() == Material.DRAGON_EGG || e.getBlock().getType() == Material.WATER || e.getBlock().getType() == Material.LAVA)) {
-			e.setCancelled(true);
-			return;
-		}
-	}
-	
-	@EventHandler //cancel rétractation piston si un bloc affecté se trouve sur une route
-	public void onPistonRetractEvent(BlockPistonRetractEvent e) {
-		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-		
-		if (plot == null || plot.hasStoplag()) {
-			e.setCancelled(true);
-			return;	
-		}
-		
-		for (Block block : e.getBlocks())
-			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation())))
-				e.setCancelled(true);
-	}
-	
-	@EventHandler //cancel poussée piston si un bloc affecté se trouve sur une route
-	public void onPistonPushEvent(BlockPistonExtendEvent e) {
-		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-		
-		if (plot == null || plot.hasStoplag()) {
-			e.setCancelled(true);
-			return;	
-		}
-		
-		for (Block block : e.getBlocks()) {
-			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation()))) {
-				e.setCancelled(true);
-				return;
-			}
-			else if (plot.getPlotId().isOnInteriorDiameter(block.getLocation())) {
-				e.setCancelled(true);
-				return;
-			}
-		}
-	}
-	
 	@EventHandler //cancel explosion TNT
 	public void onEntityExplodeEvent(EntityExplodeEvent e) {
 		e.blockList().clear();
@@ -290,9 +247,11 @@ public class WorldEventsListener implements Listener{
 	public void onOpenMenu(PlayerToggleSneakEvent e) {
 		if (e.isSneaking())
 			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
-				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis())
+				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis()) {
 					if (((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK))
-						MainGui.openMainGui(e.getPlayer());
+						MainGui.openMainGui(e.getPlayer());	
+				}
+		/*
 					else
 						e.getPlayer().spigot().sendMessage(new ComponentBuilder()
 								.append("Ouverture du menu via double sneak désactivé. Modifiez vos paramètres ou ")
@@ -301,6 +260,7 @@ public class WorldEventsListener implements Listener{
 								.color(net.md_5.bungee.api.ChatColor.BOLD)
 								.event(new ClickEvent(Action.RUN_COMMAND, "/oc menu"))
 								.create());
+								*/
 				else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
 			else

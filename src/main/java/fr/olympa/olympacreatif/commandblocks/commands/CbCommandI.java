@@ -69,7 +69,7 @@ public abstract class CbCommandI {
 		//si le sélecteur ne contient qu'un pseudo
 		if (!s.startsWith("@")){
 			Player p = Bukkit.getPlayer(s);
-			if (p == null)
+			if (!plot.getPlayers().contains(p))
 				return new ArrayList<Entity>();
 			
 			list.add(p);

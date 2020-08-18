@@ -102,6 +102,12 @@ public class OcCommand extends OlympaCommand {
 						//si le plot a assez de slots pour accueillir un nouveau membre
 						if (pendingInvitations.get(sender).getMembers().getMaxMembers() > pendingInvitations.get(sender).getMembers().getCount()) {
 							sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue(pendingInvitations.get(sender)));
+							
+							pendingInvitations.get(sender).getPlayers().forEach(pp -> {
+								if (pendingInvitations.get(sender).getMembers().getPlayerLevel(pp) >= 3)
+									pp.sendMessage(Message.PLOT_PLAYER_JOIN.getValue(pp.getName()));
+							});
+							
 							pendingInvitations.remove(sender).getMembers().set(p, PlotRank.MEMBER);	
 						}else
 							sender.sendMessage(Message.PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS.getValue(pendingInvitations.get(sender)));

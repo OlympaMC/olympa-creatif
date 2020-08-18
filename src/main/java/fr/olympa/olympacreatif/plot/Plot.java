@@ -43,11 +43,14 @@ public class Plot {
 	private PlotId plotId;
 	
 	private PlotCbData cbData;
-
+	private PlotStoplagChecker stoplagChecker;
+	
 	private Set<Player> playersInPlot = new HashSet<Player>();
 	private Set<Entity> entitiesInPlot = new HashSet<Entity>();
 	
-	private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
+	private boolean allowLiquidFlow = false;
+	
+	//private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
 	//constructeur pour un plot n'existant pas encore
 	public Plot(OlympaCreatifMain plugin, OlympaPlayerCreatif p) {
@@ -64,6 +67,11 @@ public class Plot {
 				UpgradeType.CB_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.CB_LEVEL)), 
 				p.hasKit(KitType.HOSTILE_MOBS) && p.hasKit(KitType.PEACEFUL_MOBS), p.hasKit(KitType.HOSTILE_MOBS));
 		
+		stoplagChecker = new PlotStoplagChecker(plugin, this);
+		
+		if (p.hasKit(KitType.FLUIDS))
+			allowLiquidFlow = true;
+		
 		//exécution des actions d'entrée pour tous les joueurs sur le plot au moment du chargement
 		for (Player player : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(player.getLocation()))
@@ -77,8 +85,9 @@ public class Plot {
 		this.members = ap.getMembers();
 		this.plotId = ap.getId();
 		this.cbData = ap.getCbData();
-
-		//plugin.getCommandBlocksManager().registerPlot(this);
+		this.stoplagChecker = new PlotStoplagChecker(plugin, this);
+		
+		allowLiquidFlow = ap.getAllowLiquidFlow();
 		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
@@ -96,6 +105,10 @@ public class Plot {
 	
 	public PlotCbData getCbData() {
 		return cbData;
+	}
+	
+	public PlotStoplagChecker getStoplagChecker() {
+		return stoplagChecker;
 	}
 	
 	public void addPlayerInPlot(Player p) {
@@ -123,6 +136,14 @@ public class Plot {
 		return Collections.unmodifiableSet(entitiesInPlot);
 	}
 	
+	public boolean hasLiquidFlow() {
+		return allowLiquidFlow;
+	}
+	
+	public void setAllowLiquidFlow() {
+		allowLiquidFlow = true;
+	}
+	
 	public void teleportOut(Player p) {
 		p.teleport(getOutLoc());
 	}
@@ -133,9 +154,11 @@ public class Plot {
 		return loc;
 	}
 
+	/*
 	public Map<Location, SimpleEntry<BlockData, TileEntity>> getProtectedZoneData() {
 		return protectedZoneData;
 	}
+	*/
 
 	public void unload() {
 		cbData.unload();

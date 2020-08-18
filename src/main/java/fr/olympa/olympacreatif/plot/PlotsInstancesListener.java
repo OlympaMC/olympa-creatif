@@ -24,10 +24,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -46,6 +49,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.collect.ImmutableList;
+import com.sk89q.worldedit.LocalSession;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -55,6 +59,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -146,7 +151,7 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !plot.getProtectedZoneData().keySet().contains(e.getBlock().getLocation())) {
+		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue(plot));
 			return;
@@ -182,7 +187,7 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !plot.getProtectedZoneData().keySet().contains(e.getBlock().getLocation())) {
+		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue(plot));
 		}
@@ -427,6 +432,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	
 	//actions à exécuter en entrée du plot. return false si le joueur en est banni, true sinon
+	@SuppressWarnings("unchecked")
 	public static boolean executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
 		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
@@ -436,7 +442,6 @@ public class PlotsInstancesListener implements Listener{
 			
 			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));
-				//plotTo.teleportOut(p);
 				return false;	
 			}
 		}
@@ -448,12 +453,8 @@ public class PlotsInstancesListener implements Listener{
 		//exécution instruction commandblock d'entrée
 		plugin.getCommandBlocksManager().executeJoinActions(plotTo, p);
 		
-		//les actions suivantes ne sont effectuées que si le joueur appartient au plot
-		//if (plotTo.getMembers().getPlayerRank(p) != PlotRank.VISITOR)
-			//return true;
-		
 		//clear les visiteurs en entrée & stockage de leur inventaire
-		if ((boolean)plotTo.getParameters().getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS)) {
+		if ((boolean)plotTo.getParameters().getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS) && plotTo.getMembers().getPlayerRank(pc) == PlotRank.VISITOR) {
 			List<ItemStack> list = new ArrayList<ItemStack>();
 			for (ItemStack it : p.getInventory().getContents()) {
 				if (it != null && it.getType() != Material.AIR)
@@ -473,17 +474,19 @@ public class PlotsInstancesListener implements Listener{
 			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
 		}
 		
-		//set max fly speed
-		p.setFlySpeed(0.1f);
+		if (plotTo.getMembers().getPlayerRank(pc) == PlotRank.VISITOR) {
+			//définition du gamemode
+			p.setGameMode((GameMode) plotTo.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
+			
+			//définition du flymode
+			p.setAllowFlight((boolean) plotTo.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
+
+			//set max fly speed
+			p.setFlySpeed(0.1f);
+		}
 		
 		//définition de l'heure du joueur
 		p.setPlayerTime((int) plotTo.getParameters().getParameter(PlotParamType.PLOT_TIME), false);
-		
-		//définition du gamemode
-		p.setGameMode((GameMode) plotTo.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
-		
-		//définition du flymode
-		p.setAllowFlight((boolean) plotTo.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
 		
 		//définition de la météo
 		p.setPlayerWeather((WeatherType) plotTo.getParameters().getParameter(PlotParamType.PLOT_WEATHER));
@@ -509,17 +512,14 @@ public class PlotsInstancesListener implements Listener{
 		p.resetPlayerTime();
 		p.resetPlayerWeather();
 
+		LocalSession weSession = plugin.getWorldEditManager().getSession(p);
+		
 		//clear clipboard si le joueur n'en est pas le proprio
 		if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER)
-			plugin.getWorldEditManager().getSession(p).setClipboard(null);
+			weSession.setClipboard(null);
 		
-		/*
-		//fait croire au client qu'il est deop (pour ouvrir l'interface des commandblocks) sauf pour les staff
-		if (!((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE)){
-			EntityPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
-			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 24));	
-		}
-		*/
+		//reset positions worldedit
+		weSession.getRegionSelector(weSession.getSelectionWorld()).clear();
 	}
 	
 	@EventHandler //cancel remove paintings et itemsframes
@@ -650,7 +650,7 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 	}
 	
-	@EventHandler
+	@EventHandler//cancel redstone si stoplag, sinon enregistre l'évent dans le stoplag checker
 	public void onRedstoneChange(BlockRedstoneEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		
@@ -658,7 +658,9 @@ public class PlotsInstancesListener implements Listener{
 			e.setNewCurrent(0);
 		else
 			if (plot.hasStoplag())
-				e.setNewCurrent(0);		
+				e.setNewCurrent(0);
+			else if (e.getBlock().getType() == Material.REDSTONE_LAMP)
+				plot.getStoplagChecker().addEvent(StopLagDetect.LAMP);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH) //si spawn d'entité, ajout à la liste des entités du plot
@@ -669,5 +671,63 @@ public class PlotsInstancesListener implements Listener{
 		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
 		if (plot != null)
 			plot.addEntityInPlot(e.getEntity());
+	}
+	
+	@EventHandler(priority = EventPriority.LOW)//cancel rétractation piston si un bloc affecté se trouve sur une route
+	public void onPistonRetractEvent(BlockPistonRetractEvent e) {
+		if (e.isCancelled())
+			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null || plot.hasStoplag()) {
+			e.setCancelled(true);
+			return;	
+		}
+		
+		for (Block block : e.getBlocks())
+			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation())))
+				e.setCancelled(true);
+		
+		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
+	}
+	
+	@EventHandler(priority = EventPriority.LOW) //cancel poussée piston si un bloc affecté se trouve sur une route
+	public void onPistonPushEvent(BlockPistonExtendEvent e) {
+		if (e.isCancelled())
+			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null || plot.hasStoplag()) {
+			e.setCancelled(true);
+			return;	
+		}
+		
+		//cancel évent si blocks poussés sur la route
+		for (Block block : e.getBlocks()) {
+			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation()))) {
+				e.setCancelled(true);
+				return;
+			}
+			else if (plot.getPlotId().isOnInteriorDiameter(block.getLocation())) {
+				e.setCancelled(true);
+				return;
+			}
+		}
+		
+		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
+	}
+	
+	@EventHandler //cancel lava/water flow en dehors du plot. Cancel aussi toute téléportation d'un oeuf de dragon
+	public void onLiquidFlow(BlockFromToEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getToBlock().getLocation());
+		
+		if (plot == null || plot.hasStoplag() || e.getBlock().getType() == Material.DRAGON_EGG || !plot.hasLiquidFlow()) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		plot.getStoplagChecker().addEvent(StopLagDetect.LIQUID);
 	}
 }

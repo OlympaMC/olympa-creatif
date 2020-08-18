@@ -73,7 +73,7 @@ public class DataManager implements Listener {
 			"SELECT * FROM creatif_plotsmembers WHERE `plot_id` = ?;"
 			);
 	
-	private final OlympaStatement osSelectPlotParameters = new OlympaStatement(
+	private final OlympaStatement osSelectPlotDatas = new OlympaStatement(
 			"SELECT * FROM creatif_plotsdatas WHERE `plot_id` = ?;"
 			);
 	
@@ -170,16 +170,16 @@ public class DataManager implements Listener {
 		plugin.getTask().runTaskAsynchronously(() -> {
 			
 			//CREATION DU PLOT
-			
-			//création plotParameters
-			PreparedStatement getPlotParams;
 			try {
-				getPlotParams = osSelectPlotParameters.getStatement();
-				getPlotParams.setInt(1, plotId.getId());
-				ResultSet getPlotParamsResult = getPlotParams.executeQuery();
 				
-				getPlotParamsResult.next();
-				PlotParameters plotParams = PlotParameters.fromJson(plotId, getPlotParamsResult.getString("plot_parameters"));
+				//création plotParameters
+				PreparedStatement getPlotDatas;
+				getPlotDatas = osSelectPlotDatas.getStatement();
+				getPlotDatas.setInt(1, plotId.getId());
+				ResultSet getPlotDatasResult = getPlotDatas.executeQuery();
+				
+				getPlotDatasResult.next();
+				PlotParameters plotParams = PlotParameters.fromJson(plotId, getPlotDatasResult.getString("plot_parameters"));
 				
 				//get owner id
 				PreparedStatement getPlotOwner = osSelectPlotOwner.getStatement();
@@ -218,7 +218,8 @@ public class DataManager implements Listener {
 						getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey())
 						);
 				
-				AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData);
+				AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData, 
+						getPlotOwnerResult.getBoolean(KitType.FLUIDS.getBddKey()));
 				
 				plugin.getPlotsManager().addAsyncPlot(plot, plotId);
 			} catch (SQLException e) {

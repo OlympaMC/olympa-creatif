@@ -63,6 +63,10 @@ public class KitsManager {
 		list.add(Material.STRUCTURE_VOID);
 		list.add(Material.STRUCTURE_BLOCK);
 		list.add(Material.LINGERING_POTION);
+		list.add(Material.SHULKER_SHELL);
+		for (Material mat : Material.values())
+			if (mat.toString().contains("SHULKER_BOX"))
+				list.add(mat);
 		
 		list.forEach(mat -> kits.put(mat, KitType.ADMIN));
 		list.clear();
@@ -101,7 +105,6 @@ public class KitsManager {
 		list.add(Material.SPIDER_SPAWN_EGG);
 		list.add(Material.CAVE_SPIDER_SPAWN_EGG);
 		list.add(Material.ENDERMAN_SPAWN_EGG);
-		list.add(Material.LLAMA_SPAWN_EGG);
 		list.add(Material.POLAR_BEAR_SPAWN_EGG);
 		
 		list.add(Material.BLAZE_SPAWN_EGG);
@@ -135,6 +138,7 @@ public class KitsManager {
 		list.forEach(mat -> kits.put(mat, KitType.HOSTILE_MOBS));
 		list.clear();
 
+		list.add(Material.LLAMA_SPAWN_EGG);
 		list.add(Material.BEE_SPAWN_EGG);
 		list.add(Material.DOLPHIN_SPAWN_EGG);
 		list.add(Material.PANDA_SPAWN_EGG);
