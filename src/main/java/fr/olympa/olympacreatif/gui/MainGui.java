@@ -186,8 +186,6 @@ public class MainGui extends IGui {
 		
 		PlotId plotId = PlotId.fromString(OlympaCreatifMain.getMainClass(), stringPlotId);
 		
-		Bukkit.broadcastMessage("String id : " + stringPlotId + " - int id : " + plotId);
-		
 		if (plotId != null) 
 			plot = OlympaCreatifMain.getMainClass().getPlotsManager().getPlot(plotId);
 		

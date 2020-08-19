@@ -18,10 +18,12 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import net.minecraft.server.v1_15_R1.NBTBase;
 import net.minecraft.server.v1_15_R1.NBTTagByte;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagDouble;
 import net.minecraft.server.v1_15_R1.NBTTagFloat;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
 import net.minecraft.server.v1_15_R1.NBTTagList;
+import net.minecraft.server.v1_15_R1.NBTTagLong;
 import net.minecraft.server.v1_15_R1.NBTTagShort;
 import net.minecraft.server.v1_15_R1.NBTTagString;
 
@@ -62,14 +64,21 @@ public class TagsValues {
 			case "NBTTagInt":
 				nbt = NBTTagInt.class;
 				break;
+			case "NBTTagLong":
+				nbt = NBTTagLong.class;
+				break;
 			case "NBTTagString":
 				nbt = NBTTagString.class;
 				break;
-			case "NBTTagDouble":
-				nbt = NBTTagDouble.class;
-				break;
 			case "NBTTagFloat":
 				nbt = NBTTagFloat.class;
+				break;
+			case "NBTTagCompound":
+				nbt = NBTTagCompound.class;
+				break;
+				/*
+			case "NBTTagDouble":
+				nbt = NBTTagDouble.class;
 				break;
 			case "NBTTagList":
 				nbt = NBTTagList.class;
@@ -77,6 +86,7 @@ public class TagsValues {
 			case "NBTTagByte":
 				nbt = NBTTagByte.class;
 				break;
+				*/
 			}
 			
 			if (nbt == null)
@@ -120,12 +130,12 @@ public class TagsValues {
 	@SuppressWarnings("rawtypes")
 	public class TagParams{
 		
-		private Object min;
-		private Object max;
+		private int min;
+		private int max;
 		private Integer listType;
 		private Class nbtClass;
 		
-		public TagParams(Class nbtClass, Object min, Object max, Integer listContainType) {
+		public TagParams(Class nbtClass, int min, int max, Integer listContainType) {
 			this.nbtClass= nbtClass; 
 			this.min = min;
 			this.max = max;
@@ -136,10 +146,10 @@ public class TagsValues {
 			return nbtClass;
 		}
 		
-		public Object getMin() {
+		public int getMin() {
 			return min;
 		}
-		public Object getMax() {
+		public int getMax() {
 			return max;
 		}
 		public Integer getListType() {

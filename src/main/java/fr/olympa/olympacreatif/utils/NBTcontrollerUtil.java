@@ -1,9 +1,15 @@
 package fr.olympa.olympacreatif.utils;
 
+import java.util.HashSet;
+
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
+import org.bukkit.entity.EntityType;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.utils.TagsValues.TagParams;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTBase;
@@ -26,7 +32,8 @@ public abstract class NBTcontrollerUtil {
 
 	public static NBTTagCompound getValidTags(String string) {
 		try {
-			return getValidTags(MojangsonParser.parse(string));
+			//Bukkit.broadcastMessage("String tag : " + string + " - parsed tag : " + MojangsonParser.parse(string.replace("minecraft:", "")));
+			return getValidTags(MojangsonParser.parse(string.replace("minecraft:", "")));
 		} catch (CommandSyntaxException e) {
 			return new NBTTagCompound();
 		}
@@ -35,7 +42,7 @@ public abstract class NBTcontrollerUtil {
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
 		//Bukkit.broadcastMessage("Tag initial : " + tag);
 		//Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
-		return getValidTags(getValidTags(tag, 0), 0);
+		return getValidTags(tag, 0);
 	}
 	
 	private static NBTTagCompound getValidTags(NBTTagCompound tag, int recurIndex) {
@@ -44,7 +51,7 @@ public abstract class NBTcontrollerUtil {
 		if (tag == null)
 			return new NBTTagCompound();		
 		
-		for (String key : tag.getKeys()) {
+		for (String key : new HashSet<String>(tag.getKeys())) {
 			//récursivité pour les clés contenant d'autres tags
 			if (tag.get(key) instanceof NBTTagCompound)
 				if (recurIndex < recurIndexMax)
@@ -56,10 +63,18 @@ public abstract class NBTcontrollerUtil {
 			else {
 				TagParams params = allowedTags.getTagParams(key);
 				
+				//Bukkit.broadcastMessage("key : " + key + " - class : " + tag.get(key).getClass().getName() + " - params : " + params);
+				
 				if (params == null) {
 					tag.remove(key);
 					continue;
 				}
+				//remove tag "id" si c'est un oeuf (pas possible de le faire dans la liste, le tag id est utilisé pour d'autres choses...)
+				/*
+				if (key.equals("id") && EnumUtils.isValidEnum(EntityType.class, CbCommand.getUndomainedString(tag.getString(key)))) {
+					tag.remove(key);
+					continue;
+				}*/
 				
 				//Bukkit.broadcastMessage("tag : " + tag.get(key).asString() + " - " + params.toString());
 				//Bukkit.broadcastMessage("classe : " + tag.get(key).getClass().getName());
@@ -99,7 +114,7 @@ public abstract class NBTcontrollerUtil {
 	@SuppressWarnings("rawtypes")
 	private static boolean isValueValid(TagParams params, NBTBase value) {
 		
-		//Bukkit.broadcastMessage("param value : " + params.getTagNbtClass().toString() + " - value class : " + value.getClass().toString());
+		//Bukkit.broadcastMessage("param value : " + params + " - value class : " + value.getClass().getName());
 		
 		if (!params.getTagNbtClass().equals(value.getClass()))
 			return false;
@@ -112,28 +127,28 @@ public abstract class NBTcontrollerUtil {
 			if (((NBTTagInt)value).asInt() >= (Integer)params.getMin() && ((NBTTagInt)value).asInt() <= (Integer)params.getMax())
 				return true;
 		
-		if (tagClass.equals(NBTTagByte.class))
-			if (((NBTTagByte)value).asByte() >= (Byte)params.getMin() && ((NBTTagByte)value).asByte() <= (Byte)params.getMax())
-				return true;
-		
-		if (tagClass.equals(NBTTagDouble.class))
-			if (((NBTTagDouble)value).asDouble() >= (Double)params.getMin() && ((NBTTagDouble)value).asDouble() <= (Double)params.getMax())
+		if (tagClass.equals(NBTTagString.class))
+			if (((NBTTagString)value).asString().length() >= (Integer)params.getMin() && ((NBTTagString)value).asString().length() <= (Integer)params.getMax())
 				return true;
 		
 		if (tagClass.equals(NBTTagFloat.class))
-			if (((NBTTagFloat)value).asFloat() >= (Float)params.getMin() && ((NBTTagFloat)value).asFloat() <= (Float)params.getMax())
+			if (((NBTTagFloat)value).asFloat() >= params.getMin() && ((NBTTagFloat)value).asFloat() <= params.getMax())
 				return true;
 		
 		if (tagClass.equals(NBTTagLong.class))
-			if (((NBTTagLong)value).asLong() >= (Long)params.getMin() && ((NBTTagLong)value).asLong() <= (Long)params.getMax())
+			if (((NBTTagLong)value).asLong() >= params.getMin() && ((NBTTagLong)value).asLong() <= params.getMax())
+				return true;
+		
+		if (tagClass.equals(NBTTagByte.class))
+			if (((NBTTagByte)value).asByte() >= params.getMin() && ((NBTTagByte)value).asByte() <= params.getMax())
+				return true;
+		
+		if (tagClass.equals(NBTTagDouble.class))
+			if (((NBTTagDouble)value).asDouble() >= params.getMin() && ((NBTTagDouble)value).asDouble() <= params.getMax())
 				return true;
 		
 		if (tagClass.equals(NBTTagShort.class))
-			if (((NBTTagShort)value).asShort() >= (Short)params.getMin() && ((NBTTagShort)value).asShort() <= (Short)params.getMax())
-				return true;
-		
-		if (tagClass.equals(NBTTagString.class))
-			if (((NBTTagString)value).asString().length() >= (Integer)params.getMin() && ((NBTTagString)value).asString().length() <= (Integer)params.getMax())
+			if (((NBTTagShort)value).asShort() >= params.getMin() && ((NBTTagShort)value).asShort() <= params.getMax())
 				return true;
 		
 		return false;

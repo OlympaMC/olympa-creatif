@@ -54,12 +54,7 @@ public abstract class CbCommand extends CbCommandI {
 		if (s == null)
 			return null;
 		
-		String matStr = "";
-		
-		if (s.contains("minecraft:"))
-			matStr = s.substring(10);
-		else
-			matStr = s;
+		String matStr = s.replace("minecraft:", "");
 
 		Material mat = Material.getMaterial(matStr.split("\\{")[0].toUpperCase());
 		

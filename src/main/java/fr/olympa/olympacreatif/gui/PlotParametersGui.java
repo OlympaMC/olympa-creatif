@@ -58,7 +58,7 @@ public class PlotParametersGui extends IGui {
 		inv.setItem(0,it);
 
 		//1 : Heure du plot
-		it = ItemUtils.item(Material.SUNFLOWER, "§6Heure de la parcelle");
+		it = ItemUtils.item(Material.CLOCK, "§6Heure de la parcelle");
 		it = ItemUtils.lore(it, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 7000)/1000 + "h");
 		
 		it = ItemUtils.loreAdd(it, clickToChange);

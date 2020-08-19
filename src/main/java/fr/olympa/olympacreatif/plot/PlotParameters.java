@@ -78,11 +78,13 @@ public class PlotParameters {
 				(int)parameters.get(PlotParamType.SPAWN_LOC_Z));
 	}
 	
+	
 	public void setSpawnLoc(Location loc) {
 		parameters.put(PlotParamType.SPAWN_LOC_X, loc.getBlockX());
 		parameters.put(PlotParamType.SPAWN_LOC_Y, loc.getBlockY());
 		parameters.put(PlotParamType.SPAWN_LOC_Z, loc.getBlockZ());
 	}
+	
 	
 	@SuppressWarnings("unchecked")
 	public String toJson() {
