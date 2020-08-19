@@ -163,6 +163,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		//détection placement spawner
+		/*
 		if (e.getBlock().getType() == Material.SPAWNER) {
 			TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(e.getBlockPlaced().getLocation().getBlockX(), e.getBlockPlaced().getLocation().getBlockY(), e.getBlockPlaced().getLocation().getBlockZ()));
 			
@@ -177,6 +178,7 @@ public class PlotsInstancesListener implements Listener{
 					tile.load(tag.getCompound("tag"));
 			}
 		}
+		*/
 	}
 	
 	@EventHandler //test break block (autorisé uniquement pour les membres et pour la zone protégeé)
@@ -679,8 +681,16 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
-		if (plot != null)
+		if (plot == null) {
+			e.setCancelled(true);
+			return;
+		}
+		if (!plot.hasStoplag())
 			plot.addEntityInPlot(e.getEntity());
+		else{
+			plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
+			e.setCancelled(true);
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)//cancel rétractation piston si un bloc affecté se trouve sur une route
