@@ -685,12 +685,11 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-		if (!plot.hasStoplag())
-			plot.addEntityInPlot(e.getEntity());
-		else{
+		if (!plot.hasStoplag()) {
+			plot.addEntityInPlot(e.getEntity());	
 			plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
+		}else
 			e.setCancelled(true);
-		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)//cancel rétractation piston si un bloc affecté se trouve sur une route
