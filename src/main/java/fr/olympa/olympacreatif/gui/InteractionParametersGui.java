@@ -28,8 +28,6 @@ public class InteractionParametersGui extends IGui {
 	public InteractionParametersGui(IGui gui) {
 		super(gui, "§6Interactions du plot " + gui.getPlot().getPlotId(), 6);
 		
-		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
-		
 		//pour tous les items interdits possibles, ajout de l'item au gui selon son état (interdit/autorisé)
 		for (Material mat : PlotParamType.getAllPossibleIntaractibleBlocks()) {
 			ItemStack it = new ItemStack(mat);

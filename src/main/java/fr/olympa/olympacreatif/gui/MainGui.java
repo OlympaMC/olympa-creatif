@@ -52,7 +52,7 @@ public class MainGui extends IGui {
 		};
 
 		consumer.accept(new ItemStack(Material.PLAYER_HEAD));
-		ItemUtils.skull(consumer, p.getName(), p.getName());
+		ItemUtils.skull(consumer, player.getName(), player.getName());
 		//plugin.getPerksManager().getMicroBlocks().skull(consumer, p.getName(), p.getName());
 
 		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes parcelles", 
@@ -167,11 +167,6 @@ public class MainGui extends IGui {
 	
 	public Plot getPlot() {
 		return plot;
-	}
-	
-	//création item de retour
-	public static ItemStack getBackItem() {
-		return ItemUtils.skullCustom("§cRetour", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ==");
 	}
 	
 	//open main gui

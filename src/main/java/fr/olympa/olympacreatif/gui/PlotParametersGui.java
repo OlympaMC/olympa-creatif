@@ -30,6 +30,8 @@ public class PlotParametersGui extends IGui {
 	
 	private String[] clickToChange = null;
 	
+	private int timeToAdd = 6000;
+	
 	private String clearWeather = "§eMétéo actuelle : ensoleillée";
 	private String rainyWeather = "§eMétéo actuelle : pluvieuse";
 	private String[] stoplagLevels = {"§eEtat : §ainactif", "§eEtat : §cactif", "§eEtat : §cforcé §4(contacter un staff)"};
@@ -40,8 +42,6 @@ public class PlotParametersGui extends IGui {
 		super(gui, "Paramètres du plot " + gui.getPlot().getPlotId(), 3);
 
 		//newBiome = (Biome) plot.getParameters().getParameter(PlotParamType.PLOT_BIOME);
-		
-		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
 		if (plot.getMembers().getPlayerLevel(p) >= 3)
 			 clickToChange = new String[] {" ", "§7Cliquez pour changer la valeur"};
@@ -59,7 +59,7 @@ public class PlotParametersGui extends IGui {
 
 		//1 : Heure du plot
 		it = ItemUtils.item(Material.CLOCK, "§6Heure de la parcelle");
-		it = ItemUtils.lore(it, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 7000)/1000 + "h");
+		it = ItemUtils.lore(it, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd)/1000 + "h");
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
 		
@@ -151,8 +151,8 @@ public class PlotParametersGui extends IGui {
 			break;
 			
 		case 1:
-			plot.getParameters().setParameter(PlotParamType.PLOT_TIME, ((int) plot.getParameters().getParameter(PlotParamType.PLOT_TIME)  - 7000 + 1000)%25000);
-			current = ItemUtils.lore(current, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 7000)/1000 + "h");
+			plot.getParameters().setParameter(PlotParamType.PLOT_TIME, ((int) plot.getParameters().getParameter(PlotParamType.PLOT_TIME)  + 1000)%25000);
+			current = ItemUtils.lore(current, "§eHeure actuelle : " + ((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd)/1000 + "h");
 			current = ItemUtils.loreAdd(current, clickToChange);
 			plot.getPlayers().forEach(pp -> pp.setPlayerTime((int)plot.getParameters().getParameter(PlotParamType.PLOT_TIME), false));
 			break;

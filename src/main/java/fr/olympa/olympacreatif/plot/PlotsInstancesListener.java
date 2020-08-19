@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
@@ -25,6 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
@@ -44,6 +46,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -94,6 +97,7 @@ public class PlotsInstancesListener implements Listener{
 			.add(Material.CHEST_MINECART)
 			.add(Material.TNT_MINECART)
 			.add(Material.MINECART)
+			.add(Material.BONE_MEAL)
 			.build();
 	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
@@ -735,5 +739,27 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		plot.getStoplagChecker().addEvent(StopLagDetect.LIQUID);
+	}
+	
+	@EventHandler //cancel pousse d'arbres, etc en dehors d'un plot
+	public void onGrow(StructureGrowEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
+		if (plot == null) {
+			e.setCancelled(true);
+			return;
+		}
+		for (BlockState b : e.getBlocks())
+			if (!plot.equals(plugin.getPlotsManager().getPlot(b.getLocation()))) {
+				e.setCancelled(true);
+				return;
+			}
+	}
+	
+	@EventHandler //cancel pousse céréale, citrouille, ...
+	public void onGrow(BlockGrowEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+
+		if (plot == null)
+			e.setCancelled(true);
 	}
 }

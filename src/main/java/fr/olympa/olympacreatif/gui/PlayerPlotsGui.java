@@ -55,8 +55,7 @@ public class PlayerPlotsGui extends IGui {
 			}
 			
 			if (mat != null) 
-				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getPlotId().getId(), "§eRang : " + plot.getMembers().getPlayerRank(p).getRankName(), "§7Cliquez pour vous téléporter"));	
-			
+				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getPlotId().getId(), "§eRang : " + plot.getMembers().getPlayerRank(p).getRankName(), "§7Clic gauche : téléportation vers le plot", "§7Clic droit : ouverture du menu pour celle parcelle"));	
 		}
 			
 	}
@@ -67,8 +66,12 @@ public class PlayerPlotsGui extends IGui {
 		
 		if (slot < playerPlots.size()) {
 			player.closeInventory();
-			player.teleport(playerPlots.get(slot).getParameters().getSpawnLoc(plugin));
-			player.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(slot)));
+			if (click == ClickType.LEFT) {
+				player.teleport(playerPlots.get(slot).getParameters().getSpawnLoc(plugin));
+				player.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(slot)));	
+			}else if (click == ClickType.RIGHT) {
+				MainGui.getMainGui(player, playerPlots.get(slot)).create(player);
+			}
 		}
 		
 		return true;

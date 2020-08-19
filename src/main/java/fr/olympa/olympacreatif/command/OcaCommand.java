@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.StaffGui;
 
 public class OcaCommand extends OlympaCommand {
@@ -25,7 +26,7 @@ public class OcaCommand extends OlympaCommand {
 			return false;
 		
 		Player p = (Player) sender;
-		new StaffGui(plugin, p).create(p);
+		new StaffGui(MainGui.getMainGui(p)).create(p);
 		
 		return false;
 	}

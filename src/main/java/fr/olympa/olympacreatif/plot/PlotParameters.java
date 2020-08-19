@@ -27,36 +27,30 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 public class PlotParameters {
 
 	private Map <PlotParamType, Object> parameters = new HashMap<PlotParamType, Object>();
+	private PlotId id;
 	
 	public PlotParameters(PlotId id) {
-		for (PlotParamType param : PlotParamType.values())
-			switch (param) {
-			case SPAWN_LOC_X:
-				if (id != null)
+		
+		this.id = id;
+		
+		for (PlotParamType type : PlotParamType.values())
+			parameters.put(type, type.getDefaultValue());
+		
+		if (id != null)
+			for (PlotParamType param : PlotParamType.values())
+				switch (param) {
+				case SPAWN_LOC_X:
 					parameters.put(param, id.getLocation().getBlockX());
-				else
-					parameters.put(param, 0);
-				break;
-				
-			case SPAWN_LOC_Y:
-				if (id != null)
+					break;
+					
+				case SPAWN_LOC_Y:
 					parameters.put(param, id.getLocation().getBlockY());
-				else
-					parameters.put(param, 100);
-				break;
-				
-			case SPAWN_LOC_Z:
-				if (id != null)
+					break;
+					
+				case SPAWN_LOC_Z:
 					parameters.put(param, id.getLocation().getBlockZ());
-				else
-					parameters.put(param, 0);
-				break;
-				
-			default:
-				parameters.put(param, param.getDefaultValue());
-				break;
-			
-			}
+					break;
+				}
 	}
 
 	
@@ -73,16 +67,18 @@ public class PlotParameters {
 	
 	public Location getSpawnLoc(OlympaCreatifMain plugin) {
 		return new Location(plugin.getWorldManager().getWorld(), 
-				(int) parameters.get(PlotParamType.SPAWN_LOC_X), 
+				(int)parameters.get(PlotParamType.SPAWN_LOC_X), 
 				(int)parameters.get(PlotParamType.SPAWN_LOC_Y), 
 				(int)parameters.get(PlotParamType.SPAWN_LOC_Z));
 	}
 	
 	
 	public void setSpawnLoc(Location loc) {
-		parameters.put(PlotParamType.SPAWN_LOC_X, loc.getBlockX());
-		parameters.put(PlotParamType.SPAWN_LOC_Y, loc.getBlockY());
-		parameters.put(PlotParamType.SPAWN_LOC_Z, loc.getBlockZ());
+		if (id.isInPlot(loc)) {
+			parameters.put(PlotParamType.SPAWN_LOC_X, loc.getBlockX());
+			parameters.put(PlotParamType.SPAWN_LOC_Y, loc.getBlockY());
+			parameters.put(PlotParamType.SPAWN_LOC_Z, loc.getBlockZ());	
+		}
 	}
 	
 	

@@ -5,6 +5,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.gui.OlympaGUI;
+import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -24,7 +25,8 @@ public abstract class IGui extends OlympaGUI{
 		
 		this.p = AccountProvider.get(player.getUniqueId());
 		
-		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
+		inv.setItem(inv.getSize() - 1, ItemUtils.skullCustom("§aVers menu principal", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ=="));
+		//inv.setItem(inv.getSize() - 1, ItemUtils.skullCustom("§aVers menu principal", "skull"));
 	}
 	
 	public IGui(IGui gui, String inventoryName, int rows) {
@@ -46,7 +48,7 @@ public abstract class IGui extends OlympaGUI{
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		if (slot == inv.getSize() - 1) 
-			MainGui.getMainGui(p, plot).create(p);
+			MainGui.getMainGui(p, this).create(p);
 		return true;
 	}
 }
