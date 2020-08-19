@@ -23,6 +23,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
+import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 
@@ -91,7 +92,7 @@ public class OcCommand extends OlympaCommand {
 				
 			case "menu":
 				if (sender instanceof Player) 
-					MainGui.openMainGui(p);
+					MainGui.getMainGui(p).create(p);
 				break;
 				
 			case "accept":
@@ -194,6 +195,11 @@ public class OcCommand extends OlympaCommand {
 				}
 				break;
 				*/
+			
+		case "menu":
+			if (sender instanceof Player) 
+				MainGui.getMainGui((Player) sender, args[1]).create((Player)sender);
+			break;
 				
 			case "visit":
 				PlotId id = PlotId.fromString(plugin, args[1]);
@@ -271,7 +277,7 @@ public class OcCommand extends OlympaCommand {
 				else if (plot.getMembers().getPlayerLevel(pc) < 3)
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				
-				else if (plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR || !plot.getPlayers().contains(target))
+				else if (!plot.getPlayers().contains(target) || plot.getMembers().getPlayerRank(target) == PlotRank.OWNER)
 					p.sendMessage(Message.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.getValue(target.getName()));
 				
 				else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN))
@@ -282,6 +288,8 @@ public class OcCommand extends OlympaCommand {
 					((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).add(AccountProvider.get(target.getUniqueId()).getId());
 					
 					plot.teleportOut(target);
+					plot.getMembers().set(target, PlotRank.VISITOR);
+					
 					target.sendMessage(Message.PLOT_HAVE_BEEN_BANNED.getValue(plot, sender.getName()));
 					sender.sendMessage(Message.PLOT_BAN_PLAYER.getValue(target.getName()));
 					return false;	

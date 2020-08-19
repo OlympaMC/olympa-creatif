@@ -106,7 +106,10 @@ public class PlotId {
 	}
 
 	//retourne un nouveau plotId avec l'id en paramètre
-	public static PlotId fromId(OlympaCreatifMain plugin, int id) {
+	public static PlotId fromId(OlympaCreatifMain plugin, Integer id) {
+		if (id == null)
+			return null;
+		
 		if (id <= plugin.getPlotsManager().getTotalPlotCount())
 			return new PlotId(plugin, id);
 		else

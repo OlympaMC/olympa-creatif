@@ -18,20 +18,14 @@ import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 
-public class PlayerPlotsGui extends OlympaGUI {
-
-	private OlympaCreatifMain plugin;
-	private OlympaPlayerCreatif pc;
+public class PlayerPlotsGui extends IGui {
+	
 	private List<Plot> playerPlots = new ArrayList<Plot>();
 	
-	public PlayerPlotsGui(OlympaCreatifMain plugin, Player p) {
-		super("Plots du joueur " + p.getDisplayName(), 5);
-		this.plugin = plugin;
-		this.pc = AccountProvider.get(p.getUniqueId());
+	public PlayerPlotsGui(IGui gui) {
+		super(gui, "Plots du joueur " + gui.getPlayer().getName(), 5);
 		
-		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
-		
-		playerPlots = pc.getPlots(false);
+		playerPlots = p.getPlots(false);
 		
 		//tri de la liste de plots par ordre croissant d'id
 		Collections.sort(playerPlots, new Comparator<Plot>() {
@@ -45,7 +39,7 @@ public class PlayerPlotsGui extends OlympaGUI {
 		//recherche des plots du joueur
 		for (Plot plot : playerPlots) {
 			Material mat = null;
-			switch(plot.getMembers().getPlayerRank(pc)) {
+			switch(plot.getMembers().getPlayerRank(p)) {
 			case OWNER:
 				mat = Material.EMERALD_BLOCK;
 				break;
@@ -61,23 +55,20 @@ public class PlayerPlotsGui extends OlympaGUI {
 			}
 			
 			if (mat != null) 
-				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getPlotId().getId(), "§eRang : " + plot.getMembers().getPlayerRank(pc).getRankName(), "§7Cliquez pour vous téléporter"));	
+				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getPlotId().getId(), "§eRang : " + plot.getMembers().getPlayerRank(p).getRankName(), "§7Cliquez pour vous téléporter"));	
 			
 		}
 			
 	}
 
 	@Override
-	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		if (slot == inv.getSize() - 1) {
-			MainGui.openMainGui(p);
-			return true;
-		}
+	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
+		super.onClick(player, current, slot, click);
 		
 		if (slot < playerPlots.size()) {
-			p.closeInventory();
-			p.teleport(playerPlots.get(slot).getParameters().getSpawnLoc(plugin));
-			p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(slot)));
+			player.closeInventory();
+			player.teleport(playerPlots.get(slot).getParameters().getSpawnLoc(plugin));
+			player.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(slot)));
 		}
 		
 		return true;

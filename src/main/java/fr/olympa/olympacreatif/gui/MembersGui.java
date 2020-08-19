@@ -25,25 +25,13 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
-public class MembersGui extends OlympaGUI {
-
-	private OlympaCreatifMain plugin;
-	private Plot plot;
-	private Player p;
-	private OlympaPlayerCreatif pc;
+public class MembersGui extends IGui {
 	
 	private List<MemberInformations> members = new ArrayList<MemberInformations>();
 	
-	public MembersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("Membres parcelle " + plot.getPlotId() + "(" + plot.getMembers().getCount() + "/" + 
-				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3);
-		
-		this.plugin = plugin;
-		this.p = p;
-		this.pc = AccountProvider.get(p.getUniqueId());
-		this.plot = plot;
-		
-		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
+	public MembersGui(IGui gui) {
+		super(gui, "Membres parcelle " + gui.getPlot().getPlotId() + "(" + gui.getPlot().getMembers().getCount() + "/" + 
+				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(gui.getPlayer().getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3);
 		
 		members = new ArrayList<MemberInformations>(plot.getMembers().getMembers().keySet());
 		
@@ -56,14 +44,14 @@ public class MembersGui extends OlympaGUI {
 			final int thisHeadIndex = headIndex;
 			
 			//création de la tête du joueur
-			Consumer<ItemStack> consumer = sk -> inv.setItem(thisHeadIndex, addBasicInfos(sk, e.getKey(), e.getValue()));
+			Consumer<ItemStack> consumer = sk -> inv.setItem(thisHeadIndex, createLore(sk, e.getKey(), e.getValue()));
 
 			consumer.accept(ItemUtils.item(Material.PLAYER_HEAD, "§6" + e.getKey().getName()));
 			ItemUtils.skull(consumer, "§6" + e.getKey().getName(), e.getKey().getName());
 		}
 	}
 	
-	private ItemStack addBasicInfos(ItemStack item, MemberInformations member, PlotRank rank) {
+	private ItemStack createLore(ItemStack item, MemberInformations member, PlotRank rank) {
 		item = ItemUtils.lore(item, "§6Rang : " + rank.getRankName());
 		if (Bukkit.getPlayer(member.getUUID()) != null)
 			item = ItemUtils.loreAdd(item, "§6Statut : §aen ligne");
@@ -85,17 +73,17 @@ public class MembersGui extends OlympaGUI {
 	}
 	
 	private boolean canDemote(MemberInformations member) {
-		int playerLevel = plot.getMembers().getPlayerLevel(pc);
+		int playerLevel = plot.getMembers().getPlayerLevel(p);
 		int memberLevel = plot.getMembers().getPlayerLevel(member);
 		
-		if (playerLevel >= 3 && memberLevel > 0 && memberLevel < 4)
+		if (playerLevel >= 3 && memberLevel > 0 && memberLevel < playerLevel)
 			return true;
 		else
 			return false;
 	}
 
 	private boolean canPromote(MemberInformations member) {
-		int playerLevel = plot.getMembers().getPlayerLevel(pc);
+		int playerLevel = plot.getMembers().getPlayerLevel(p);
 		int memberLevel = plot.getMembers().getPlayerLevel(member);
 		
 		if (playerLevel >= 3 && playerLevel > memberLevel + 1)
@@ -105,11 +93,8 @@ public class MembersGui extends OlympaGUI {
 	}
 	
 	@Override
-	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		if (slot == inv.getSize() - 1) {
-			MainGui.openMainGui(p);
-			return true;
-		}
+	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
+		super.onClick(player, current, slot, click);
 		
 		MemberInformations target = null;
 		if (slot >= 0 && slot < members.size())
@@ -123,7 +108,7 @@ public class MembersGui extends OlympaGUI {
 		else if (click == ClickType.RIGHT && canDemote(target))
 			plot.getMembers().set(target, PlotRank.getPlotRank(plot.getMembers().getPlayerLevel(target) - 1));
 		
-		inv.setItem(slot, addBasicInfos(current, target, plot.getMembers().getPlayerRank(target)));
+		inv.setItem(slot, createLore(current, target, plot.getMembers().getPlayerRank(target)));
 		
 		return true;
 	}

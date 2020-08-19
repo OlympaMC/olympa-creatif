@@ -34,7 +34,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
-public class ShopGui extends OlympaGUI{
+public class ShopGui extends IGui{
 
 	private ItemStack ranksRowHead;
 	private ItemStack kitsRowHead;
@@ -52,9 +52,6 @@ public class ShopGui extends OlympaGUI{
 	private MarketItemData itemReadyToBuy = null;
 	private boolean readyToBuy = false;
 	
-	OlympaCreatifMain plugin;
-	OlympaPlayerCreatif p;
-	
 	int firstRankPrice = 10;
 	int secondRankPrice = 20;
 
@@ -63,13 +60,8 @@ public class ShopGui extends OlympaGUI{
 	private List<MarketItemData> upgrades = new ArrayList<MarketItemData>();
 			
 	
-	public ShopGui(OlympaCreatifMain plugin, Player player) {
-		super("Magasin (monnaie : " + ((OlympaPlayerCreatif)AccountProvider.get(player.getUniqueId())).getGameMoney() + " bellis)", 4);
-
-		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
-		
-		this.plugin = plugin;
-		p = AccountProvider.get(player.getUniqueId());
+	public ShopGui(IGui gui) {
+		super(gui, "Magasin (monnaie : " + gui.getPlayer().getGameMoney() + " bellis)", 4);
 
 		//init têtes
 		ranksRowHead = ItemUtils.skullCustom("§6Grades", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI1NzViNTU3N2NjYjMyZTQyZDU0MzA0YTFlZjVmMjNhZDZiYWQ1YTM0NTYzNDBhNDkxMmE2MmIzNzk3YmI1In19fQ==");
@@ -138,10 +130,7 @@ public class ShopGui extends OlympaGUI{
 	
 	@Override
 	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
-		if (inv.getSize() - 1 == slot) {
-			MainGui.openMainGui(player);
-			return true;
-		}
+		super.onClick(player, current, slot, click);
 		
 		int row = slot / 9;
 		int column = slot % 9;
@@ -170,7 +159,7 @@ public class ShopGui extends OlympaGUI{
 		//tentative d'achat
 		if (slot == inv.getSize() - 3) {
 			if (readyToBuy && itemReadyToBuy != null) 
-				itemReadyToBuy.tryToItem();
+				itemReadyToBuy.tryToItem(this);
 			return true;
 		}
 		
@@ -346,7 +335,7 @@ public class ShopGui extends OlympaGUI{
 			return isBuyable;
 		}
 		
-		public void tryToItem() {
+		public void tryToItem(ShopGui gui) {
 			if (!isBuyable || p.getGameMoney() < price)
 				return;
 			
@@ -386,7 +375,7 @@ public class ShopGui extends OlympaGUI{
 			}
 			
 			p.getPlayer().sendMessage(Message.SHOP_BUY_SUCCESS.getValue(itemHolder.getItemMeta().getDisplayName().toLowerCase()));
-			new ShopGui(plugin, p.getPlayer()).create(p.getPlayer());
+			new ShopGui(gui).create(p.getPlayer());
 			new AccountProvider(p.getUniqueId()).saveToDb(p);
 		}
 	}

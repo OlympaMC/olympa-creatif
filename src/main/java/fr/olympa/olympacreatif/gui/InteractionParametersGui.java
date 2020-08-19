@@ -19,20 +19,14 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotParameters;
 
-public class InteractionParametersGui extends OlympaGUI {
+public class InteractionParametersGui extends IGui {
 
-	private OlympaCreatifMain plugin;
-	private OlympaPlayerCreatif pc;
-	private Plot plot;
 	private String[] stateAllowed = new String[] {" ", "§eEtat : §aautorisé", "§7Cliquez pour changer l'état. Si autorisé, les visiteurs", "§7pourront interragir avec ce bloc, sinon non."};
 	private String[] stateDenied = new String[] {" ", "§eEtat : §cinterdit", "§7Cliquez pour changer l'état. Si autorisé, les visiteurs", "§7pourront interragir avec ce bloc, sinon non."}; 
 	
 	@SuppressWarnings("unchecked")
-	public InteractionParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("§6Interactions du plot " + plot.getPlotId(), 6);
-		this.plugin = plugin;
-		this.pc = AccountProvider.get(p.getUniqueId());
-		this.plot = plot;
+	public InteractionParametersGui(IGui gui) {
+		super(gui, "§6Interactions du plot " + gui.getPlot().getPlotId(), 6);
 		
 		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
@@ -46,13 +40,13 @@ public class InteractionParametersGui extends OlympaGUI {
 			if (((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(mat)) {
 				it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
 
-				if (plot.getMembers().getPlayerLevel(pc) < 3)
+				if (plot.getMembers().getPlayerLevel(p) < 3)
 					it = ItemUtils.loreAdd(it, "§eEtat : §aautorisé");
 				else
 					it = ItemUtils.loreAdd(it, stateAllowed);
 			}
 			else
-				if (plot.getMembers().getPlayerLevel(pc) < 3)
+				if (plot.getMembers().getPlayerLevel(p) < 3)
 					it = ItemUtils.loreAdd(it, "§eEtat : §cinterdit");
 				else
 					it = ItemUtils.loreAdd(it, stateDenied);
@@ -64,13 +58,10 @@ public class InteractionParametersGui extends OlympaGUI {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		if (slot == inv.getSize() - 1) {
-			MainGui.openMainGui(p);
-			return true;
-		}
+		super.onClick(p, current, slot, click);
 		
 		//changement de l'état d'autorisation de l'interraction pour le bloc cliqué si le joueur a la permission
-		if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(pc) >= 3 && slot < PlotParamType.getAllPossibleIntaractibleBlocks().size()) {
+		if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(p) >= 3 && slot < PlotParamType.getAllPossibleIntaractibleBlocks().size()) {
 			if (((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(current.getType())) {
 				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).remove(current.getType());
 				current = ItemUtils.removeEnchant(current, Enchantment.DURABILITY);

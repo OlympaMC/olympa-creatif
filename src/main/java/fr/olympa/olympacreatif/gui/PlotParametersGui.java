@@ -26,13 +26,8 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 
-public class PlotParametersGui extends OlympaGUI {
-
-	private OlympaCreatifMain plugin;
-	private OlympaPlayerCreatif pc;
-	private Plot plot;
+public class PlotParametersGui extends IGui {
 	
-	private Biome newBiome;
 	private String[] clickToChange = null;
 	
 	private String clearWeather = "§eMétéo actuelle : ensoleillée";
@@ -41,17 +36,14 @@ public class PlotParametersGui extends OlympaGUI {
 	
 	private Map<ItemStack, PlotParamType> switchButtons = new LinkedHashMap<ItemStack, PlotParamType>(); 
 	
-	public PlotParametersGui(OlympaCreatifMain plugin, Player p, Plot plot) {
-		super("Paramètres du plot " + plot.getPlotId(), 3);
-		this.plugin = plugin;
-		this.pc = AccountProvider.get(p.getUniqueId());
-		this.plot = plot;
+	public PlotParametersGui(IGui gui) {
+		super(gui, "Paramètres du plot " + gui.getPlot().getPlotId(), 3);
 
 		//newBiome = (Biome) plot.getParameters().getParameter(PlotParamType.PLOT_BIOME);
 		
 		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
 		
-		if (plot.getMembers().getPlayerLevel(pc) >= 3)
+		if (plot.getMembers().getPlayerLevel(p) >= 3)
 			 clickToChange = new String[] {" ", "§7Cliquez pour changer la valeur"};
 		else
 			 clickToChange = new String[] {};
@@ -127,13 +119,13 @@ public class PlotParametersGui extends OlympaGUI {
 	}
 	
 	@Override
-	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
+	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
 		if (slot == inv.getSize() - 1) {
-			MainGui.openMainGui(p);
+			MainGui.getMainGui(player);
 			return true;
 		}
 		
-		if (plot.getMembers().getPlayerLevel(pc) < 3)
+		if (plot.getMembers().getPlayerLevel(player) < 3)
 			return true;
 		
 		//modification des options
@@ -200,7 +192,7 @@ public class PlotParametersGui extends OlympaGUI {
 			
 		case 3:
 			int mod = 2;
-			if (pc.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
+			if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
 				mod = 3;
 			
 			int currentState = (int) plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS);

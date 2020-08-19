@@ -249,7 +249,7 @@ public class WorldEventsListener implements Listener{
 			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
 				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis()) {
 					if (((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK))
-						MainGui.openMainGui(e.getPlayer());	
+						MainGui.getMainGui(e.getPlayer()).create(e.getPlayer());	
 				}
 		/*
 					else

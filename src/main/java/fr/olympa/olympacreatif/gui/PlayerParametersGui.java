@@ -12,18 +12,10 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
 
-public class PlayerParametersGui extends OlympaGUI{
-
-	private OlympaCreatifMain plugin;
-	private OlympaPlayerCreatif p;
+public class PlayerParametersGui extends IGui{
 	
-	public PlayerParametersGui(OlympaCreatifMain plugin, Player player) {
-		super("Paramètres de " + player.getName(), 1);
-		this.plugin = plugin;
-		
-		p = AccountProvider.get(player.getUniqueId());
-
-		inv.setItem(inv.getSize() - 1, MainGui.getBackItem());
+	public PlayerParametersGui(IGui gui) {
+		super(gui, "Paramètres de " + gui.getPlayer().getName(), 1);
 		
 		inv.setItem(0, PlotParametersGui.setSwitchState(ItemUtils.item(Material.PAPER, "§6Activation par défaut du chat parcelle"), 
 				p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)));
@@ -33,10 +25,7 @@ public class PlayerParametersGui extends OlympaGUI{
 	
 	@Override
 	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
-		if (slot == inv.getSize() - 1) {
-			MainGui.openMainGui(player);
-			return true;
-		}
+		super.onClick(player, current, slot, click);
 		
 		switch(slot) {
 		case 0:

@@ -16,21 +16,14 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
+import fr.olympa.olympacreatif.plot.PlotsManager;
 
-public class MainGui extends OlympaGUI {
-
-	private OlympaCreatifMain plugin;
-	private OlympaPlayerCreatif p;
-	private Plot plot;
+public class MainGui extends IGui {
 	
-	public MainGui(OlympaCreatifMain plugin, Player player, Plot plot, String inventoryName) {
-		super(inventoryName, 6);
-		
-		this.plugin = plugin;
-		this.p = AccountProvider.get(player.getUniqueId());
-		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
-		this.plot = plot;
+	private MainGui(OlympaCreatifMain plugin, Player player, Plot plot, String inventoryName) {
+		super(plugin, player, plot, inventoryName, 6); 
 		
 		String clickToOpenMenu = "§9Cliquez pour ouvrir le menu";
 		
@@ -54,11 +47,6 @@ public class MainGui extends OlympaGUI {
 			
 			sk = ItemUtils.name(sk, "§6Paramètres de " + player.getDisplayName());
 			sk = ItemUtils.lore(sk, clickToOpenMenu);
-			/*sk = ItemUtils.loreAdd(sk, "§eGrade : " + p.getGroupNameColored(), 
-					" ",
-					"§eParcelles totales : " + memberPlots + "/" + memberPlotsSlots,  
-					"§eParcelles propriétaire : " + ownedPlots + "/" + ownedPlotsSlots);
-			*/
 			inv.setItem(12, sk);
 			
 		};
@@ -68,8 +56,8 @@ public class MainGui extends OlympaGUI {
 		//plugin.getPerksManager().getMicroBlocks().skull(consumer, p.getName(), p.getName());
 
 		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes parcelles", 
-				"§eParcelles possédées : " + pc.getPlots(true).size() + "/" + pc.getPlotsSlots(true),
-				"§eParcelles totales : " + pc.getPlots(false).size() + "/" + pc.getPlotsSlots(false), 
+				"§eParcelles possédées : " + p.getPlots(true).size() + "/" + p.getPlotsSlots(true),
+				"§eParcelles totales : " + p.getPlots(false).size() + "/" + p.getPlotsSlots(false), 
 				clickToOpenMenu));
 		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", clickToOpenMenu));
 		
@@ -121,34 +109,34 @@ public class MainGui extends OlympaGUI {
 			
 		case 21:
 			if (plot != null)
-				new MembersGui(plugin, p, plot).create(p);
+				new MembersGui(this).create(p);
 			break;
 			
 			
 		case 23:
 			if (plot != null)
-				new InteractionParametersGui(plugin, p, plot).create(p);
+				new InteractionParametersGui(this).create(p);
 			break;
 			
 			
 		case 22:
 			if (plot != null)
-				new PlotParametersGui(plugin, p, plot).create(p);
+				new PlotParametersGui(this).create(p);
 			break;
 			
 			
 		case 12:
-			new PlayerParametersGui(plugin, p).create(p);
+			new PlayerParametersGui(this).create(p);
 			break;
 			
 			
 		case 13:
-			new PlayerPlotsGui(plugin, p).create(p);
+			new PlayerPlotsGui(this).create(p);
 			break;
 			
 			
 		case 14:
-			new ShopGui(plugin, p).create(p);
+			new ShopGui(this).create(p);
 			break;
 			
 		case 30 :
@@ -158,9 +146,9 @@ public class MainGui extends OlympaGUI {
 			
 		case 32:
 			if (plugin.getPlotsManager().getPlots().size()>0) {
-				Plot pl = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
-				p.teleport(pl.getParameters().getSpawnLoc(plugin));
-				p.sendMessage(Message.TELEPORT_TO_RANDOM_PLOT.getValue());
+				Plot plot = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
+				p.teleport(plot.getParameters().getSpawnLoc(plugin));
+				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
 			}
 			break;
 			
@@ -177,17 +165,43 @@ public class MainGui extends OlympaGUI {
 		return true;
 	}
 	
+	public Plot getPlot() {
+		return plot;
+	}
+	
 	//création item de retour
 	public static ItemStack getBackItem() {
 		return ItemUtils.skullCustom("§cRetour", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ==");
 	}
 	
 	//open main gui
-	public static void openMainGui(Player p) {
+	public static MainGui getMainGui(Player p) {
 		Plot plot = OlympaCreatifMain.getMainClass().getPlotsManager().getPlot(p.getLocation());
+		return getMainGui(p, plot);
+	}
+
+	public static MainGui getMainGui(Player p, String stringPlotId) {
+		
+		Plot plot = null;
+		
+		PlotId plotId = PlotId.fromString(OlympaCreatifMain.getMainClass(), stringPlotId);
+		
+		Bukkit.broadcastMessage("String id : " + stringPlotId + " - int id : " + plotId);
+		
+		if (plotId != null) 
+			plot = OlympaCreatifMain.getMainClass().getPlotsManager().getPlot(plotId);
+		
+		return getMainGui(p, plot);
+	}
+	
+	public static MainGui getMainGui(Player p, IGui gui) {
+		return getMainGui(p, gui.getPlot());
+	}
+	
+	public static MainGui getMainGui(Player p, Plot plot) {
 		if (plot == null)
-			new MainGui(OlympaCreatifMain.getMainClass(), p, plot, "Menu").create(p);
+			return new MainGui(OlympaCreatifMain.getMainClass(), p, null, "Menu");
 		else
-			new MainGui(OlympaCreatifMain.getMainClass(), p, plot, "Menu >> " + plot.getPlotId()).create(p);
+			return new MainGui(OlympaCreatifMain.getMainClass(), p, plot, "Menu >> " + plot.getPlotId());
 	}
 }
