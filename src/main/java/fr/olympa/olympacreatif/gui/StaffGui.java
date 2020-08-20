@@ -1,7 +1,5 @@
 package fr.olympa.olympacreatif.gui;
 
-import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -9,15 +7,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.player.Gender;
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
-import fr.olympa.olympacreatif.world.WorldManager;
 
 public class StaffGui extends IGui {
 	
@@ -42,7 +33,7 @@ public class StaffGui extends IGui {
 		inv.setItem(4, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		inv.setItem(4 + 9, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		
-		inv.setItem(5, ItemUtils.item(Material.TNT, "§4Reset de la parcelle " + plot, "§cPour reset la parcelle, cliquez ici", "§cavec une TNT dans la main", "§4ATTENTION : Cette action est irréversible !"));
+		//inv.setItem(5, ItemUtils.item(Material.TNT, "§4Reset de la parcelle " + plot, "§cPour reset la parcelle, cliquez ici", "§cavec une TNT dans la main", "§4ATTENTION : Cette action est irréversible !"));
 		
 		//TODO clear plot, stoplag plot, ...
 		
@@ -84,27 +75,77 @@ public class StaffGui extends IGui {
 		return true;
 	}
 	
+	/*
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onClickCursor(Player player, ItemStack current, ItemStack cursor, int slot) {
-		if (cursor.getType() != Material.TNT)
+		if (slot != 5 || cursor.getType() != Material.TNT || plot == null || !p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
 			return true;
 		
-		if (plot == null)
+		if (plugin.getWorldEditManager() == null)
 			return true;
 		
-		current.setType(Material.AIR);
+		current.setAmount(0);
 		player.closeInventory();
 		player.sendMessage("§cLa parcelle " + plot + " est en train de se régénérer. Merci de ne pas relancer le processus.");
-		
-		//reset du plot
-		for (int x = plot.getPlotId().getX()/16 ; x < plot.getPlotId().getX()/16 + WorldManager.plotSize/16 ; x++)
-			for (int z = plot.getPlotId().getZ()/16 ; x < plot.getPlotId().getZ()/16 + WorldManager.plotSize/16 ; z++)
-				//plugin.getWorldManager().getWorld().
-				return true;
-		
-		return true;
+
+
+    	IAsyncWorldEdit awe = (IAsyncWorldEdit) Bukkit.getPluginManager().getPlugin("AsyncWorldEdit");
+    	IThreadSafeEditSession tsSession = ((IAsyncEditSessionFactory)plugin.getWorldEditManager().getSession(player))
+    			.getThreadSafeEditSession(new BukkitWorld(plugin.getWorldManager().getWorld()), 0);
+	
+    	awe.getBlockPlacer().performAsAsyncJob(tsSession, awe.getPlayerManager().getConsolePlayer(), "reset_plot_" + plot, 
+    			new IFuncParamEx<Integer, ICancelabeEditSession, MaxChangedBlocksException>() {
+					
+					@Override
+					public Integer execute(ICancelabeEditSession editSession) throws MaxChangedBlocksException {
+						
+						Location pos1 = plot.getPlotId().getLocation().clone();
+						pos1.setY(0);
+						Location pos2 = plot.getPlotId().getLocation().clone();
+						pos2.setY(256);
+						pos2 = pos2.add(WorldManager.plotSize - 1, 0, WorldManager.plotSize - 1);
+						
+						Bukkit.broadcastMessage("pos1 : " + pos1 + " - pos2 : " + pos2);
+						
+					    Region region = new CuboidRegion(editSession.getWorld(), getBlockVector(pos1), getBlockVector(pos2));
+					    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+					    try {
+						    
+						    for (int x = clipboard.getMinimumPoint().getBlockX() ; x <= clipboard.getMaximumPoint().getBlockX() ; x++)
+							    for (int y = clipboard.getMinimumPoint().getBlockY() ; y <= clipboard.getMaximumPoint().getBlockY() ; y++)
+								    for (int z = clipboard.getMinimumPoint().getBlockZ() ; z <= clipboard.getMaximumPoint().getBlockZ() ; z++)
+								    	if (y > WorldManager.worldLevel)
+											clipboard.setBlock(BlockVector3.at(x, y, z), BlockTypes.AIR.getDefaultState());
+								    	else if (y == 0)
+											clipboard.setBlock(BlockVector3.at(x, y, z), BlockTypes.BEDROCK.getDefaultState());
+								    	else if (y < WorldManager.worldLevel)
+											clipboard.setBlock(BlockVector3.at(x, y, z), BlockTypes.DIRT.getDefaultState());
+								    	else //if (y == WorldManager.worldLevel)
+											clipboard.setBlock(BlockVector3.at(x, y, z), BlockTypes.GRASS.getDefaultState());
+						    
+
+						    Operation operation = new ClipboardHolder(clipboard)
+						            .createPaste(editSession)
+						            .to(clipboard.getMinimumPoint())
+						            // configure here
+						            .build();
+						    Operations.complete(operation);
+					        //IAsyncWorldEditHandler.registerCompletion(player);
+					    }catch(WorldEditException e) {
+						    	e.printStackTrace();
+						}
+						return 1;
+					}
+	    		});
+	    return true;
 	}
+
+	
+	private BlockVector3 getBlockVector(Location loc) {
+		return BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+	}
+	*/
 	
 	//switch l'apparence du switch
 	private void toggleSwitch(int slot) {

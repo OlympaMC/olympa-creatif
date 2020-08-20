@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+
+import fr.olympa.api.command.essentials.tp.TpaHandler;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
 import fr.olympa.api.permission.OlympaPermission;
@@ -75,6 +77,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new OcoCommand(this, "olympacreatifother", new String[] { "oco" }).register();
 		new OcaCommand(this, "olympacreatifadmin", new String[] { "oca" }).register();
 
+		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.TPA), plugin);
+		
 		dataManager = new DataManager(this);
 		plotsManager = new PlotsManager(this);
 		creativeWorldManager = new WorldManager(this);
@@ -185,7 +189,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			return "§3";
 
 		case 7:
-			return "§7Kumars : §6" + p.getGameMoneyFormated();
+			return "§7" + p.getGameMoneyName() + " : §6" + p.getGameMoney() + p.getGameMoneySymbol();
 
 		case 8:
 			plotId = PlotId.fromLoc(this, p.getPlayer().getLocation());

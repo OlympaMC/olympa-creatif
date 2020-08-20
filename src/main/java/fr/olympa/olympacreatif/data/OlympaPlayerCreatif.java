@@ -200,25 +200,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		return i;
 	}
 	
-	//définit une ligne de scoreboard custom
-	/*
-	@Deprecated
-	private void setCustomScoreboardLine(int line, String text) {
-		
-		if (scoreboardLines.get(0) == null)
-			for (int i = 0 ; i < scoreboardLines.size() ; i++)
-				scoreboardLines.put(i, "§" + i);
-		
-		if (line >= 0 && line < scoreboardLines.size())
-			if (text != null)
-				scoreboardLines.put(line, text);
-			else
-				scoreboardLines.put(line, "§" + line);
-	}
-	*/
-	
-	
-	
 	public void setCustomScoreboardTitle(String title) {
 		initCustomScoreboard();
 		
@@ -265,10 +246,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	
 	
-	public String getGameMoneyFormated() {
-		return gameMoney + "$";
-	}
 
+	public String getGameMoneyName() {
+		return "Kumars";
+	}
+	
+	public String getGameMoneySymbol() {
+		return "K";
+	}
 	
 	public boolean hasStaffPerm(StaffPerm perm) {
 		return staffPerm.contains(perm);

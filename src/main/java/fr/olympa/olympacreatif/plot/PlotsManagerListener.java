@@ -1,8 +1,11 @@
 package fr.olympa.olympacreatif.plot;
 
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class PlotsManagerListener implements Listener {
@@ -19,9 +22,19 @@ public class PlotsManagerListener implements Listener {
 		if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ())
 			return;
 		
+		tryToRegisterPlot(e.getFrom(), e.getTo());
+	}
+	
+	@EventHandler 
+	public void onTpEvent(PlayerTeleportEvent e){
+		tryToRegisterPlot(e.getFrom(), e.getTo());
+	}
+	
+	private void tryToRegisterPlot(Location oldLoc, Location newLoc) {
+		
 		//si l'ancien/nouveau plot sont égaux, return, sinon chargement du plot
-		PlotId oldId = PlotId.fromLoc(plugin, e.getFrom());
-		PlotId newId = PlotId.fromLoc(plugin, e.getTo());
+		PlotId oldId = PlotId.fromLoc(plugin, oldLoc);
+		PlotId newId = PlotId.fromLoc(plugin, newLoc);
 		
 		if (newId != null && !newId.equals(oldId))
 			plugin.getPlotsManager().loadExistingPlot(newId);

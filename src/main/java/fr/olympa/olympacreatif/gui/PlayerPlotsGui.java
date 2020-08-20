@@ -23,7 +23,7 @@ public class PlayerPlotsGui extends IGui {
 	private List<Plot> playerPlots = new ArrayList<Plot>();
 	
 	public PlayerPlotsGui(IGui gui) {
-		super(gui, "Plots du joueur " + gui.getPlayer().getName(), 5);
+		super(gui, "Plots du joueur " + gui.getPlayer().getName(), gui.getPlayer().getPlots(false).size()/9 + 2);
 		
 		playerPlots = p.getPlots(false);
 		

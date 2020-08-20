@@ -1,26 +1,17 @@
 package fr.olympa.olympacreatif.plot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
-import org.bukkit.block.Biome;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
@@ -34,28 +25,17 @@ public class PlotParameters {
 		this.id = id;
 		
 		for (PlotParamType type : PlotParamType.values())
-			parameters.put(type, type.getDefaultValue());
+			setParameter(type, type.getDefaultValue());
 		
 		if (id != null)
-			for (PlotParamType param : PlotParamType.values())
-				switch (param) {
-				case SPAWN_LOC_X:
-					parameters.put(param, id.getLocation().getBlockX());
-					break;
-					
-				case SPAWN_LOC_Y:
-					parameters.put(param, id.getLocation().getBlockY());
-					break;
-					
-				case SPAWN_LOC_Z:
-					parameters.put(param, id.getLocation().getBlockZ());
-					break;
-				}
+			setSpawnLoc(id.getLocation());
 	}
 
 	
-	public void setParameter(PlotParamType param, Object value) {
+	synchronized public void setParameter(PlotParamType param, Object value) {
 		parameters.put(param, value);
+		if (param == PlotParamType.SPAWN_LOC_X || param == PlotParamType.SPAWN_LOC_Y || param == PlotParamType.SPAWN_LOC_Z)
+			Bukkit.broadcastMessage("set " + param  + " to " + value + " for plot " + id);
 	}
 	
 	public Object getParameter(PlotParamType param) {
@@ -67,17 +47,17 @@ public class PlotParameters {
 	
 	public Location getSpawnLoc(OlympaCreatifMain plugin) {
 		return new Location(plugin.getWorldManager().getWorld(), 
-				(int)parameters.get(PlotParamType.SPAWN_LOC_X), 
-				(int)parameters.get(PlotParamType.SPAWN_LOC_Y), 
-				(int)parameters.get(PlotParamType.SPAWN_LOC_Z));
+				(int)getParameter(PlotParamType.SPAWN_LOC_X), 
+				(int)getParameter(PlotParamType.SPAWN_LOC_Y), 
+				(int)getParameter(PlotParamType.SPAWN_LOC_Z));
 	}
 	
 	
 	public void setSpawnLoc(Location loc) {
 		if (id.isInPlot(loc)) {
-			parameters.put(PlotParamType.SPAWN_LOC_X, loc.getBlockX());
-			parameters.put(PlotParamType.SPAWN_LOC_Y, loc.getBlockY());
-			parameters.put(PlotParamType.SPAWN_LOC_Z, loc.getBlockZ());	
+			setParameter(PlotParamType.SPAWN_LOC_X, loc.getBlockX());
+			setParameter(PlotParamType.SPAWN_LOC_Y, loc.getBlockY());
+			setParameter(PlotParamType.SPAWN_LOC_Z, loc.getBlockZ());	
 		}
 	}
 	
@@ -121,15 +101,11 @@ public class PlotParameters {
 					else if (type == PlotParamType.GAMEMODE_INCOMING_PLAYERS)
 						if (EnumUtils.isValidEnum(GameMode.class, (String)json.get(key)))
 							params.setParameter(type, GameMode.valueOf((String)json.get(key)));
-						else
-							params.setParameter(type, GameMode.CREATIVE);
 					
 					//gestion météo
 					else if (type == PlotParamType.PLOT_WEATHER)
 						if (EnumUtils.isValidEnum(WeatherType.class, (String)json.get(key)))
 							params.setParameter(type, WeatherType.valueOf((String)json.get(key)));
-						else
-							params.setParameter(type, WeatherType.CLEAR);
 					
 					//gestion listes
 					else if (type.getType().equals(List.class)) {
@@ -146,7 +122,7 @@ public class PlotParameters {
 							//gestion interractions autorisées
 							else if (type == PlotParamType.LIST_ALLOWED_INTERRACTION)
 								if (Material.getMaterial(args[i]) != null)
-									((List<Material>)params.getParameter(PlotParamType.BANNED_PLAYERS)).add(Material.getMaterial(args[i]));
+									((List<Material>)params.getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(Material.getMaterial(args[i]));
 						}
 					}
 						

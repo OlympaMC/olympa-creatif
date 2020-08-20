@@ -18,6 +18,8 @@ public class PermissionsList {
 	public static final OlympaPermission STAFF_BYPASS_WORLDEDIT = new OlympaPermission(OlympaGroup.DEV);
 	public static final OlympaPermission STAFF_PLOT_OWNER_EVERYWHERE = new OlympaPermission(OlympaGroup.DEV);
 	
+	public static final OlympaPermission TPA = new OlympaPermission(OlympaGroup.PLAYER);
+	
 	 
 	/*nb de plots propriétaire :
 	 * Joueur : 1
