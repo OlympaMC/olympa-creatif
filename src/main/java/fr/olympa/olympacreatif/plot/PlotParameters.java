@@ -1,5 +1,7 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +36,8 @@ public class PlotParameters {
 	
 	synchronized public void setParameter(PlotParamType param, Object value) {
 		parameters.put(param, value);
-		if (param == PlotParamType.SPAWN_LOC_X || param == PlotParamType.SPAWN_LOC_Y || param == PlotParamType.SPAWN_LOC_Z)
-			Bukkit.broadcastMessage("set " + param  + " to " + value + " for plot " + id);
+		//if (param == PlotParamType.SPAWN_LOC_X || param == PlotParamType.SPAWN_LOC_Y || param == PlotParamType.SPAWN_LOC_Z)
+			//Bukkit.broadcastMessage("set " + param  + " to " + value + " for plot " + id);
 	}
 	
 	public Object getParameter(PlotParamType param) {
@@ -74,7 +76,7 @@ public class PlotParameters {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static PlotParameters fromJson(PlotId plotId, String jsonString) {
+	public synchronized static PlotParameters fromJson(PlotId plotId, String jsonString) {
 
 		PlotParameters params = new PlotParameters(plotId);
 		
@@ -98,18 +100,22 @@ public class PlotParameters {
 						}
 					
 					//gestion gamemode
-					else if (type == PlotParamType.GAMEMODE_INCOMING_PLAYERS)
+					else if (type == PlotParamType.GAMEMODE_INCOMING_PLAYERS) {
 						if (EnumUtils.isValidEnum(GameMode.class, (String)json.get(key)))
-							params.setParameter(type, GameMode.valueOf((String)json.get(key)));
+							params.setParameter(type, GameMode.valueOf((String)json.get(key)));	
+					}
 					
 					//gestion météo
-					else if (type == PlotParamType.PLOT_WEATHER)
+					else if (type == PlotParamType.PLOT_WEATHER) {
 						if (EnumUtils.isValidEnum(WeatherType.class, (String)json.get(key)))
-							params.setParameter(type, WeatherType.valueOf((String)json.get(key)));
+							params.setParameter(type, WeatherType.valueOf((String)json.get(key)));	
+					}
 					
 					//gestion listes
 					else if (type.getType().equals(List.class)) {
-						String[] args = ((String)json.get(key)).substring(1, ((String)json.get(key)).length() - 1).split(",");
+						String[] args = ((String)json.get(key)).substring(1, ((String)json.get(key)).length() - 1).replace(" ", "").split(",");
+						
+						//Bukkit.broadcastMessage("param " + type + " : " + Arrays.asList(args));
 						
 						for (int i = 0 ; i < args.length ; i++) {
 							//gestion joueurs bannis du plot
@@ -125,7 +131,6 @@ public class PlotParameters {
 									((List<Material>)params.getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(Material.getMaterial(args[i]));
 						}
 					}
-						
 				}
 			
 			return params;

@@ -69,16 +69,42 @@ public class ShopGui extends IGui{
 		upgradesRowHead = ItemUtils.skullCustom("§6Améliorations", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODA3M2FlNTQ3ZTZkYWE5ZDJkYzhjYjkwZTc4ZGQxYzcxY2RmYWRiNzQwMWRjMTY3ZDE2ODE5YjE3MzI4M2M1MSJ9fX0=");
 		
 		//init rangs
-		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CONSTRUCTOR, 10, ItemUtils.item(Material.IRON_PICKAXE, "§6Grade " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()), "descriptions à faire")));
-		ranks.add(new MarketItemData(p, OlympaGroup.CREA_ARCHITECT, 20, ItemUtils.item(Material.GOLDEN_PICKAXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), "descriptions à faire")));
+		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CONSTRUCTOR, 10, ItemUtils.item(Material.IRON_PICKAXE, "§6Grade " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()), 
+				"§2Ce grade donne accès à :", 
+				" ",
+				"§aPréfixe §3Constructeur " + p.getPlayer().getName(), 
+				"§a+1 parcelle (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 1), 
+				"§aAccès aux microblocks et aux têtes"
+				)));
+		ranks.add(new MarketItemData(p, OlympaGroup.CREA_ARCHITECT, 20, ItemUtils.item(Material.GOLDEN_PICKAXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), 
+				"§2En plus des avantages du niveau précédent,",
+				"§2ce grade donne accès à :",
+				" ",
+				"§aPréfixe §dArchitecte " + p.getPlayer().getName(), 
+				"§a+2 parcelles (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 2),
+				"§aAccès aux commandes WorldEdit",
+				"§aTéléchargement de vos plots en .schematic",
+				"§aAccès au /hat",
+				" ",
+				"§7Le niveau précédent est requis pour acheter ce grade.")));
 		
 		//ajout du grade créateur si les prérequis sont respectés
 		boolean hasAllKits = true;
 		for (KitType kit : KitType.values())
 			if (!p.hasKit(kit) && kit != KitType.ADMIN)
 				hasAllKits = false;
-		if ((p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) || p.getGroups().containsKey(OlympaGroup.CREA_CREATOR)) && hasAllKits)
-			ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 30, ItemUtils.item(Material.DIAMOND_PICKAXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), "descriptions à faire")));
+		if (p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) && hasAllKits)
+			ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 30, ItemUtils.item(Material.DIAMOND_PICKAXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), 
+					"§2En plus des avantages du niveau précédent,",
+					"§2ce grade donne accès à :",
+					" ",
+					"§aAccès à toutes les couleurs dans le chat",
+					"§aMessage quand vous rejoignez le serveur",
+					" ",
+					"§6Mais avant tout, nous vous remercions chaleureusement",
+					"§6du soutien que vous nous apportez !",
+					"§6En espérant vous voir encore longtemps parmis nous,",
+					"§4L'équipe dévouée d'Olympa")));
 
 		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 10, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks")));
 		kits.add(new MarketItemData(p, KitType.REDSTONE, 10, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone")));
