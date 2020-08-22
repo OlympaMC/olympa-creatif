@@ -120,7 +120,7 @@ public class TagsValues {
 			tags.put(e.getKey(), new TagParams(nbt, min, max, listType));
 		}
 		
-		//Bukkit.getLogger().log(Level.SEVERE, "après parse config : " + tags.toString());
+		//Bukkit.getLogger().log(Level.SEVERE, tags.toString());
 	}
 	
 	public TagParams getTagParams(String key) {

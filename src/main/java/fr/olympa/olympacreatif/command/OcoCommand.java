@@ -1,42 +1,41 @@
 package fr.olympa.olympacreatif.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.collect.ImmutableList;
+
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
-import fr.olympa.olympacreatif.commandblocks.commands.CmdGive;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
-import fr.olympa.olympacreatif.perks.KitsManager;
-import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
-import fr.olympa.olympacreatif.plot.PlotsManager;
-import fr.olympa.olympacreatif.utils.NbtParserUtil;
-import fr.olympa.olympacreatif.utils.NbtParserUtil.EntitySourceType;
 import fr.olympa.olympacreatif.world.WorldManager;
-import net.minecraft.server.v1_15_R1.IMaterial;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public class OcoCommand extends OlympaCommand {
 
+	public static final List<String> subArgsList = ImmutableList.<String>builder()
+			.add("skull")
+			.add("hat")
+			.add("mb")
+			.add("export")
+			.add("speed")
+			.add("debug")
+			.build();
+	
 	private OlympaCreatifMain plugin;
 	
 	public OcoCommand(OlympaCreatifMain plugin, String cmd, String[] aliases) {
@@ -50,6 +49,8 @@ public class OcoCommand extends OlympaCommand {
 			return false;
 		
 		OlympaPlayerCreatif p = AccountProvider.get(((Player)sender).getUniqueId());
+		
+		args = OcCommand.updatedArgs(label, "oco", args);
 		
 		switch (args.length) {
 		case 1:
@@ -166,17 +167,14 @@ public class OcoCommand extends OlympaCommand {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		
+		args = OcCommand.updatedArgs(label, "oco", args);
+		
 		List<String> list = new ArrayList<String>();
 		List<String> response = new ArrayList<String>();
 		
-		if (args.length == 1) {
-			list.add("skull");
-			list.add("hat");
-			list.add("mb");
-			list.add("export");
-			list.add("speed");
-			list.add("debug");
-		}
+		if (args.length == 1)
+			list.addAll(subArgsList);
 		else if (args.length == 2 && args[0].equals("mb")) {
 			for (Entry<String, ItemStack> e : plugin.getPerksManager().getMicroBlocks().getAllMbs().entrySet())
 				list.add(e.getKey());

@@ -354,7 +354,7 @@ public class WorldEventsListener implements Listener{
 	public static void setWorldEditPerms(OlympaPlayerCreatif p, boolean addPerms) {
 		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
 
-		if (luckperms == null)
+		if (luckperms == null || p == null || p.getPlayer() == null || !p.getPlayer().isOnline())
 			return;
 		
 		User user = luckperms.getUserManager().getUser(p.getPlayer().getUniqueId());
@@ -371,7 +371,7 @@ public class WorldEventsListener implements Listener{
 	public static void setCommandBlockPerms(OlympaPlayerCreatif p, boolean addPerms) {
 		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
 
-		if (luckperms == null)
+		if (luckperms == null || p == null || p.getPlayer() == null || !p.getPlayer().isOnline())
 			return;
 		
 		User user = luckperms.getUserManager().getUser(p.getPlayer().getUniqueId());

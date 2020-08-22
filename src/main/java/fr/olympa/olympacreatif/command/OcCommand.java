@@ -28,6 +28,8 @@ import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcCommand extends OlympaCommand {
+	
+	public static final List<String> subArgsList = new ArrayList<String>();
 
 	private OlympaCreatifMain plugin;
 	private Map<Player, Plot> pendingInvitations = new HashMap<Player, Plot>();
@@ -35,6 +37,19 @@ public class OcCommand extends OlympaCommand {
 	public OcCommand(OlympaCreatifMain plugin, String command, String[] alias) {
 		super(plugin, command, alias);
 		this.plugin = plugin;
+
+		subArgsList.add("help");
+		subArgsList.add("menu");
+		subArgsList.add("find");
+		subArgsList.add("invite");
+		subArgsList.add("accept");
+		subArgsList.add("chat");
+		subArgsList.add("ban");
+		subArgsList.add("unban");
+		subArgsList.add("kick");
+		subArgsList.add("visit");
+		subArgsList.add("setspawn");
+		subArgsList.add("center");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -42,6 +57,8 @@ public class OcCommand extends OlympaCommand {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player))
 			return false;
+		
+		args = updatedArgs(label, "oc", args);
 		
 		Player p = (Player) sender;
 		OlympaPlayerCreatif pc = AccountProvider.get(player.getUniqueId());
@@ -372,26 +389,15 @@ public class OcCommand extends OlympaCommand {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+
+		args = OcCommand.updatedArgs(label, "oc", args);
+		
 		List<String> list = new ArrayList<String>();
 		List<String> response = new ArrayList<String>();
 		
-		switch (args.length) {
-		case 1:
-			list.add("help");
-			list.add("find");
-			list.add("menu");
-			list.add("center");
-			list.add("setspawn");
-			list.add("invite");
-			list.add("accept");
-			list.add("visit");
-			list.add("kick");
-			list.add("ban");
-			list.add("unban");
-			//list.add("protectedarea");
-			list.add("chat");
-			break;
-		case 2:
+		if (args.length == 1)
+			list.addAll(subArgsList);
+		if (args.length == 2) {
 			switch(args[0]) {
 			case "ban":
 				for (Player p : Bukkit.getOnlinePlayers())
@@ -407,21 +413,12 @@ public class OcCommand extends OlympaCommand {
 				for (Player p : Bukkit.getOnlinePlayers())
 					list.add(p.getName());
 				break;
-
+	
 			case "invite":
 				for (Player p : Bukkit.getOnlinePlayers())
 					list.add(p.getName());
 				break;
-
-				/*
-			case "protectedarea":
-				list.add("create");
-				list.add("save");
-				list.add("restore");
-				break;
-				*/
 			}
-			break;
 		}
 
 		for (String s : list)
@@ -429,5 +426,14 @@ public class OcCommand extends OlympaCommand {
 				response.add(s);
 		
 		return response;
+	}
+	
+	public static String[] updatedArgs(String label, String wantedCmd, String[] args) {
+		if (label.equals(wantedCmd))
+			return args;
+		
+		List<String> list = new ArrayList<String>(Arrays.asList(args));
+		list.add(0, label);
+		return (String[]) list.toArray(new String[list.size()]);
 	}
 }

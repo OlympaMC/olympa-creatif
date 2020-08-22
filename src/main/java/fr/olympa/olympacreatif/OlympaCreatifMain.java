@@ -72,10 +72,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		createScoreboard();
 
 		//saveDefaultConfig();
-		new OcCommand(this, "olympacreatif", new String[] { "oc" }).register();
-		//new OceCommand(this, "olympacreatifedit", new String[] { "oce" }).register();
-		new OcoCommand(this, "olympacreatifother", new String[] { "oco" }).register();
-		new OcaCommand(this, "olympacreatifadmin", new String[] { "oca" }).register();
+		new OcCommand(this, "oc", OcCommand.subArgsList.toArray(new String[OcCommand.subArgsList.size()])).register();
+		new OcoCommand(this, "oco", OcoCommand.subArgsList.toArray(new String[OcoCommand.subArgsList.size()])).register();
+		new OcaCommand(this, "oca", new String[] { "oca" }).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.TPA), plugin);
 		

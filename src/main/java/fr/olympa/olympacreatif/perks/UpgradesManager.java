@@ -35,6 +35,7 @@ public class UpgradesManager {
 			.put(4, 10)
 			.put(5, 10)
 			.put(6, 10)
+			.put(7, 10)
 			.build();
 	
 	private static Map<Integer, Integer> membersLevels = ImmutableMap.<Integer, Integer>builder()

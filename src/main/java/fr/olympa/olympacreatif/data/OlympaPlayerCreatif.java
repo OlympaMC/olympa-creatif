@@ -191,15 +191,15 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		if (!onlyOwnedPlots)
 			return PlotsManager.maxPlotsPerPlayer;
 		
-		int i = UpgradeType.BONUS_PLOTS_LEVEL.getValueOf(upgrades.get(UpgradeType.BONUS_PLOTS_LEVEL));
+		int count = UpgradeType.BONUS_PLOTS_LEVEL.getValueOf(upgrades.get(UpgradeType.BONUS_PLOTS_LEVEL));
 
 		if (getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR))
-			i += 1;
+			count += 1;
 
 		if (getGroups().containsKey(OlympaGroup.CREA_ARCHITECT))
-			i += 2;
+			count += 2;
 
-		return i;
+		return count;
 	}
 	
 	public void setCustomScoreboardTitle(String title) {

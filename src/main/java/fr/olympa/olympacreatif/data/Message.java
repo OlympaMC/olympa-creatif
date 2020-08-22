@@ -1,12 +1,13 @@
 package fr.olympa.olympacreatif.data;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 public enum Message {
 
 	CB_INVALID_CMD,
 	CB_NO_COMMANDS_LEFT,
 	CB_RESULT_FAILED,
 	CB_RESULT_SUCCESS,
-	COMMAND_BASIC,
 	COMMAND_HELP,
 	INSUFFICIENT_PLOT_PERMISSION,
 	INVALID_PLOT_ID,
@@ -79,7 +80,7 @@ public enum Message {
 	}
 	
 	public void setValue(String s) {
-		message = s;
+		message = StringEscapeUtils.unescapeJava(s);
 	}
 	
 }

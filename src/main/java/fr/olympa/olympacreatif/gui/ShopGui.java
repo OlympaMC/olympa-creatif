@@ -83,7 +83,7 @@ public class ShopGui extends IGui{
 				"§aPréfixe " + OlympaGroup.CREA_ARCHITECT.getPrefix(p.getGender()) + p.getPlayer().getName(), 
 				"§a+2 parcelles (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 2) + ")",
 				"§aAccès aux commandes WorldEdit",
-				"§aTéléchargement de vos plots en .schematic",
+				"§aExport de vos parcelles en .schematic",
 				"§aAccès au /hat",
 				" ",
 				"§7Le niveau précédent est requis pour acheter ce grade.")));

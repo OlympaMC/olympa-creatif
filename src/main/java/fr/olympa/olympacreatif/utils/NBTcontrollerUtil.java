@@ -2,14 +2,9 @@ package fr.olympa.olympacreatif.utils;
 
 import java.util.HashSet;
 
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
-import org.bukkit.entity.EntityType;
-
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.utils.TagsValues.TagParams;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTBase;
@@ -52,16 +47,20 @@ public abstract class NBTcontrollerUtil {
 			return new NBTTagCompound();		
 		
 		for (String key : new HashSet<String>(tag.getKeys())) {
+			TagParams params = allowedTags.getTagParams(key);
+			
 			//récursivité pour les clés contenant d'autres tags
 			if (tag.get(key) instanceof NBTTagCompound)
-				if (recurIndex < recurIndexMax)
-					tag.set(key, getValidTags(tag.getCompound(key), recurIndex + 1));
+				if (params != null && params.getTagNbtClass().equals(NBTTagCompound.class))
+					continue;
 				else
-					return new NBTTagCompound();
+					if (recurIndex < recurIndexMax)
+						tag.set(key, getValidTags(tag.getCompound(key), recurIndex + 1));
+					else
+						return new NBTTagCompound();
 			
 			//traitement si le tag n'est pas un compound
 			else {
-				TagParams params = allowedTags.getTagParams(key);
 				
 				//Bukkit.broadcastMessage("key : " + key + " - class : " + tag.get(key).getClass().getName() + " - params : " + params);
 				
