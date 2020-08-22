@@ -120,10 +120,7 @@ public class PlotParametersGui extends IGui {
 	
 	@Override
 	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
-		if (slot == inv.getSize() - 1) {
-			MainGui.getMainGui(player);
-			return true;
-		}
+		super.onClick(player, current, slot, click);
 		
 		if (plot.getMembers().getPlayerLevel(player) < 3)
 			return true;

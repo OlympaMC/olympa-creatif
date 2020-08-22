@@ -159,14 +159,14 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			return "§1";
 
 		case 1:
-			plotId = PlotId.fromLoc(this, p.getPlayer().getLocation());
-			if (plotId == null)
+			plot = p.getCurrentPlot();
+			if (plot == null)
 				return "§7Parcelle : §eaucune";
 			else
-				return "§7Parcelle : §e" + plotId;
+				return "§7Parcelle : §e" + plot;
 
 		case 2:
-			plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
+			plot = p.getCurrentPlot();
 			if (plot == null)
 				return "§7Proprio : §eaucun";
 			else
@@ -179,7 +179,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			return "§7Grade : " + p.getGroupNameColored();
 
 		case 5:
-			plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
+			plot = p.getCurrentPlot();
 			if (plot == null)
 				return "§7Rang : " + PlotRank.VISITOR.getRankName();
 			else
@@ -192,10 +192,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			return "§7" + p.getGameMoneyName() + " : §6" + p.getGameMoney() + p.getGameMoneySymbol();
 
 		case 8:
-			plotId = PlotId.fromLoc(this, p.getPlayer().getLocation());
+			plot = p.getCurrentPlot();
 
-			if (p.getCustomScoreboardLines().size() > 0 && plotId != null)
-				return "§8Sidebar plot " + plotId;
+			if (p.getCustomScoreboardLines().size() > 0 && plot != null)
+				return "§8Sidebar plot " + plot;
 			else
 				return "§4";
 		}

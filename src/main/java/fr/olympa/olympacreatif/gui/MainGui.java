@@ -22,7 +22,7 @@ import fr.olympa.olympacreatif.plot.PlotsManager;
 
 public class MainGui extends IGui {
 	
-	private MainGui(OlympaCreatifMain plugin, Player player, Plot plot, String inventoryName) {
+	private MainGui(OlympaCreatifMain plugin, OlympaPlayerCreatif player, Plot plot, String inventoryName) {
 		super(plugin, player, plot, inventoryName, 6); 
 		
 		String clickToOpenMenu = "§9Cliquez pour ouvrir le menu";
@@ -45,7 +45,7 @@ public class MainGui extends IGui {
 		Consumer<ItemStack> consumer = sk -> {
 			//Bukkit.broadcastMessage("tête chargée : " + sk.toString());
 			
-			sk = ItemUtils.name(sk, "§6Paramètres de " + player.getDisplayName());
+			sk = ItemUtils.name(sk, "§6Paramètres de " + p.getName());
 			sk = ItemUtils.lore(sk, clickToOpenMenu);
 			inv.setItem(12, sk);
 			
@@ -170,12 +170,11 @@ public class MainGui extends IGui {
 	}
 	
 	//open main gui
-	public static MainGui getMainGui(Player p) {
-		Plot plot = OlympaCreatifMain.getMainClass().getPlotsManager().getPlot(p.getLocation());
-		return getMainGui(p, plot);
+	public static MainGui getMainGui(OlympaPlayerCreatif p) {
+		return getMainGui(p, p.getCurrentPlot());
 	}
 
-	public static MainGui getMainGui(Player p, String stringPlotId) {
+	public static MainGui getMainGui(OlympaPlayerCreatif p, String stringPlotId) {
 		
 		Plot plot = null;
 		
@@ -187,11 +186,11 @@ public class MainGui extends IGui {
 		return getMainGui(p, plot);
 	}
 	
-	public static MainGui getMainGui(Player p, IGui gui) {
+	public static MainGui getMainGui(OlympaPlayerCreatif p, IGui gui) {
 		return getMainGui(p, gui.getPlot());
 	}
 	
-	public static MainGui getMainGui(Player p, Plot plot) {
+	public static MainGui getMainGui(OlympaPlayerCreatif p, Plot plot) {
 		if (plot == null)
 			return new MainGui(OlympaCreatifMain.getMainClass(), p, null, "Menu");
 		else

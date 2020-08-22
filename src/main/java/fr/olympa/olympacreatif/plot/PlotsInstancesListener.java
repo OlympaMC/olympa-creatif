@@ -380,27 +380,33 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	@SuppressWarnings("unchecked")
-	@EventHandler //modifie la destination téléport si joueur banni du plot
+	@EventHandler(priority = EventPriority.LOWEST) //modifie la destination téléport si joueur banni du plot
 	public void onTeleportEvent(PlayerTeleportEvent e) {
-		Player p = e.getPlayer();
 		
 		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
 		Plot plotTo = plugin.getPlotsManager().getPlot(e.getTo());
+		
+		((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).setCurrentPlot(plotTo);
 		
 		if (plotFrom != null && plotFrom.equals(plotTo))
 			return;
 		
 		if (plotFrom != null) 
-			executeExitActions(plugin, p, plotFrom);
-		
+			executeExitActions(plugin, e.getPlayer(), plotFrom);
+
+		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 
 		if (plotTo != null) 
-			if (!executeEntryActions(plugin, p, plotTo))
+			if (!executeEntryActions(plugin, e.getPlayer(), plotTo))
 				e.setTo(plotTo.getOutLoc());
+			else
+				p.setCurrentPlot(plotTo);
+		else
+			p.setCurrentPlot(plotTo);
 	}
 	
 	@SuppressWarnings("unchecked")
-	@EventHandler //actions à effectuer lors de la sortie/entrée d'un joueur
+	@EventHandler(priority = EventPriority.LOWEST) //actions à effectuer lors de la sortie/entrée d'un joueur
 	public void onPlayerMove(PlayerMoveEvent e) {
 		if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ())
 			return;
@@ -412,10 +418,16 @@ public class PlotsInstancesListener implements Listener{
 		if (plotTo == plotFrom)
 			return;
 
+		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
+		
 		//expulse les joueurs bannis & actions d'entrée de plot
 		if (plotTo != null) 
 			if (!executeEntryActions(plugin, e.getPlayer(), plotTo)) 
 				plotTo.teleportOut(e.getPlayer());
+			else
+				p.setCurrentPlot(plotTo);
+		else
+			p.setCurrentPlot(plotTo);
 			
 		//actions de sortie de plot
 		if (plotFrom != null) 

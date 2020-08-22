@@ -17,8 +17,11 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.event.platform.PlayerInputEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.internal.cui.SelectionPointEvent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.eventbus.EventHandler;
@@ -66,6 +69,24 @@ public class WorldEditListener extends EventHandler implements Listener {
 					plugin.getWorldEditManager().getSession(p).clearHistory();
 			}
 		}.runTaskTimer(plugin, 0, 5);*/
+	}
+	
+	@org.bukkit.event.EventHandler //cancel copy si joueur essaie de copier dans un plot qui n'est pas à lui
+	public void onCopyCmd(PlayerCommandPreprocessEvent e) {
+		if (!e.getMessage().contains("/copy"))
+			return;
+		
+		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
+		
+		if (p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot == null || plot.getMembers().getPlayerRank(p) == PlotRank.VISITOR || !plot.equals(p.getCurrentPlot())) {
+			e.setCancelled(true);
+			e.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue());
+		}
 	}
 
 	/*
@@ -145,7 +166,7 @@ public class WorldEditListener extends EventHandler implements Listener {
 	*/
 	
 	@Subscribe //handle WE place block event
-	public void onEditSession(EditSessionEvent e) {
+	public void onEditSessionEvent(EditSessionEvent e) {
 		e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
 
 	        @Override

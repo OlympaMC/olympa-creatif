@@ -70,7 +70,7 @@ public class PlayerPlotsGui extends IGui {
 				player.teleport(playerPlots.get(slot).getParameters().getSpawnLoc(plugin));
 				player.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(slot)));	
 			}else if (click == ClickType.RIGHT) {
-				MainGui.getMainGui(player, playerPlots.get(slot)).create(player);
+				MainGui.getMainGui(p, playerPlots.get(slot)).create(player);
 			}
 		}
 		

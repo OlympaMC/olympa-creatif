@@ -92,7 +92,7 @@ public class OcCommand extends OlympaCommand {
 				
 			case "menu":
 				if (sender instanceof Player) 
-					MainGui.getMainGui(p).create(p);
+					MainGui.getMainGui(pc).create(p);
 				break;
 				
 			case "accept":
@@ -198,7 +198,7 @@ public class OcCommand extends OlympaCommand {
 			
 		case "menu":
 			if (sender instanceof Player) 
-				MainGui.getMainGui((Player) sender, args[1]).create((Player)sender);
+				MainGui.getMainGui(pc, args[1]).create((Player)sender);
 			break;
 				
 			case "visit":

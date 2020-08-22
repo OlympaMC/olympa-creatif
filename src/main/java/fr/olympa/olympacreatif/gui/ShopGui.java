@@ -105,17 +105,82 @@ public class ShopGui extends IGui{
 					"§6Mais avant tout, nous vous remercions chaleureusement",
 					"§6du soutien que vous nous apportez !",
 					"§6En espérant vous voir encore longtemps parmis nous,",
-					"§4L'équipe dévouée d'Olympa")));
+					"§cL'équipe dévouée d'Olympa")));
 
-		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 10, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks")));
-		kits.add(new MarketItemData(p, KitType.REDSTONE, 10, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone")));
-		kits.add(new MarketItemData(p, KitType.FLUIDS, 10, ItemUtils.item(Material.WATER_BUCKET, "§6Kit fluides")));
-		kits.add(new MarketItemData(p, KitType.PEACEFUL_MOBS, 10, ItemUtils.item(Material.PIG_SPAWN_EGG, "§6Kit animaux")));
-		kits.add(new MarketItemData(p, KitType.HOSTILE_MOBS, 10, ItemUtils.item(Material.CREEPER_SPAWN_EGG, "§6Kit monstres")));
+		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 10, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks", 
+				"§2Caractéristiques :",
+				" ",
+				"§aCe kit vous permet d'§eutiliser les",
+				"§ecommandblocks sur vos parcelles. La liste des",
+				"§acommandes disponibles se trouve sur le forum.",
+				" ",
+				"§eAttention, le nombre de commandes par seconde (CPS)",
+				"§eest limité pour éviter les lags sur le serveur.",
+				"§eSi vous avez besoin de plus de CPS, achetez",
+				"§el'amélioration correspondante.",
+				" ",
+				"§7Pour voir votre consommation de CPS : /oco debug")));
+		
+		kits.add(new MarketItemData(p, KitType.REDSTONE, 10, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone",
+				"§2Caractéristiques :",
+				" ",
+				"§aCe kit vous permet d'utiliser tous les blocs",
+				"§aliés à la §eredstone§a, sur toutes les parcelles, ",
+				"§ay compris celles où vous n'êtes pas propriétaire.",
+				" ",
+				"§7Les machines à lag sont interdites. En cas d'abus,",
+				"§7les courant de redstone se bloqueront sur la parcelle.")));
+		
+		kits.add(new MarketItemData(p, KitType.FLUIDS, 10, ItemUtils.item(Material.WATER_BUCKET, "§6Kit fluides",
+		"§2Caractéristiques :",
+		" ",
+		"§aCe kit permet aux fluides (eau et lave) de couler sur",
+		"§avos parcelles, au lieu de rester statique.",
+		" ",
+		"§7Les machines à lag sont interdites. En cas d'abus,",
+		"§7les fluides se bloqueront sur la parcelle.")));
+		
+		kits.add(new MarketItemData(p, KitType.PEACEFUL_MOBS, 10, ItemUtils.item(Material.PIG_SPAWN_EGG, "§6Kit animaux",
+				"§2Caractéristiques :",
+				" ",
+				"§aCe kit vous permet d'utiliser tous les oeufs d'animaux",
+				"§asur toutes les parcelles où vous êtes au minimum membre.",
+				"§aCe kit permet également l'utilisation de tags sur les oeufs.",
+				" ",
+				"§7Les machines à lag sont interdites. En cas d'abus,",
+				"§7entités n'apparaîtront plus sur la parcelle.")));
+		
+		kits.add(new MarketItemData(p, KitType.HOSTILE_MOBS, 10, ItemUtils.item(Material.CREEPER_SPAWN_EGG, "§6Kit monstres",
+				"§2Caractéristiques :",
+				" ",
+				"§aCe kit vous permet d'utiliser tous les oeufs de monstre",
+				"§asur toutes les parcelles où vous êtes au minimum membre.",
+				"§aCe kit permet également l'utilisation de tags sur les oeufs.",
+				" ",
+				"§7Les machines à lag sont interdites. En cas d'abus,",
+				"§7entités n'apparaîtront plus sur la parcelle.")));
 
-		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_PLOTS_LEVEL, 0, ItemUtils.item(Material.GRASS_BLOCK, "§6Augmentation du nombre de parcelles")));
-		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_MEMBERS_LEVEL, 0, ItemUtils.item(Material.ACACIA_DOOR, "§6Augmentation nombre membres par parcelle")));
-		upgrades.add(new MarketItemData(p, UpgradeType.CB_LEVEL, 0, ItemUtils.item(Material.REPEATING_COMMAND_BLOCK, "§6Augmentation CPS commandblocks")));
+		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_PLOTS_LEVEL, 0, ItemUtils.item(Material.GRASS_BLOCK, "§6Augmentation du nombre de parcelles",
+				"§2Contenu :",
+				" ",
+				"§aCette amélioration augmente le nombre de parcelles",
+				"§asur lesquelles vous êtes propriétaire.")));
+		
+		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_MEMBERS_LEVEL, 0, ItemUtils.item(Material.ACACIA_DOOR, "§6Augmentation nombre membres par parcelle",
+				"§2Contenu :",
+				" ",
+				"§aCette amélioration augmente le nombre de membres que",
+				"§avous pouvez recruter sur vos parcelles.")));
+		
+		upgrades.add(new MarketItemData(p, UpgradeType.CB_LEVEL, 0, ItemUtils.item(Material.REPEATING_COMMAND_BLOCK, "§6Augmentation CPS commandblocks",
+				"§2Contenu :",
+				" ",
+				"§aCette amélioration augmente le nombre de",
+				"§acommandes par seconde que les commandblocks",
+				"§ade vos parcelles pourront exécuter.",
+				" ",
+				"§7Attention : cette amélioration est inutile si",
+				"§7vous n'avez pas acheté le kit commandblocks !")));
 		
 		//CREATION GUI
 		

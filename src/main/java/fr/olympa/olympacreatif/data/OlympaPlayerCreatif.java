@@ -63,6 +63,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	private List<StaffPerm> staffPerm = new ArrayList<StaffPerm>();
 	
+	private Plot currentPlot = null;
+	
 	public OlympaPlayerCreatif(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
 		this.plugin = OlympaCreatifMain.getMainClass();
@@ -253,6 +255,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	public String getGameMoneySymbol() {
 		return "K";
+	}
+	
+	public Plot getCurrentPlot() {
+		return currentPlot;
+	}
+	
+	public void setCurrentPlot(Plot plot) {
+		currentPlot = plot;
 	}
 	
 	public boolean hasStaffPerm(StaffPerm perm) {
