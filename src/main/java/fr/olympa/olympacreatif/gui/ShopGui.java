@@ -72,7 +72,7 @@ public class ShopGui extends IGui{
 		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CONSTRUCTOR, 10, ItemUtils.item(Material.IRON_PICKAXE, "§6Grade " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()), 
 				"§2Ce grade donne accès à :", 
 				" ",
-				"§aPréfixe " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()) + " " + p.getPlayer().getName(),  
+				"§aPréfixe " + OlympaGroup.CREA_CONSTRUCTOR.getPrefix(p.getGender()) + p.getPlayer().getName(),  
 				"§a+1 parcelle (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 1) + ")", 
 				"§aAccès aux microblocks et aux têtes"
 				)));
@@ -80,7 +80,7 @@ public class ShopGui extends IGui{
 				"§2En plus des avantages du niveau précédent,",
 				"§2ce grade donne accès à :",
 				" ",
-				"§aPréfixe " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()) + " " + p.getPlayer().getName(), 
+				"§aPréfixe " + OlympaGroup.CREA_ARCHITECT.getPrefix(p.getGender()) + p.getPlayer().getName(), 
 				"§a+2 parcelles (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 2) + ")",
 				"§aAccès aux commandes WorldEdit",
 				"§aTéléchargement de vos plots en .schematic",
@@ -98,12 +98,12 @@ public class ShopGui extends IGui{
 					"§2En plus des avantages du niveau précédent,",
 					"§2ce grade donne accès à :",
 					" ",
-					"§aPréfixe " + OlympaGroup.CREA_CREATOR.getName(p.getGender()) + " " + p.getPlayer().getName(), 
+					"§aPréfixe " + OlympaGroup.CREA_CREATOR.getPrefix(p.getGender()) + p.getPlayer().getName(), 
 					"§aAccès à toutes les couleurs dans le chat",
 					"§aMessage quand vous rejoignez le serveur",
 					" ",
-					"§6Mais avant tout, nous vous remercions chaleureusement",
-					"§6du soutien que vous nous apportez !",
+					"§6Mais avant tout, nous vous remercions",
+					"§6chaleureusementdu soutien que vous nous apportez !",
 					"§6En espérant vous voir encore longtemps parmis nous,",
 					"§cL'équipe dévouée d'Olympa")));
 
@@ -111,76 +111,92 @@ public class ShopGui extends IGui{
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'§eutiliser les",
-				"§ecommandblocks sur vos parcelles. La liste des",
-				"§acommandes disponibles se trouve sur le forum.",
+				"§ecommandblocks §asur vos parcelles.",
+				"§aLa liste des commandes disponibles", 
+				"§ase trouve sur le forum.",
 				" ",
-				"§eAttention, le nombre de commandes par seconde (CPS)",
-				"§eest limité pour éviter les lags sur le serveur.",
-				"§eSi vous avez besoin de plus de CPS, achetez",
-				"§el'amélioration correspondante.",
+				"§7Attention, les commandes par seconde (CPS)",
+				"§7sont limitées pour éviter les lags.",
+				"§7Si vous avez besoin de plus de CPS",
+				"§7achetez l'amélioration correspondante.",
 				" ",
 				"§7Pour voir votre consommation de CPS : /oco debug")));
 		
 		kits.add(new MarketItemData(p, KitType.REDSTONE, 10, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone",
 				"§2Caractéristiques :",
 				" ",
-				"§aCe kit vous permet d'utiliser tous les blocs",
-				"§aliés à la §eredstone§a, sur toutes les parcelles, ",
-				"§ay compris celles où vous n'êtes pas propriétaire.",
+				"§aCe kit vous permet d'utiliser",
+				"§atous les blocsliés à la §eredstone§a,", 
+				"§asur toutes les parcelles, y compris",
+				"§acelles où vous n'êtes pas propriétaire.",
 				" ",
-				"§7Les machines à lag sont interdites. En cas d'abus,",
-				"§7les courant de redstone se bloqueront sur la parcelle.")));
+				"§7Les machines à lag sont interdites. ", 
+				"§7En cas d'abus, les courant de redstone",
+				"§7se bloqueront sur la parcelle.")));
 		
 		kits.add(new MarketItemData(p, KitType.FLUIDS, 10, ItemUtils.item(Material.WATER_BUCKET, "§6Kit fluides",
-		"§2Caractéristiques :",
-		" ",
-		"§aCe kit permet aux fluides (eau et lave) de couler sur",
-		"§avos parcelles, au lieu de rester statique.",
-		" ",
-		"§7Les machines à lag sont interdites. En cas d'abus,",
-		"§7les fluides se bloqueront sur la parcelle.")));
+				"§2Caractéristiques :",
+				" ",
+				"§aCe kit permet à l'§eeau et à la lave", 
+				"§ade couler sur vos parcelles,",
+				"§aau lieu de rester statique.",
+				" ",
+				"§7Les machines à lag sont interdites. ", 
+				"§7En cas d'abus, les fluides arrêteront",
+				"§7de couler sur la parcelle.")));
 		
 		kits.add(new MarketItemData(p, KitType.PEACEFUL_MOBS, 10, ItemUtils.item(Material.PIG_SPAWN_EGG, "§6Kit animaux",
 				"§2Caractéristiques :",
 				" ",
-				"§aCe kit vous permet d'utiliser tous les oeufs d'animaux",
-				"§asur toutes les parcelles où vous êtes au minimum membre.",
-				"§aCe kit permet également l'utilisation de tags sur les oeufs.",
+				"§aCe kit vous permet d'utiliser tous les ",
+				"§eoeufs d'animaux §asur toutes les parcelles", 
+				"§aoù vous êtes au minimum membre.",
 				" ",
-				"§7Les machines à lag sont interdites. En cas d'abus,",
-				"§7entités n'apparaîtront plus sur la parcelle.")));
+				"§eCe kit permet également l'utilisation", 
+				"§ede tags sur les oeufs.",
+				" ",
+				"§7Les machines à lag sont interdites. ", 
+				"§7En cas d'abus, les entités",
+				"§7n'apparaîtront plus sur la parcelle.")));
 		
 		kits.add(new MarketItemData(p, KitType.HOSTILE_MOBS, 10, ItemUtils.item(Material.CREEPER_SPAWN_EGG, "§6Kit monstres",
 				"§2Caractéristiques :",
 				" ",
-				"§aCe kit vous permet d'utiliser tous les oeufs de monstre",
-				"§asur toutes les parcelles où vous êtes au minimum membre.",
-				"§aCe kit permet également l'utilisation de tags sur les oeufs.",
+				"§aCe kit vous permet d'utiliser tous les ",
+				"§eoeufs de monstres §asur toutes les parcelles", 
+				"§aoù vous êtes au minimum membre.",
 				" ",
-				"§7Les machines à lag sont interdites. En cas d'abus,",
-				"§7entités n'apparaîtront plus sur la parcelle.")));
+				"§eCe kit permet également l'utilisation", 
+				"§ede tags sur les oeufs.",
+				" ",
+				"§7Les machines à lag sont interdites. ", 
+				"§7En cas d'abus, les entités",
+				"§7n'apparaîtront plus sur la parcelle.")));
 
 		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_PLOTS_LEVEL, 0, ItemUtils.item(Material.GRASS_BLOCK, "§6Augmentation du nombre de parcelles",
 				"§2Contenu :",
 				" ",
-				"§aCette amélioration augmente le nombre de parcelles",
-				"§asur lesquelles vous êtes propriétaire.")));
+				"§aCette amélioration augmente le",
+				"§anombre de parcelles sur lesquelles",
+				"§avous êtes propriétaire.")));
 		
 		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_MEMBERS_LEVEL, 0, ItemUtils.item(Material.ACACIA_DOOR, "§6Augmentation nombre membres par parcelle",
 				"§2Contenu :",
 				" ",
-				"§aCette amélioration augmente le nombre de membres que",
-				"§avous pouvez recruter sur vos parcelles.")));
+				"§aCette amélioration augmente le", 
+				"§anombre de membres que vous pouvez",
+				"§arecruter sur vos parcelles.")));
 		
 		upgrades.add(new MarketItemData(p, UpgradeType.CB_LEVEL, 0, ItemUtils.item(Material.REPEATING_COMMAND_BLOCK, "§6Augmentation CPS commandblocks",
 				"§2Contenu :",
 				" ",
-				"§aCette amélioration augmente le nombre de",
-				"§acommandes par seconde que les commandblocks",
-				"§ade vos parcelles pourront exécuter.",
+				"§aCette amélioration augmente le",
+				"§anombre de commandes par seconde", 
+				"§aque les commandblocks de vos",
+				"§aparcelles pourront exécuter.",
 				" ",
 				"§7Attention : cette amélioration est inutile si",
-				"§7vous n'avez pas acheté le kit commandblocks !")));
+				"§7vous n'avez pas acheté le §6kit commandblocks §7!")));
 		
 		//CREATION GUI
 		
@@ -378,14 +394,37 @@ public class ShopGui extends IGui{
 						itemHolder = addInvisibleEnchant(itemHolder);
 						isBuyable = false;	
 					}
+
+					int oldValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy));
+					int newValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1);
+
+					if (toBuy == UpgradeType.CB_LEVEL) {
+						oldValue *= 20;
+						newValue *= 20;
+					}
+
+					String oldV = Integer.toString(oldValue);
+					String newV = Integer.toString(newValue);
 					
+					if (oldValue == newValue)
+						newV = "§7maximum atteint";
+					
+					itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + oldV + " ➔ " + newV);
+					
+					/*
 					if (isBuyable)
-						itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
-								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ➔ " + 
-								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1));
+						if (toBuy == UpgradeType.CB_LEVEL)
+							itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
+									((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) * 20 + " ➔ " + 
+									((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1) * 20);
+						else
+							itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
+									((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ➔ " + 
+									((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1));
 					else
 						itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
 								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ➔ §7maximum atteint");
+								*/
 			}
 
 			itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§ePrix : " + price);
