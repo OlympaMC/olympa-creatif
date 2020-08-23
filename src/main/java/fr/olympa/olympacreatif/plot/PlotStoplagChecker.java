@@ -89,7 +89,8 @@ public class PlotStoplagChecker {
 		PISTON(60, "pistons"),
 		LAMP(80, "lampes de redstone"),
 		LIQUID(1000, "liquides fluides"), 
-		ENTITY(50, "spawn entités"),
+		ENTITY(50, "spawn entités"), 
+		WIRE(5000, "fil de redstone"),
 		;
 		
 		int max;

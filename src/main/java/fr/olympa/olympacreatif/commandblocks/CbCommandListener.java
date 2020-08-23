@@ -123,8 +123,8 @@ public class CbCommandListener implements Listener {
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		 
 		//si la commandes est un trigger, ou si le joueur a la perm d'exécuter cette commande (selon kit et type cmd)
-		if (cmd.getType() == CommandType.trigger ||
-				cmd.getPlot().getMembers().getPlayerLevel(p) >= cmd.getMinPlotLevelToExecute() && (p.hasKit(KitType.COMMANDBLOCK) || cmd.getType() == CommandType.give))
+		if ((cmd.getPlot().getMembers().getPlayerLevel(p) >= cmd.getMinPlotLevelToExecute() && p.hasKit(KitType.COMMANDBLOCK)) || 
+				cmd.getType() == CommandType.give || cmd.getType() == CommandType.trigger)
 			executeCommandBlockCommand(cmd, e.getPlayer());
 		else
 			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());

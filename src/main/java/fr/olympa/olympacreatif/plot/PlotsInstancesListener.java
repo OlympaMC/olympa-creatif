@@ -318,7 +318,7 @@ public class PlotsInstancesListener implements Listener{
 					
 					e.getItem().setType(Material.DISPENSER);
 				}
-			}else if (e.getAction() == Action.LEFT_CLICK_BLOCK) {
+			}else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() == Material.WOODEN_AXE)) {
 				if (commandBlockTypes.contains(e.getClickedBlock().getType()))
 					e.getClickedBlock().setType(Material.AIR);
 			}
@@ -685,6 +685,8 @@ public class PlotsInstancesListener implements Listener{
 				e.setNewCurrent(0);
 			else if (e.getBlock().getType() == Material.REDSTONE_LAMP)
 				plot.getStoplagChecker().addEvent(StopLagDetect.LAMP);
+			else if (e.getBlock().getType() == Material.REDSTONE_WIRE)
+				plot.getStoplagChecker().addEvent(StopLagDetect.WIRE);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH) //si spawn d'entité, ajout à la liste des entités du plot
