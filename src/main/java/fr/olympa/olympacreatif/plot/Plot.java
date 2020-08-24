@@ -1,38 +1,27 @@
 package fr.olympa.olympacreatif.plot;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
-
-import fr.olympa.api.groups.OlympaGroup;
-import fr.olympa.api.player.OlympaPlayerInformations;
-import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.CbBossBar;
-import fr.olympa.olympacreatif.commandblocks.CbTeam;
-import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
-import net.minecraft.server.v1_15_R1.TileEntity;
 
 public class Plot {
 
@@ -46,7 +35,7 @@ public class Plot {
 	private PlotStoplagChecker stoplagChecker;
 	
 	private Set<Player> playersInPlot = new HashSet<Player>();
-	private Set<Entity> entitiesInPlot = new HashSet<Entity>();
+	private List<Entity> entitiesInPlot = new ArrayList<Entity>();
 	
 	private boolean allowLiquidFlow = false;
 	
@@ -76,6 +65,8 @@ public class Plot {
 		for (Player player : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(player.getLocation()))
 				PlotsInstancesListener.executeEntryActions(plugin, player, this);
+		
+		loadInitialEntitiesOnChunks();
 	}
 	
 	//chargement d'un plot déjà existant
@@ -93,6 +84,30 @@ public class Plot {
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
 				PlotsInstancesListener.executeEntryActions(plugin, p, this);
+		
+		loadInitialEntitiesOnChunks();
+	}
+	
+	private void loadInitialEntitiesOnChunks() {
+
+		int initialX = plotId.getIndexX() * (Math.floorDiv(WorldManager.plotSize + WorldManager.roadSize, 16));
+		int initialZ = plotId.getIndexZ() * (Math.floorDiv(WorldManager.plotSize + WorldManager.roadSize, 16));
+		int chunksRowCount = Math.floorDiv(WorldManager.plotSize, 16);
+
+		//Bukkit.broadcastMessage("x min : " + initialX + " - max : " + initialX + chunksRowCount);
+		//Bukkit.broadcastMessage("z min : " + initialZ + " - max : " + initialZ + chunksRowCount);
+		
+		
+		for (int x = initialX ; x < initialX + chunksRowCount ; x++)
+			for (int z = initialZ ; z < initialZ + chunksRowCount ; z++)
+				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
+					new ArrayList<Entity>(Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities())).forEach(e -> {
+						if (e.getType() != EntityType.PLAYER)
+							addEntityInPlot(e);
+						//Bukkit.broadcastMessage("detected entity " + e + " on chunk " + chunk);
+					});
+			
+			
 	}
 	
 	public PlotParameters getParameters() {
@@ -120,21 +135,44 @@ public class Plot {
 		playersInPlot.remove(p);
 	}
 	
+	//ajoute l'entité à la liste des entités du plot, et supprime la plus vieille entité si le quota est dépassé
 	public void addEntityInPlot(Entity e) {
+		if (entitiesInPlot.size() == WorldManager.maxTotalEntitiesPerPlot) 
+			entitiesInPlot.remove(0).remove();
+		
+		int count = 0;
+		Entity toRemove = null;
+		
+		for (Entity ent : entitiesInPlot)
+			if (ent.getType() == e.getType()) {
+				count++;
+				if (toRemove == null)
+					toRemove = ent;
+			}
+		
+		if (count >= WorldManager.maxEntitiesPerTypePerPlot && toRemove != null) {
+			entitiesInPlot.remove(toRemove);
+			toRemove.remove();
+		}
+			
 		entitiesInPlot.add(e);
 	}
 	
-	public void clearEntitiesInPlot() {
-		entitiesInPlot.clear();
+	public void removeEntityInPlot(Entity e, boolean killEntity) {
+		if (killEntity)
+			e.remove();
+		entitiesInPlot.remove(e);
 	}
 	
 	public Set<Player> getPlayers(){
 		return Collections.unmodifiableSet(playersInPlot);
 	}
 	
-	public Set<Entity> getEntities(){
-		return Collections.unmodifiableSet(entitiesInPlot);
+	
+	public synchronized List<Entity> getEntities(){
+		return new ArrayList<Entity>(entitiesInPlot);
 	}
+	
 	
 	public boolean hasLiquidFlow() {
 		return allowLiquidFlow;

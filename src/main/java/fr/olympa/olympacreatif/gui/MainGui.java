@@ -97,16 +97,7 @@ public class MainGui extends IGui {
 
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		switch (slot) {
-		case 31:
-			if (plot != null) {
-				p.closeInventory();
-				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
-				p.teleport(plot.getParameters().getSpawnLoc(plugin));	
-			}
-			break;
-			
-			
+		switch (slot) {			
 		case 21:
 			if (plot != null)
 				new MembersGui(this).create(p);
@@ -143,6 +134,13 @@ public class MainGui extends IGui {
 			p.teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 			break;
 			
+		case 31:
+			if (plot != null) {
+				p.closeInventory();
+				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
+				p.teleport(plot.getParameters().getSpawnLoc(plugin));	
+			}
+			break;
 			
 		case 32:
 			if (plugin.getPlotsManager().getPlots().size()>0) {

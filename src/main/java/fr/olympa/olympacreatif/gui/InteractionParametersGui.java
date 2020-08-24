@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.gui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -34,8 +35,8 @@ public class InteractionParametersGui extends IGui {
 			ItemMeta im = it.getItemMeta();
 			im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 			it.setItemMeta(im);
-
-			if (((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(mat)) {
+			
+			if (((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(mat)) {
 				it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
 
 				if (plot.getMembers().getPlayerLevel(p) < 3)
@@ -60,13 +61,13 @@ public class InteractionParametersGui extends IGui {
 		
 		//changement de l'état d'autorisation de l'interraction pour le bloc cliqué si le joueur a la permission
 		if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(p) >= 3 && slot < PlotParamType.getAllPossibleIntaractibleBlocks().size()) {
-			if (((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(current.getType())) {
-				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).remove(current.getType());
+			if (((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(current.getType())) {
+				((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).remove(current.getType());
 				current = ItemUtils.removeEnchant(current, Enchantment.DURABILITY);
 				current = ItemUtils.lore(current, stateDenied);
 			}
 			else {
-				((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(current.getType());
+				((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(current.getType());
 				current = ItemUtils.addEnchant(current, Enchantment.DURABILITY, 1);
 				current = ItemUtils.lore(current, stateAllowed);
 			}

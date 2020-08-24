@@ -1,11 +1,10 @@
 package fr.olympa.olympacreatif.plot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
-import org.bukkit.Bukkit;
+import java.util.Set;
+
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -112,7 +111,7 @@ public class PlotParameters {
 					}
 					
 					//gestion listes
-					else if (type.getType().equals(List.class)) {
+					else if (type.getType().equals(Set.class)) {
 						String[] args = ((String)json.get(key)).substring(1, ((String)json.get(key)).length() - 1).replace(" ", "").split(",");
 						
 						//Bukkit.broadcastMessage("param " + type + " : " + Arrays.asList(args));
@@ -121,14 +120,14 @@ public class PlotParameters {
 							//gestion joueurs bannis du plot
 							if (type == PlotParamType.BANNED_PLAYERS)
 								try {
-									((List<Long>)params.getParameter(PlotParamType.BANNED_PLAYERS)).add(Long.valueOf(args[i]));
+									((HashSet<Long>)params.getParameter(PlotParamType.BANNED_PLAYERS)).add(Long.valueOf(args[i]));
 								}catch(NumberFormatException e) {
 								}	
 							
 							//gestion interractions autorisées
 							else if (type == PlotParamType.LIST_ALLOWED_INTERRACTION)
 								if (Material.getMaterial(args[i]) != null)
-									((List<Material>)params.getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(Material.getMaterial(args[i]));
+									((HashSet<Material>)params.getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(Material.getMaterial(args[i]));
 						}
 					}
 				}

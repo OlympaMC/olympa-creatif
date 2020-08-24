@@ -2,8 +2,10 @@ package fr.olympa.olympacreatif.plot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -38,8 +40,8 @@ public enum PlotParamType {
 	PLOT_WEATHER(WeatherType.class, WeatherType.CLEAR),
 	GAMEMODE_INCOMING_PLAYERS(GameMode.class, GameMode.CREATIVE),
 	
-	LIST_ALLOWED_INTERRACTION(List.class, new ArrayList<Material>()),
-	BANNED_PLAYERS(List.class, new ArrayList<Long>()),
+	LIST_ALLOWED_INTERRACTION(Set.class, new HashSet<Material>()),
+	BANNED_PLAYERS(Set.class, new HashSet<Long>()),
 	
 	PLOT_TIME(Integer.class, 6000),
 	//niveaux de stoplag : 0 aucun, 1 activé, 2 activé et bloqué jusqu'à vérif par un staff
@@ -48,10 +50,10 @@ public enum PlotParamType {
 	
 	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();
 	
-	private Class paramType;
+	private Class<?> paramType;
 	private Object defaultValue;
 	
-	private PlotParamType(Class type, Object defaultValue) {
+	private PlotParamType(Class<?> type, Object defaultValue) {
 		this.paramType = type;
 		this.defaultValue = defaultValue;
 	}

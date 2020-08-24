@@ -46,7 +46,7 @@ public class DataManager implements Listener {
 			"CREATE TABLE IF NOT EXISTS `creatif_plotsdatas` (" +
 					"`plot_id` INT NOT NULL," +
 					"`plot_creation_date` DATETIME NOT NULL DEFAULT NOW()," +
-					"`plot_parameters` VARCHAR(2048) NOT NULL DEFAULT '', " +
+					"`plot_parameters` VARCHAR(8192) NOT NULL DEFAULT '', " +
 					"PRIMARY KEY (`plot_Id`) );"
 			);
 	

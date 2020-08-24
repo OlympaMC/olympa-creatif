@@ -84,7 +84,7 @@ public class WorldEventsListener implements Listener{
 		this.plugin = plugin;
 		
 		//gestion des entités (remove si id null ou si nb par plot > 100) et update de la liste des entités dans chaque plot (amélioration res performances du sélecteur @ dans les commandes)
-		new BukkitRunnable() {
+		/*new BukkitRunnable() {
 			
 			Thread asyncEntityCheckup = null;
 			
@@ -174,6 +174,7 @@ public class WorldEventsListener implements Listener{
 				spawnEntities.clear();
 			}
 		}.runTaskTimer(plugin, 0, 20);
+		*/
 	}
 	
 	@EventHandler //n'autorise que certaines sources de spawn de créatures 

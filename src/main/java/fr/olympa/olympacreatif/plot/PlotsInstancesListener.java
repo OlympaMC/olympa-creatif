@@ -3,8 +3,10 @@ package fr.olympa.olympacreatif.plot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -15,8 +17,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.block.data.type.Dispenser;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -40,12 +42,15 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -64,11 +69,15 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
+import fr.olympa.olympacreatif.utils.EntityRemoveEvent;
+import fr.olympa.olympacreatif.utils.EntityRemoveListener;
+
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.NBTTagList;
+import net.minecraft.server.v1_15_R1.NBTTagString;
 import net.minecraft.server.v1_15_R1.PacketPlayOutTileEntityData;
-import net.minecraft.server.v1_15_R1.TileEntity;
 
 public class PlotsInstancesListener implements Listener{
 
@@ -86,8 +95,6 @@ public class PlotsInstancesListener implements Listener{
 	private List<Material> cbPlacementTypeCb = new ArrayList<Material>();
 	
 	private List<Material> interractProhibitedItems = ImmutableList.<Material>builder()
-			.add(Material.ARMOR_STAND)
-			.add(Material.ITEM_FRAME)
 			.add(Material.WATER_BUCKET)
 			.add(Material.WATER)
 			.add(Material.LAVA_BUCKET)
@@ -102,6 +109,8 @@ public class PlotsInstancesListener implements Listener{
 	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		
+		plugin.getServer().getPluginManager().registerEvents(new EntityRemoveListener(plugin), plugin);
 		
 		//gère le remplacement des commandblock dans la main du joueur (après le remplacement initial pour permettre le placement du cb)
 		new BukkitRunnable() {
@@ -215,6 +224,7 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
 		
@@ -238,7 +248,7 @@ public class PlotsInstancesListener implements Listener{
 		//test si permission d'interagir avec le bloc donné
 		if (playerRank == PlotRank.VISITOR &&
 				PlotParamType.getAllPossibleIntaractibleBlocks().contains(e.getClickedBlock().getType()) &&
-				!((ArrayList<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType())
+				!((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType())
 				) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
@@ -318,7 +328,7 @@ public class PlotsInstancesListener implements Listener{
 					
 					e.getItem().setType(Material.DISPENSER);
 				}
-			}else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() == Material.WOODEN_AXE)) {
+			}else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE)) {
 				if (commandBlockTypes.contains(e.getClickedBlock().getType()))
 					e.getClickedBlock().setType(Material.AIR);
 			}
@@ -338,9 +348,8 @@ public class PlotsInstancesListener implements Listener{
 		
 		//remove entity si clic droit dessus avec une houe
 		if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && !(e.getRightClicked() instanceof Player) &&
-				plot.getMembers().getPlayerRank(e.getPlayer()) != PlotRank.VISITOR)
-			e.getRightClicked().remove();
-			
+				plot.getMembers().getPlayerRank(e.getPlayer()) != PlotRank.VISITOR) 
+			plot.removeEntityInPlot(e.getRightClicked(), true);
 	}
 	
 	@EventHandler//cancel spawn entité si paramètre du plot l'interdit
@@ -379,7 +388,6 @@ public class PlotsInstancesListener implements Listener{
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	@EventHandler(priority = EventPriority.LOWEST) //modifie la destination téléport si joueur banni du plot
 	public void onTeleportEvent(PlayerTeleportEvent e) {
 		
@@ -394,18 +402,13 @@ public class PlotsInstancesListener implements Listener{
 		if (plotFrom != null) 
 			executeExitActions(plugin, e.getPlayer(), plotFrom);
 
-		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
+		//OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 
 		if (plotTo != null) 
 			if (!executeEntryActions(plugin, e.getPlayer(), plotTo))
 				e.setTo(plotTo.getOutLoc());
-			else
-				p.setCurrentPlot(plotTo);
-		else
-			p.setCurrentPlot(plotTo);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@EventHandler(priority = EventPriority.LOWEST) //actions à effectuer lors de la sortie/entrée d'un joueur
 	public void onPlayerMove(PlayerMoveEvent e) {
 		if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ())
@@ -418,16 +421,12 @@ public class PlotsInstancesListener implements Listener{
 		if (plotTo == plotFrom)
 			return;
 
-		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
+		//OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		
 		//expulse les joueurs bannis & actions d'entrée de plot
 		if (plotTo != null) 
 			if (!executeEntryActions(plugin, e.getPlayer(), plotTo)) 
 				plotTo.teleportOut(e.getPlayer());
-			else
-				p.setCurrentPlot(plotTo);
-		else
-			p.setCurrentPlot(plotTo);
 			
 		//actions de sortie de plot
 		if (plotFrom != null) 
@@ -455,9 +454,10 @@ public class PlotsInstancesListener implements Listener{
 	public static boolean executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
 		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+		pc.setCurrentPlot(plotTo);
 		
 		//si le joueur est banni, téléportation en dehors du plot
-		if (((List<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
+		if (((HashSet<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
 			
 			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));
@@ -515,6 +515,8 @@ public class PlotsInstancesListener implements Listener{
 
 	public static void executeExitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
 
+		((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCurrentPlot(null);
+		
 		plot.removePlayerInPlot(p);
 		plugin.getCommandBlocksManager().excecuteQuitActions(plot, p);
 
@@ -553,27 +555,34 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		}
 		
-		if (((OlympaPlayerCreatif)AccountProvider.get(e.getRemover().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
-			return;
-		
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		if (plot == null)
 			return;
 		
-		//remove entity si joueur a un ehoue en bois dans la main
-		if (((Player)e.getRemover()).getInventory().getItemInMainHand() != null && 
-				((Player)e.getRemover()).getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && 
-				plot.getMembers().getPlayerRank((Player) e.getRemover()) != PlotRank.VISITOR) {
-			e.getEntity().remove();
+		if (plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR) {
+			e.setCancelled(true);	
 			return;
 		}
 		
-		if (plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR)
-			e.setCancelled(true);
+		plot.removeEntityInPlot(e.getEntity(), true);
 		
+		//remove entity si joueur a une houe en bois dans la main
+		/*if (((Player)e.getRemover()).getInventory().getItemInMainHand() != null && 
+				((Player)e.getRemover()).getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && 
+				plot.getMembers().getPlayerRank((Player) e.getRemover()) != PlotRank.VISITOR) {
+
+			plot.removeEntityInPlot(e.getEntity());
+		}*/
 	}
 	
-	@EventHandler //gestion autorisation pvp
+	@EventHandler
+	public void onHangingPlace(HangingPlaceEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		if (plot == null || plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) 
+			e.setCancelled(true);
+	}
+	
+	@EventHandler //gestion autorisation pvp & fake player death
 	public void onDamageByEntity(EntityDamageByEntityEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		
@@ -700,8 +709,20 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		}
 		if (!plot.hasStoplag()) {
-			plot.addEntityInPlot(e.getEntity());	
+			plot.addEntityInPlot(e.getEntity());
 			plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
+			
+			
+			NBTTagCompound tag = new NBTTagCompound();
+			net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e.getEntity()).getHandle();
+			ent.c(tag);
+			
+			NBTTagList list = new NBTTagList();			
+			list.add(NBTTagString.a(plot.getPlotId().toString()));
+			tag.set("Tags", list);
+			
+			ent.f(tag);
+
 		}else
 			e.setCancelled(true);
 	}
@@ -785,4 +806,44 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			e.setCancelled(true);
 	}
+	
+	@EventHandler //ajoute les entités du chunk au plot correspondant s'il existe, sinon les supprimer
+	public void onChunkLoad(ChunkLoadEvent e) {
+		if (e.isNewChunk())
+			return;
+		
+		new ArrayList<Entity>(Arrays.asList(e.getChunk().getEntities())).forEach(ent -> {
+			if (ent.getType() == EntityType.PLAYER)
+				return;
+			
+			Plot plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getPlotIdFromTagOf(ent));
+			if (plot != null && plot.getPlotId().equals(plugin.getPlotsManager().getPlot(ent.getLocation()).getPlotId()))
+				plot.addEntityInPlot(ent);
+		});
+	}
+	
+	
+	@EventHandler
+	public void onChunkUnload(ChunkUnloadEvent e) {
+		new ArrayList<Entity>(Arrays.asList(e.getChunk().getEntities())).forEach(ent -> {
+			if (ent.getType() == EntityType.PLAYER)
+				return;
+			
+			Plot plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getPlotIdFromTagOf(ent));
+			if (plot != null)
+				plot.removeEntityInPlot(ent, false);
+		});
+	}
+	/*
+	@EventHandler //remove entité de la liste des entités du plot si l'entité a despawn
+	public void onEntityRemove(EntityRemoveEvent e) {
+		if (e.getPlot() != null)
+			e.getPlot().removeEntityInPlot(e.getEntity(), true);
+	}
+	*/
 }
+
+
+
+
+

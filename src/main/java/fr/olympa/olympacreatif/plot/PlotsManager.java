@@ -4,14 +4,21 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -19,6 +26,8 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.NBTTagList;
 
 public class PlotsManager {
 
@@ -86,6 +95,69 @@ public class PlotsManager {
 				}
 			}
 		}.runTaskTimer(plugin, 20, delayBetweenCheckup);
+		
+		
+		//kill les entités en dehors de leur plot attitré
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				Map<Entity, Plot> listToRemove = new HashMap<Entity, Plot>();		
+				
+				new ArrayList<Entity>(plugin.getWorldManager().getWorld().getEntities()).forEach(e ->{
+					if (e.getType() == EntityType.PLAYER)
+						return;
+					
+					PlotId id = getPlotIdFromTagOf(e);
+					
+					if (id  == null || !id.equals(PlotId.fromLoc(plugin, e.getLocation())))
+						listToRemove.put(e, plugin.getPlotsManager().getPlot(id));
+				});
+				//remove entités
+				plugin.getTask().runTask(()-> listToRemove.forEach((e, plot) -> {
+					if (plot != null)
+						plot.removeEntityInPlot(e, true);
+					else
+						e.remove();
+				}));
+			}
+		}.runTaskTimerAsynchronously(plugin, 10, 100);
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				/*
+				for (Plot plot : plugin.getPlotsManager().getPlots())
+					for (Entity e : plot.getEntities())
+						if (e.isDead())
+							plot.removeEntityInPlot(e, true);
+				*/
+					plugin.getPlotsManager().getPlots().forEach(plot -> plot.getEntities().forEach(e -> {
+					if (e.isDead())
+						plot.removeEntityInPlot(e, true);
+				}));
+			}
+		}.runTaskTimerAsynchronously(plugin, 10, 1);
+	}
+	
+	public synchronized PlotId getPlotIdFromTagOf(Entity e) {
+		if (e.getType() == EntityType.PLAYER)
+			return null;
+		
+		net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e).getHandle();
+		NBTTagCompound tag = new NBTTagCompound();
+		ent.c(tag);
+		
+		if (tag == null || !tag.hasKey("Tags"))
+			return null;
+		
+		NBTTagList list = tag.getList("Tags", NBT.TAG_STRING);
+		
+		if (list == null || list.size() == 0)
+			return null;
+		
+		return PlotId.fromString(plugin, list.getString(0));
 	}
 
 	
@@ -110,8 +182,8 @@ public class PlotsManager {
 		return plot;
 	}
 	
-	public Set<Plot> getPlots(){
-		return Collections.unmodifiableSet(loadedPlots);
+	public synchronized Set<Plot> getPlots(){
+		return new HashSet<Plot>(loadedPlots);
 	}
 
 	public Plot getPlot(Location loc) {

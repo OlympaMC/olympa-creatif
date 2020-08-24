@@ -28,9 +28,9 @@ public class CmdKill extends CbCommand {
 		for (Entity e : targetEntities)
 			if (e instanceof Player)
 				PlotsInstancesListener.fireFakeDeath((Player) e, null, getPlot(), 999999999);
-			else
-				e.remove();
-		
+			else 
+				plot.removeEntityInPlot(e, true);
+			
 		return targetEntities.size();
 	}
 

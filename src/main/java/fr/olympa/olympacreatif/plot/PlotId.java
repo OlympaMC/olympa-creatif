@@ -191,11 +191,11 @@ public class PlotId {
 	
 	
 
-	public int getX() {
+	public int getIndexX() {
 		return indexX;
 	}
 	
-	public int getZ() {
+	public int getIndexZ() {
 		return indexZ;
 	}
 	

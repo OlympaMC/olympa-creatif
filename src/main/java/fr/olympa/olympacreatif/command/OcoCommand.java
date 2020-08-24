@@ -21,6 +21,8 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.gui.MainGui;
+import fr.olympa.olympacreatif.gui.ShopGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -34,6 +36,7 @@ public class OcoCommand extends OlympaCommand {
 			.add("export")
 			.add("speed")
 			.add("debug")
+			.add("shop")
 			.build();
 	
 	private OlympaCreatifMain plugin;
@@ -105,6 +108,10 @@ public class OcoCommand extends OlympaCommand {
 						CommandBlocksManager.maxCommandsTicketst + " (+" + plot2.getCbData().getCpt() * 20 + "/s)";
 				
 				sender.sendMessage(debug);
+				break;
+				
+			case "shop":
+				new ShopGui(MainGui.getMainGui(p)).create(player);
 				break;
 				
 			default:

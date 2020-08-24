@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.command;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -302,7 +303,7 @@ public class OcCommand extends OlympaCommand {
 				
 				else {
 					//exécution du ban
-					((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).add(AccountProvider.get(target.getUniqueId()).getId());
+					((HashSet<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).add(AccountProvider.get(target.getUniqueId()).getId());
 					
 					plot.teleportOut(target);
 					plot.getMembers().set(target, PlotRank.VISITOR);
@@ -328,8 +329,8 @@ public class OcCommand extends OlympaCommand {
 				
 				else if (plot.getMembers().getPlayerLevel(pc) < 3)
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
-
-				else if (((ArrayList<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).remove(AccountProvider.get(target.getUniqueId()).getId()))
+				
+				else if (((HashSet<Long>) plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).remove(AccountProvider.get(target.getUniqueId()).getId()))
 					sender.sendMessage(Message.PLOT_UNBAN_PLAYER.getValue(target.getName()));
 				else
 					sender.sendMessage(Message.PLOT_CANT_UNBAN_PLAYER.getValue(target.getName()));
