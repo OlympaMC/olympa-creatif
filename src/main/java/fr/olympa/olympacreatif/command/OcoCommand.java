@@ -21,6 +21,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.ShopGui;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -30,6 +31,7 @@ import fr.olympa.olympacreatif.world.WorldManager;
 public class OcoCommand extends OlympaCommand {
 
 	public static final List<String> subArgsList = ImmutableList.<String>builder()
+			.add("help")
 			.add("skull")
 			.add("hat")
 			.add("mb")
@@ -59,29 +61,29 @@ public class OcoCommand extends OlympaCommand {
 		case 1:
 			switch (args[0]) {
 			case "hat":
-				/*if (!p.hasPermission(PermissionsList.USE_HAT_COMMAND)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_SKULL_COMMAND.getGroup().getName(p.getGender())));
+				if (!PermissionsList.USE_HAT_COMMAND.hasPermission(p)) {
+					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_HAT_COMMAND.getMinGroup().getName(p.getGender())));
 					return false;
-				}*/
+				}
 				p.getPlayer().sendMessage(Message.OCO_HAT_SUCCESS.getValue());
 				p.getPlayer().getInventory().setHelmet(new ItemStack(p.getPlayer().getInventory().getItemInMainHand().getType()));
 				break;
 				
 				
 			case "mb":
-				/*if (!p.hasPermission(PermissionsList.USE_MICRO_BLOCKS)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_MICRO_BLOCKS.getGroup().getName(p.getGender())));
+				if (!PermissionsList.USE_MICRO_BLOCKS.hasPermission(p)) {
+					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
 					return false;
-				}*/
+				}
 				plugin.getPerksManager().getMicroBlocks().openGui(p.getPlayer());
 				break;
 				
 				
 			case "export":
-				/*if (!p.hasPermission(PermissionsList.USE_PLOT_EXPORTATION)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_PLOT_EXPORTATION.getGroup().getName(p.getGender())));
+				if (!PermissionsList.USE_PLOT_EXPORTATION.hasPermission(p)) {
+					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_PLOT_EXPORTATION.getMinGroup().getName(p.getGender())));
 					return false;
-				}*/
+				}
 				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 				if (plot != null && plot.getMembers().getPlayerRank(p.getPlayer()) == PlotRank.OWNER) {
 					plugin.getPerksManager().getSchematicCreator().export(plot);
@@ -122,10 +124,10 @@ public class OcoCommand extends OlympaCommand {
 		case 2:
 			switch(args[0]) {
 			case "mb":
-				/*if (!p.hasPermission(PermissionsList.USE_MICRO_BLOCKS)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue().replace("%group%", PermissionsList.USE_MICRO_BLOCKS.getGroup().getName()));
+				if (!PermissionsList.USE_MICRO_BLOCKS.hasPermission(p)) {
+					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
 					return false;
-				}*/
+				}
 				ItemStack item = plugin.getPerksManager().getMicroBlocks().getMb(args[1]);
 				if (item != null) {
 					p.getPlayer().getInventory().addItem(item);

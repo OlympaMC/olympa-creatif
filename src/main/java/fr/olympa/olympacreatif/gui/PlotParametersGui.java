@@ -92,6 +92,7 @@ public class PlotParametersGui extends IGui {
 		//4 : Etat stoplag
 		it = ItemUtils.item(Material.COMMAND_BLOCK, "§6Blocage tâches intensives (redstone & cb)");
 		ItemUtils.lore(it, stoplagLevels[(int) plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)]);
+		ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(3, it);
 		
 		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamType.ALLOW_ENVIRONMENT_DAMAGE);

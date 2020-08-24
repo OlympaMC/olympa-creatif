@@ -73,22 +73,51 @@ public class WorldEditListener extends EventHandler implements Listener {
 	
 	@org.bukkit.event.EventHandler //cancel copy si joueur essaie de copier dans un plot qui n'est pas à lui
 	public void onCopyCmd(PlayerCommandPreprocessEvent e) {
-		if (!e.getMessage().contains("/copy"))
+		if (!e.getMessage().contains("/copy") || plugin.getWorldEditManager() == null)
 			return;
+		
+		if (e.getMessage().contains("/pos") && e.getMessage().split(" ").length > 1) {
+			e.setCancelled(true);
+			return;
+		}
 		
 		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		
 		if (p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
 			return;
 		
-		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		LocalSession session = plugin.getWorldEditManager().getSession(e.getPlayer());
 		
-		if (plot == null || plot.getMembers().getPlayerRank(p) == PlotRank.VISITOR || !plot.equals(p.getCurrentPlot())) {
+		try {
+			Region region = session.getSelection(session.getSelectionWorld());
+			long size = region.getHeight() * region.getLength() * region.getWidth();
+			
+			//return si la sélection est trop grosse
+			if (size <= 0 || size > session.getBlockChangeLimit()){
+				e.setCancelled(true);
+				e.getPlayer().sendMessage(Message.WE_ERR_SELECTION.getValue());
+				return;
+			}
+
+			Plot plot1 = plugin.getPlotsManager().getPlot(blockVectorToLocation(region.getMinimumPoint()));
+			Plot plot2 = plugin.getPlotsManager().getPlot(blockVectorToLocation(region.getMaximumPoint()));
+			
+			//return si le joueur n'a pas la perm de copy sur ce plot
+			if (plot1 == null || plot2 == null || !plot1.equals(plot2) || plot1.getMembers().getPlayerRank(p) == PlotRank.VISITOR) {
+				
+				e.setCancelled(true);
+				e.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue());
+			}
+		} catch (IncompleteRegionException e1) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue());
+			e.getPlayer().sendMessage(Message.WE_ERR_SELECTION.getValue());
 		}
 	}
 
+	private Location blockVectorToLocation(BlockVector3 vector) {
+		return new Location(plugin.getWorldManager().getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+	}
+	
 	/*
 	@org.bukkit.event.EventHandler //cancel copy si plot du joueur null
 	public void onCopyCmd(PlayerCommandPreprocessEvent e) {

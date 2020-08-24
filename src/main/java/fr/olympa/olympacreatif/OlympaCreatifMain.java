@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -20,6 +21,7 @@ import fr.olympa.olympacreatif.command.OcaCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.DataManager;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.PerksManager;
@@ -27,6 +29,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
+import fr.olympa.olympacreatif.world.CustomChunkGenerator;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.WorldEditListener;
 import net.luckperms.api.LuckPerms;
@@ -52,8 +55,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	@Override //retourne le générateur de chunks custom
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
 		return new CustomChunkGenerator(this);
-	}
-	*/
+	}*/
+	
 
 	public static OlympaCreatifMain getMainClass() {
 		return plugin;

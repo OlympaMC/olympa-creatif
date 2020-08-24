@@ -1,18 +1,12 @@
 package fr.olympa.olympacreatif.plot;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.function.BiConsumer;
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
@@ -25,7 +19,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
-import fr.olympa.olympacreatif.world.WorldManager;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
 
@@ -123,16 +116,11 @@ public class PlotsManager {
 			}
 		}.runTaskTimerAsynchronously(plugin, 10, 100);
 		
+		//retire les entités de la liste des entités des plots si l'entité est morte
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
-				/*
-				for (Plot plot : plugin.getPlotsManager().getPlots())
-					for (Entity e : plot.getEntities())
-						if (e.isDead())
-							plot.removeEntityInPlot(e, true);
-				*/
 					plugin.getPlotsManager().getPlots().forEach(plot -> plot.getEntities().forEach(e -> {
 					if (e.isDead())
 						plot.removeEntityInPlot(e, true);

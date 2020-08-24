@@ -1,7 +1,9 @@
 name: OlympaCreatif
 version: 0.1
 author: Bullobily
+
 main: fr.olympa.olympacreatif.OlympaCreatifMain
+
 depend: [OlympaCore]
 softdepend: [WorldEdit, AsyncWorldEdit, LuckPerms]
 api-version: 1.15

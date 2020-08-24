@@ -18,6 +18,7 @@ import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 
 import fr.olympa.api.item.ItemUtils;
@@ -74,10 +75,12 @@ public class WorldManager {
 		world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
 		world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
 		world.setPVP(true);
-
+		
 		//édition server.properties
         Path path = Paths.get(plugin.getDataFolder().getParentFile().getAbsolutePath()).getParent().resolve("server.properties");
+
         try {
+        	
             List<String> lines = Files.readAllLines(path);
 
             for (String s : new ArrayList<String>(lines)) {
@@ -103,7 +106,7 @@ public class WorldManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        
 		nmsWorld = ((CraftWorld) world).getHandle();
 	}
 

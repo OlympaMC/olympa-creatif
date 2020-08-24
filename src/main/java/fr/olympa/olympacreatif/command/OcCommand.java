@@ -13,6 +13,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.google.common.collect.ImmutableList;
+
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -29,8 +31,21 @@ import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcCommand extends OlympaCommand {
-	
-	public static final List<String> subArgsList = new ArrayList<String>();
+
+	public static final List<String> subArgsList = ImmutableList.<String>builder()
+			.add("help")
+			.add("menu")
+			.add("find")
+			.add("invite")
+			.add("accept")
+			.add("chat")
+			.add("ban")
+			.add("unban")
+			.add("kick")
+			.add("visit")
+			.add("setspawn")
+			.add("center")
+			.build();
 
 	private OlympaCreatifMain plugin;
 	private Map<Player, Plot> pendingInvitations = new HashMap<Player, Plot>();
@@ -38,19 +53,6 @@ public class OcCommand extends OlympaCommand {
 	public OcCommand(OlympaCreatifMain plugin, String command, String[] alias) {
 		super(plugin, command, alias);
 		this.plugin = plugin;
-
-		subArgsList.add("help");
-		subArgsList.add("menu");
-		subArgsList.add("find");
-		subArgsList.add("invite");
-		subArgsList.add("accept");
-		subArgsList.add("chat");
-		subArgsList.add("ban");
-		subArgsList.add("unban");
-		subArgsList.add("kick");
-		subArgsList.add("visit");
-		subArgsList.add("setspawn");
-		subArgsList.add("center");
 	}
 
 	@SuppressWarnings("unchecked")
