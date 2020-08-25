@@ -1,10 +1,12 @@
 package fr.olympa.olympacreatif;
 
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
@@ -31,6 +33,7 @@ import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.CustomChunkGenerator;
 import fr.olympa.olympacreatif.world.WorldManager;
+import fr.olympa.olympacreatif.worldedit.AWEProgressBar;
 import fr.olympa.olympacreatif.worldedit.WorldEditListener;
 import net.luckperms.api.LuckPerms;
 
@@ -101,16 +104,26 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		
 		//get luckperms api provider
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-		if (provider != null) {
+		if (provider != null) 
 			luckperms = provider.getProvider();
-		}
 		
-		//hook into worldedit
+		
+		//hook into worldedit & asyncworldedit
 		WorldEditPlugin we = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
+	    IAsyncWorldEdit awe = (IAsyncWorldEdit)getServer().getPluginManager().getPlugin("AsyncWorldEdit");
 		if (we != null) {
 			worldedit = we;
-			worldedit.getWorldEdit().getEventBus().register(new WorldEditListener(this));	
-		}		
+			worldedit.getWorldEdit().getEventBus().register(new WorldEditListener(this));
+			
+			if (awe == null) {
+				Bukkit.getPluginManager().disablePlugin(we);
+				Bukkit.getLogger().log(Level.WARNING, getPrefixConsole() + "WorldEdit disabled because AsyncWorldEdit wasn't found.");
+			}
+		}
+		if (awe != null) {
+			awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
+			Bukkit.getLogger().log(Level.FINE, getPrefixConsole() + "Successfully loaded WorldEdit and AWE custom progressbar.");
+		}
 	}
 
 	@Override
