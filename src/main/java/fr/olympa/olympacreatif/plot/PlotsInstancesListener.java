@@ -586,7 +586,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		
-		Bukkit.broadcastMessage("death " + e.getEntity() + " - plot : " + plot + " - damages : " + e.getFinalDamage() + " - health : "  + ((Player)e.getEntity()).getHealth());
+		//Bukkit.broadcastMessage("death " + e.getEntity() + " - plot : " + plot + " - damages : " + e.getFinalDamage() + " - health : "  + ((Player)e.getEntity()).getHealth());
 		
 		if (plot == null) {
 			e.setCancelled(true);
