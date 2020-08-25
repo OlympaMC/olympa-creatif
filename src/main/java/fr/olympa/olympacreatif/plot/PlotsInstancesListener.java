@@ -37,10 +37,12 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -69,8 +71,6 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
-import fr.olympa.olympacreatif.utils.EntityRemoveEvent;
-import fr.olympa.olympacreatif.utils.EntityRemoveListener;
 
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
@@ -109,8 +109,6 @@ public class PlotsInstancesListener implements Listener{
 	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-		
-		plugin.getServer().getPluginManager().registerEvents(new EntityRemoveListener(plugin), plugin);
 		
 		//gère le remplacement des commandblock dans la main du joueur (après le remplacement initial pour permettre le placement du cb)
 		new BukkitRunnable() {
@@ -450,7 +448,6 @@ public class PlotsInstancesListener implements Listener{
 	
 	
 	//actions à exécuter en entrée du plot. return false si le joueur en est banni, true sinon
-	@SuppressWarnings("unchecked")
 	public static boolean executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
 		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
@@ -489,7 +486,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		//tp au spawn de la zone
 		if ((boolean)plotTo.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-			p.teleport(plotTo.getParameters().getSpawnLoc(plugin));
+			p.teleport(plotTo.getParameters().getSpawnLoc());
 			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
 		}
 		
@@ -582,9 +579,14 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 	}
 	
-	@EventHandler //gestion autorisation pvp & fake player death
+	@EventHandler(priority = EventPriority.LOW) //gestion autorisation pvp & fake player death
 	public void onDamageByEntity(EntityDamageByEntityEvent e) {
+		if (e.isCancelled())
+			return;
+		
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		Bukkit.broadcastMessage("death " + e.getEntity() + " - plot : " + plot + " - damages : " + e.getFinalDamage() + " - health : "  + ((Player)e.getEntity()).getHealth());
 		
 		if (plot == null) {
 			e.setCancelled(true);
@@ -602,7 +604,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		if (e.getEntity().getType() == EntityType.PLAYER)
-			if (fireFakeDeath((Player) e.getEntity(), e.getDamager(), plot, e.getDamage()))
+			if (FakePlayerDeathEvent.fireFakeDeath(plugin, (Player) e.getEntity(), e.getDamager(), e.getFinalDamage(), plot))
 				e.setCancelled(true);
 		
 		/*
@@ -614,11 +616,10 @@ public class PlotsInstancesListener implements Listener{
 				e.setCancelled(true);
 				*/
 	}
-	
-	
-	@EventHandler //gestion autorisation pvp
-	public void onDamageByBlock(EntityDamageByBlockEvent e) {
-		if (e.getEntityType() != EntityType.PLAYER)
+
+	@EventHandler(priority = EventPriority.LOW) //gestion autorisation dégâts environementaux
+	public void onGeneralDamage(EntityDamageEvent e) {
+		if (e instanceof EntityDamageByEntityEvent || e.getEntityType() != EntityType.PLAYER)
 			return;
 		
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
@@ -634,24 +635,8 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		if (e.getEntity().getType() == EntityType.PLAYER)
-			if (fireFakeDeath((Player) e.getEntity(), null, plot, e.getDamage()))
+			if (FakePlayerDeathEvent.fireFakeDeath(plugin, (Player) e.getEntity(), null, e.getFinalDamage(), plot))
 				e.setCancelled(true);
-	}
-	
-	//gestion fake death (le joueur ne doit jamais vraiment mourir sinon le fake op ne fonctionne plus)
-	public static boolean fireFakeDeath(Player p, Entity killer, Plot plot, double damages) {
-		
-		if (p.getHealth() > damages)
-			return false;
-		
-		FakePlayerDeathEvent event = new FakePlayerDeathEvent(p, killer, plot);
-		Bukkit.getPluginManager().callEvent(event);
-		
-		p.teleport(event.getRespawnLoc());
-		
-		event.getDrops().forEach(item -> event.getDeathLoc().getWorld().dropItemNaturally(event.getDeathLoc(), item));
-		
-		return true;
 	}
 	
 	@EventHandler //empêche le drop d'items si interdit sur le plot (et cancel si route)

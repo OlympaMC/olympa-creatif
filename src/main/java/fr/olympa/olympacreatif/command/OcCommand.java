@@ -365,7 +365,7 @@ public class OcCommand extends OlympaCommand {
 					int index = Integer.valueOf(args[2]) - 1;
 					
 					if (index < plots.size()) {
-						p.teleport(plots.get(index).getParameters().getSpawnLoc(plugin));
+						p.teleport(plots.get(index).getParameters().getSpawnLoc());
 						p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(plots.get(index)));
 					}else
 						sender.sendMessage(Message.INVALID_PLOT_ID.getValue());						

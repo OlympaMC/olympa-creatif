@@ -138,14 +138,14 @@ public class MainGui extends IGui {
 			if (plot != null) {
 				p.closeInventory();
 				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
-				p.teleport(plot.getParameters().getSpawnLoc(plugin));	
+				p.teleport(plot.getParameters().getSpawnLoc());	
 			}
 			break;
 			
 		case 32:
 			if (plugin.getPlotsManager().getPlots().size()>0) {
 				Plot plot = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
-				p.teleport(plot.getParameters().getSpawnLoc(plugin));
+				p.teleport(plot.getParameters().getSpawnLoc());
 				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
 			}
 			break;

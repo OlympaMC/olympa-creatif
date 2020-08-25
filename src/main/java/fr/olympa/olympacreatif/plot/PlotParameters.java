@@ -18,11 +18,13 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class PlotParameters {
 
+	OlympaCreatifMain plugin;
 	private Map <PlotParamType, Object> parameters = new HashMap<PlotParamType, Object>();
 	private PlotId id;
 	
-	public PlotParameters(PlotId id) {
+	public PlotParameters(OlympaCreatifMain plugin, PlotId id) {
 		
+		this.plugin = plugin;
 		this.id = id;
 		
 		for (PlotParamType type : PlotParamType.values())
@@ -46,7 +48,7 @@ public class PlotParameters {
 		return null;
 	}
 	
-	public Location getSpawnLoc(OlympaCreatifMain plugin) {
+	public Location getSpawnLoc() {
 		return new Location(plugin.getWorldManager().getWorld(), 
 				(int)getParameter(PlotParamType.SPAWN_LOC_X), 
 				(int)getParameter(PlotParamType.SPAWN_LOC_Y), 
@@ -75,9 +77,9 @@ public class PlotParameters {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public synchronized static PlotParameters fromJson(PlotId plotId, String jsonString) {
+	public synchronized static PlotParameters fromJson(OlympaCreatifMain plugin, PlotId plotId, String jsonString) {
 
-		PlotParameters params = new PlotParameters(plotId);
+		PlotParameters params = new PlotParameters(plugin, plotId);
 		
 		try {
 			JSONObject json = (JSONObject) new JSONParser().parse(jsonString);

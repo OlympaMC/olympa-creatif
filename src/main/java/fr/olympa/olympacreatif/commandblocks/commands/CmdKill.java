@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
+import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
@@ -27,7 +28,7 @@ public class CmdKill extends CbCommand {
 		
 		for (Entity e : targetEntities)
 			if (e instanceof Player)
-				PlotsInstancesListener.fireFakeDeath((Player) e, null, getPlot(), 999999999);
+				FakePlayerDeathEvent.fireFakeDeath(plugin, (Player) e, null, 999999999, plot);
 			else 
 				plot.removeEntityInPlot(e, true);
 			

@@ -66,7 +66,7 @@ public enum Message {
 	PLOT_FORCED_STOPLAG_FIRED, 
 	
 	INSUFFICIENT_GROUP_PERMISSION, 
-	WE_ERR_SELECTION,
+	WE_ERR_SELECTION_TOO_BIG,
 	;
 	
 	private String message = null;

@@ -47,7 +47,7 @@ public class Plot {
 		
 		plotId = PlotId.createNew(plugin);
 		
-		parameters = new PlotParameters(plotId);
+		parameters = new PlotParameters(plugin, plotId);
 		members = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)));
 		
 		members.set(p, PlotRank.OWNER);

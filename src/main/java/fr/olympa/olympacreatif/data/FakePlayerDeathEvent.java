@@ -24,33 +24,39 @@ public class FakePlayerDeathEvent extends Event{
 	Player p;
 	Plot plot;
 	
-	Location death;
-	Location respawn;
-	
 	List<ItemStack> drops = new ArrayList<ItemStack>();
 	
-	public FakePlayerDeathEvent(Player p, Entity killer, Plot deathPlot) {
+	public static boolean fireFakeDeath(OlympaCreatifMain plugin, Player p, Entity killer, double damages, Plot deathPlot) {
+		if (p.getHealth() > damages)
+			return false;
+		p.sendMessage("§7§oVous êtes mort !");
+		plugin.getServer().getPluginManager().callEvent(new FakePlayerDeathEvent(plugin, p, killer, deathPlot));
+		
+		return true;
+	}
+	
+	private FakePlayerDeathEvent(OlympaCreatifMain plugin, Player p, Entity killer, Plot deathPlot) {
 		this.killer = killer;
 		this.p = p;
 		this.plot = deathPlot;
-		this.death = p.getLocation();
+		
+		Location respawnLoc = plugin.getWorldManager().getWorld().getSpawnLocation();
 		
 		for (PotionEffect pot : p.getActivePotionEffects())
 			p.removePotionEffect(pot.getType());
 		
-		if (plot == null)
-			respawn = OlympaCreatifMain.getMainClass().getWorldManager().getWorld().getSpawnLocation();
-		
-		else {
-			respawn = plot.getParameters().getSpawnLoc(OlympaCreatifMain.getMainClass());
+				
+		if (plot != null) {
+			respawnLoc = plot.getParameters().getSpawnLoc();
 			
 			if (!(boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH)) {
-				p.getInventory().forEach(item -> {if (item != null) drops.add(item);});
+				p.getInventory().forEach(item -> {if (item != null) plugin.getWorldManager().getWorld().dropItemNaturally(p.getLocation(), item);});
 				
 				p.getInventory().clear();
 			}
 		}
 		
+		p.teleport(respawnLoc);
 		p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 		p.setFoodLevel(20);
 	}
@@ -66,10 +72,11 @@ public class FakePlayerDeathEvent extends Event{
 	public Plot getPlot() {
 		return plot;
 	}
-	
+	/*
 	public Location getDeathLoc() {
 		return death;
 	}
+	
 	
 	public Location getRespawnLoc() {
 		return respawn;
@@ -78,6 +85,7 @@ public class FakePlayerDeathEvent extends Event{
 	public List<ItemStack> getDrops(){
 		return drops;
 	}
+	*/
 	
 	@Override
 	public HandlerList getHandlers() {

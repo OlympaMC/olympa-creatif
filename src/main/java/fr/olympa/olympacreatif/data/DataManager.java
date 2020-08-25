@@ -179,7 +179,7 @@ public class DataManager implements Listener {
 				ResultSet getPlotDatasResult = getPlotDatas.executeQuery();
 				
 				getPlotDatasResult.next();
-				PlotParameters plotParams = PlotParameters.fromJson(plotId, getPlotDatasResult.getString("plot_parameters"));
+				PlotParameters plotParams = PlotParameters.fromJson(plugin, plotId, getPlotDatasResult.getString("plot_parameters"));
 				
 				//get owner id
 				PreparedStatement getPlotOwner = osSelectPlotOwner.getStatement();

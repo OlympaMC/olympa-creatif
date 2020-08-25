@@ -67,7 +67,7 @@ public class PlayerPlotsGui extends IGui {
 		if (slot < playerPlots.size()) {
 			player.closeInventory();
 			if (click == ClickType.LEFT) {
-				player.teleport(playerPlots.get(slot).getParameters().getSpawnLoc(plugin));
+				player.teleport(playerPlots.get(slot).getParameters().getSpawnLoc());
 				player.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(slot)));	
 			}else if (click == ClickType.RIGHT) {
 				MainGui.getMainGui(p, playerPlots.get(slot)).create(player);
