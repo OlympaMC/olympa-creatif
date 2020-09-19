@@ -25,6 +25,16 @@ public abstract class NBTcontrollerUtil {
 	
 	private final static TagsValues allowedTags = new TagsValues();
 
+	private static boolean denyAllCustomTags = false;
+	
+	public static void setDenyAllCustomFlags(boolean b) {
+		denyAllCustomTags = b;
+	}
+	
+	public static boolean getDenyAllCustomFlags() {
+		return denyAllCustomTags;
+	}
+	
 	public static NBTTagCompound getValidTags(String string) {
 		try {
 			//Bukkit.broadcastMessage("String tag : " + string + " - parsed tag : " + MojangsonParser.parse(string.replace("minecraft:", "")));
@@ -37,6 +47,9 @@ public abstract class NBTcontrollerUtil {
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
 		//Bukkit.broadcastMessage("Tag initial : " + tag);
 		//Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
+		if (denyAllCustomTags)
+			return new NBTTagCompound();
+		
 		return getValidTags(tag, 0);
 	}
 	

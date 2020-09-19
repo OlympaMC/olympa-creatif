@@ -86,8 +86,8 @@ public class PlotStoplagChecker {
 	}
 
 	public enum StopLagDetect{
-		PISTON(60, "pistons"),
-		LAMP(80, "lampes de redstone"),
+		PISTON(200, "pistons"),
+		LAMP(200, "lampes de redstone"),
 		LIQUID(1000, "liquides fluides"), 
 		ENTITY(50, "spawn entités"), 
 		WIRE(5000, "fil de redstone"),

@@ -74,18 +74,15 @@ public class WorldEditListener extends EventHandler implements Listener {
 	@org.bukkit.event.EventHandler //cancel copy si joueur essaie de copier dans un plot qui n'est pas à lui
 	public void onCopyCmd(PlayerCommandPreprocessEvent e) {
 		
-		if (e.getMessage().contains("/pos") && e.getMessage().split(" ").length > 1) {
+		/*if (e.getMessage().contains("/pos") && e.getMessage().split(" ").length > 1) {
 			e.setCancelled(true);
 			return;
-		}
+		}*/
 		
 		if (!e.getMessage().contains("/copy") || plugin.getWorldEditManager() == null)
 			return;
 		
 		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
-		
-		if (p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
-			return;
 		
 		LocalSession session = plugin.getWorldEditManager().getSession(e.getPlayer());
 		
@@ -104,11 +101,14 @@ public class WorldEditListener extends EventHandler implements Listener {
 			Plot plot2 = plugin.getPlotsManager().getPlot(blockVectorToLocation(region.getMaximumPoint()));
 			
 			//return si le joueur n'a pas la perm de copy sur ce plot
-			if (plot1 == null || plot2 == null || !plot1.equals(plot2) || plot1.getMembers().getPlayerRank(p) == PlotRank.VISITOR) {
-				
-				e.setCancelled(true);
-				e.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue());
-			}
+			if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+				if (plot1 == null || plot2 == null || !plot1.equals(plot2) || 
+						!plot1.equals(plugin.getPlotsManager().getPlot(p.getPlayer().getLocation())) || 
+						plot1.getMembers().getPlayerRank(p) == PlotRank.VISITOR) {
+					
+					e.setCancelled(true);
+					e.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue());
+				}
 		} catch (IncompleteRegionException e1) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.WE_ERR_SELECTION_TOO_BIG.getValue());

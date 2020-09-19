@@ -17,6 +17,9 @@ public class PermissionsList {
 	public static final OlympaPermission STAFF_BYPASS_VANILLA_COMMANDS = new OlympaPermission(OlympaGroup.DEV);
 	public static final OlympaPermission STAFF_BYPASS_WORLDEDIT = new OlympaPermission(OlympaGroup.DEV);
 	public static final OlympaPermission STAFF_PLOT_OWNER_EVERYWHERE = new OlympaPermission(OlympaGroup.DEV);
+
+	public static final OlympaPermission STAFF_DEACTIVATE_CUSTOM_TAGS = new OlympaPermission(OlympaGroup.DEV);
+	public static final OlympaPermission STAFF_DEACTIVATE_WORLD_EDIT = new OlympaPermission(OlympaGroup.DEV);
 	
 	public static final OlympaPermission TPA = new OlympaPermission(OlympaGroup.PLAYER);
 	

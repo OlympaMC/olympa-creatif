@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.gui;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -66,7 +67,7 @@ public class MainGui extends IGui {
 			inv.setItem(22, ItemUtils.item(Material.COMPARATOR, "§6Paramètres généraux parcelle", clickToOpenMenu));
 			inv.setItem(23, ItemUtils.item(Material.REPEATER, "§6Paramètres d'interraction parcelle", clickToOpenMenu));
 
-			inv.setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle"));	
+			inv.setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle", "§7Uniquement si vous êtes en mode créatif"));	
 		}
 		inv.setItem(30, ItemUtils.item(Material.RED_BED, "§6Téléportation au spawn"));
 		inv.setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"));
@@ -135,11 +136,12 @@ public class MainGui extends IGui {
 			break;
 			
 		case 31:
-			if (plot != null) {
+			if (plot != null && p.getGameMode() == GameMode.CREATIVE) {
 				p.closeInventory();
 				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
 				p.teleport(plot.getParameters().getSpawnLoc());	
 			}
+				
 			break;
 			
 		case 32:

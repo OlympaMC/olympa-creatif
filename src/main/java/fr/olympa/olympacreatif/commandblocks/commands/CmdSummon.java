@@ -54,7 +54,7 @@ public class CmdSummon extends CbCommand {
 		
 		EntityType type = EntityType.fromName(getUndomainedString(args[0]));
 		
-		if (type == null /*|| !allowedEntities.contains(type)*/) 
+		if (type == null || !allowedEntities.contains(type)) 
 			return 0;
 		
 		Entity e = plugin.getWorldManager().getWorld().spawnEntity(sendingLoc, type);

@@ -2,9 +2,6 @@ package fr.olympa.olympacreatif.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -15,20 +12,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent;
 import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent.ChangeType;
 import fr.olympa.api.groups.OlympaGroup;
-import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.player.Gender;
-import fr.olympa.api.plugin.OlympaSpigot;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
-import fr.olympa.core.spigot.redis.RedisSpigotSend;
-import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;

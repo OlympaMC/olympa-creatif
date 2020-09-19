@@ -95,24 +95,35 @@ public class PlotsManager {
 			
 			@Override
 			public void run() {
-				Map<Entity, Plot> listToRemove = new HashMap<Entity, Plot>();		
+				//Map<Entity, Plot> listToRemove = new HashMap<Entity, Plot>();		
 				
+				//parcours les entités du monde. Si elles sont en dehors de leur plot, elles sont supprimées
 				new ArrayList<Entity>(plugin.getWorldManager().getWorld().getEntities()).forEach(e ->{
 					if (e.getType() == EntityType.PLAYER)
 						return;
 					
 					PlotId id = getPlotIdFromTagOf(e);
 					
-					if (id  == null || !id.equals(PlotId.fromLoc(plugin, e.getLocation())))
-						listToRemove.put(e, plugin.getPlotsManager().getPlot(id));
+					if (id  == null || !id.equals(PlotId.fromLoc(plugin, e.getLocation()))) {
+						Plot plot = plugin.getPlotsManager().getPlot(id);
+						
+						if (plot != null)
+							plot.removeEntityInPlot(e, true);
+						else
+							e.remove();
+						
+						//listToRemove.put(e, plugin.getPlotsManager().getPlot(id));
+					}
 				});
+				
 				//remove entités
-				plugin.getTask().runTask(()-> listToRemove.forEach((e, plot) -> {
+				/*
+				listToRemove.forEach((e, plot) -> {
 					if (plot != null)
 						plot.removeEntityInPlot(e, true);
 					else
 						e.remove();
-				}));
+				});*/
 			}
 		}.runTaskTimerAsynchronously(plugin, 10, 100);
 		
@@ -129,6 +140,11 @@ public class PlotsManager {
 		}.runTaskTimerAsynchronously(plugin, 10, 1);
 	}
 	
+	/**
+	 * Return the birth plot of an entity (stored in Tags tags list).
+	 * @param e
+	 * @return
+	 */
 	public synchronized PlotId getPlotIdFromTagOf(Entity e) {
 		if (e.getType() == EntityType.PLAYER)
 			return null;

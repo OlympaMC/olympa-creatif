@@ -82,7 +82,6 @@ import net.minecraft.server.v1_15_R1.PacketPlayOutTileEntityData;
 public class PlotsInstancesListener implements Listener{
 
 	private OlympaCreatifMain plugin;
-	private static Map<Player, List<ItemStack>> inventoryStorage = new HashMap<Player, List<ItemStack>>();
 	private Plot plot;
 	
 	//private Map<UUID, List<ItemStack>> itemsToKeepOnDeath = new HashMap<UUID, List<ItemStack>>();
@@ -364,12 +363,9 @@ public class PlotsInstancesListener implements Listener{
 	public void onPrintTnt(BlockIgniteEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		
-		if (plot == null)
-			return;
-		
-		if (plot.hasStoplag()) {
+		if (plot == null || plot.hasStoplag()) {
 			e.setCancelled(true);
-			return;
+			return;	
 		}
 		
 		if (e.getPlayer() == null || (e.getCause() != IgniteCause.ARROW && e.getCause() != IgniteCause.FLINT_AND_STEEL)) {
@@ -398,12 +394,12 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		
 		if (plotFrom != null) 
-			executeExitActions(plugin, e.getPlayer(), plotFrom);
+			plotFrom.executeExitActions(e.getPlayer());
 
 		//OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 
 		if (plotTo != null) 
-			if (!executeEntryActions(plugin, e.getPlayer(), plotTo))
+			if (!plotTo.executeEntryActions(e.getPlayer()))
 				e.setTo(plotTo.getOutLoc());
 	}
 	
@@ -423,128 +419,27 @@ public class PlotsInstancesListener implements Listener{
 		
 		//expulse les joueurs bannis & actions d'entrée de plot
 		if (plotTo != null) 
-			if (!executeEntryActions(plugin, e.getPlayer(), plotTo)) 
+			if (!plotTo.executeEntryActions(e.getPlayer())) 
 				plotTo.teleportOut(e.getPlayer());
 			
 		//actions de sortie de plot
 		if (plotFrom != null) 
-			executeExitActions(plugin, e.getPlayer(), plotFrom);
+			plotFrom.executeExitActions(e.getPlayer());
 	}
 
 	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
 	public void onQuitEvent(PlayerQuitEvent e) {
 		//itemsToKeepOnDeath.remove(e.getPlayer().getUniqueId());
-		inventoryStorage.remove(e.getPlayer());
 		
 		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		if (plot == null)
 			return;
 
-		executeExitActions(plugin, e.getPlayer(), plot);
+		plot.executeExitActions(e.getPlayer());
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 	}
 
 
-	
-	
-	//actions à exécuter en entrée du plot. return false si le joueur en est banni, true sinon
-	public static boolean executeEntryActions(OlympaCreatifMain plugin, Player p, Plot plotTo) {
-		
-		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
-		pc.setCurrentPlot(plotTo);
-		
-		//si le joueur est banni, téléportation en dehors du plot
-		if (((HashSet<Long>) plotTo.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
-			
-			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
-				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(plotTo.getMembers().getOwner().getName()));
-				return false;	
-			}
-		}
-		
-		//ajoute le joueur aux joueurs du plot s'il n'a pas la perm de bypass les commandes vanilla
-		if (!pc.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
-			plotTo.addPlayerInPlot(p);
-		
-		//exécution instruction commandblock d'entrée
-		plugin.getCommandBlocksManager().executeJoinActions(plotTo, p);
-		
-		//clear les visiteurs en entrée & stockage de leur inventaire
-		if ((boolean)plotTo.getParameters().getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS) && plotTo.getMembers().getPlayerRank(pc) == PlotRank.VISITOR) {
-			List<ItemStack> list = new ArrayList<ItemStack>();
-			for (ItemStack it : p.getInventory().getContents()) {
-				if (it != null && it.getType() != Material.AIR)
-				list.add(it);
-			}
-			
-			inventoryStorage.put(p, list);
-			p.getInventory().clear();
-			
-			for (PotionEffect effect : p.getActivePotionEffects())
-				p.removePotionEffect(effect.getType());
-		}
-		
-		//tp au spawn de la zone
-		if ((boolean)plotTo.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-			p.teleport(plotTo.getParameters().getSpawnLoc());
-			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
-		}
-		
-		if (plotTo.getMembers().getPlayerRank(pc) == PlotRank.VISITOR) {
-			//définition du gamemode
-			p.setGameMode((GameMode) plotTo.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
-			
-			//définition du flymode
-			p.setAllowFlight((boolean) plotTo.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
-
-			//set max fly speed
-			p.setFlySpeed(0.1f);
-		}
-		
-		//définition de l'heure du joueur
-		p.setPlayerTime((int) plotTo.getParameters().getParameter(PlotParamType.PLOT_TIME), false);
-		
-		//définition de la météo
-		p.setPlayerWeather((WeatherType) plotTo.getParameters().getParameter(PlotParamType.PLOT_WEATHER));
-		
-		return true;
-	}
-
-	public static void executeExitActions(OlympaCreatifMain plugin, Player p, Plot plot) {
-
-		((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCurrentPlot(null);
-		
-		plot.removePlayerInPlot(p);
-		plugin.getCommandBlocksManager().excecuteQuitActions(plot, p);
-
-		//rendu inventaire si stocké
-		if (inventoryStorage.containsKey(p)) {
-			p.getInventory().clear();
-			for (ItemStack it : inventoryStorage.get(p))
-				p.getInventory().addItem(it);
-			inventoryStorage.remove(p);
-		}
-		
-		p.setGameMode(GameMode.CREATIVE);
-		p.setAllowFlight(true);
-		p.resetPlayerTime();
-		p.resetPlayerWeather();
-
-		LocalSession weSession = plugin.getWorldEditManager().getSession(p);
-		
-		if (weSession != null) {
-			//clear clipboard si le joueur n'en est pas le proprio
-			if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER)
-				weSession.setClipboard(null);
-			
-			World world = weSession.getSelectionWorld();
-			
-			//reset positions worldedit
-			if (world != null && weSession.getRegionSelector(world) != null)
-				weSession.getRegionSelector(world).clear();	
-		}
-	}
-	
 	@EventHandler //cancel remove paintings et itemsframes
 	public void onItemFrameDestroy(HangingBreakByEntityEvent e) {
 		if (e.getRemover().getType() != EntityType.PLAYER) {

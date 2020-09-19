@@ -46,7 +46,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private CommandBlocksManager cbManager;
 
 	private LuckPerms luckperms;
-	private WorldEditPlugin worldedit;
+	
+	private WorldEditPlugin we = null;
+	private IAsyncWorldEdit awe = null;
 	
 	private static OlympaCreatifMain plugin;
 
@@ -109,11 +111,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		
 		
 		//hook into worldedit & asyncworldedit
-		WorldEditPlugin we = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
-	    IAsyncWorldEdit awe = (IAsyncWorldEdit)getServer().getPluginManager().getPlugin("AsyncWorldEdit");
+		we = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
+	    awe = (IAsyncWorldEdit) getServer().getPluginManager().getPlugin("AsyncWorldEdit");
+	    
 		if (we != null) {
-			worldedit = we;
-			worldedit.getWorldEdit().getEventBus().register(new WorldEditListener(this));
+			we.getWorldEdit().getEventBus().register(new WorldEditListener(this));
 			
 			if (awe == null) {
 				Bukkit.getPluginManager().disablePlugin(we);
@@ -124,6 +126,13 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
 			Bukkit.getLogger().log(Level.FINE, getPrefixConsole() + "Successfully loaded WorldEdit and AWE custom progressbar.");
 		}
+	}
+	
+	public void disableWorldEdit() {
+		getServer().getPluginManager().disablePlugin(getServer().getPluginManager().getPlugin("WorldEdit"));
+		getServer().getPluginManager().disablePlugin(getServer().getPluginManager().getPlugin("AsyncWorldEdit"));
+		we = null;
+		awe = null;
 	}
 
 	@Override
@@ -168,7 +177,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			return p.getCustomScoreboardLines().get(i);
 
 		Plot plot;
-		PlotId plotId;
 		switch (i) {
 		case 0:
 			return "§1";
@@ -222,7 +230,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	}
 
 	public WorldEditPlugin getWorldEditManager() {
-		return worldedit;
+		return we;
 	}
 	
 	public LuckPerms getLuckPerms() {

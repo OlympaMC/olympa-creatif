@@ -16,12 +16,14 @@ import org.bukkit.entity.Player;
 import com.google.common.collect.ImmutableList;
 
 import fr.olympa.api.command.OlympaCommand;
+import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.gui.MainGui;
+import fr.olympa.olympacreatif.gui.MembersGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
@@ -39,10 +41,12 @@ public class OcCommand extends OlympaCommand {
 			.add("invite")
 			.add("accept")
 			.add("chat")
+			.add("kick")
 			.add("ban")
 			.add("unban")
-			.add("kick")
+			.add("banlist")
 			.add("visit")
+			.add("members")
 			.add("setspawn")
 			.add("center")
 			.build();
@@ -153,6 +157,7 @@ public class OcCommand extends OlympaCommand {
 							x, plugin.getWorldManager().getWorld().getHighestBlockYAt((int)x, (int)z) + 1, z));
 				}
 				break;
+				
 			case "setspawn":
 				plot = plugin.getPlotsManager().getPlot(p.getLocation());
 				if (plot == null || plot.getMembers().getPlayerLevel(p) < 3)
@@ -163,6 +168,33 @@ public class OcCommand extends OlympaCommand {
 				}
 				
 			break;
+			
+			case "members":
+				new MembersGui(MainGui.getMainGui(pc)).create(p);
+			break;
+			
+			case "banlist":
+				plugin.getTask().runTaskAsynchronously(() -> {
+					Plot plot2 = pc.getCurrentPlot();
+					String msg = "§a >> Joueurs bannis de la parcelle " + plot2 + " : ";
+					
+					List<Long> list = new ArrayList<Long>(((HashSet<Long>) plot2.getParameters().getParameter(PlotParamType.BANNED_PLAYERS)));
+					
+					for (int i = 0 ; i < list.size() ; i++) {
+						msg += "§e" + AccountProvider.getPlayerInformations(list.get(i)).getName();
+						if (i < list.size() - 1)
+							msg += ", ";
+					}
+					
+					if (list.size() == 0)
+						msg += "§7aucun";
+					
+					p.sendMessage(msg);
+				});
+				
+					
+				break;
+			
 			default:
 				sender.sendMessage(Message.COMMAND_HELP.getValue());
 				break;

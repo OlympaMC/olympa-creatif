@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.gui;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -8,7 +9,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 
 public class StaffGui extends IGui {
 	
@@ -27,13 +30,19 @@ public class StaffGui extends IGui {
 		inv.setItem(2, ItemUtils.item(Material.WOODEN_AXE, "§6Bypass WorldEdit", "§7Permet d'utiliser les fonctionnalités WorldEdit", "§7sur tous les plots et la route"));
 		inv.setItem(2 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().getMinGroup().getName(p.getGender())));
 		
-		inv.setItem(3, ItemUtils.item(Material.REDSTONE_TORCH, "§6Fake owner", "§7Permet d'éditer le plot comme si vous", "§7en étiez le propriétaire"));
+		inv.setItem(3, ItemUtils.item(Material.REDSTONE_TORCH, "§6Fake owner", "§7Permet d'éditer les paramètres du plot comme si", "§7vous en étiez le propriétaire"));
 		inv.setItem(3 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().getMinGroup().getName(p.getGender())));
 
 		inv.setItem(4, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		inv.setItem(4 + 9, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
 		
 		//inv.setItem(5, ItemUtils.item(Material.TNT, "§4Reset de la parcelle " + plot, "§cPour reset la parcelle, cliquez ici", "§cavec une TNT dans la main", "§4ATTENTION : Cette action est irréversible !"));
+		
+		inv.setItem(5, ItemUtils.item(Material.PAPER, "§6Désactivation de tous les tags custom", "§2Fonction de sécurité.", "§7Permet de désactiver tous", "§7les tags NBT custom sur le serveur en cas", "§7de problème.", "§cAttention : au redémarage, les tags custom seront de nouveau activés !"));
+		inv.setItem(5 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS.getMinGroup().getName(p.getGender())));
+		
+		inv.setItem(6, ItemUtils.item(Material.DIAMOND_AXE, "§6Désactivation totale de WorldEdit", "§2Fonction de sécurité.", "§7Permet d'interromptre instantanément", "§7toutes les tâches WorldEdit sur le serveur", "§7et de désactiver le plugin.", "§cAttention : au redémarage, WorldEdit sera de nouveau activé !", "§cIl est impossible de réactiver WorldEdit une fois qu'il a été désactivé."));
+		inv.setItem(6 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT.getMinGroup().getName(p.getGender())));
 		
 		//TODO clear plot, stoplag plot, ...
 		
@@ -45,6 +54,12 @@ public class StaffGui extends IGui {
 			toggleSwitch(2);
 		if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
 			toggleSwitch(3);
+
+		if (NBTcontrollerUtil.getDenyAllCustomFlags())
+			toggleSwitch(5);
+		
+		if (plugin.getWorldEditManager() == null || !plugin.getWorldEditManager().isEnabled())
+			toggleSwitch(6);
 	}
 
 	@Override
@@ -54,23 +69,39 @@ public class StaffGui extends IGui {
 		case 0:
 			if (p.toggleStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) 
 				toggleSwitch(slot);
-			
 			break;
+			
 		case 1:
 			if (p.toggleStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
 				toggleSwitch(slot);
-			
 			break;
+			
 		case 2:
 			if (p.toggleStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
 				toggleSwitch(slot);
-			
 			break;
+			
 		case 3:
 			if (p.toggleStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))	
 				toggleSwitch(slot);
-				
 			break;
+			
+		case 5:
+			if (PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS.hasPermission(p))
+				NBTcontrollerUtil.setDenyAllCustomFlags(!NBTcontrollerUtil.getDenyAllCustomFlags());
+				toggleSwitch(slot);
+			break;
+			
+		case 6:
+			if (PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT.hasPermission(p))
+				NBTcontrollerUtil.setDenyAllCustomFlags(!NBTcontrollerUtil.getDenyAllCustomFlags());
+
+				if (plugin.getWorldEditManager() != null && plugin.getWorldEditManager().isEnabled())
+					plugin.disableWorldEdit();
+				
+				toggleSwitch(slot);
+			break;
+			
 		}
 		return true;
 	}

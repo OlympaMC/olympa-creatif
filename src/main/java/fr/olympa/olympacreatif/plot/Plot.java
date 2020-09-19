@@ -3,21 +3,35 @@ package fr.olympa.olympacreatif.plot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.WeatherType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.world.World;
+
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
@@ -38,6 +52,8 @@ public class Plot {
 	private List<Entity> entitiesInPlot = new ArrayList<Entity>();
 	
 	private boolean allowLiquidFlow = false;
+	
+	private static Map<Player, List<ItemStack>> inventoryStorage = new HashMap<Player, List<ItemStack>>();
 	
 	//private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
 	
@@ -64,7 +80,7 @@ public class Plot {
 		//exécution des actions d'entrée pour tous les joueurs sur le plot au moment du chargement
 		for (Player player : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(player.getLocation()))
-				PlotsInstancesListener.executeEntryActions(plugin, player, this);
+				executeEntryActions(player);
 		
 		loadInitialEntitiesOnChunks();
 	}
@@ -83,7 +99,7 @@ public class Plot {
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
-				PlotsInstancesListener.executeEntryActions(plugin, p, this);
+				executeEntryActions(p);
 		
 		loadInitialEntitiesOnChunks();
 	}
@@ -228,4 +244,113 @@ public class Plot {
 	public String toString() {
 		return plotId.toString();
 	}
+	
+	
+	/**
+	 * Execute entry actions for this player for the plot
+	 * @param p concerned player
+	 * @return
+	 */
+	public boolean executeEntryActions(Player p) {
+		
+		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+		pc.setCurrentPlot(this);
+		
+		//si le joueur est banni, téléportation en dehors du plot
+		if (((HashSet<Long>) getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
+			
+			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
+				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(members.getOwner().getName()));
+				return false;	
+			}
+		}
+		
+		//ajoute le joueur aux joueurs du plot s'il n'a pas la perm de bypass les commandes vanilla
+		if (!pc.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
+			addPlayerInPlot(p);
+		
+		//exécution instruction commandblock d'entrée
+		plugin.getCommandBlocksManager().executeJoinActions(this, p);
+		
+		//clear les visiteurs en entrée & stockage de leur inventaire
+		if ((boolean)parameters.getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS) && members.getPlayerRank(pc) == PlotRank.VISITOR) {
+			List<ItemStack> list = new ArrayList<ItemStack>();
+			for (ItemStack it : p.getInventory().getContents()) {
+				if (it != null && it.getType() != Material.AIR)
+				list.add(it);
+			}
+			
+			inventoryStorage.put(p, list);
+			p.getInventory().clear();
+			
+			for (PotionEffect effect : p.getActivePotionEffects())
+				p.removePotionEffect(effect.getType());
+		}
+		
+		//tp au spawn de la zone
+		if ((boolean)parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
+			p.teleport(parameters.getSpawnLoc());
+			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
+		}
+		
+		if (members.getPlayerRank(pc) == PlotRank.VISITOR) {
+			//définition du gamemode
+			p.setGameMode((GameMode) parameters.getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
+			
+			//définition du flymode
+			p.setAllowFlight((boolean) parameters.getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
+
+			//set max fly speed
+			p.setFlySpeed(0.1f);
+		}
+		
+		//définition de l'heure du joueur
+		p.setPlayerTime((int) parameters.getParameter(PlotParamType.PLOT_TIME), false);
+		
+		//définition de la météo
+		p.setPlayerWeather((WeatherType) parameters.getParameter(PlotParamType.PLOT_WEATHER));
+		
+		return true;
+	}
+
+	/**
+	 * Execute quit actions for this player on the plot
+	 * @param p
+	 */
+	public void executeExitActions(Player p) {
+
+		((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCurrentPlot(null);
+		
+		removePlayerInPlot(p);
+		plugin.getCommandBlocksManager().excecuteQuitActions(this, p);
+
+		//rendu inventaire si stocké
+		if (inventoryStorage.containsKey(p)) {
+			p.getInventory().clear();
+			for (ItemStack it : inventoryStorage.get(p))
+				p.getInventory().addItem(it);
+			inventoryStorage.remove(p);
+		}
+		
+		p.setGameMode(GameMode.CREATIVE);
+		p.setAllowFlight(true);
+		p.resetPlayerTime();
+		p.resetPlayerWeather();
+
+		LocalSession weSession = plugin.getWorldEditManager().getSession(p);
+		
+		if (weSession != null) {
+			//clear clipboard si le joueur n'en est pas le proprio
+			if (members.getPlayerRank(p) != PlotRank.OWNER)
+				weSession.setClipboard(null);
+			
+			World world = weSession.getSelectionWorld();
+			
+			//reset positions worldedit
+			if (world != null && weSession.getRegionSelector(world) != null)
+				weSession.getRegionSelector(world).clear();	
+		}
+	}
+	
+	
 }
