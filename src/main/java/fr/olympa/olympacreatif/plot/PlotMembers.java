@@ -71,6 +71,9 @@ public class PlotMembers{
 	}
 
 	public PlotRank getPlayerRank(Player p) {
+		if (p == null)
+			return PlotRank.VISITOR;
+		
 		return getPlayerRank((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
 	}
 	

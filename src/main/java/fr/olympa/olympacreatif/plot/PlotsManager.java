@@ -141,7 +141,7 @@ public class PlotsManager {
 	}
 	
 	/**
-	 * Return the birth plot of an entity (stored in Tags tags list).
+	 * Return the birth plot of an entity
 	 * @param e
 	 * @return
 	 */

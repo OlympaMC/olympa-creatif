@@ -45,9 +45,11 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.potion.PotionEffect;
 
 import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent;
+import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -331,9 +333,18 @@ public class WorldEventsListener implements Listener{
 		setCommandBlockPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
 	}
 	
+	PermissionAttachment attachment = null;
+	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
+		
+		attachment = e.getPlayer().addAttachment(plugin);
+		attachment.setPermission("minecraft.command.execute", true);
+		attachment.setPermission("worldedit.selection.pos", true);
+		attachment.setPermission("worldedit.help", true);
+
+		Bukkit.broadcastMessage(OlympaGroup.PLAYER.runtimePermissions + "");
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
@@ -352,7 +363,8 @@ public class WorldEventsListener implements Listener{
 	}
 	
 	//ajoute/retire les perms worldedit aux joueurs
-	public static void setWorldEditPerms(OlympaPlayerCreatif p, boolean addPerms) {
+	private static void setWorldEditPerms(OlympaPlayerCreatif p, boolean addPerms) {
+		/*
 		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
 
 		if (luckperms == null || p == null || p.getPlayer() == null || !p.getPlayer().isOnline())
@@ -366,10 +378,13 @@ public class WorldEventsListener implements Listener{
 		else 
 			user.data().remove(Node.builder("group.weperms").build());
 		//luckperms.getUserManager().saveUser(user);
+		*/
 	}
 	
 	//ajoute/retire les perms commandblock aux joueurs
 	public static void setCommandBlockPerms(OlympaPlayerCreatif p, boolean addPerms) {
+		
+		/*
 		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
 
 		if (luckperms == null || p == null || p.getPlayer() == null || !p.getPlayer().isOnline())
@@ -383,6 +398,8 @@ public class WorldEventsListener implements Listener{
 		else 
 			user.data().remove(Node.builder("group.cbperms").build());
 		//luckperms.getUserManager().saveUser(user);
+		 * 
+		 */
 	}
 	
 	//GESTION DES KITS

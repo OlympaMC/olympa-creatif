@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.gui;
+ package fr.olympa.olympacreatif.gui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +66,7 @@ public class ShopGui extends IGui{
 				"§a+1 parcelle (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 1) + ")", 
 				"§aAccès aux microblocks et aux têtes"
 				)));
+		
 		ranks.add(new MarketItemData(p, OlympaGroup.CREA_ARCHITECT, 20, ItemUtils.item(Material.GOLDEN_PICKAXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), 
 				"§2En plus des avantages du niveau précédent,",
 				"§2ce grade donne accès à :",

@@ -12,7 +12,7 @@ import net.minecraft.server.v1_15_R1.MinecraftServer;
 public class PlotStoplagChecker {
 
 	public static final int periodDuration = 20;
-	public static int currentPeriod = 0;
+	private static int currentPeriod = 0;
 	
 	public static final int forcedStoplagPeriodDuration = 200;
 	public static final int forcedStoplagStoplagCount = 3;

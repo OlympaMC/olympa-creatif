@@ -657,7 +657,7 @@ public class PlotsInstancesListener implements Listener{
 	public void onLiquidFlow(BlockFromToEvent e) {
 		Plot plot = plugin.getPlotsManager().getPlot(e.getToBlock().getLocation());
 		
-		if (plot == null || plot.hasStoplag() || e.getBlock().getType() == Material.DRAGON_EGG || !plot.hasLiquidFlow()) {
+		if (plot == null || plot.hasStoplag() || !plot.hasLiquidFlow() || e.getBlock().getType() == Material.DRAGON_EGG) {
 			e.setCancelled(true);
 			return;
 		}
