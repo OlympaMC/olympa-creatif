@@ -15,7 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
-import fr.olympa.api.sql.OlympaStatement;
+import fr.olympa.api.sql.statement.OlympaStatement;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
