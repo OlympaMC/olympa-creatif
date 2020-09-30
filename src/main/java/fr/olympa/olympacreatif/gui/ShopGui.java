@@ -182,9 +182,8 @@ public class ShopGui extends IGui{
 				"§2Contenu :",
 				" ",
 				"§aCette amélioration augmente le",
-				"§anombre de commandes par seconde", 
-				"§aque les commandblocks de vos",
-				"§aparcelles pourront exécuter.",
+				"§anombre de commandblocks s'exécutant",
+				"§achaque seconde sur vos parcelles.",
 				" ",
 				"§7Attention : cette amélioration est inutile si",
 				"§7vous n'avez pas acheté le §6kit commandblocks §7!")));
@@ -377,45 +376,32 @@ public class ShopGui extends IGui{
 				
 			//détecte le prochain niveau d'upgrade dispo
 			}else if (toBuy instanceof UpgradeType) {
-				//Bukkit.broadcastMessage("upgrade : " + toBuy + " - player lvl : " + p.getUpgradeLevel((UpgradeType)toBuy));
 				
-					if (((UpgradeType)toBuy).getMaxLevel() > p.getUpgradeLevel((UpgradeType)toBuy))
-						this.price = ((UpgradeType)toBuy).getPriceOf(p.getUpgradeLevel((UpgradeType)toBuy));
-					else {
-						itemHolder = addInvisibleEnchant(itemHolder);
-						isBuyable = false;	
-					}
+				if (((UpgradeType)toBuy).getMaxLevel() > p.getUpgradeLevel((UpgradeType)toBuy))
+					this.price = ((UpgradeType)toBuy).getPriceOf(p.getUpgradeLevel((UpgradeType)toBuy));
+				else {
+					itemHolder = addInvisibleEnchant(itemHolder);
+					isBuyable = false;	
+				}
 
-					int oldValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy));
-					int newValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1);
+				int oldValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy));
+				int newValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1);
 
-					if (toBuy == UpgradeType.CB_LEVEL) {
-						oldValue *= 20;
-						newValue *= 20;
-					}
+				if (toBuy == UpgradeType.CB_LEVEL) {
+					oldValue *= 20;
+					newValue *= 20;
+				}
 
-					String oldV = Integer.toString(oldValue);
-					String newV = Integer.toString(newValue);
-					
-					if (oldValue == newValue)
-						newV = "§7maximum atteint";
-					
-					itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + oldV + " ➔ " + newV);
-					
-					/*
-					if (isBuyable)
-						if (toBuy == UpgradeType.CB_LEVEL)
-							itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
-									((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) * 20 + " ➔ " + 
-									((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1) * 20);
-						else
-							itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
-									((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ➔ " + 
-									((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1));
-					else
-						itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + 
-								((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy)) + " ➔ §7maximum atteint");
-								*/
+				String oldV = Integer.toString(oldValue);
+				String newV = Integer.toString(newValue);
+				
+				if (oldValue == newValue)
+					newV = "§7maximum atteint";
+				
+				itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + oldV + " ➔ " + newV);
+				
+				if (toBuy == UpgradeType.CB_LEVEL && !p.hasKit(KitType.COMMANDBLOCK))
+					isBuyable = false;
 			}
 
 			itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§ePrix : " + price);

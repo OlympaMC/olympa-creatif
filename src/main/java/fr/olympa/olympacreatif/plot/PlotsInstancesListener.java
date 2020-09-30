@@ -467,11 +467,16 @@ public class PlotsInstancesListener implements Listener{
 		}*/
 	}
 	
-	@EventHandler
+	@EventHandler//TODO
 	public void onHangingPlace(HangingPlaceEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
-		if (plot == null || plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) 
+		
+		if (plot == null || plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR || plot.hasStoplag()) {
 			e.setCancelled(true);
+			return;
+		}
+		
+		addPlotMarkerTo(e.getEntity());
 	}
 	
 	@EventHandler(priority = EventPriority.LOW) //gestion autorisation pvp & fake player death
@@ -592,19 +597,21 @@ public class PlotsInstancesListener implements Listener{
 			plot.addEntityInPlot(e.getEntity());
 			plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
 			
-			
-			NBTTagCompound tag = new NBTTagCompound();
-			net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e.getEntity()).getHandle();
-			ent.c(tag);
-			
-			NBTTagList list = new NBTTagList();			
-			list.add(NBTTagString.a(plot.getPlotId().toString()));
-			tag.set("Tags", list);
-			
-			ent.f(tag);
-
+			addPlotMarkerTo(e.getEntity());
 		}else
 			e.setCancelled(true);
+	}
+	
+	private void addPlotMarkerTo(Entity e) {
+		NBTTagCompound tag = new NBTTagCompound();
+		net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e).getHandle();
+		ent.c(tag);
+		
+		NBTTagList list = new NBTTagList();			
+		list.add(NBTTagString.a(plot.getPlotId().toString()));
+		tag.set("Tags", list);
+		
+		ent.f(tag);
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)//cancel rétractation piston si un bloc affecté se trouve sur une route

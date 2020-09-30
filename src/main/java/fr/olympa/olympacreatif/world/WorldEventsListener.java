@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -276,7 +277,7 @@ public class WorldEventsListener implements Listener{
 			e.setCancelled(true);
 	}
 	
-	@EventHandler //remplir le dispenser au fur et à mesure qu'il se vide (pour toujours garder les mêmes objets à l'intérieur)
+	/*@EventHandler //remplir le dispenser au fur et à mesure qu'il se vide (pour toujours garder les mêmes objets à l'intérieur)
 	public void onDispense(BlockDispenseEvent e) {
 		if (e.getItem() == null) 
 			return;
@@ -288,7 +289,7 @@ public class WorldEventsListener implements Listener{
 			((Dropper) e.getBlock().getState()).getInventory().addItem(e.getItem().clone());
 		}
 		
-	}
+	}*/
 	
 	@EventHandler(priority = EventPriority.HIGHEST) //chat de plot
 	public void onChat(AsyncPlayerChatEvent e) {
@@ -333,18 +334,19 @@ public class WorldEventsListener implements Listener{
 		setCommandBlockPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
 	}
 	
-	PermissionAttachment attachment = null;
+	//PermissionAttachment attachment = null;
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 		
+		/*
 		attachment = e.getPlayer().addAttachment(plugin);
 		attachment.setPermission("minecraft.command.execute", true);
 		attachment.setPermission("worldedit.selection.pos", true);
 		attachment.setPermission("worldedit.help", true);
 
-		Bukkit.broadcastMessage(OlympaGroup.PLAYER.runtimePermissions + "");
+		Bukkit.broadcastMessage(OlympaGroup.PLAYER.runtimePermissions + "");*/
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
@@ -353,7 +355,7 @@ public class WorldEventsListener implements Listener{
 			OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId()); 
 			setWorldEditPerms(p, true);
 			setCommandBlockPerms(p, true);
-		}, 60);
+		}, 3, TimeUnit.SECONDS);
 	}
 	
 	@EventHandler //add perms worldedit si achat du grade correspondant

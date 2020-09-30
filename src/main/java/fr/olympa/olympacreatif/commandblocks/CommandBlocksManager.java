@@ -10,6 +10,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -92,6 +93,9 @@ public class CommandBlocksManager {
 			team.removeMember(p);
 		
 		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
+		
+		//resend tablist packets
+		OlympaCore.getInstance().getNameTagApi().sendTeams(p);
 		
 		//maj du scoreboard (reset du score du scoreboard du plot et réaffectation du scoreboard
 		p.getScoreboard().resetScores(p);

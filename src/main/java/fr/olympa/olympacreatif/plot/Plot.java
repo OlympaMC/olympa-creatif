@@ -77,12 +77,7 @@ public class Plot {
 		if (p.hasKit(KitType.FLUIDS))
 			allowLiquidFlow = true;
 		
-		//exécution des actions d'entrée pour tous les joueurs sur le plot au moment du chargement
-		for (Player player : Bukkit.getOnlinePlayers())
-			if (plotId.isInPlot(player.getLocation()))
-				executeEntryActions(player);
-		
-		loadInitialEntitiesOnChunks();
+		executeCommonInstanciationActions();
 	}
 	
 	//chargement d'un plot déjà existant
@@ -96,12 +91,22 @@ public class Plot {
 		
 		allowLiquidFlow = ap.getAllowLiquidFlow();
 		
+		executeCommonInstanciationActions();
+	}
+	
+	private void executeCommonInstanciationActions() {
+		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
 				executeEntryActions(p);
 		
 		loadInitialEntitiesOnChunks();
+		
+		//forceload 2*2 chunks à l'origine du plot
+		for (int i = plotId.getLocation().getChunk().getX() ; i < plotId.getLocation().getChunk().getX() + 2 ; i++)
+			for (int j = plotId.getLocation().getChunk().getZ() ; j < plotId.getLocation().getChunk().getX() + 2 ; j++)
+				plugin.getWorldManager().getWorld().setChunkForceLoaded(i, j, true);
 	}
 	
 	private void loadInitialEntitiesOnChunks() {
@@ -208,14 +213,13 @@ public class Plot {
 		return loc;
 	}
 
-	/*
-	public Map<Location, SimpleEntry<BlockData, TileEntity>> getProtectedZoneData() {
-		return protectedZoneData;
-	}
-	*/
-
 	public void unload() {
 		cbData.unload();
+		
+		//unload des forced chunks
+		for (int i = plotId.getLocation().getChunk().getX() ; i < plotId.getLocation().getChunk().getX() + 2 ; i++)
+			for (int j = plotId.getLocation().getChunk().getZ() ; j < plotId.getLocation().getChunk().getX() + 2 ; j++)
+				plugin.getWorldManager().getWorld().setChunkForceLoaded(i, j, false);
 	}
 
 	public PlotId getPlotId() {
