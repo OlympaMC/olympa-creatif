@@ -224,10 +224,29 @@ public class PlotId {
 				z < indexZ * (WorldManager.plotSize + WorldManager.roadSize) + WorldManager.plotSize; 
 	}
 	
-	public boolean isOnInteriorDiameter(Location loc) {
-		return isOnInteriorDiameter(loc.getBlockX(), loc.getBlockZ());
+	public boolean isOnInteriorDiameter(Location loc, int radius) {
+		return isOnInteriorDiameter(loc.getBlockX(), loc.getBlockZ(), radius);
 	}
 	
+	public boolean isOnInteriorDiameter(int x, int z, int radius) {
+		if (!isInPlot(x, z))
+			return false;
+		
+		x = Math.floorMod(x, WorldManager.plotSize + WorldManager.roadSize);
+		z = Math.floorMod(z, WorldManager.plotSize + WorldManager.roadSize);
+		
+		if (getMinimalDifference(x, WorldManager.plotSize) >= radius)
+			return false;
+		if (getMinimalDifference(z, WorldManager.plotSize) >= radius)
+			return false;
+		
+		return true;
+	}
+	
+	private int getMinimalDifference(int x, int plotSize) {
+		return Math.min(x,  plotSize - x - 1);
+	}
+	/*
 	public boolean isOnInteriorDiameter(int x, int z) {
 		if (x == indexX * (WorldManager.plotSize + WorldManager.roadSize) || 
 			x == indexX * (WorldManager.plotSize + WorldManager.roadSize) + WorldManager.plotSize - 1 ||
@@ -236,7 +255,7 @@ public class PlotId {
 			return true;
 		else
 			return false;
-	}
+	}*/
 	
 	@Override
 	public boolean equals(Object obj) {

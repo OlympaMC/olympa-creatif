@@ -58,6 +58,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.world.World;
@@ -467,18 +470,6 @@ public class PlotsInstancesListener implements Listener{
 		}*/
 	}
 	
-	@EventHandler//TODO
-	public void onHangingPlace(HangingPlaceEvent e) {
-		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
-		
-		if (plot == null || plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR || plot.hasStoplag()) {
-			e.setCancelled(true);
-			return;
-		}
-		
-		addPlotMarkerTo(e.getEntity());
-	}
-	
 	@EventHandler(priority = EventPriority.LOW) //gestion autorisation pvp & fake player death
 	public void onDamageByEntity(EntityDamageByEntityEvent e) {
 		if (e.isCancelled())
@@ -583,6 +574,18 @@ public class PlotsInstancesListener implements Listener{
 				plot.getStoplagChecker().addEvent(StopLagDetect.WIRE);
 	}
 	
+	@EventHandler
+	public void onHangingPlace(HangingPlaceEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (plot == null || plot.hasStoplag() || plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		plugin.getPlotsManager().setBirthPlot(plot.getPlotId(), e.getEntity());
+	}
+	
 	@EventHandler(priority = EventPriority.HIGH) //si spawn d'entité, ajout à la liste des entités du plot
 	public void onEntitySpawn(EntitySpawnEvent e) {
 		if (e.isCancelled())
@@ -597,22 +600,36 @@ public class PlotsInstancesListener implements Listener{
 			plot.addEntityInPlot(e.getEntity());
 			plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
 			
-			addPlotMarkerTo(e.getEntity());
+			plugin.getPlotsManager().setBirthPlot(plot.getPlotId(), e.getEntity());
 		}else
 			e.setCancelled(true);
 	}
 	
-	private void addPlotMarkerTo(Entity e) {
-		NBTTagCompound tag = new NBTTagCompound();
-		net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e).getHandle();
-		ent.c(tag);
+	@EventHandler //remove entities from plot entities list
+	public void onEntityDespawn(EntityRemoveFromWorldEvent e) {
+		plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		
-		NBTTagList list = new NBTTagList();			
-		list.add(NBTTagString.a(plot.getPlotId().toString()));
-		tag.set("Tags", list);
-		
-		ent.f(tag);
+		if (plot != null)
+			plot.removeEntityInPlot(e.getEntity(), true);
 	}
+	
+	@EventHandler //cancel entity pathfind of entity try to go outside of the plot
+	public void onEntityPathFind(EntityPathfindEvent e) {
+		if (e.getEntityType() == EntityType.PLAYER)
+			return;
+		
+		plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(e.getEntity()));
+		
+		if (plot == null) {
+			e.getEntity().remove();
+			return;
+		}
+		
+		if (!plot.getPlotId().isInPlot(e.getLoc()))
+			e.setCancelled(true);
+	}
+	
+	
 	
 	@EventHandler(priority = EventPriority.LOW)//cancel rétractation piston si un bloc affecté se trouve sur une route
 	public void onPistonRetractEvent(BlockPistonRetractEvent e) {
@@ -651,7 +668,7 @@ public class PlotsInstancesListener implements Listener{
 				e.setCancelled(true);
 				return;
 			}
-			else if (plot.getPlotId().isOnInteriorDiameter(block.getLocation())) {
+			else if (plot.getPlotId().isOnInteriorDiameter(block.getLocation(), 2)) {
 				e.setCancelled(true);
 				return;
 			}
@@ -673,7 +690,7 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	@EventHandler //cancel pousse d'arbres, etc en dehors d'un plot
-	public void onGrow(StructureGrowEvent e) {
+	public void onGrowStructure(StructureGrowEvent e) {
 		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
 		if (plot == null) {
 			e.setCancelled(true);
@@ -687,7 +704,7 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	@EventHandler //cancel pousse céréale, citrouille, ...
-	public void onGrow(BlockGrowEvent e) {
+	public void onGrowBlock(BlockGrowEvent e) {
 		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 
 		if (plot == null)
@@ -703,7 +720,7 @@ public class PlotsInstancesListener implements Listener{
 			if (ent.getType() == EntityType.PLAYER)
 				return;
 			
-			Plot plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getPlotIdFromTagOf(ent));
+			Plot plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(ent));
 			if (plot != null && plot.getPlotId().equals(plugin.getPlotsManager().getPlot(ent.getLocation()).getPlotId()))
 				plot.addEntityInPlot(ent);
 		});
@@ -716,7 +733,7 @@ public class PlotsInstancesListener implements Listener{
 			if (ent.getType() == EntityType.PLAYER)
 				return;
 			
-			Plot plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getPlotIdFromTagOf(ent));
+			Plot plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(ent));
 			if (plot != null)
 				plot.removeEntityInPlot(ent, false);
 		});

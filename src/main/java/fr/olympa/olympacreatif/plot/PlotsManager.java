@@ -21,10 +21,11 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
+import net.minecraft.server.v1_15_R1.NBTTagString;
 
 public class PlotsManager {
 
-	private final int delayBetweenCheckup = 20 * 30;
+	private static final int delayBetweenPlotsCheckup = 20 * 30;
 	public static final int maxPlotsPerPlayer = 36;
 	
 	private OlympaCreatifMain plugin;
@@ -87,7 +88,7 @@ public class PlotsManager {
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 20, delayBetweenCheckup);
+		}.runTaskTimer(plugin, 20, delayBetweenPlotsCheckup);
 		
 		
 		//kill les entités en dehors de leur plot attitré
@@ -102,7 +103,7 @@ public class PlotsManager {
 					if (e.getType() == EntityType.PLAYER)
 						return;
 					
-					PlotId id = getPlotIdFromTagOf(e);
+					PlotId id = getBirthPlot(e);
 					
 					if (id  == null || !id.equals(PlotId.fromLoc(plugin, e.getLocation()))) {
 						Plot plot = plugin.getPlotsManager().getPlot(id);
@@ -125,10 +126,11 @@ public class PlotsManager {
 						e.remove();
 				});*/
 			}
-		}.runTaskTimerAsynchronously(plugin, 10, 100);
+		}.runTaskTimerAsynchronously(plugin, 10, 300);
 		
 		//retire les entités de la liste des entités des plots si l'entité est morte
-		new BukkitRunnable() {
+		//implémenté avec l'évent EntityRemoveFromWorldEvent
+		/*new BukkitRunnable() {
 			
 			@Override
 			public void run() {
@@ -137,7 +139,7 @@ public class PlotsManager {
 						plot.removeEntityInPlot(e, true);
 				}));
 			}
-		}.runTaskTimerAsynchronously(plugin, 10, 1);
+		}.runTaskTimerAsynchronously(plugin, 10, 1);*/
 	}
 	
 	/**
@@ -145,7 +147,7 @@ public class PlotsManager {
 	 * @param e
 	 * @return
 	 */
-	public synchronized PlotId getPlotIdFromTagOf(Entity e) {
+	public synchronized PlotId getBirthPlot(Entity e) {
 		if (e.getType() == EntityType.PLAYER)
 			return null;
 		
@@ -162,6 +164,18 @@ public class PlotsManager {
 			return null;
 		
 		return PlotId.fromString(plugin, list.getString(0));
+	}
+	
+	public void setBirthPlot(PlotId plot, Entity e) {
+		NBTTagCompound tag = new NBTTagCompound();
+		net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e).getHandle();
+		ent.c(tag);
+		
+		NBTTagList list = new NBTTagList();			
+		list.add(NBTTagString.a(plot.toString()));
+		tag.set("Tags", list);
+		
+		ent.f(tag);
 	}
 
 	
