@@ -13,6 +13,9 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -23,7 +26,69 @@ import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public class CmdSummon extends CbCommand {
 
-	private static List<EntityType> allowedEntities = new ArrayList<EntityType>();
+	//private static List<EntityType> allowedEntities = new ArrayList<EntityType>();
+	private static List<EntityType> allowedEntities  = ImmutableList.<EntityType>builder()
+			.add(EntityType.ARMOR_STAND)
+			.add(EntityType.BAT)
+			.add(EntityType.BEE)
+			.add(EntityType.BLAZE)
+			.add(EntityType.CAT)
+			.add(EntityType.CAVE_SPIDER)
+			.add(EntityType.CHICKEN)
+			.add(EntityType.COD)
+			.add(EntityType.COW)
+			.add(EntityType.CREEPER)
+			.add(EntityType.DOLPHIN)
+			.add(EntityType.DONKEY)
+			.add(EntityType.DROWNED)
+			.add(EntityType.ELDER_GUARDIAN)
+			.add(EntityType.ENDERMAN)
+			.add(EntityType.ENDERMITE)
+			.add(EntityType.EVOKER)
+			.add(EntityType.FOX)
+			.add(EntityType.GHAST)
+			.add(EntityType.GUARDIAN)
+			.add(EntityType.HORSE)
+			.add(EntityType.HUSK)
+			.add(EntityType.LLAMA)
+			.add(EntityType.MAGMA_CUBE)
+			.add(EntityType.MUSHROOM_COW)
+			.add(EntityType.MULE)
+			.add(EntityType.OCELOT)
+			.add(EntityType.PANDA)
+			.add(EntityType.PARROT)
+			.add(EntityType.PHANTOM)
+			.add(EntityType.PIG)
+			.add(EntityType.PILLAGER)
+			.add(EntityType.POLAR_BEAR)
+			.add(EntityType.PUFFERFISH)
+			.add(EntityType.RABBIT)
+			.add(EntityType.RAVAGER)
+			.add(EntityType.SALMON)
+			.add(EntityType.SHEEP)
+			.add(EntityType.SHULKER)
+			.add(EntityType.SILVERFISH)
+			.add(EntityType.SKELETON_HORSE)
+			.add(EntityType.SKELETON)
+			.add(EntityType.SLIME)
+			.add(EntityType.SPIDER)
+			.add(EntityType.SQUID)
+			.add(EntityType.STRAY)
+			.add(EntityType.TRADER_LLAMA)
+			.add(EntityType.TROPICAL_FISH)
+			.add(EntityType.TURTLE)
+			.add(EntityType.VEX)
+			.add(EntityType.VILLAGER)
+			.add(EntityType.VINDICATOR)
+			.add(EntityType.WANDERING_TRADER)
+			.add(EntityType.WITCH)
+			.add(EntityType.WITHER_SKELETON)
+			.add(EntityType.WOLF)
+			.add(EntityType.ZOMBIE_HORSE)
+			.add(EntityType.PIG_ZOMBIE)
+			.add(EntityType.ZOMBIE)
+			.add(EntityType.ZOMBIE_VILLAGER)
+			.build();//= new ArrayList<EntityType>();
 	
 	public CmdSummon(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(type, sender, loc, plugin, plot, args);
@@ -32,7 +97,6 @@ public class CmdSummon extends CbCommand {
 	
 	@Override
 	public int execute() {
-		//instanciateAllowedEntities();
 		
 		//return si le proprio du plot n'a pas débloqué le /summon
 		if (!plotCbData.hasUnlockedSummon())
@@ -67,72 +131,4 @@ public class CmdSummon extends CbCommand {
 		
 		return 1;
 	}
-	
-	private void instanciateAllowedEntities() {
-		if (allowedEntities.size() > 0)
-			return;
-
-		allowedEntities.add(EntityType.ARMOR_STAND);
-		allowedEntities.add(EntityType.BAT);
-		allowedEntities.add(EntityType.BEE);
-		allowedEntities.add(EntityType.BLAZE);
-		allowedEntities.add(EntityType.CAT);
-		allowedEntities.add(EntityType.CAVE_SPIDER);
-		allowedEntities.add(EntityType.CHICKEN);
-		allowedEntities.add(EntityType.COD);
-		allowedEntities.add(EntityType.COW);
-		allowedEntities.add(EntityType.CREEPER);
-		allowedEntities.add(EntityType.DOLPHIN);
-		allowedEntities.add(EntityType.DONKEY);
-		allowedEntities.add(EntityType.DROWNED);
-		allowedEntities.add(EntityType.ELDER_GUARDIAN);
-		allowedEntities.add(EntityType.ENDERMAN);
-		allowedEntities.add(EntityType.ENDERMITE);
-		allowedEntities.add(EntityType.EVOKER);
-		allowedEntities.add(EntityType.FOX);
-		allowedEntities.add(EntityType.GHAST);
-		allowedEntities.add(EntityType.GUARDIAN);
-		allowedEntities.add(EntityType.HORSE);
-		allowedEntities.add(EntityType.HUSK);
-		allowedEntities.add(EntityType.LLAMA);
-		allowedEntities.add(EntityType.MAGMA_CUBE);
-		allowedEntities.add(EntityType.MUSHROOM_COW);
-		allowedEntities.add(EntityType.MULE);
-		allowedEntities.add(EntityType.OCELOT);
-		allowedEntities.add(EntityType.PANDA);
-		allowedEntities.add(EntityType.PARROT);
-		allowedEntities.add(EntityType.PHANTOM);
-		allowedEntities.add(EntityType.PIG);
-		allowedEntities.add(EntityType.PILLAGER);
-		allowedEntities.add(EntityType.POLAR_BEAR);
-		allowedEntities.add(EntityType.PUFFERFISH);
-		allowedEntities.add(EntityType.RABBIT);
-		allowedEntities.add(EntityType.RAVAGER);
-		allowedEntities.add(EntityType.SALMON);
-		allowedEntities.add(EntityType.SHEEP);
-		allowedEntities.add(EntityType.SHULKER);
-		allowedEntities.add(EntityType.SILVERFISH);
-		allowedEntities.add(EntityType.SKELETON_HORSE);
-		allowedEntities.add(EntityType.SKELETON);
-		allowedEntities.add(EntityType.SLIME);
-		allowedEntities.add(EntityType.SPIDER);
-		allowedEntities.add(EntityType.SQUID);
-		allowedEntities.add(EntityType.STRAY);
-		allowedEntities.add(EntityType.TRADER_LLAMA);
-		allowedEntities.add(EntityType.TROPICAL_FISH);
-		allowedEntities.add(EntityType.TURTLE);
-		allowedEntities.add(EntityType.VEX);
-		allowedEntities.add(EntityType.VILLAGER);
-		allowedEntities.add(EntityType.VINDICATOR);
-		allowedEntities.add(EntityType.WANDERING_TRADER);
-		allowedEntities.add(EntityType.WITCH);
-		allowedEntities.add(EntityType.WITHER_SKELETON);
-		allowedEntities.add(EntityType.WOLF);
-		allowedEntities.add(EntityType.ZOMBIE_HORSE);
-		allowedEntities.add(EntityType.PIG_ZOMBIE);
-		allowedEntities.add(EntityType.ZOMBIE);
-		allowedEntities.add(EntityType.ZOMBIE_VILLAGER);
-
-	}
-	
 }

@@ -2,22 +2,17 @@ package fr.olympa.olympacreatif.plot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.WeatherType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.block.data.type.Dispenser;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -35,14 +30,12 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -55,16 +48,12 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.common.collect.ImmutableList;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.world.World;
-
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
@@ -78,8 +67,6 @@ import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.NBTTagList;
-import net.minecraft.server.v1_15_R1.NBTTagString;
 import net.minecraft.server.v1_15_R1.PacketPlayOutTileEntityData;
 
 public class PlotsInstancesListener implements Listener{
@@ -150,6 +137,10 @@ public class PlotsInstancesListener implements Listener{
 		}.runTaskTimer(plugin, 10, 1);
 	}
 
+	////////////////////////////////////////////////////////////
+	//                      BLOCKS EVENTS                     //
+	////////////////////////////////////////////////////////////
+	
 	@EventHandler //test place block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
 		if (e.isCancelled())
@@ -208,6 +199,130 @@ public class PlotsInstancesListener implements Listener{
 			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue(plot));
 		}
 	}
+	
+	@EventHandler//cancel redstone si stoplag, sinon enregistre l'évent dans le stoplag checker
+	public void onRedstoneChange(BlockRedstoneEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null)
+			e.setNewCurrent(0);
+		else
+			if (plot.hasStoplag())
+				e.setNewCurrent(0);
+			else if (e.getBlock().getType() == Material.REDSTONE_LAMP)
+				plot.getStoplagChecker().addEvent(StopLagDetect.LAMP);
+			else if (e.getBlock().getType() == Material.REDSTONE_WIRE)
+				plot.getStoplagChecker().addEvent(StopLagDetect.WIRE);
+	}
+	
+	@EventHandler //test print TNT
+	public void onPrintTnt(BlockIgniteEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null || plot.hasStoplag()) {
+			e.setCancelled(true);
+			return;	
+		}
+		
+		if (e.getPlayer() == null || (e.getCause() != IgniteCause.ARROW && e.getCause() != IgniteCause.FLINT_AND_STEEL)) {
+			e.setCancelled(true);
+			return;
+		}
+		if (e.getBlock().getType() != Material.TNT && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
+			e.setCancelled(true);
+			return;
+		}
+		if (!(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT) && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
+			e.setCancelled(true);
+			e.getPlayer().sendMessage(Message.PLOT_CANT_PRINT_TNT.getValue());
+		}
+	}
+	
+	
+	
+	@EventHandler(priority = EventPriority.LOW)//cancel rétractation piston si un bloc affecté se trouve sur une route
+	public void onPistonRetractEvent(BlockPistonRetractEvent e) {
+		if (e.isCancelled())
+			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null || plot.hasStoplag()) {
+			e.setCancelled(true);
+			return;	
+		}
+		
+		for (Block block : e.getBlocks())
+			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation())))
+				e.setCancelled(true);
+		
+		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
+	}
+	
+	@EventHandler(priority = EventPriority.LOW) //cancel poussée piston si un bloc affecté se trouve sur une route
+	public void onPistonPushEvent(BlockPistonExtendEvent e) {
+		if (e.isCancelled())
+			return;
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null || plot.hasStoplag()) {
+			e.setCancelled(true);
+			return;	
+		}
+		
+		//cancel évent si blocks poussés sur la route
+		for (Block block : e.getBlocks()) {
+			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation()))) {
+				e.setCancelled(true);
+				return;
+			}
+			else if (plot.getPlotId().isOnInteriorDiameter(block.getLocation(), 2)) {
+				e.setCancelled(true);
+				return;
+			}
+		}
+		
+		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
+	}
+	
+	@EventHandler //cancel lava/water flow en dehors du plot. Cancel aussi toute téléportation d'un oeuf de dragon
+	public void onLiquidFlow(BlockFromToEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getToBlock().getLocation());
+		
+		if (plot == null || plot.hasStoplag() || !plot.hasLiquidFlow() || e.getBlock().getType() == Material.DRAGON_EGG) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		plot.getStoplagChecker().addEvent(StopLagDetect.LIQUID);
+	}
+	
+	@EventHandler //cancel pousse d'arbres, etc en dehors d'un plot
+	public void onGrowStructure(StructureGrowEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
+		if (plot == null) {
+			e.setCancelled(true);
+			return;
+		}
+		for (BlockState b : e.getBlocks())
+			if (!plot.equals(plugin.getPlotsManager().getPlot(b.getLocation()))) {
+				e.setCancelled(true);
+				return;
+			}
+	}
+	
+	@EventHandler //cancel pousse céréale, citrouille, ...
+	public void onGrowBlock(BlockGrowEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+
+		if (plot == null)
+			e.setCancelled(true);
+	}
+
+	////////////////////////////////////////////////////////////
+	//               POTIONS & INTERRACT EVENTS               //
+	////////////////////////////////////////////////////////////
 	
 	@EventHandler //cancel splash potion sin interdites dans le plot
 	public void onPotionThrows(PotionSplashEvent e) {
@@ -351,39 +466,10 @@ public class PlotsInstancesListener implements Listener{
 				plot.getMembers().getPlayerRank(e.getPlayer()) != PlotRank.VISITOR) 
 			plot.removeEntityInPlot(e.getRightClicked(), true);
 	}
-	
-	@EventHandler//cancel spawn entité si paramètre du plot l'interdit
-	public void onProjectileSpawn(ProjectileLaunchEvent e) {
-		plot = plugin.getPlotsManager().getPlot(e.getLocation());
 
-		if (plot == null || !(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_LAUNCH_PROJECTILES)) {
-			e.setCancelled(true);
-			return;
-		}			
-	}
-	
-	@EventHandler //test print TNT
-	public void onPrintTnt(BlockIgniteEvent e) {
-		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-		
-		if (plot == null || plot.hasStoplag()) {
-			e.setCancelled(true);
-			return;	
-		}
-		
-		if (e.getPlayer() == null || (e.getCause() != IgniteCause.ARROW && e.getCause() != IgniteCause.FLINT_AND_STEEL)) {
-			e.setCancelled(true);
-			return;
-		}
-		if (e.getBlock().getType() != Material.TNT && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
-			e.setCancelled(true);
-			return;
-		}
-		if (!(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT) && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
-			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_PRINT_TNT.getValue());
-		}
-	}
+	////////////////////////////////////////////////////////////
+	//                       MOVE EVENTS                      //
+	////////////////////////////////////////////////////////////
 	
 	@EventHandler(priority = EventPriority.LOWEST) //modifie la destination téléport si joueur banni du plot
 	public void onTeleportEvent(PlayerTeleportEvent e) {
@@ -430,6 +516,7 @@ public class PlotsInstancesListener implements Listener{
 			plotFrom.executeExitActions(e.getPlayer());
 	}
 
+	/* Inutile car les données des joueurs ne sont pas save au déco
 	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
 	public void onQuitEvent(PlayerQuitEvent e) {
 		//itemsToKeepOnDeath.remove(e.getPlayer().getUniqueId());
@@ -440,35 +527,11 @@ public class PlotsInstancesListener implements Listener{
 
 		plot.executeExitActions(e.getPlayer());
 		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
-	}
+	}*/
 
-
-	@EventHandler //cancel remove paintings et itemsframes
-	public void onItemFrameDestroy(HangingBreakByEntityEvent e) {
-		if (e.getRemover().getType() != EntityType.PLAYER) {
-			e.setCancelled(true);
-			return;
-		}
-		
-		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
-		if (plot == null)
-			return;
-		
-		if (plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR) {
-			e.setCancelled(true);	
-			return;
-		}
-		
-		plot.removeEntityInPlot(e.getEntity(), true);
-		
-		//remove entity si joueur a une houe en bois dans la main
-		/*if (((Player)e.getRemover()).getInventory().getItemInMainHand() != null && 
-				((Player)e.getRemover()).getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && 
-				plot.getMembers().getPlayerRank((Player) e.getRemover()) != PlotRank.VISITOR) {
-
-			plot.removeEntityInPlot(e.getEntity());
-		}*/
-	}
+	////////////////////////////////////////////////////////////
+	//                      DAMAGE EVENTS                     //
+	////////////////////////////////////////////////////////////
 	
 	@EventHandler(priority = EventPriority.LOW) //gestion autorisation pvp & fake player death
 	public void onDamageByEntity(EntityDamageByEntityEvent e) {
@@ -529,6 +592,37 @@ public class PlotsInstancesListener implements Listener{
 			if (FakePlayerDeathEvent.fireFakeDeath(plugin, (Player) e.getEntity(), null, e.getFinalDamage(), plot))
 				e.setCancelled(true);
 	}
+
+	////////////////////////////////////////////////////////////
+	//                      ENTITY EVENTS                     //
+	////////////////////////////////////////////////////////////
+
+	@EventHandler //cancel remove paintings et itemsframes
+	public void onItemFrameDestroy(HangingBreakByEntityEvent e) {
+		if (e.getRemover().getType() != EntityType.PLAYER) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		if (plot == null)
+			return;
+		
+		if (plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR) {
+			e.setCancelled(true);	
+			return;
+		}
+		
+		plot.removeEntityInPlot(e.getEntity(), true);
+		
+		//remove entity si joueur a une houe en bois dans la main
+		/*if (((Player)e.getRemover()).getInventory().getItemInMainHand() != null && 
+				((Player)e.getRemover()).getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && 
+				plot.getMembers().getPlayerRank((Player) e.getRemover()) != PlotRank.VISITOR) {
+
+			plot.removeEntityInPlot(e.getEntity());
+		}*/
+	}
 	
 	@EventHandler //empêche le drop d'items si interdit sur le plot (et cancel si route)
 	public void onDropItem(PlayerDropItemEvent e) {
@@ -546,34 +640,7 @@ public class PlotsInstancesListener implements Listener{
 		}		
 	}
 	
-	@EventHandler //empêche la nourriture de descendre si paramètre du plot défini comme tel
-	public void onFoodChange(FoodLevelChangeEvent e) {
-		if (e.getEntityType() != EntityType.PLAYER)
-			return;
-		
-		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
-		if (plot == null)
-			return;
-		
-		if ((boolean) plot.getParameters().getParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL))
-			e.setCancelled(true);
-	}
-	
-	@EventHandler//cancel redstone si stoplag, sinon enregistre l'évent dans le stoplag checker
-	public void onRedstoneChange(BlockRedstoneEvent e) {
-		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-		
-		if (plot == null)
-			e.setNewCurrent(0);
-		else
-			if (plot.hasStoplag())
-				e.setNewCurrent(0);
-			else if (e.getBlock().getType() == Material.REDSTONE_LAMP)
-				plot.getStoplagChecker().addEvent(StopLagDetect.LAMP);
-			else if (e.getBlock().getType() == Material.REDSTONE_WIRE)
-				plot.getStoplagChecker().addEvent(StopLagDetect.WIRE);
-	}
-	
+	/*
 	@EventHandler
 	public void onHangingPlace(HangingPlaceEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
@@ -583,34 +650,59 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		}
 		
-		plugin.getPlotsManager().setBirthPlot(plot.getPlotId(), e.getEntity());
+		//lugin.getPlotsManager().setBirthPlot(plot.getPlotId(), e.getEntity());
+	}*/
+	
+	@EventHandler//cancel spawn entité si paramètre du plot l'interdit
+	public void onProjectileSpawn(ProjectileLaunchEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getLocation());
+
+		if (plot == null || !(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_LAUNCH_PROJECTILES)) {
+			e.setCancelled(true);
+			return;
+		}			
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH) //si spawn d'entité, ajout à la liste des entités du plot
+	@EventHandler(priority = EventPriority.HIGH) //décide si l'entité aura le droit de spawn
 	public void onEntitySpawn(EntitySpawnEvent e) {
+		Bukkit.broadcastMessage("spawn event");
 		if (e.isCancelled())
 			return;
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
-		if (plot == null) {
+		if (plot == null || plot.hasStoplag()) {
 			e.setCancelled(true);
 			return;
 		}
-		if (!plot.hasStoplag()) {
-			plot.addEntityInPlot(e.getEntity());
-			plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
-			
-			plugin.getPlotsManager().setBirthPlot(plot.getPlotId(), e.getEntity());
-		}else
-			e.setCancelled(true);
+	}
+	
+	@EventHandler //set birth plot of new entities
+	public void onEntitySpawn(EntityAddToWorldEvent e ) {
+		Bukkit.broadcastMessage("add to world event");
+
+		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		if (plot == null)
+			return;
+		
+		plugin.getPlotsManager().setBirthPlot(plot.getPlotId(), e.getEntity());
+		
+		plot.addEntityInPlot(e.getEntity());
+		plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
 	}
 	
 	@EventHandler //remove entities from plot entities list
 	public void onEntityDespawn(EntityRemoveFromWorldEvent e) {
+		if (e.getEntityType() == EntityType.PLAYER)
+			return;
+		
 		plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(e.getEntity()));
+		
+		Bukkit.broadcastMessage("Entity removed : " + e.getEntity() + " from " + plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		
 		if (plot != null)
 			plot.removeEntityInPlot(e.getEntity(), true);
+		else
+			e.getEntity().remove();
 	}
 	
 	@EventHandler //cancel entity pathfind of entity try to go outside of the plot
@@ -628,95 +720,17 @@ public class PlotsInstancesListener implements Listener{
 		if (!plot.getPlotId().isInPlot(e.getLoc()))
 			e.setCancelled(true);
 	}
-	
-	
-	
-	@EventHandler(priority = EventPriority.LOW)//cancel rétractation piston si un bloc affecté se trouve sur une route
-	public void onPistonRetractEvent(BlockPistonRetractEvent e) {
-		if (e.isCancelled())
-			return;
-		
-		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-		
-		if (plot == null || plot.hasStoplag()) {
-			e.setCancelled(true);
-			return;	
-		}
-		
-		for (Block block : e.getBlocks())
-			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation())))
-				e.setCancelled(true);
-		
-		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
-	}
-	
-	@EventHandler(priority = EventPriority.LOW) //cancel poussée piston si un bloc affecté se trouve sur une route
-	public void onPistonPushEvent(BlockPistonExtendEvent e) {
-		if (e.isCancelled())
-			return;
-		
-		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-		
-		if (plot == null || plot.hasStoplag()) {
-			e.setCancelled(true);
-			return;	
-		}
-		
-		//cancel évent si blocks poussés sur la route
-		for (Block block : e.getBlocks()) {
-			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation()))) {
-				e.setCancelled(true);
-				return;
-			}
-			else if (plot.getPlotId().isOnInteriorDiameter(block.getLocation(), 2)) {
-				e.setCancelled(true);
-				return;
-			}
-		}
-		
-		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
-	}
-	
-	@EventHandler //cancel lava/water flow en dehors du plot. Cancel aussi toute téléportation d'un oeuf de dragon
-	public void onLiquidFlow(BlockFromToEvent e) {
-		Plot plot = plugin.getPlotsManager().getPlot(e.getToBlock().getLocation());
-		
-		if (plot == null || plot.hasStoplag() || !plot.hasLiquidFlow() || e.getBlock().getType() == Material.DRAGON_EGG) {
-			e.setCancelled(true);
-			return;
-		}
-		
-		plot.getStoplagChecker().addEvent(StopLagDetect.LIQUID);
-	}
-	
-	@EventHandler //cancel pousse d'arbres, etc en dehors d'un plot
-	public void onGrowStructure(StructureGrowEvent e) {
-		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
-		if (plot == null) {
-			e.setCancelled(true);
-			return;
-		}
-		for (BlockState b : e.getBlocks())
-			if (!plot.equals(plugin.getPlotsManager().getPlot(b.getLocation()))) {
-				e.setCancelled(true);
-				return;
-			}
-	}
-	
-	@EventHandler //cancel pousse céréale, citrouille, ...
-	public void onGrowBlock(BlockGrowEvent e) {
-		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 
-		if (plot == null)
-			e.setCancelled(true);
-	}
+	////////////////////////////////////////////////////////////
+	//                      OTHERS EVENTS                     //
+	////////////////////////////////////////////////////////////
 	
 	@EventHandler //ajoute les entités du chunk au plot correspondant s'il existe, sinon les supprimer
 	public void onChunkLoad(ChunkLoadEvent e) {
 		if (e.isNewChunk())
 			return;
 		
-		new ArrayList<Entity>(Arrays.asList(e.getChunk().getEntities())).forEach(ent -> {
+		Arrays.asList(e.getChunk().getEntities()).forEach(ent -> {
 			if (ent.getType() == EntityType.PLAYER)
 				return;
 			
@@ -725,7 +739,6 @@ public class PlotsInstancesListener implements Listener{
 				plot.addEntityInPlot(ent);
 		});
 	}
-	
 	
 	@EventHandler
 	public void onChunkUnload(ChunkUnloadEvent e) {
@@ -738,13 +751,19 @@ public class PlotsInstancesListener implements Listener{
 				plot.removeEntityInPlot(ent, false);
 		});
 	}
-	/*
-	@EventHandler //remove entité de la liste des entités du plot si l'entité a despawn
-	public void onEntityRemove(EntityRemoveEvent e) {
-		if (e.getPlot() != null)
-			e.getPlot().removeEntityInPlot(e.getEntity(), true);
+	
+	@EventHandler //empêche la nourriture de descendre si paramètre du plot défini comme tel
+	public void onFoodChange(FoodLevelChangeEvent e) {
+		if (e.getEntityType() != EntityType.PLAYER)
+			return;
+		
+		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		if (plot == null)
+			return;
+		
+		if ((boolean) plot.getParameters().getParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL))
+			e.setCancelled(true);
 	}
-	*/
 }
 
 

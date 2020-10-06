@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.world;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -31,7 +32,10 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.sk89q.worldedit.extent.world.ChunkLoadingExtent;
 
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -44,6 +48,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.permissions.PermissionAttachment;
@@ -199,6 +204,12 @@ public class WorldEventsListener implements Listener{
 				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG)
 			e.setCancelled(true);
 	}
+	
+	@EventHandler //cancel spawn if outside of the creative world
+	public void onEntitySpawn(EntitySpawnEvent e) {
+		if (!e.getLocation().getWorld().equals(plugin.getWorldManager().getWorld()))
+			e.setCancelled(true);
+	}
 
 	@EventHandler
 	public void onFireSpread(BlockSpreadEvent e) {
@@ -271,9 +282,9 @@ public class WorldEventsListener implements Listener{
 				sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
 	}
 	
-	@EventHandler //cancel téléportation par portail de l'end ou du nether
+	@EventHandler //cancel téléportation par portail de l'end ou du nether ou si le monde de destination n'est pas le monde creative
 	public void onChangeWorld(PlayerTeleportEvent e) {
-		if (e.getCause() == TeleportCause.END_PORTAL || e.getCause() == TeleportCause.NETHER_PORTAL)
+		if (e.getCause() == TeleportCause.END_PORTAL || e.getCause() == TeleportCause.NETHER_PORTAL || !e.getTo().getWorld().equals(plugin.getWorldManager().getWorld()))
 			e.setCancelled(true);
 	}
 	
@@ -449,4 +460,11 @@ public class WorldEventsListener implements Listener{
 			return;
 		}
 	}
+	
+	/*
+	@EventHandler
+	public void onChunkLoadEvent(ChunkLoadEvent e) {
+		if (!e.getWorld().equals(plugin.getWorldManager().getWorld()))
+			Arrays.asList(e.getChunk().getEntities()).forEach(ent -> ent.remove());
+	}*/
 }

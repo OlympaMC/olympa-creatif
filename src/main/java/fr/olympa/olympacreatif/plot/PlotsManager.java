@@ -153,7 +153,9 @@ public class PlotsManager {
 		
 		net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e).getHandle();
 		NBTTagCompound tag = new NBTTagCompound();
-		ent.c(tag);
+		ent.save(tag);
+		
+		//Bukkit.broadcastMessage("birth plot of "  + e + " " + tag.asString() + " : " + tag.getList("Tags", NBT.TAG_STRING).getString(0));
 		
 		if (tag == null || !tag.hasKey("Tags"))
 			return null;

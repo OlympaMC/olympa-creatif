@@ -108,6 +108,12 @@ public class WorldManager {
         }
         
 		nmsWorld = ((CraftWorld) world).getHandle();
+		
+		//unload all world which aren't the creative world
+		/*Bukkit.getWorlds().forEach(w -> {
+			if (!w.equals(world))
+				Bukkit.unloadWorld(w, false);
+		});*/
 	}
 
 	public World getWorld() {
