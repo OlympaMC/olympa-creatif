@@ -1,5 +1,60 @@
-cb_perms:
+cb_perms:  
+  - minecraft.command.clear
+  - minecraft.command.effect
+  - minecraft.command.enchant
+  - minecraft.command.execute
+  - minecraft.command.experience
+  - minecraft.command.gamemode
+  - minecraft.command.give
+  - minecraft.command.kill
   - minecraft.command.say
+  - minecraft.command.scoreboard
+  - minecraft.command.summon
+  - minecraft.command.team
+  - minecraft.command.tellraw
+  - minecraft.command.trigger
+
   
 we_perms:
+  - worldedit.analysis.count
+  - worldedit.analysis.distr
+  - worldedit.brush.options.mask
+  - worldedit.brush.options.material
+  - worldedit.brush.options.range
+  - worldedit.brush.options.size
+  - worldedit.clipboard.copy
+  - worldedit.clipboard.cut
+  - worldedit.clipboard.flip
+  - worldedit.clipboard.paste
+  - worldedit.clipboard.rotate
+  - worldedit.drain
+  - worldedit.generation.cylinder
+  - worldedit.generation.forest
+  - worldedit.generation.pumpkins
+  - worldedit.generation.pyramid
+  - worldedit.generation.shape
+  - worldedit.generation.sphere
+  - worldedit.green
+  - worldedit.help
+  - worldedit.history.redo
+  - worldedit.history.undo
+  - worldedit.region.curve
+  - worldedit.region.faces
+  - worldedit.region.forest
+  - worldedit.region.line
+  - worldedit.region.naturalize
+  - worldedit.region.overlay
+  - worldedit.region.replace
+  - worldedit.region.set
+  - worldedit.region.smooth
+  - worldedit.region.stack
+  - worldedit.region.walls
+  - worldedit.replacenear
+  - worldedit.selection.expand
+  - worldedit.selection.hpos
   - worldedit.selection.pos
+  - worldedit.selection.shift
+  - worldedit.snow
+  - worldedit.superpickaxe.area
+  - worldedit.thaw
+  - worldedit.tool.tree
