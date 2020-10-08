@@ -178,10 +178,10 @@ public class MainGui extends IGui {
 		
 		Plot plot = null;
 		
-		PlotId plotId = PlotId.fromString(OlympaCreatifMain.getMainClass(), stringPlotId);
+		PlotId plotId = PlotId.fromString(OlympaCreatifMain.getInstance(), stringPlotId);
 		
 		if (plotId != null) 
-			plot = OlympaCreatifMain.getMainClass().getPlotsManager().getPlot(plotId);
+			plot = OlympaCreatifMain.getInstance().getPlotsManager().getPlot(plotId);
 		
 		return getMainGui(p, plot);
 	}
@@ -192,8 +192,8 @@ public class MainGui extends IGui {
 	
 	public static MainGui getMainGui(OlympaPlayerCreatif p, Plot plot) {
 		if (plot == null)
-			return new MainGui(OlympaCreatifMain.getMainClass(), p, null, "Menu");
+			return new MainGui(OlympaCreatifMain.getInstance(), p, null, "Menu");
 		else
-			return new MainGui(OlympaCreatifMain.getMainClass(), p, plot, "Menu >> " + plot.getPlotId());
+			return new MainGui(OlympaCreatifMain.getInstance(), p, plot, "Menu >> " + plot.getPlotId());
 	}
 }

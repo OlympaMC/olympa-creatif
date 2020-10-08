@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.permissions.PermissionAttachment;
 
 import com.google.common.collect.ImmutableMap; 
 
@@ -67,7 +68,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	public OlympaPlayerCreatif(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
-		this.plugin = OlympaCreatifMain.getMainClass();
+		this.plugin = OlympaCreatifMain.getInstance();
 		
 		for (UpgradeType upg : UpgradeType.values())
 			upgrades.put(upg, 0);

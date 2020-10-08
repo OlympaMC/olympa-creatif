@@ -1,0 +1,5 @@
+cb_perms:
+  - minecraft.command.say
+  
+we_perms:
+  - worldedit.selection.pos

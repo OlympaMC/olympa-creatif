@@ -1,12 +1,14 @@
 package fr.olympa.olympacreatif.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
@@ -45,7 +47,21 @@ public class TagsValues {
 		*/
 		
 		//chargement des tags depuis le fichier config
-		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(OlympaCreatifMain.getMainClass().getDataFolder(), "tags.yml"));
+        File file = new File(OlympaCreatifMain.getInstance().getDataFolder(), "tags.yml");
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            OlympaCreatifMain.getInstance().saveResource("tags.yml", false);
+         }
+        
+        //YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(OlympaCreatifMain.getInstance().getDataFolder(), "tags.yml"));
+        YamlConfiguration config = new YamlConfiguration();
+        try {
+			config.load(file);
+		} catch (IOException | InvalidConfigurationException e1) {
+			e1.printStackTrace();
+			return;
+		}
+        
 		Map<String, String> map = new HashMap<String, String>();
 		
 		config.getConfigurationSection("tags").getValues(false).entrySet().forEach(entry -> map.put(entry.getKey(), (String)entry.getValue()));

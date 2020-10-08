@@ -63,7 +63,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	}*/
 	
 
-	public static OlympaCreatifMain getMainClass() {
+	public static OlympaCreatifMain getInstance() {
 		return plugin;
 	}
 

@@ -27,12 +27,19 @@ import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotParameters;
+import fr.olympa.olympacreatif.utils.PermissionsManager;
 
 public class DataManager implements Listener {
 
 	private OlympaCreatifMain plugin;
 
 	private List<PlotId> loadedPlots = new ArrayList<PlotId>();
+	
+	private PermissionsManager permsManager = new PermissionsManager();
+	
+	public PermissionsManager getPermissionsManager() {
+		return permsManager;
+	}
 	
 	//statements de création des tables
 	private final OlympaStatement osTableCreateMessages = new OlympaStatement(
