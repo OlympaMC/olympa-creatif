@@ -207,6 +207,9 @@ public class PlotsManager {
 	}
 
 	public Plot getPlot(Location loc) {
+		if (loc == null)
+			return null;
+		
 		PlotId id = PlotId.fromLoc(plugin, loc);
 		
 		if (id == null)

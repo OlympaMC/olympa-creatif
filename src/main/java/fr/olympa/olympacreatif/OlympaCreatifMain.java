@@ -39,13 +39,13 @@ import net.luckperms.api.LuckPerms;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
 
-	private WorldManager creativeWorldManager;
+	private WorldManager worldManager;
 	private DataManager dataManager;
 	private PlotsManager plotsManager;
 	private PerksManager perksManager;
 	private CommandBlocksManager cbManager;
 
-	private LuckPerms luckperms;
+	//private LuckPerms luckperms;
 	
 	private WorldEditPlugin we = null;
 	private IAsyncWorldEdit awe = null;
@@ -87,27 +87,18 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.TPA), plugin);
 		
 		dataManager = new DataManager(this);
+		worldManager = new WorldManager(this);
 		plotsManager = new PlotsManager(this);
-		creativeWorldManager = new WorldManager(this);
-		//worldEditManager = new WorldEditManager(this);
 		perksManager = new PerksManager(this);
 		cbManager = new CommandBlocksManager(this);
 
-		/*try {
-			//OlympaCore.getInstance().getDatabase();
-			PreparedStatement preparedStatement = statement.getStatement();
-			preparedStatement.setString(1, "xxxxx");
-			ResultSet resultSet = preparedStatement.executeQuery();
-			resultSet.close();
-		}catch (SQLException e) {
-			e.printStackTrace();
-		}*/
 		//OlympaCorePermissions.GROUP_COMMAND.allowGroup(OlympaGroup.DEV);
 		
 		//get luckperms api provider
+		/*
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 		if (provider != null) 
-			luckperms = provider.getProvider();
+			luckperms = provider.getProvider();*/
 		
 		
 		//hook into worldedit & asyncworldedit
@@ -226,16 +217,17 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	}
 
 	public WorldManager getWorldManager() {
-		return creativeWorldManager;
+		return worldManager;
 	}
 
 	public WorldEditPlugin getWorldEditManager() {
 		return we;
 	}
-	
+
+	/*
 	public LuckPerms getLuckPerms() {
 		return luckperms;
-	}
+	}*/
 
 	public PlotsManager getPlotsManager() {
 		return plotsManager;

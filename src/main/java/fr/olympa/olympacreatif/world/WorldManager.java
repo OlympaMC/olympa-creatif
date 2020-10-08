@@ -45,9 +45,7 @@ public class WorldManager {
 
 		maxEntitiesPerTypePerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue());
 		maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
-
-		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
-		plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);
+		
 		Bukkit.setDefaultGameMode(GameMode.CREATIVE);
 
 		WorldCreator worldCreator = new WorldCreator(Message.PARAM_WORLD_NAME.getValue());
@@ -110,10 +108,17 @@ public class WorldManager {
 		nmsWorld = ((CraftWorld) world).getHandle();
 		
 		//unload all world which aren't the creative world
-		/*Bukkit.getWorlds().forEach(w -> {
-			if (!w.equals(world))
-				Bukkit.unloadWorld(w, false);
-		});*/
+		/*
+		plugin.getTask().runTaskLater(() -> {
+			Bukkit.getWorlds().forEach(w -> {
+				if (!w.equals(world))
+					Bukkit.unloadWorld(w, false);
+			});
+		}, 2);*/
+		
+		//register listeners
+		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
+		plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);
 	}
 
 	public World getWorld() {

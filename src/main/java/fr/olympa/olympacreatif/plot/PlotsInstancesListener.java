@@ -665,7 +665,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler(priority = EventPriority.HIGH) //décide si l'entité aura le droit de spawn
 	public void onEntitySpawn(EntitySpawnEvent e) {
-		Bukkit.broadcastMessage("spawn event");
+		//Bukkit.broadcastMessage("spawn event");
 		if (e.isCancelled())
 			return;
 		
@@ -678,7 +678,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //set birth plot of new entities
 	public void onEntitySpawn(EntityAddToWorldEvent e ) {
-		Bukkit.broadcastMessage("add to world event");
+		//Bukkit.broadcastMessage("add to world event");
 
 		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		if (plot == null)
