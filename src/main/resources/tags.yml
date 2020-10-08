@@ -1,3 +1,49 @@
-tags:
+tags: 
   Name: NBTTagString,0,200,null
   Lore: NBTTagString,0,200,NBT_STRING
+  CustomName: NBTTagString,0,200,null
+  CustomNameVisible: NBTTagInt,0,1,null
+  color: NBTTagInt,0,1000000000000,null
+  HideFlags: NBTTagInt,0,100000,null
+  Enchantments: NBTTagCompound,0,100,NBT_COMPOUND
+  id: NBTTagString,0,100,null
+  lvl: NBTTagInt,0,100,null
+  Unbreakable: NBTTagInt,0,1,null
+  Damage: NBTTagInt,0,10000,null
+  RepairCost: NBTTagInt,0,100,null
+  AttributeModifiers: NBTTagCompound,0,10,NBT_COMPOUND
+  AttributeName: NBTTagString,0,100,null
+#  Amount: NBTTagFloat,0,100,null
+  Operation: NBTTagInt,0,2,null
+  UUIDLeast: NBTTagInt,0,1000000000,null
+  UUIDMost: NBTTagInt,0,1000000000,null
+  CanDestroy: NBTTagString,0,20,NBT_STRING
+  CanPlaceOn: NBTTagString,0,20,NBT_STRING
+  CustomName: NBTTagString,0,100,null
+  CustomNameVisible: NBTTagInt,0,1,null
+  ActiveEffects: NBTTagCompound,0,20,NBT_COMPOUND
+  Id: NBTTagInt,0,50,null
+  Amplifier: NBTTagInt,0,100,null
+  Duration: NBTTagInt,0,1000000000,null
+  NoAI: NBTTagInt,0,1,null
+  Glowing: NBTTagInt,0,1,null
+  NoGravity: NBTTagInt,0,1,null
+  FallFlying: NBTTagInt,0,1,null
+  Health: NBTTagInt,0,10000,null
+  Fire: NBTTagInt,-1,100000,null
+  Attributes: NBTTagCompound,0,50,NBT_COMPOUND
+  Name: NBTTagString,0,50,null
+  Base: NBTTagFloat,0,1000,null
+  Silent: NBTTagInt,0,1,null
+  Invulnerable: NBTTagInt,0,1,null
+  HandItems: NBTTagCompound,0,2,NBT_COMPOUND
+  ArmorItems: NBTTagCompound,0,4,NBT_COMPOUND
+  HandDropChances: NBTTagFloat,0,2,NBT_FLOAT
+  ArmorDropChances: NBTTagFloat,0,4,NBT_FLOAT
+  Count: NBTTagInt,0,64,null
+  ActiveEffects: NBTTagCompound,0,50,NBT_COMPOUND
+  ShowParticles: NBTTagInt,0,1,null
+  Size: NBTTagInt,0,10,null
+  Fuse: NBTTagInt,0,10000,null
+  ignited: NBTTagInt,0,1,null
+  SkullOwner: NBTTagCompound,0,1,null
