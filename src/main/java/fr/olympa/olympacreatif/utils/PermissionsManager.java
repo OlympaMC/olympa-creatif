@@ -12,16 +12,18 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 
 public class PermissionsManager {
 	
+	private OlympaCreatifMain plugin;
+	
 	@SuppressWarnings("unchecked")
-	public PermissionsManager() {
+	public PermissionsManager(OlympaCreatifMain plugin) {
+		
+		this.plugin = plugin;
 		
 		//chargement des tags depuis le fichier config
-		
-		//chargement des tags depuis le fichier config
-        File file = new File(OlympaCreatifMain.getInstance().getDataFolder(), "permissions.yml");
+        File file = new File(plugin.getDataFolder(), "permissions.yml");
         if (!file.exists()) {
             file.getParentFile().mkdirs();
-            OlympaCreatifMain.getInstance().saveResource("permissions.yml", false);
+            plugin.saveResource("permissions.yml", false);
          }
         
         //YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(OlympaCreatifMain.getInstance().getDataFolder(), "tags.yml"));
@@ -35,6 +37,9 @@ public class PermissionsManager {
         
 		//FileConfiguration config = YamlConfiguration.loadConfiguration(new File(OlympaCreatifMain.getInstance().getDataFolder(), "permissions.yml"));
 
+        System.out.println("cb perms : " + config.getList("cb_perms"));
+        System.out.println("we perms : " + config.getList("we_perms"));
+        
 		OlympaGroup.PLAYER.runtimePermissions.addAll((List<String>) config.getList("cb_perms"));
 		PermissionsList.USE_WORLD_EDIT.getMinGroup().runtimePermissions.addAll((List<String>) config.getList("we_perms"));
 	}

@@ -22,6 +22,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.gui.IGui;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.MembersGui;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -170,7 +171,11 @@ public class OcCommand extends OlympaCommand {
 			break;
 			
 			case "members":
-				new MembersGui(MainGui.getMainGui(pc)).create(p);
+				IGui main = MainGui.getMainGui(pc);
+				if (main.getPlot() != null)
+					new MembersGui(main).create(p);
+				else
+					p.sendMessage(Message.INVALID_PLOT_ID.getValue());
 			break;
 			
 			case "banlist":

@@ -30,7 +30,7 @@ public class MembersGui extends IGui {
 	private List<MemberInformations> members = new ArrayList<MemberInformations>();
 	
 	public MembersGui(IGui gui) {
-		super(gui, "Membres parcelle " + gui.getPlot().getPlotId() + "(" + gui.getPlot().getMembers().getCount() + "/" + 
+		super(gui, "Membres parcelle " + gui.getPlot().getPlotId() + " (" + gui.getPlot().getMembers().getCount() + "/" + 
 				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(gui.getPlayer().getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3);
 		
 		members = new ArrayList<MemberInformations>(plot.getMembers().getMembers().keySet());

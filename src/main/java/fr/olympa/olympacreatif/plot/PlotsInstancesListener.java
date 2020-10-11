@@ -56,6 +56,7 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.common.collect.ImmutableList;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CmdSummon;
 import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -678,8 +679,11 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //set birth plot of new entities
 	public void onEntitySpawn(EntityAddToWorldEvent e ) {
-		//Bukkit.broadcastMessage("add to world event");
-
+		if (e.getEntityType() != EntityType.PLAYER && !CmdSummon.allowedEntities.contains(e.getEntityType())) {
+			e.getEntity().remove();
+			return;
+		}
+			
 		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		if (plot == null)
 			return;
@@ -697,7 +701,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		
-		Bukkit.broadcastMessage("Entity removed : " + e.getEntity() + " from " + plugin.getPlotsManager().getBirthPlot(e.getEntity()));
+		//Bukkit.broadcastMessage("Entity removed : " + e.getEntity() + " from " + plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		
 		if (plot != null)
 			plot.removeEntityInPlot(e.getEntity(), true);

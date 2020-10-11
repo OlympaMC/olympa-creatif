@@ -47,14 +47,20 @@ public class WorldManager {
 		maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
 		
 		Bukkit.setDefaultGameMode(GameMode.CREATIVE);
-
+		
+		/*
 		WorldCreator worldCreator = new WorldCreator(Message.PARAM_WORLD_NAME.getValue());
 		worldCreator.generateStructures(false);
 		worldCreator.generator(new CustomChunkGenerator(plugin));
 
-		Bukkit.getLogger().log(Level.INFO, plugin.getPrefixConsole() + "Creative world " + Message.PARAM_WORLD_NAME.getValue() + " loading...");
+		
+		plugin.getLogger().log(Level.INFO, "Creative world " + Message.PARAM_WORLD_NAME.getValue() + " loading...");
 		
 		world = worldCreator.createWorld();
+		
+		System.out.println("world : " + world);*/
+		
+		world = Bukkit.getWorld(Message.PARAM_WORLD_NAME.getValue());
 		
 		//définition des règles du monde
 		world.setDifficulty(Difficulty.EASY);

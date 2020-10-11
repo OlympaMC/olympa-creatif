@@ -66,7 +66,7 @@ public class PlotParameters {
 	
 	
 	@SuppressWarnings("unchecked")
-	public String toJson() {
+	public synchronized String toJson() {
 		JSONObject json = new JSONObject();
 		
 		for (PlotParamType param : PlotParamType.values())

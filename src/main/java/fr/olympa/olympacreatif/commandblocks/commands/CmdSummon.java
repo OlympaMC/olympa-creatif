@@ -27,7 +27,7 @@ import net.minecraft.server.v1_15_R1.NBTTagCompound;
 public class CmdSummon extends CbCommand {
 
 	//private static List<EntityType> allowedEntities = new ArrayList<EntityType>();
-	private static List<EntityType> allowedEntities  = ImmutableList.<EntityType>builder()
+	public static List<EntityType> allowedEntities  = ImmutableList.<EntityType>builder()
 			.add(EntityType.ARMOR_STAND)
 			.add(EntityType.BAT)
 			.add(EntityType.BEE)
@@ -88,7 +88,7 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.PIG_ZOMBIE)
 			.add(EntityType.ZOMBIE)
 			.add(EntityType.ZOMBIE_VILLAGER)
-			.build();//= new ArrayList<EntityType>();
+			.build();
 	
 	public CmdSummon(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(type, sender, loc, plugin, plot, args);

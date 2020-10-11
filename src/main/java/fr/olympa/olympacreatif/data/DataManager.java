@@ -35,12 +35,6 @@ public class DataManager implements Listener {
 
 	private List<PlotId> loadedPlots = new ArrayList<PlotId>();
 	
-	private PermissionsManager permsManager = new PermissionsManager();
-	
-	public PermissionsManager getPermissionsManager() {
-		return permsManager;
-	}
-	
 	//statements de création des tables
 	private final OlympaStatement osTableCreateMessages = new OlympaStatement(
 			"CREATE TABLE IF NOT EXISTS `creatif_messages` (" + 

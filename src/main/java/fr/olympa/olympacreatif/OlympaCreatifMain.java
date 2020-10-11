@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -31,6 +32,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
+import fr.olympa.olympacreatif.utils.PermissionsManager;
 import fr.olympa.olympacreatif.world.CustomChunkGenerator;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.AWEProgressBar;
@@ -45,6 +47,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private PerksManager perksManager;
 	private CommandBlocksManager cbManager;
 
+	private PermissionsManager permsManager;
+	
 	//private LuckPerms luckperms;
 	
 	private WorldEditPlugin we = null;
@@ -56,22 +60,32 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	public Random random = new Random();
 
-	/*
-	@Override //retourne le générateur de chunks custom
+	@Override //defines the custom world generator 
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
 		return new CustomChunkGenerator(this);
-	}*/
+	}
 	
-
 	public static OlympaCreatifMain getInstance() {
 		return plugin;
 	}
 
-	//private OlympaStatement statement = new OlympaStatement("SELECT * FROM xxx WHERE xx = ?");
-	@Override
+	
+	@Override //actions on load: STARTUP. Main stuff is done in onEnablePOSTWORLD().
 	public void onEnable() {
 		super.onEnable();
-
+		
+		new BukkitRunnable() {
+			@Override
+		    public void run() {
+				onEnablePOSTWORLD();
+			}
+		}.runTaskLater(this, 1);
+	}
+	
+	/**
+	 * Executes startup actions after worlds loaded.
+	 */
+	private void onEnablePOSTWORLD() {
 		plugin = this;
 		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
 
@@ -82,7 +96,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		//saveDefaultConfig();
 		new OcCommand(this, "oc", OcCommand.subArgsList.toArray(new String[OcCommand.subArgsList.size()])).register();
 		new OcoCommand(this, "oco", OcoCommand.subArgsList.toArray(new String[OcoCommand.subArgsList.size()])).register();
-		new OcaCommand(this, "oca", new String[] { "oca" }).register();
+		new OcaCommand(this, "oca", new String[] {}).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.TPA), plugin);
 		
@@ -91,6 +105,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		plotsManager = new PlotsManager(this);
 		perksManager = new PerksManager(this);
 		cbManager = new CommandBlocksManager(this);
+		permsManager = new PermissionsManager(this);
 
 		//OlympaCorePermissions.GROUP_COMMAND.allowGroup(OlympaGroup.DEV);
 		
@@ -113,10 +128,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 				Bukkit.getLogger().log(Level.WARNING, getPrefixConsole() + "WorldEdit disabled because AsyncWorldEdit wasn't found.");
 			}
 		}
+		
 		if (awe != null) {
 			awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
 			Bukkit.getLogger().log(Level.FINE, getPrefixConsole() + "Successfully loaded WorldEdit and AWE custom progressbar.");
-		}
+		}   
 	}
 	
 	public void disableWorldEdit() {

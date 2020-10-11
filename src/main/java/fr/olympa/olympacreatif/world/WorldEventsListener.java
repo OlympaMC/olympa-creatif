@@ -349,7 +349,7 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
-		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
+		//e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 		
 		/*
 		attachment = e.getPlayer().addAttachment(plugin);
@@ -362,11 +362,12 @@ public class WorldEventsListener implements Listener{
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
 		
+		/*
 		plugin.getTask().runTaskLater(() -> {
 			OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId()); 
 			setWorldEditPerms(p, true);
 			setCommandBlockPerms(p, true);
-		}, 3, TimeUnit.SECONDS);
+		}, 3, TimeUnit.SECONDS);*/
 	}
 	
 	@EventHandler //add perms worldedit si achat du grade correspondant
