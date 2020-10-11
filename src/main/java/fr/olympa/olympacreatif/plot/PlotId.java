@@ -99,13 +99,22 @@ public class PlotId {
 				indexZ * (WorldManager.plotSize + WorldManager.roadSize) + 0.5);
 	}
 	
-	//crée un nouveau plotId (EXCLUSIVEMENT pour un nouveau plot)
+	/**
+	 * Crée un nouveau plotId (EXCLUSIVEMENT pour un nouveau plot)
+	 * @param plugin
+	 * @return
+	 */
 	public static PlotId createNew(OlympaCreatifMain plugin) {
 		plugin.getPlotsManager().incrementTotalPlotCount();
 		return new PlotId(plugin, plugin.getPlotsManager().getTotalPlotCount());
 	}
 
-	//retourne un nouveau plotId avec l'id en paramètre
+	/**
+	 * Retourne un nouveau plotId avec l'id en paramètre
+	 * @param plugin
+	 * @param id
+	 * @return
+	 */
 	public static PlotId fromId(OlympaCreatifMain plugin, Integer id) {
 		if (id == null)
 			return null;
@@ -116,7 +125,12 @@ public class PlotId {
 			return null;
 	}
 
-	//retourne un PlotId si un plot est affecté à cet id (chargé ou non)
+	/**
+	 * Retourne un PlotId si un plot est affecté à cet id (chargé ou non)
+	 * @param plugin
+	 * @param idAsString
+	 * @return
+	 */
 	public static PlotId fromString(OlympaCreatifMain plugin, String idAsString) {
 
 		Integer id = PlotsManager.getPlotIdFromString(idAsString);

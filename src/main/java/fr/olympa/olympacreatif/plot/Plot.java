@@ -55,8 +55,6 @@ public class Plot {
 	
 	private static Map<Player, List<ItemStack>> inventoryStorage = new HashMap<Player, List<ItemStack>>();
 	
-	//private Map<Location, SimpleEntry<BlockData, TileEntity>> protectedZoneData = new HashMap<Location, SimpleEntry<BlockData,TileEntity>>();
-	
 	//constructeur pour un plot n'existant pas encore
 	public Plot(OlympaCreatifMain plugin, OlympaPlayerCreatif p) {
 		this.plugin = plugin;
@@ -95,6 +93,8 @@ public class Plot {
 	}
 	
 	private void executeCommonInstanciationActions() {
+		
+		cbData.executeSynchronousInit();
 		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())

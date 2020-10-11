@@ -356,7 +356,7 @@ public class CbObjective {
 	public void clearDisplaySlot() {
 		if (displaySlot == DisplaySlot.SIDEBAR)
 			for (Player p : plot.getPlayers())
-				((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
+				((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).clearCustomSidebar();
 
 		if (displaySlot == DisplaySlot.BELOW_NAME)
 			plot.getCbData().clearBelowName();

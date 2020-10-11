@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -47,11 +48,15 @@ public class PlotCbData {
 		
 		commandsLeft = CommandBlocksManager.maxCommandsTicketst;
 	}
+
+	public void executeSynchronousInit() {
+		scb = Bukkit.getScoreboardManager().getNewScoreboard();
+	}
 	
 	//GETTERS
 	public Scoreboard getScoreboard() {
-		if (scb == null)
-			scb = plugin.getCommandBlocksManager().getScoreboardForPlotCbData();
+		//if (scb == null)
+			//scb = plugin.getCommandBlocksManager().getScoreboardForPlotCbData();
 		
 		return scb;
 	}
@@ -232,10 +237,11 @@ public class PlotCbData {
 		if (bossbarsMap != null)
 			bossbarsMap.clear();
 		
+		/*
 		if (scb != null) {
 			if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
 				scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
 			plugin.getCommandBlocksManager().addUnusedScoreboard(scb);
-		}	
+		}*/	
 	}
 }

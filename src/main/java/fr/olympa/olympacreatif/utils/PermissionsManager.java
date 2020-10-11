@@ -6,11 +6,15 @@ import java.util.List;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.PermissionsList;
 
-public class PermissionsManager {
+public class PermissionsManager implements Listener{
 	
 	private OlympaCreatifMain plugin;
 	
@@ -18,6 +22,7 @@ public class PermissionsManager {
 	public PermissionsManager(OlympaCreatifMain plugin) {
 		
 		this.plugin = plugin;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		
 		//chargement des tags depuis le fichier config
         File file = new File(plugin.getDataFolder(), "permissions.yml");
@@ -37,8 +42,8 @@ public class PermissionsManager {
         
 		//FileConfiguration config = YamlConfiguration.loadConfiguration(new File(OlympaCreatifMain.getInstance().getDataFolder(), "permissions.yml"));
 
-        System.out.println("cb perms : " + config.getList("cb_perms"));
-        System.out.println("we perms : " + config.getList("we_perms"));
+        //System.out.println("cb perms : " + config.getList("cb_perms"));
+        //System.out.println("we perms : " + config.getList("we_perms"));
         
 		OlympaGroup.PLAYER.runtimePermissions.addAll((List<String>) config.getList("cb_perms"));
 		PermissionsList.USE_WORLD_EDIT.getMinGroup().runtimePermissions.addAll((List<String>) config.getList("we_perms"));
@@ -58,6 +63,11 @@ public class PermissionsManager {
 		
 		return perms;
 	}*/
+	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		//plugin.getTask().runTaskLater(() -> e.getPlayer().recalculatePermissions(), 40);
+	}
 }
 
 

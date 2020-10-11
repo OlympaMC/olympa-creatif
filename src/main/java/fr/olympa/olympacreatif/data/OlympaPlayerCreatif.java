@@ -242,7 +242,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 				scoreboardLines.add("§" + i);
 	}
 	
-	public void clearCustomScoreboard() {
+	public void clearCustomSidebar() {
 		for (int i = 0 ; i < scoreboardLines.size() ; i++)
 			scoreboardLines.clear();
 	}

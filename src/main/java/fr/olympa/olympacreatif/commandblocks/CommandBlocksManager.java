@@ -23,7 +23,7 @@ public class CommandBlocksManager {
 	private OlympaCreatifMain plugin;
 	
 	//scoreboards inutilisés qui seront réaffectés au besoin à d'autres plots chargés ultérieurement	 
-	private List<Scoreboard> unusedScoreboards = new ArrayList<Scoreboard>();
+	//private List<Scoreboard> unusedScoreboards = new ArrayList<Scoreboard>();
 	
 	public static int maxTeamsPerPlot;
 	public static int maxObjectivesPerPlot;
@@ -51,6 +51,7 @@ public class CommandBlocksManager {
 		//Bukkit.getServer().getPluginManager().getPermission("minecraft.command.gamemode").setDefault(PermissionDefault.TRUE);
 	}
 	
+	/*
 	public Scoreboard getScoreboardForPlotCbData() {
 		if (unusedScoreboards.size() == 0)
 			return Bukkit.getScoreboardManager().getNewScoreboard();
@@ -60,7 +61,7 @@ public class CommandBlocksManager {
 
 	public void addUnusedScoreboard(Scoreboard scb) {
 		unusedScoreboards.add(scb);
-	}
+	}*/
 	
 	//Actions à exécuter en entrée et sortie de plot
 	public void executeJoinActions(Plot toPlot, Player p) {
@@ -92,14 +93,14 @@ public class CommandBlocksManager {
 		if (team != null)
 			team.removeMember(p);
 		
-		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomScoreboard();
+		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomSidebar();
 		
 		//resend tablist packets
-		OlympaCore.getInstance().getNameTagApi().sendTeams(p);
+		//OlympaCore.getInstance().getNameTagApi().sendTeams(p);
 		
 		//maj du scoreboard (reset du score du scoreboard du plot et réaffectation du scoreboard
-		p.getScoreboard().resetScores(p);
-		p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+		//p.getScoreboard().resetScores(p);
+		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());

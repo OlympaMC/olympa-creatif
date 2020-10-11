@@ -74,6 +74,17 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	public void onEnable() {
 		super.onEnable();
 		
+		plugin = this;
+		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
+		OlympaPermission.registerPermissions(PermissionsList.class);
+		createScoreboard();
+		
+		new OcCommand(this, "oc", OcCommand.subArgsList.toArray(new String[OcCommand.subArgsList.size()])).register();
+		new OcoCommand(this, "oco", OcoCommand.subArgsList.toArray(new String[OcoCommand.subArgsList.size()])).register();
+		new OcaCommand(this, "oca", new String[] {}).register();
+
+		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.TPA), plugin);
+		
 		new BukkitRunnable() {
 			@Override
 		    public void run() {
@@ -86,19 +97,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	 * Executes startup actions after worlds loaded.
 	 */
 	private void onEnablePOSTWORLD() {
-		plugin = this;
-		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
-
-		OlympaPermission.registerPermissions(PermissionsList.class);
-
-		createScoreboard();
-
-		//saveDefaultConfig();
-		new OcCommand(this, "oc", OcCommand.subArgsList.toArray(new String[OcCommand.subArgsList.size()])).register();
-		new OcoCommand(this, "oco", OcoCommand.subArgsList.toArray(new String[OcoCommand.subArgsList.size()])).register();
-		new OcaCommand(this, "oca", new String[] {}).register();
-
-		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.TPA), plugin);
 		
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);
