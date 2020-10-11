@@ -292,7 +292,7 @@ public class Plot {
 		}
 		
 		//tp au spawn de la zone
-		if ((boolean)parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
+		if ((boolean) parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
 			p.teleport(parameters.getSpawnLoc());
 			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
 		}

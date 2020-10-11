@@ -31,7 +31,7 @@ public class PlotParameters {
 			setParameter(type, type.getDefaultValue());
 		
 		if (id != null)
-			setSpawnLoc(id.getLocation().clone().add(0, 2, 0));
+			setSpawnLoc(id.getLocation().clone().add(0.5, 10, 0.5));
 	}
 
 	

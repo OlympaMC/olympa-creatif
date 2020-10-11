@@ -60,10 +60,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	public Random random = new Random();
 
+	/*
 	@Override //defines the custom world generator 
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
 		return new CustomChunkGenerator(this);
-	}
+	}*/
 	
 	public static OlympaCreatifMain getInstance() {
 		return plugin;
@@ -84,19 +85,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new OcaCommand(this, "oca", new String[] {}).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.TPA), plugin);
-		
-		new BukkitRunnable() {
-			@Override
-		    public void run() {
-				onEnablePOSTWORLD();
-			}
-		}.runTaskLater(this, 1);
-	}
-	
-	/**
-	 * Executes startup actions after worlds loaded.
-	 */
-	private void onEnablePOSTWORLD() {
 		
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);

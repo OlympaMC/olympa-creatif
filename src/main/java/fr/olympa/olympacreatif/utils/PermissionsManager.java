@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -44,9 +45,10 @@ public class PermissionsManager implements Listener{
 
         //System.out.println("cb perms : " + config.getList("cb_perms"));
         //System.out.println("we perms : " + config.getList("we_perms"));
-        
 		OlympaGroup.PLAYER.runtimePermissions.addAll((List<String>) config.getList("cb_perms"));
 		PermissionsList.USE_WORLD_EDIT.getMinGroup().runtimePermissions.addAll((List<String>) config.getList("we_perms"));
+
+        plugin.getLogger().log(Level.INFO, "§aWorldEdit & vanilla perms successfully respectively added to " + OlympaGroup.PLAYER + " and " + PermissionsList.USE_WORLD_EDIT.getMinGroup());
 	}
 	
 	/*

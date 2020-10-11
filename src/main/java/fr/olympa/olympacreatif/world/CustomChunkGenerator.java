@@ -11,6 +11,7 @@ import org.bukkit.generator.ChunkGenerator;
 import fr.olympa.api.utils.spigot.Schematic;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
+@Deprecated //this class is now used in an external standalone plugin to generate map
 public class CustomChunkGenerator extends ChunkGenerator {
 
 	private OlympaCreatifMain plugin;

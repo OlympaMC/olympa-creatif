@@ -25,6 +25,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.gui.IGui;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.MembersGui;
+import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
@@ -47,6 +48,7 @@ public class OcCommand extends OlympaCommand {
 			.add("unban")
 			.add("banlist")
 			.add("visit")
+			.add("plots")
 			.add("members")
 			.add("setspawn")
 			.add("center")
@@ -176,6 +178,10 @@ public class OcCommand extends OlympaCommand {
 					new MembersGui(main).create(p);
 				else
 					p.sendMessage(Message.INVALID_PLOT_ID.getValue());
+			break;
+			
+			case "plots":
+				new PlayerPlotsGui(MainGui.getMainGui(pc)).create(p);
 			break;
 			
 			case "banlist":
