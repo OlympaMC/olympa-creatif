@@ -106,6 +106,8 @@ public class PlotId {
 	 */
 	public static PlotId createNew(OlympaCreatifMain plugin) {
 		plugin.getPlotsManager().incrementTotalPlotCount();
+		plugin.getWorldManager().updateWorldBorder();
+		
 		return new PlotId(plugin, plugin.getPlotsManager().getTotalPlotCount());
 	}
 

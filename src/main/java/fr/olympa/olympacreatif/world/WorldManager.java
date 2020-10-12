@@ -17,6 +17,7 @@ import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
@@ -134,4 +135,36 @@ public class WorldManager {
 	public net.minecraft.server.v1_15_R1.World getNmsWorld(){
 		return nmsWorld;
 	}
+	
+	/**
+	 * Updates worldborder size if necessary
+	 */
+	public void updateWorldBorder() {
+		int circleIndex = 1;
+		int newSize = plotSize / 2 + roadSize;
+		
+		//recherche du premier cercle de plots non plein (plot central = circleIndex 1)
+		while (plugin.getPlotsManager().getTotalPlotCount() > Math.pow(circleIndex*2-1, 2))
+			circleIndex++;
+		
+		newSize += (circleIndex - 1) * (plotSize + roadSize);
+		
+		WorldBorder border = world.getWorldBorder();
+		
+		if (border.getSize() == newSize)
+			return;
+		
+		border.setCenter(plotSize/2, plotSize/2);
+		border.setWarningDistance(0);
+		border.setSize(newSize);
+	}
 }
+
+
+
+
+
+
+
+
+

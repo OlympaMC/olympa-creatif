@@ -50,6 +50,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -286,7 +287,9 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler //cancel téléportation par portail de l'end ou du nether ou si le monde de destination n'est pas le monde creative
 	public void onChangeWorld(PlayerTeleportEvent e) {
-		if (e.getCause() == TeleportCause.END_PORTAL || e.getCause() == TeleportCause.NETHER_PORTAL || !e.getTo().getWorld().equals(plugin.getWorldManager().getWorld()))
+		if (e.getCause() == TeleportCause.END_PORTAL || e.getCause() == TeleportCause.NETHER_PORTAL || 
+				!e.getTo().getWorld().equals(plugin.getWorldManager().getWorld()) ||
+				!plugin.getWorldManager().getWorld().getWorldBorder().isInside(e.getTo()))
 			e.setCancelled(true);
 	}
 	
@@ -466,6 +469,11 @@ public class WorldEventsListener implements Listener{
 			e.getItem().setItemStack(plugin.getPerksManager().getKitsManager().getNoKitPermItem(e.getItem().getItemStack().getType()));
 			return;
 		}
+	}
+	
+	@EventHandler //MAJ worldborder au démarage du serveur
+	public void onServerLoad(ServerLoadEvent e) {
+		plugin.getWorldManager().updateWorldBorder();
 	}
 	
 	/*

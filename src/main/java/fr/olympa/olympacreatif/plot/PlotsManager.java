@@ -112,34 +112,10 @@ public class PlotsManager {
 							plot.removeEntityInPlot(e, true);
 						else
 							e.remove();
-						
-						//listToRemove.put(e, plugin.getPlotsManager().getPlot(id));
 					}
 				});
-				
-				//remove entités
-				/*
-				listToRemove.forEach((e, plot) -> {
-					if (plot != null)
-						plot.removeEntityInPlot(e, true);
-					else
-						e.remove();
-				});*/
 			}
 		}.runTaskTimerAsynchronously(plugin, 10, 300);
-		
-		//retire les entités de la liste des entités des plots si l'entité est morte
-		//implémenté avec l'évent EntityRemoveFromWorldEvent
-		/*new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-					plugin.getPlotsManager().getPlots().forEach(plot -> plot.getEntities().forEach(e -> {
-					if (e.isDead())
-						plot.removeEntityInPlot(e, true);
-				}));
-			}
-		}.runTaskTimerAsynchronously(plugin, 10, 1);*/
 	}
 	
 	/**
