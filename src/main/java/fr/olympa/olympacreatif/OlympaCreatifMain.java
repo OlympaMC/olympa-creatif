@@ -142,7 +142,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	//crée le scoreboard du joueur avec des lignes dynamiques, pour afficher le scoreboard custom du plot si besoin
 	@SuppressWarnings("unchecked")
 	private void createScoreboard() {
-		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif");
+		scm = new ScoreboardManager<OlympaPlayerCreatif>(plugin, "§6Olympa Créatif");
 
 		//initialisation lignes scoreboard
 		for (int i = 0; i < OlympaPlayerCreatif.scoreboardLinesSize; i++) {

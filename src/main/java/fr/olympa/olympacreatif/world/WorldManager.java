@@ -141,13 +141,13 @@ public class WorldManager {
 	 */
 	public void updateWorldBorder() {
 		int circleIndex = 1;
-		int newSize = plotSize / 2 + roadSize;
+		int newSize = plotSize + roadSize;
 		
 		//recherche du premier cercle de plots non plein (plot central = circleIndex 1)
 		while (plugin.getPlotsManager().getTotalPlotCount() > Math.pow(circleIndex*2-1, 2))
 			circleIndex++;
 		
-		newSize += (circleIndex - 1) * (plotSize + roadSize);
+		newSize += (circleIndex - 1) * (plotSize + roadSize) * 2;
 		
 		WorldBorder border = world.getWorldBorder();
 		

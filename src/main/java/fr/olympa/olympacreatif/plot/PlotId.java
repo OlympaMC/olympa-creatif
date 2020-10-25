@@ -30,18 +30,7 @@ public class PlotId {
 		
 		//recherche du premier cercle de plots non plein (plot central = circleIndex 1)
 		while (plotId > Math.pow(circleIndex*2-1, 2))
-			circleIndex++;		
-		
-		//Bukkit.broadcastMessage("ID : " + plotId + " - CircleIndex : " + circleIndex);
-		
-		/*
-		if (circleIndex == 1) {
-			indexX = 0;
-			indexZ = 0;
-			loc = new Location(plugin.getWorldManager().getWorld(), 0, WorldManager.worldLevel, 0);
-			return;	
-		}
-		*/
+			circleIndex++;
 		
 		//nombre de plots par ligne de tour (4 par cercle)
 		lineSize = circleIndex * 2 - 2;//(int) Math.pow(circleIndex - 1, 2);
@@ -53,10 +42,6 @@ public class PlotId {
 		if (lineSize > 0)
 			while (plotIndex >= lineSize * (lineIndex + 1))
 				lineIndex++;
-		
-		//index de la ligne sur laquelle sera placée le plot (entre 0 et 3 en commençant par le côté en haut à gauche puis sens horaire)
-		//if (circleIndex > 1)
-		//	lineIndex = (int) (plotIndex / ((circleIndex * 2) - 2));//(int) (plotIndex / ((circleIndex-1)*2));
 		
 		plotLineIndex = plotIndex - lineIndex * lineSize;
 		
@@ -262,16 +247,6 @@ public class PlotId {
 	private int getMinimalDifference(int x, int plotSize) {
 		return Math.min(x,  plotSize - x - 1);
 	}
-	/*
-	public boolean isOnInteriorDiameter(int x, int z) {
-		if (x == indexX * (WorldManager.plotSize + WorldManager.roadSize) || 
-			x == indexX * (WorldManager.plotSize + WorldManager.roadSize) + WorldManager.plotSize - 1 ||
-			z == indexZ * (WorldManager.plotSize + WorldManager.roadSize) ||
-			z == indexZ * (WorldManager.plotSize + WorldManager.roadSize) + WorldManager.plotSize - 1)
-			return true;
-		else
-			return false;
-	}*/
 	
 	@Override
 	public boolean equals(Object obj) {

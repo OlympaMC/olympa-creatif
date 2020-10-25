@@ -2,9 +2,13 @@ package fr.olympa.olympacreatif.utils;
 
 import java.util.HashSet;
 
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
+import org.bukkit.entity.EntityType;
+
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.utils.TagsValues.TagParams;
 import net.minecraft.server.v1_15_R1.MojangsonParser;
 import net.minecraft.server.v1_15_R1.NBTBase;
@@ -27,8 +31,8 @@ public abstract class NBTcontrollerUtil {
 
 	private static boolean denyAllCustomTags = false;
 	
-	public static void setDenyAllCustomFlags(boolean b) {
-		denyAllCustomTags = b;
+	public static void setDenyAllCustomFlags(boolean bool) {
+		denyAllCustomTags = bool;
 	}
 	
 	public static boolean getDenyAllCustomFlags() {
@@ -82,11 +86,10 @@ public abstract class NBTcontrollerUtil {
 					continue;
 				}
 				//remove tag "id" si c'est un oeuf (pas possible de le faire dans la liste, le tag id est utilisé pour d'autres choses...)
-				/*
 				if (key.equals("id") && EnumUtils.isValidEnum(EntityType.class, CbCommand.getUndomainedString(tag.getString(key)))) {
 					tag.remove(key);
 					continue;
-				}*/
+				}
 				
 				//Bukkit.broadcastMessage("tag : " + tag.get(key).asString() + " - " + params.toString());
 				//Bukkit.broadcastMessage("classe : " + tag.get(key).getClass().getName());

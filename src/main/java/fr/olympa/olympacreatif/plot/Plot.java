@@ -42,7 +42,7 @@ public class Plot {
 	private OlympaCreatifMain plugin;
 	
 	private PlotMembers members;
-	private PlotParameters parameters;
+	private PlotParametersBIS parameters;
 	private PlotId plotId;
 	
 	private PlotCbData cbData;
@@ -61,7 +61,7 @@ public class Plot {
 		
 		plotId = PlotId.createNew(plugin);
 		
-		parameters = new PlotParameters(plugin, plotId);
+		parameters = new PlotParametersBIS(plugin, plotId);
 		members = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)));
 		
 		members.set(p, PlotRank.OWNER);
@@ -99,7 +99,7 @@ public class Plot {
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
-				executeEntryActions(p);
+				executeEntryActions(p, true);
 		
 		loadInitialEntitiesOnChunks();
 		
@@ -131,7 +131,7 @@ public class Plot {
 			
 	}
 	
-	public PlotParameters getParameters() {
+	public PlotParametersBIS getParameters() {
 		return parameters;
 	}
 	
@@ -227,7 +227,7 @@ public class Plot {
 	}
 	
 	public boolean hasStoplag() {
-		if ((int)parameters.getParameter(PlotParamType.STOPLAG_STATUS) == 0)
+		if (parameters.getParameter(PlotParamTypeBIS.STOPLAG_STATUS) >= 1)
 			return false;
 		else
 			return true;
@@ -253,15 +253,16 @@ public class Plot {
 	/**
 	 * Execute entry actions for this player for the plot
 	 * @param p concerned player
+	 * @param teleportPlayer 
 	 * @return
 	 */
-	public boolean executeEntryActions(Player p) {
+	public boolean executeEntryActions(Player p, boolean tpToPlotSpawn) {
 		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		pc.setCurrentPlot(this);
 		
 		//si le joueur est banni, téléportation en dehors du plot
-		if (((HashSet<Long>) getParameters().getParameter(PlotParamType.BANNED_PLAYERS)).contains(pc.getId())) {
+		if (parameters.getParameter(PlotParamTypeBIS.BANNED_PLAYERS).contains(pc.getId())) {
 			
 			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
 				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(members.getOwner().getName()));
@@ -277,7 +278,7 @@ public class Plot {
 		plugin.getCommandBlocksManager().executeJoinActions(this, p);
 		
 		//clear les visiteurs en entrée & stockage de leur inventaire
-		if ((boolean)parameters.getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS) && members.getPlayerRank(pc) == PlotRank.VISITOR) {
+		if (parameters.getParameter(PlotParamTypeBIS.CLEAR_INCOMING_PLAYERS) && members.getPlayerRank(pc) == PlotRank.VISITOR) {
 			List<ItemStack> list = new ArrayList<ItemStack>();
 			for (ItemStack it : p.getInventory().getContents()) {
 				if (it != null && it.getType() != Material.AIR)
@@ -292,27 +293,27 @@ public class Plot {
 		}
 		
 		//tp au spawn de la zone
-		if ((boolean) parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
+		if (tpToPlotSpawn && parameters.getParameter(PlotParamTypeBIS.FORCE_SPAWN_LOC)) {
 			p.teleport(parameters.getSpawnLoc());
-			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
+			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plotId));
 		}
 		
 		if (members.getPlayerRank(pc) == PlotRank.VISITOR) {
 			//définition du gamemode
-			p.setGameMode((GameMode) parameters.getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
+			p.setGameMode(parameters.getParameter(PlotParamTypeBIS.GAMEMODE_INCOMING_PLAYERS));
 			
 			//définition du flymode
-			p.setAllowFlight((boolean) parameters.getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
+			p.setAllowFlight(parameters.getParameter(PlotParamTypeBIS.ALLOW_FLY_INCOMING_PLAYERS));
 
 			//set max fly speed
 			p.setFlySpeed(0.1f);
 		}
 		
 		//définition de l'heure du joueur
-		p.setPlayerTime((int) parameters.getParameter(PlotParamType.PLOT_TIME), false);
+		p.setPlayerTime(parameters.getParameter(PlotParamTypeBIS.PLOT_TIME), false);
 		
 		//définition de la météo
-		p.setPlayerWeather((WeatherType) parameters.getParameter(PlotParamType.PLOT_WEATHER));
+		p.setPlayerWeather(parameters.getParameter(PlotParamTypeBIS.PLOT_WEATHER));
 		
 		return true;
 	}
@@ -340,19 +341,21 @@ public class Plot {
 		p.setAllowFlight(true);
 		p.resetPlayerTime();
 		p.resetPlayerWeather();
-
-		LocalSession weSession = plugin.getWorldEditManager().getSession(p);
 		
-		if (weSession != null) {
-			//clear clipboard si le joueur n'en est pas le proprio
-			if (members.getPlayerRank(p) != PlotRank.OWNER)
-				weSession.setClipboard(null);
+		if (plugin.getWorldEditManager() != null) {
+			LocalSession weSession = plugin.getWorldEditManager().getSession(p);
 			
-			World world = weSession.getSelectionWorld();
-			
-			//reset positions worldedit
-			if (world != null && weSession.getRegionSelector(world) != null)
-				weSession.getRegionSelector(world).clear();	
+			if (weSession != null) {
+				//clear clipboard si le joueur n'en est pas le proprio
+				if (members.getPlayerRank(p) != PlotRank.OWNER)
+					weSession.setClipboard(null);
+				
+				World world = weSession.getSelectionWorld();
+				
+				//reset positions worldedit
+				if (world != null && weSession.getRegionSelector(world) != null)
+					weSession.getRegionSelector(world).clear();	
+			}
 		}
 	}
 	

@@ -7,12 +7,12 @@ public class AsyncPlot {
 	private OlympaCreatifMain plugin;
 	private PlotId id;
 	private PlotMembers members;
-	private PlotParameters params;
+	private PlotParametersBIS params;
 	private PlotCbData cbData;
 	
 	private boolean liquidFlow;
 	
-	public AsyncPlot(OlympaCreatifMain plugin, PlotId plotLoc, PlotMembers plotMembers, PlotParameters plotParams, PlotCbData cbData, boolean liquidFlow) {
+	public AsyncPlot(OlympaCreatifMain plugin, PlotId plotLoc, PlotMembers plotMembers, PlotParametersBIS plotParams, PlotCbData cbData, boolean liquidFlow) {
 		this.plugin = plugin;
 		this.id = plotLoc;
 		this.members = plotMembers;
@@ -33,7 +33,7 @@ public class AsyncPlot {
 		return members;
 	}
 	
-	public PlotParameters getParameters() {
+	public PlotParametersBIS getParameters() {
 		return params;
 	}
 

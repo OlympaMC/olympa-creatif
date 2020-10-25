@@ -68,7 +68,7 @@ public class PlotStoplagChecker {
 		
 		//si le nombre d'avertissement a été dépassé, mise en stoplag forcée
 		if (stoplagCount < forcedStoplagStoplagCount) {
-			plot.getParameters().setParameter(PlotParamType.STOPLAG_STATUS, 1);	
+			PlotParamTypeBIS.STOPLAG_STATUS.setValue(plot, 1);	
 			
 			//message
 			plot.getPlayers().forEach(p -> {
@@ -76,7 +76,7 @@ public class PlotStoplagChecker {
 					p.sendMessage(Message.PLOT_STOPLAG_FIRED.getValue(type, stoplagCount, forcedStoplagStoplagCount));});
 		}
 		else {
-			plot.getParameters().setParameter(PlotParamType.STOPLAG_STATUS, 2);
+			PlotParamTypeBIS.STOPLAG_STATUS.setValue(plot, 2);
 			
 			//message
 			plot.getPlayers().forEach(p -> {

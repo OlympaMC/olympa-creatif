@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
+import fr.olympa.olympacreatif.plot.PlotParamTypeBIS;
 
 public class FakePlayerDeathEvent extends Event{
 
@@ -49,7 +50,7 @@ public class FakePlayerDeathEvent extends Event{
 		if (plot != null) {
 			respawnLoc = plot.getParameters().getSpawnLoc();
 			
-			if (!(boolean) plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH)) {
+			if (!plot.getParameters().getParameter(PlotParamTypeBIS.KEEP_INVENTORY_ON_DEATH)) {
 				p.getInventory().forEach(item -> {if (item != null) plugin.getWorldManager().getWorld().dropItemNaturally(p.getLocation(), item);});
 				
 				p.getInventory().clear();

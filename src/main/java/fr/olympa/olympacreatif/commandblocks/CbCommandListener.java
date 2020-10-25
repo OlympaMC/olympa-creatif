@@ -70,17 +70,15 @@ public class CbCommandListener implements Listener {
 	
 	@EventHandler //Handle commandes des commandsblocks
 	public void onPreprocessCommandServer(ServerCommandEvent e) {
-		
 		if (!(e.getSender() instanceof CraftBlockCommandSender))
 			return;
 		
 		e.setCancelled(true);
+		Bukkit.broadcastMessage("CB : " + e.getSender() + " - " + blockedExecutionLocs.get(((CraftBlockCommandSender) e.getSender()).getBlock().getLocation()));
 		
 		CommandBlock cb = ((CommandBlock)((CraftBlockCommandSender)e.getSender()).getBlock().getState());
 		
 		CbCommand cmd = CbCommand.getCommand(plugin, e.getSender(), cb.getLocation(), e.getCommand());
-		
-		//maintainCbTags(e.getSender());
 		
 		if (cmd != null && !cmd.getPlot().hasStoplag()) {
 			
@@ -96,7 +94,6 @@ public class CbCommandListener implements Listener {
 				else
 					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
 			
-			//Bukkit.broadcastMessage("CB : " + cb.getLocation() + " - " + blockedExecutionLocs.get(cb.getLocation()));
 			
 			executeCommandBlockCommand(cmd, e.getSender());		
 		}	

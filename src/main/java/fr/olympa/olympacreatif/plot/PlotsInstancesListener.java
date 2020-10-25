@@ -233,7 +233,7 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-		if (!(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT) && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
+		if (!plot.getParameters().getParameter(PlotParamTypeBIS.ALLOW_PRINT_TNT) && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_PRINT_TNT.getValue());
 		}
@@ -335,7 +335,7 @@ public class PlotsInstancesListener implements Listener{
 		if (e.isCancelled() || plot == null)
 			return;
 		
-		if(!(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_SPLASH_POTIONS) || plot.hasStoplag())
+		if(!plot.getParameters().getParameter(PlotParamTypeBIS.ALLOW_SPLASH_POTIONS) || plot.hasStoplag())
 			e.setCancelled(true);
 	}
 	
@@ -364,8 +364,7 @@ public class PlotsInstancesListener implements Listener{
 		//test si permission d'interagir avec le bloc donné
 		if (playerRank == PlotRank.VISITOR &&
 				PlotParamType.getAllPossibleIntaractibleBlocks().contains(e.getClickedBlock().getType()) &&
-				!((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(e.getClickedBlock().getType())
-				) {
+				!plot.getParameters().getParameter(PlotParamTypeBIS.LIST_ALLOWED_INTERRACTION).contains(e.getClickedBlock().getType()) ) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
 			
@@ -489,8 +488,11 @@ public class PlotsInstancesListener implements Listener{
 		//OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 
 		if (plotTo != null) 
-			if (!plotTo.executeEntryActions(e.getPlayer()))
-				e.setTo(plotTo.getOutLoc());
+			if (!plotTo.executeEntryActions(e.getPlayer(), false))
+				//e.setTo(plotTo.getOutLoc());
+				e.setCancelled(true);
+			else if (plotTo.getParameters().getParameter(PlotParamTypeBIS.FORCE_SPAWN_LOC))
+				e.setTo(plotTo.getParameters().getSpawnLoc());
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST) //actions à effectuer lors de la sortie/entrée d'un joueur
@@ -509,8 +511,11 @@ public class PlotsInstancesListener implements Listener{
 		
 		//expulse les joueurs bannis & actions d'entrée de plot
 		if (plotTo != null) 
-			if (!plotTo.executeEntryActions(e.getPlayer())) 
-				plotTo.teleportOut(e.getPlayer());
+			if (!plotTo.executeEntryActions(e.getPlayer(), false)) 
+				//plotTo.teleportOut(e.getPlayer());
+				e.setCancelled(true);
+			else if (plotTo.getParameters().getParameter(PlotParamTypeBIS.FORCE_SPAWN_LOC))
+				e.setTo(plotTo.getParameters().getSpawnLoc());
 			
 		//actions de sortie de plot
 		if (plotFrom != null) 
@@ -548,12 +553,12 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (!(boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVP) && e.getEntityType() == EntityType.PLAYER && e.getDamager().getType() == EntityType.PLAYER) {
+		if (!plot.getParameters().getParameter(PlotParamTypeBIS.ALLOW_PVP) && e.getEntityType() == EntityType.PLAYER && e.getDamager().getType() == EntityType.PLAYER) {
 			e.setCancelled(true);
 			return;
 		}
 		
-		if (!(boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_PVE) && (e.getEntityType() != EntityType.PLAYER || e.getDamager().getType() != EntityType.PLAYER)) {
+		if (!plot.getParameters().getParameter(PlotParamTypeBIS.ALLOW_PVE) && (e.getEntityType() != EntityType.PLAYER || e.getDamager().getType() != EntityType.PLAYER)) {
 			e.setCancelled(true);
 			return;
 		}
@@ -584,7 +589,7 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (!(boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_ENVIRONMENT_DAMAGE)) {
+		if (!plot.getParameters().getParameter(PlotParamTypeBIS.ALLOW_ENVIRONMENT_DAMAGE)) {
 			e.setCancelled(true);
 			return;
 		}
@@ -635,7 +640,7 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !((boolean) plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS))) {
+		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !plot.getParameters().getParameter(PlotParamTypeBIS.ALLOW_DROP_ITEMS)) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_DENY_ITEM_DROP.getValue());
 		}		
@@ -658,7 +663,7 @@ public class PlotsInstancesListener implements Listener{
 	public void onProjectileSpawn(ProjectileLaunchEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getLocation());
 
-		if (plot == null || !(boolean)plot.getParameters().getParameter(PlotParamType.ALLOW_LAUNCH_PROJECTILES)) {
+		if (plot == null || !plot.getParameters().getParameter(PlotParamTypeBIS.ALLOW_LAUNCH_PROJECTILES)) {
 			e.setCancelled(true);
 			return;
 		}			
@@ -765,7 +770,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 		
-		if ((boolean) plot.getParameters().getParameter(PlotParamType.KEEP_MAX_FOOD_LEVEL))
+		if (plot.getParameters().getParameter(PlotParamTypeBIS.KEEP_MAX_FOOD_LEVEL))
 			e.setCancelled(true);
 	}
 }

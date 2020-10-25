@@ -18,6 +18,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
+import fr.olympa.olympacreatif.plot.PlotParamTypeBIS;
 import fr.olympa.olympacreatif.plot.PlotParameters;
 
 public class InteractionParametersGui extends IGui {
@@ -36,7 +37,7 @@ public class InteractionParametersGui extends IGui {
 			im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 			it.setItemMeta(im);
 			
-			if (((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(mat)) {
+			if (plot.getParameters().getParameter(PlotParamTypeBIS.LIST_ALLOWED_INTERRACTION).contains(mat)) {
 				it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
 
 				if (plot.getMembers().getPlayerLevel(p) < 3)
@@ -61,13 +62,13 @@ public class InteractionParametersGui extends IGui {
 		
 		//changement de l'état d'autorisation de l'interraction pour le bloc cliqué si le joueur a la permission
 		if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(p) >= 3 && slot < PlotParamType.getAllPossibleIntaractibleBlocks().size()) {
-			if (((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).contains(current.getType())) {
-				((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).remove(current.getType());
+			if (plot.getParameters().getParameter(PlotParamTypeBIS.LIST_ALLOWED_INTERRACTION).contains(current.getType())) {
+				plot.getParameters().getParameter(PlotParamTypeBIS.LIST_ALLOWED_INTERRACTION).remove(current.getType());
 				current = ItemUtils.removeEnchant(current, Enchantment.DURABILITY);
 				current = ItemUtils.lore(current, stateDenied);
 			}
 			else {
-				((HashSet<Material>) plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(current.getType());
+				plot.getParameters().getParameter(PlotParamTypeBIS.LIST_ALLOWED_INTERRACTION).add(current.getType());
 				current = ItemUtils.addEnchant(current, Enchantment.DURABILITY, 1);
 				current = ItemUtils.lore(current, stateAllowed);
 			}
