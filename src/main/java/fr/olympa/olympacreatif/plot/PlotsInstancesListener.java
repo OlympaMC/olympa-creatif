@@ -522,19 +522,6 @@ public class PlotsInstancesListener implements Listener{
 			plotFrom.executeExitActions(e.getPlayer());
 	}
 
-	/* Inutile car les données des joueurs ne sont pas save au déco
-	@EventHandler //rendu inventaire en cas de déconnexion & tp au spawn
-	public void onQuitEvent(PlayerQuitEvent e) {
-		//itemsToKeepOnDeath.remove(e.getPlayer().getUniqueId());
-		
-		plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
-		if (plot == null)
-			return;
-
-		plot.executeExitActions(e.getPlayer());
-		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
-	}*/
-
 	////////////////////////////////////////////////////////////
 	//                      DAMAGE EVENTS                     //
 	////////////////////////////////////////////////////////////

@@ -1,6 +1,8 @@
 package fr.olympa.olympacreatif.data;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
 public enum Message {
 
@@ -30,6 +32,7 @@ public enum Message {
 	PARAM_WORLD_NAME,
 	PARAM_HOLO_HELP_LOC_1,
 	PARAM_HOLO_HELP_LOC_2,
+	PARAM_SPAWN_LOC,
 	PLAYER_TARGET_OFFLINE,
 	PLOT_ACCEPTED_INVITATION,
 	PLOT_BAN_PLAYER,
@@ -68,7 +71,7 @@ public enum Message {
 	PLOT_FORCED_STOPLAG_FIRED, 
 	
 	INSUFFICIENT_GROUP_PERMISSION, 
-	WE_ERR_SELECTION_TOO_BIG,
+	WE_ERR_SELECTION_TOO_BIG, 
 	;
 	
 	private String message = null;
@@ -86,6 +89,18 @@ public enum Message {
 	
 	public void setValue(String s) {
 		message = StringEscapeUtils.unescapeJava(s);
+	}
+
+	public static Location getLocFromMessage(Message msg) {
+		try{
+			return new Location(Bukkit.getWorld(Message.PARAM_WORLD_NAME.getValue()), 
+					Double.valueOf(msg.getValue().split(" ")[0]), 
+					Double.valueOf(msg.getValue().split(" ")[1]), 
+					Double.valueOf(msg.getValue().split(" ")[2]));
+		}catch(NumberFormatException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 }

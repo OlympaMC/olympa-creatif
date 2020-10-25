@@ -124,42 +124,33 @@ public class WorldManager {
 		plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);
 
 		//création des holos d'aide
-		@SuppressWarnings("unchecked")
-		Hologram holo1 = OlympaCore.getInstance().getHologramsManager().createHologram(getLocFromMessage(Message.PARAM_HOLO_HELP_LOC_1), 
-				false, 
-				new FixedLine<HologramLine>("§aBienvenue sur le serveur Créatif Olympa !"),
-				new FixedLine<HologramLine>(" "),
-				new FixedLine<HologramLine>("§6Commandes principales :"),
-				new FixedLine<HologramLine>("§e/menu : §aouvrir le menu principal"),
-				new FixedLine<HologramLine>("§e/find : §atrouver et claim une parcelle"),
-				new FixedLine<HologramLine>("§e/visit [id] : §avisiter la parcelle [id]"),
-				new FixedLine<HologramLine>("§e/shop : §aouvrir le magasin"));
-		
-		@SuppressWarnings("unchecked")
-		Hologram holo2 = OlympaCore.getInstance().getHologramsManager().createHologram(getLocFromMessage(Message.PARAM_HOLO_HELP_LOC_2), 
-				false, 
-				new FixedLine<HologramLine>("§aBienvenue sur le serveur Créatif Olympa !"),
-				new FixedLine<HologramLine>(" "),
-				new FixedLine<HologramLine>("§c>>> EXCLUSIVITE OLYMPA : LES COMMANDBLOCKS SONT ACTIVES <<<"),
-				new FixedLine<HologramLine>("§cEt bien évidemment, tous les items redstone sont gratuits !"),
-				new FixedLine<HologramLine>(" "),
-				new FixedLine<HologramLine>("§eVous vous trouvez sur un Play2Win, c'est pourquoi seuls les éléments"),
-				new FixedLine<HologramLine>("§eprovoquant des lags (WorldEdit, commandblocks) sont restreints."),
-				new FixedLine<HologramLine>(" "),
-				new FixedLine<HologramLine>("§eVous gagnez de l'argent en jouant pour les acheter !"),
-				new FixedLine<HologramLine>("§eSi vous souhaitez les obtenir plus rapidement et nous soutenir vous pouvez les acheter sur la boutique !"));
-	}
-
-	private Location getLocFromMessage(Message msg) {
-		try{
-			return new Location(world, 
-					Double.valueOf(msg.getValue().split(" ")[0]), 
-					Double.valueOf(msg.getValue().split(" ")[1]), 
-					Double.valueOf(msg.getValue().split(" ")[2]));
-		}catch(NumberFormatException e) {
-			e.printStackTrace();
-			return null;
-		}
+		plugin.getTask().runTaskLater(() -> {
+			@SuppressWarnings("unchecked")
+			Hologram holo1 = OlympaCore.getInstance().getHologramsManager().createHologram(Message.getLocFromMessage(Message.PARAM_HOLO_HELP_LOC_1), 
+					false, 
+					new FixedLine<HologramLine>("§6Bienvenue sur le serveur Créatif Olympa !"),
+					new FixedLine<HologramLine>(" "),
+					new FixedLine<HologramLine>("§6Commandes principales :"),
+					new FixedLine<HologramLine>("§e/menu : §aouvrir le menu principal"),
+					new FixedLine<HologramLine>("§e/find : §atrouver et claim une parcelle"),
+					new FixedLine<HologramLine>("§e/visit [id] : §avisiter la parcelle [id]"),
+					new FixedLine<HologramLine>("§e/shop : §aouvrir le magasin"));
+			
+			@SuppressWarnings("unchecked")
+			Hologram holo2 = OlympaCore.getInstance().getHologramsManager().createHologram(Message.getLocFromMessage(Message.PARAM_HOLO_HELP_LOC_2), 
+					false, 
+					new FixedLine<HologramLine>("§6Bienvenue sur le serveur Créatif Olympa !"),
+					new FixedLine<HologramLine>(" "),
+					new FixedLine<HologramLine>("§c>>> EXCLUSIVITE OLYMPA : LES COMMANDBLOCKS SONT ACTIVES <<<"),
+					new FixedLine<HologramLine>("§cEt bien évidemment, tous les items redstone sont gratuits !"),
+					new FixedLine<HologramLine>(" "),
+					new FixedLine<HologramLine>("§eVous vous trouvez sur un Play2Win, c'est pourquoi seuls les éléments"),
+					new FixedLine<HologramLine>("§eprovoquant des lags (WorldEdit, commandblocks) sont restreints."),
+					new FixedLine<HologramLine>(" "),
+					new FixedLine<HologramLine>("§eVous gagnez de l'argent en jouant pour les acheter !"),
+					new FixedLine<HologramLine>("§eSi vous souhaitez les obtenir plus rapidement et nous soutenir,"),
+					new FixedLine<HologramLine>("§evous pouvez les acheter sur la boutique !"));
+		}, 100);
 	}
 	
 	public World getWorld() {

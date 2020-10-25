@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
@@ -43,6 +44,7 @@ import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
@@ -189,6 +191,11 @@ public class WorldEventsListener implements Listener{
 	public void onFireSpread(BlockSpreadEvent e) {
 		e.setCancelled(true);
 	}
+
+	@EventHandler
+	public void onBlockForm(BlockFormEvent e) {
+		e.setCancelled(true);
+	}
 	
 	@EventHandler //cancel explosion TNT
 	public void onEntityExplodeEvent(EntityExplodeEvent e) {
@@ -315,10 +322,10 @@ public class WorldEventsListener implements Listener{
 	@EventHandler //clear l'historique de sneak de ce joueur
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		sneakHistory.remove(e.getPlayer().getName());
-		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
+		e.getPlayer().teleport(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC));
 
-		setWorldEditPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
-		setCommandBlockPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
+		//setWorldEditPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
+		//setCommandBlockPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
 	}
 	
 	//PermissionAttachment attachment = null;
@@ -337,64 +344,20 @@ public class WorldEventsListener implements Listener{
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
-		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
-		/*plugin.getTask().runTaskLater(() -> {
-			((CraftServer) Bukkit.getServer()).getHandle().getServer().getCommandDispatcher().a((((CraftPlayer) e.getPlayer()).getHandle()));
-		}, 20);*/
 		
-		/*
-		plugin.getTask().runTaskLater(() -> {
-			OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId()); 
-			setWorldEditPerms(p, true);
-			setCommandBlockPerms(p, true);
-		}, 3, TimeUnit.SECONDS);*/
+		Plot plot = plugin.getPlotsManager().getPlot(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC));
+		if (plot != null)
+			plot.executeEntryActions(e.getPlayer(), false);
+
+		e.getPlayer().teleport(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC));
 	}
 	
+	/*
 	@EventHandler //add perms worldedit si achat du grade correspondant
 	public void onPlayerChangeGroupEvent(AsyncOlympaPlayerChangeGroupEvent e) {
 		if (PermissionsList.USE_WORLD_EDIT.hasPermission(e.getOlympaPlayer()))
 			setWorldEditPerms(AccountProvider.get(e.getPlayer().getUniqueId()), true);
-	}
-	
-	//ajoute/retire les perms worldedit aux joueurs
-	private static void setWorldEditPerms(OlympaPlayerCreatif p, boolean addPerms) {
-		/*
-		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
-
-		if (luckperms == null || p == null || p.getPlayer() == null || !p.getPlayer().isOnline())
-			return;
-		
-		User user = luckperms.getUserManager().getUser(p.getPlayer().getUniqueId());
-		
-		//donne les groupes luckperms nécessaires au joueur 
-		if (addPerms && PermissionsList.USE_WORLD_EDIT.hasPermission(p)) 
-			user.data().add(Node.builder("group.weperms").build());
-		else 
-			user.data().remove(Node.builder("group.weperms").build());
-		//luckperms.getUserManager().saveUser(user);
-		*/
-	}
-	
-	//ajoute/retire les perms commandblock aux joueurs
-	public static void setCommandBlockPerms(OlympaPlayerCreatif p, boolean addPerms) {
-		
-		/*
-		LuckPerms luckperms = OlympaCreatifMain.getMainClass().getLuckPerms();
-
-		if (luckperms == null || p == null || p.getPlayer() == null || !p.getPlayer().isOnline())
-			return;
-		
-		User user = luckperms.getUserManager().getUser(p.getPlayer().getUniqueId());
-		
-		//donne les groupes luckperms nécessaires au joueur 
-		if (addPerms && p.hasKit(KitType.COMMANDBLOCK)) 
-			user.data().add(Node.builder("group.cbperms").build());
-		else 
-			user.data().remove(Node.builder("group.cbperms").build());
-		//luckperms.getUserManager().saveUser(user);
-		 * 
-		 */
-	}
+	}*/
 	
 	//GESTION DES KITS
 	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits

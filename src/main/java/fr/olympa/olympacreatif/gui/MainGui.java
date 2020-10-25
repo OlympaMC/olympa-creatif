@@ -131,7 +131,7 @@ public class MainGui extends IGui {
 			break;
 			
 		case 30 :
-			p.teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
+			p.teleport(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC));
 			break;
 			
 		case 31:

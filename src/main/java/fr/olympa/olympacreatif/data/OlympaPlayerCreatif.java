@@ -157,9 +157,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		if (kit == KitType.FLUIDS)
 			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
 				plot.setAllowLiquidFlow();
-		
-		if (kit == KitType.COMMANDBLOCK)
-			WorldEventsListener.setCommandBlockPerms(this, true);
 	}
 	
 	public int getUpgradeLevel(UpgradeType upg) {

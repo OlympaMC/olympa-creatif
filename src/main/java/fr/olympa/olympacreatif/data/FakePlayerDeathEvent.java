@@ -40,7 +40,7 @@ public class FakePlayerDeathEvent extends Event{
 		this.p = p;
 		this.plot = deathPlot;
 		
-		Location respawnLoc = plugin.getWorldManager().getWorld().getSpawnLocation();
+		Location respawnLoc = Message.getLocFromMessage(Message.PARAM_SPAWN_LOC);
 		
 		for (PotionEffect pot : p.getActivePotionEffects())
 			p.removePotionEffect(pot.getType());
