@@ -15,72 +15,63 @@ import org.bukkit.block.Biome;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
-public enum PlotParamType {
+public class PlotParamType<T extends Object> implements Cloneable {
+	public static PlotParamType<Boolean> FORCE_SPAWN_LOC = new PlotParamType<Boolean>("FORCE_SPAWN_LOC", false);
+	public static PlotParamType<Boolean> CLEAR_INCOMING_PLAYERS = new PlotParamType<Boolean>("CLEAR_INCOMING_PLAYERS", false);
+	public static PlotParamType<Boolean> ALLOW_FLY_INCOMING_PLAYERS = new PlotParamType<Boolean>("ALLOW_FLY_INCOMING_PLAYERS", true);
+	public static PlotParamType<Boolean> ALLOW_SPLASH_POTIONS = new PlotParamType<Boolean>("ALLOW_SPLASH_POTIONS", false);
+	public static PlotParamType<Boolean> ALLOW_PRINT_TNT = new PlotParamType<Boolean>("ALLOW_PRINT_TNT", false);
+	public static PlotParamType<Boolean> ALLOW_PVP = new PlotParamType<Boolean>("ALLOW_PVP", false);
+	public static PlotParamType<Boolean> ALLOW_PVE = new PlotParamType<Boolean>("ALLOW_PVE", false);
+	public static PlotParamType<Boolean> ALLOW_ENVIRONMENT_DAMAGE = new PlotParamType<Boolean>("ALLOW_ENVIRONMENT_DAMAGE", false);
+	public static PlotParamType<Boolean> ALLOW_DROP_ITEMS = new PlotParamType<Boolean>("ALLOW_DROP_ITEMS", false);
+	public static PlotParamType<Boolean> ALLOW_LAUNCH_PROJECTILES = new PlotParamType<Boolean>("ALLOW_LAUNCH_PROJECTILES", false);
+	public static PlotParamType<Boolean> KEEP_MAX_FOOD_LEVEL = new PlotParamType<Boolean>("KEEP_MAX_FOOD_LEVEL", true);
+	public static PlotParamType<Boolean> KEEP_INVENTORY_ON_DEATH = new PlotParamType<Boolean>("KEEP_INVENTORY_ON_DEATH", false);
 	
-	FORCE_SPAWN_LOC(Boolean.class, false),
+	public static PlotParamType<Integer> SPAWN_LOC_X = new PlotParamType<Integer>("SPAWN_LOC_X", 0);
+	public static PlotParamType<Integer> SPAWN_LOC_Y = new PlotParamType<Integer>("SPAWN_LOC_Y", 0);
+	public static PlotParamType<Integer> SPAWN_LOC_Z = new PlotParamType<Integer>("SPAWN_LOC_Z", 0);
 	
-	CLEAR_INCOMING_PLAYERS(Boolean.class, false),
+	public static PlotParamType<Integer> PLOT_TIME = new PlotParamType<Integer>("PLOT_TIME", 6000);
 	
-	ALLOW_FLY_INCOMING_PLAYERS(Boolean.class, true),
-	ALLOW_SPLASH_POTIONS(Boolean.class, false),
-	ALLOW_PRINT_TNT(Boolean.class, false),
-	ALLOW_PVP(Boolean.class, false),
-	ALLOW_PVE(Boolean.class, false),
-	ALLOW_ENVIRONMENT_DAMAGE(Boolean.class, false),
-	ALLOW_DROP_ITEMS(Boolean.class, false),
-	ALLOW_LAUNCH_PROJECTILES(Boolean.class, false),
+	//niveaux de stoplag : 0 aucun; 1 activé; 2 activé et bloqué jusqu'à vérif par un staff
+	public static PlotParamType<Integer> STOPLAG_STATUS = new PlotParamType<Integer>("STOPLAG_STATUS", 0);
 	
-	KEEP_MAX_FOOD_LEVEL(Boolean.class, true),
-	KEEP_INVENTORY_ON_DEATH(Boolean.class, false),
-
-	SPAWN_LOC_X(Integer.class, 0),
-	SPAWN_LOC_Y(Integer.class, 0),
-	SPAWN_LOC_Z(Integer.class, 0),
+	public static PlotParamType<WeatherType> PLOT_WEATHER = new PlotParamType<WeatherType>("PLOT_WEATHER", WeatherType.CLEAR);
+	public static PlotParamType<GameMode> GAMEMODE_INCOMING_PLAYERS = new PlotParamType<GameMode>("GAMEMODE_INCOMING_PLAYERS", GameMode.CREATIVE);
 	
-	PLOT_WEATHER(WeatherType.class, WeatherType.CLEAR),
-	GAMEMODE_INCOMING_PLAYERS(GameMode.class, GameMode.CREATIVE),
-	
-	LIST_ALLOWED_INTERRACTION(Set.class, new HashSet<Material>()),
-	BANNED_PLAYERS(Set.class, new HashSet<Long>()),
-	
-	PLOT_TIME(Integer.class, 6000),
-	//niveaux de stoplag : 0 aucun, 1 activé, 2 activé et bloqué jusqu'à vérif par un staff
-	STOPLAG_STATUS(Integer.class, 0),
-	;
+	public static PlotParamType<List<Material>> LIST_ALLOWED_INTERRACTION = new PlotParamType<List<Material>>("LIST_ALLOWED_INTERRACTION", new ArrayList<Material>());
+	public static PlotParamType<List<Long>> BANNED_PLAYERS = new PlotParamType<List<Long>>("BANNED_PLAYERS", new ArrayList<Long>());
 	
 	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();
 	
-	private Class<?> paramType;
-	private Object defaultValue;
+	private String id;
+	private T defaultValue;
 	
-	private PlotParamType(Class<?> type, Object defaultValue) {
-		this.paramType = type;
+	private PlotParamType(String id, T defaultValue) {
+		this.id = id;
 		this.defaultValue = defaultValue;
 	}
 	
-	public Class getType() {
-		return paramType;
+	public String getId() {
+		return id;
 	}
 	
-	public Object getDefaultValue() {
+	public T getDefaultValue() {
 		return defaultValue;
 	}
 	
-	public static void load() {
-		//TODO
+	public void setValue(Plot plot, T val) {
+		plot.getParameters().setParameter(this, val);
 	}
 	
-	/*
-	public static PlotParamType getFromString(String s) {
-		for (PlotParamType p : PlotParamType.values())
-			if (p.getId().equals(s))
-				return p;
-		
-		return null;
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof PlotParamType && ((PlotParamType<?>)obj).getId().equals(id);
 	}
-	*/
 	
-	public static ArrayList<Material> getAllPossibleIntaractibleBlocks(){
+	public static List<Material> getAllPossibleIntaractibleBlocks(){
 		if (blocksWithInteractionsList.size() > 0)
 			return blocksWithInteractionsList;
 

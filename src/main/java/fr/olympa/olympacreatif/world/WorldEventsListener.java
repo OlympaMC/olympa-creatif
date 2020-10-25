@@ -337,7 +337,7 @@ public class WorldEventsListener implements Listener{
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
-		
+		e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
 		/*plugin.getTask().runTaskLater(() -> {
 			((CraftServer) Bukkit.getServer()).getHandle().getServer().getCommandDispatcher().a((((CraftPlayer) e.getPlayer()).getHandle()));
 		}, 20);*/

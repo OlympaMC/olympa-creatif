@@ -27,7 +27,6 @@ import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotParameters;
-import fr.olympa.olympacreatif.plot.PlotParametersBIS;
 import fr.olympa.olympacreatif.utils.PermissionsManager;
 
 public class DataManager implements Listener {
@@ -181,7 +180,7 @@ public class DataManager implements Listener {
 				ResultSet getPlotDatasResult = getPlotDatas.executeQuery();
 				
 				getPlotDatasResult.next();
-				PlotParametersBIS plotParams = PlotParametersBIS.fromJson(plugin, plotId, getPlotDatasResult.getString("plot_parameters"));
+				PlotParameters plotParams = PlotParameters.fromJson(plugin, plotId, getPlotDatasResult.getString("plot_parameters"));
 				
 				//get owner id
 				PreparedStatement getPlotOwner = osSelectPlotOwner.getStatement();

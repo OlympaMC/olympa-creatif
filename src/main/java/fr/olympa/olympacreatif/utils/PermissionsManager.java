@@ -50,26 +50,6 @@ public class PermissionsManager implements Listener{
 
         plugin.getLogger().log(Level.INFO, "§aWorldEdit & vanilla perms successfully respectively added to " + OlympaGroup.PLAYER + " and " + PermissionsList.USE_WORLD_EDIT.getMinGroup());
 	}
-	
-	/*
-	public PermissionAttachment addWePerms(Player p) {
-		PermissionAttachment perms = p.addAttachment(plugin);
-		listWe.forEach(perm -> perms.setPermission(perm, true));
-		
-		return perms;
-	}
-	
-	public PermissionAttachment addCbPerms(Player p) {
-		PermissionAttachment perms = p.addAttachment(plugin);
-		listCb.forEach(perm -> perms.setPermission(perm, true));
-		
-		return perms;
-	}*/
-	
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e) {
-		//plugin.getTask().runTaskLater(() -> e.getPlayer().recalculatePermissions(), 40);
-	}
 }
 
 

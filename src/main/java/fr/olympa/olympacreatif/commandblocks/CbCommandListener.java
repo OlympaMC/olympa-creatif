@@ -62,7 +62,7 @@ public class CbCommandListener implements Listener {
 					Entry<Location, Integer> e = iter.next();
 					if (e.getValue() + CommandBlocksManager.minTickBetweenEachCbExecution <= MinecraftServer.currentTick)
 						iter.remove();
-				}					
+				}
 			}
 		}.runTaskTimer(plugin, 10, 1);
 	}
@@ -74,7 +74,7 @@ public class CbCommandListener implements Listener {
 			return;
 		
 		e.setCancelled(true);
-		Bukkit.broadcastMessage("CB : " + e.getSender() + " - " + blockedExecutionLocs.get(((CraftBlockCommandSender) e.getSender()).getBlock().getLocation()));
+		//Bukkit.broadcastMessage("CB : " + e.getSender() + " - " + blockedExecutionLocs.get(((CraftBlockCommandSender) e.getSender()).getBlock().getLocation()));
 		
 		CommandBlock cb = ((CommandBlock)((CraftBlockCommandSender)e.getSender()).getBlock().getState());
 		

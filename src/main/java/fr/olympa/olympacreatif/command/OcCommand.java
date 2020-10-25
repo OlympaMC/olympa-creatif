@@ -29,7 +29,6 @@ import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
-import fr.olympa.olympacreatif.plot.PlotParamTypeBIS;
 import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
@@ -190,7 +189,7 @@ public class OcCommand extends OlympaCommand {
 					Plot plot2 = pc.getCurrentPlot();
 					String msg = "§e >> Joueurs bannis de la parcelle " + plot2 + " : ";
 					
-					List<Long> list = plot2.getParameters().getParameter(PlotParamTypeBIS.BANNED_PLAYERS);
+					List<Long> list = plot2.getParameters().getParameter(PlotParamType.BANNED_PLAYERS);
 					
 					for (int i = 0 ; i < list.size() ; i++) {
 						msg += "§e" + AccountProvider.getPlayerInformations(list.get(i)).getName();
@@ -349,7 +348,7 @@ public class OcCommand extends OlympaCommand {
 				
 				else {
 					//exécution du ban
-					plot.getParameters().getParameter(PlotParamTypeBIS.BANNED_PLAYERS).add(AccountProvider.get(target.getUniqueId()).getId());
+					plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).add(AccountProvider.get(target.getUniqueId()).getId());
 					
 					plot.teleportOut(target);
 					plot.getMembers().set(target, PlotRank.VISITOR);
@@ -376,7 +375,7 @@ public class OcCommand extends OlympaCommand {
 				else if (plot.getMembers().getPlayerLevel(pc) < 3)
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				
-				else if (plot.getParameters().getParameter(PlotParamTypeBIS.BANNED_PLAYERS).remove(AccountProvider.get(target.getUniqueId()).getId()))
+				else if (plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).remove(AccountProvider.get(target.getUniqueId()).getId()))
 					sender.sendMessage(Message.PLOT_UNBAN_PLAYER.getValue(target.getName()));
 				else
 					sender.sendMessage(Message.PLOT_CANT_UNBAN_PLAYER.getValue(target.getName()));

@@ -1,66 +1,85 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class PlotParameters {
 
+
 	OlympaCreatifMain plugin;
-	private Map <PlotParamType, Object> parameters = new HashMap<PlotParamType, Object>();
+	private Map <PlotParamType<?>, Object> parameters = new HashMap<PlotParamType<?>, Object>();
 	private PlotId id;
 	
 	public PlotParameters(OlympaCreatifMain plugin, PlotId id) {
-		
 		this.plugin = plugin;
 		this.id = id;
 		
-		for (PlotParamType type : PlotParamType.values())
-			setParameter(type, type.getDefaultValue());
+		Field[] fields = PlotParamType.class.getDeclaredFields();
+		for (Field field : fields)
+			if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers()))
+				try {
+					field.setAccessible(true);
+					PlotParamType<?> param = (PlotParamType<?>) field.get(null);
+					parameters.put(param, param.getDefaultValue());
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					plugin.getLogger().log(Level.SEVERE, "Unable to use reflection on plot parameter " + field.getName() + " for plot " + id);
+					e.printStackTrace();
+				}
 		
 		if (id != null)
-			setSpawnLoc(id.getLocation().clone().add(0.5, 10, 0.5));
+			setSpawnLoc(id.getLocation().clone().add(0.5, 3, 0.5));
 	}
 
-	
-	synchronized public void setParameter(PlotParamType param, Object value) {
+	/**
+	 * For internal use only, NEVER use this method!
+	 */
+	public synchronized void setParameter(PlotParamType<?> param, Object value) {
 		parameters.put(param, value);
-		//if (param == PlotParamType.SPAWN_LOC_X || param == PlotParamType.SPAWN_LOC_Y || param == PlotParamType.SPAWN_LOC_Z)
-			//Bukkit.broadcastMessage("set " + param  + " to " + value + " for plot " + id);
 	}
 	
-	public Object getParameter(PlotParamType param) {
-		if (parameters.containsKey(param))
-			return parameters.get(param);
-		
-		return null;
+	@SuppressWarnings("unchecked")
+	public synchronized <T> T getParameter(PlotParamType<T> param) {
+		return (T) parameters.get(param);
 	}
 	
-	public Location getSpawnLoc() {
+	public synchronized Set<PlotParamType<?>> getParameters(){
+		return Collections.unmodifiableSet(parameters.keySet());
+	}
+	
+	public synchronized Location getSpawnLoc() {
 		return new Location(plugin.getWorldManager().getWorld(), 
-				(int)getParameter(PlotParamType.SPAWN_LOC_X), 
-				(int)getParameter(PlotParamType.SPAWN_LOC_Y), 
-				(int)getParameter(PlotParamType.SPAWN_LOC_Z));
+				getParameter(PlotParamType.SPAWN_LOC_X), 
+				getParameter(PlotParamType.SPAWN_LOC_Y), 
+				getParameter(PlotParamType.SPAWN_LOC_Z));
 	}
 	
 	
-	public void setSpawnLoc(Location loc) {
+	public synchronized void setSpawnLoc(Location loc) {
 		if (id.isInPlot(loc)) {
 			setParameter(PlotParamType.SPAWN_LOC_X, loc.getBlockX());
 			setParameter(PlotParamType.SPAWN_LOC_Y, loc.getBlockY());
-			setParameter(PlotParamType.SPAWN_LOC_Z, loc.getBlockZ());	
+			setParameter(PlotParamType.SPAWN_LOC_Z, loc.getBlockZ());
 		}
 	}
 	
@@ -69,70 +88,42 @@ public class PlotParameters {
 	public synchronized String toJson() {
 		JSONObject json = new JSONObject();
 		
-		for (PlotParamType param : PlotParamType.values())
-			if (parameters.containsKey(param))
-				json.put(param.toString(), parameters.get(param).toString());
+		for (PlotParamType<?> param : getParameters())
+			json.put(param.getId(), parameters.get(param).toString());
 		
 		return json.toString();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public synchronized static PlotParameters fromJson(OlympaCreatifMain plugin, PlotId plotId, String jsonString) {
 
 		PlotParameters params = new PlotParameters(plugin, plotId);
 		
 		try {
 			JSONObject json = (JSONObject) new JSONParser().parse(jsonString);
+			Gson gson = new Gson();
 			
-			for (Object key : json.keySet())
-				if (EnumUtils.isValidEnum(PlotParamType.class, (String)key)) {
+			for (PlotParamType<?> param : params.getParameters())
+				if (json.containsKey(param.getId()))
 					
-					PlotParamType type = PlotParamType.valueOf((String)key);
-					
-					//types booléens
-					if (type.getType().equals(Boolean.class))
-						params.setParameter(type, Boolean.valueOf((String) json.get(key)));
-					
-					//gestion integers
-					else if (type.getType().equals(Integer.class))
-						try {
-							params.setParameter(type, Integer.valueOf((String) json.get(key)));
-						}catch(NumberFormatException e) {
-						}
-					
-					//gestion gamemode
-					else if (type == PlotParamType.GAMEMODE_INCOMING_PLAYERS) {
-						if (EnumUtils.isValidEnum(GameMode.class, (String)json.get(key)))
-							params.setParameter(type, GameMode.valueOf((String)json.get(key)));	
-					}
-					
-					//gestion météo
-					else if (type == PlotParamType.PLOT_WEATHER) {
-						if (EnumUtils.isValidEnum(WeatherType.class, (String)json.get(key)))
-							params.setParameter(type, WeatherType.valueOf((String)json.get(key)));	
-					}
-					
-					//gestion listes
-					else if (type.getType().equals(Set.class)) {
-						String[] args = ((String)json.get(key)).substring(1, ((String)json.get(key)).length() - 1).replace(" ", "").split(",");
+					if (param.getDefaultValue() instanceof Integer) {
+						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Integer.class));
 						
-						//Bukkit.broadcastMessage("param " + type + " : " + Arrays.asList(args));
+					}else if (param.getDefaultValue() instanceof Boolean) {
+						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Boolean.class));
 						
-						for (int i = 0 ; i < args.length ; i++) {
-							//gestion joueurs bannis du plot
-							if (type == PlotParamType.BANNED_PLAYERS)
-								try {
-									((HashSet<Long>)params.getParameter(PlotParamType.BANNED_PLAYERS)).add(Long.valueOf(args[i]));
-								}catch(NumberFormatException e) {
-								}	
-							
-							//gestion interractions autorisées
-							else if (type == PlotParamType.LIST_ALLOWED_INTERRACTION)
-								if (Material.getMaterial(args[i]) != null)
-									((HashSet<Material>)params.getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION)).add(Material.getMaterial(args[i]));
-						}
+					}else if (param.getDefaultValue() instanceof WeatherType) {
+						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), WeatherType.class));
+						
+					}else if (param.getDefaultValue() instanceof GameMode) {
+						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), GameMode.class));
+						
+					}else if (param.getDefaultValue() instanceof List) {
+						if (param.equals(PlotParamType.BANNED_PLAYERS))
+							params.setParameter(param, gson.fromJson((String) json.get(param.getId()), new TypeToken<ArrayList<Long>>(){}.getType()));
+						else if (param.equals(PlotParamType.LIST_ALLOWED_INTERRACTION))
+							params.setParameter(param, gson.fromJson((String) json.get(param.getId()), new TypeToken<ArrayList<Material>>(){}.getType()));
+						
 					}
-				}
 			
 			return params;
 		} catch (ParseException e) {

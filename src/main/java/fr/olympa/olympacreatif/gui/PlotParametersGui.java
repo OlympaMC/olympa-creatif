@@ -25,7 +25,6 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
-import fr.olympa.olympacreatif.plot.PlotParamTypeBIS;
 
 public class PlotParametersGui extends IGui {
 	
@@ -37,7 +36,7 @@ public class PlotParametersGui extends IGui {
 	private String rainyWeather = "§eMétéo actuelle : pluvieuse";
 	private String[] stoplagLevels = {"§eEtat : §ainactif", "§eEtat : §cactif", "§eEtat : §cforcé §4(contacter un staff)"};
 	
-	private Map<ItemStack, PlotParamTypeBIS<Boolean>> switchButtons = new LinkedHashMap<ItemStack, PlotParamTypeBIS<Boolean>>(); 
+	private Map<ItemStack, PlotParamType<Boolean>> switchButtons = new LinkedHashMap<ItemStack, PlotParamType<Boolean>>(); 
 	
 	public PlotParametersGui(IGui gui) {
 		super(gui, "Paramètres du plot " + gui.getPlot().getPlotId(), 3);
@@ -53,14 +52,14 @@ public class PlotParametersGui extends IGui {
 		ItemStack it = null;
 		
 		//0 : Gamemode par défaut
-		it = ItemUtils.item(Material.ACACIA_SIGN, "§6Gamemode par défaut", "§eMode actuel : " + plot.getParameters().getParameter(PlotParamTypeBIS.GAMEMODE_INCOMING_PLAYERS).toString());
+		it = ItemUtils.item(Material.ACACIA_SIGN, "§6Gamemode par défaut", "§eMode actuel : " + plot.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS).toString());
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(0,it);
 
 		//1 : Heure du plot
 		it = ItemUtils.item(Material.CLOCK, "§6Heure de la parcelle");
-		it = ItemUtils.lore(it, "§eHeure actuelle : " + (plot.getParameters().getParameter(PlotParamTypeBIS.PLOT_TIME) + timeToAdd)/1000 + "h");
+		it = ItemUtils.lore(it, "§eHeure actuelle : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd)/1000 + "h");
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
 		
@@ -82,7 +81,7 @@ public class PlotParametersGui extends IGui {
 
 		//3 : Définir la météo
 		it = ItemUtils.item(Material.SUNFLOWER, "§6Météo de la parcelle");
-		if (plot.getParameters().getParameter(PlotParamTypeBIS.PLOT_WEATHER) == WeatherType.CLEAR)
+		if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR)
 			it = ItemUtils.lore(it, clearWeather);
 		else
 			it = ItemUtils.lore(it, rainyWeather);
@@ -92,27 +91,27 @@ public class PlotParametersGui extends IGui {
 
 		//4 : Etat stoplag
 		it = ItemUtils.item(Material.COMMAND_BLOCK, "§6Blocage tâches intensives (redstone & cb)");
-		ItemUtils.lore(it, stoplagLevels[plot.getParameters().getParameter(PlotParamTypeBIS.STOPLAG_STATUS)]);
+		ItemUtils.lore(it, stoplagLevels[plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)]);
 		ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(3, it);
 		
-		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamTypeBIS.ALLOW_ENVIRONMENT_DAMAGE);
-		switchButtons.put(ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE"), PlotParamTypeBIS.ALLOW_PVE);
-		switchButtons.put(ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du PvP"), PlotParamTypeBIS.ALLOW_PVP);
-		switchButtons.put(ItemUtils.item(Material.BUCKET, "§6Conservation items à la mort"), PlotParamTypeBIS.KEEP_INVENTORY_ON_DEATH);
-		switchButtons.put(ItemUtils.item(Material.COOKED_BEEF, "§6Satiété maximale permanente"), PlotParamTypeBIS.KEEP_MAX_FOOD_LEVEL);
-		switchButtons.put(ItemUtils.item(Material.DROPPER, "§6Drop des items"), PlotParamTypeBIS.ALLOW_DROP_ITEMS);
-		switchButtons.put(ItemUtils.item(Material.SPLASH_POTION, "§6Utilisation des potions jetables"), PlotParamTypeBIS.ALLOW_SPLASH_POTIONS);
-		switchButtons.put(ItemUtils.item(Material.CAULDRON, "§6Clear des visiteurs"), PlotParamTypeBIS.CLEAR_INCOMING_PLAYERS);
-		switchButtons.put(ItemUtils.item(Material.TNT, "§6Amorçage de la TNT"), PlotParamTypeBIS.ALLOW_PRINT_TNT);
-		switchButtons.put(ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Forcer le spawn parcelle"), PlotParamTypeBIS.FORCE_SPAWN_LOC);
-		switchButtons.put(ItemUtils.item(Material.FEATHER, "§6Vol des visiteurs"), PlotParamTypeBIS.ALLOW_FLY_INCOMING_PLAYERS);
-		switchButtons.put(ItemUtils.item(Material.ARROW, "§6Activation des projectiles"), PlotParamTypeBIS.ALLOW_LAUNCH_PROJECTILES);
+		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamType.ALLOW_ENVIRONMENT_DAMAGE);
+		switchButtons.put(ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE"), PlotParamType.ALLOW_PVE);
+		switchButtons.put(ItemUtils.item(Material.DIAMOND_SWORD, "§6Activation du PvP"), PlotParamType.ALLOW_PVP);
+		switchButtons.put(ItemUtils.item(Material.BUCKET, "§6Conservation items à la mort"), PlotParamType.KEEP_INVENTORY_ON_DEATH);
+		switchButtons.put(ItemUtils.item(Material.COOKED_BEEF, "§6Satiété maximale permanente"), PlotParamType.KEEP_MAX_FOOD_LEVEL);
+		switchButtons.put(ItemUtils.item(Material.DROPPER, "§6Drop des items"), PlotParamType.ALLOW_DROP_ITEMS);
+		switchButtons.put(ItemUtils.item(Material.SPLASH_POTION, "§6Utilisation des potions jetables"), PlotParamType.ALLOW_SPLASH_POTIONS);
+		switchButtons.put(ItemUtils.item(Material.CAULDRON, "§6Clear des visiteurs"), PlotParamType.CLEAR_INCOMING_PLAYERS);
+		switchButtons.put(ItemUtils.item(Material.TNT, "§6Amorçage de la TNT"), PlotParamType.ALLOW_PRINT_TNT);
+		switchButtons.put(ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Forcer le spawn parcelle"), PlotParamType.FORCE_SPAWN_LOC);
+		switchButtons.put(ItemUtils.item(Material.FEATHER, "§6Vol des visiteurs"), PlotParamType.ALLOW_FLY_INCOMING_PLAYERS);
+		switchButtons.put(ItemUtils.item(Material.ARROW, "§6Activation des projectiles"), PlotParamType.ALLOW_LAUNCH_PROJECTILES);
 		
 		
-		Map<ItemStack, PlotParamTypeBIS<Boolean>> switches = new LinkedHashMap<ItemStack, PlotParamTypeBIS<Boolean>>();
+		Map<ItemStack, PlotParamType<Boolean>> switches = new LinkedHashMap<ItemStack, PlotParamType<Boolean>>();
 		
-		for(Entry<ItemStack, PlotParamTypeBIS<Boolean>> e : switchButtons.entrySet()) {
+		for(Entry<ItemStack, PlotParamType<Boolean>> e : switchButtons.entrySet()) {
 			switches.put(setSwitchState(e.getKey(), plot.getParameters().getParameter(e.getValue())), e.getValue());
 		}
 		
@@ -143,17 +142,17 @@ public class PlotParametersGui extends IGui {
 				break;
 			
 			}
-			PlotParamTypeBIS.GAMEMODE_INCOMING_PLAYERS.setValue(plot, gm);
+			PlotParamType.GAMEMODE_INCOMING_PLAYERS.setValue(plot, gm);
 			current = ItemUtils.lore(current, "§eMode actuel : " + gm.toString());
 			current = ItemUtils.loreAdd(current, clickToChange);
-			plot.getPlayers().forEach(pp -> pp.setGameMode(plot.getParameters().getParameter(PlotParamTypeBIS.GAMEMODE_INCOMING_PLAYERS)));
+			plot.getPlayers().forEach(pp -> pp.setGameMode(plot.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS)));
 			break;
 			
 		case 1:
-			PlotParamTypeBIS.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamTypeBIS.PLOT_TIME) + 1000)%25000);
-			current = ItemUtils.lore(current, "§eHeure actuelle : " + (plot.getParameters().getParameter(PlotParamTypeBIS.PLOT_TIME) + timeToAdd)/1000 + "h");
+			PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
+			current = ItemUtils.lore(current, "§eHeure actuelle : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd)/1000 + "h");
 			current = ItemUtils.loreAdd(current, clickToChange);
-			plot.getPlayers().forEach(pp -> pp.setPlayerTime(plot.getParameters().getParameter(PlotParamTypeBIS.PLOT_TIME), false));
+			plot.getPlayers().forEach(pp -> pp.setPlayerTime(plot.getParameters().getParameter(PlotParamType.PLOT_TIME), false));
 			break;
 			
 			/*
@@ -176,15 +175,15 @@ public class PlotParametersGui extends IGui {
 			break;
 			*/
 		case 2:
-			if (plot.getParameters().getParameter(PlotParamTypeBIS.PLOT_WEATHER) == WeatherType.CLEAR) {
-				PlotParamTypeBIS.PLOT_WEATHER.setValue(plot, WeatherType.DOWNFALL);
+			if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR) {
+				PlotParamType.PLOT_WEATHER.setValue(plot, WeatherType.DOWNFALL);
 				current = ItemUtils.lore(current, rainyWeather);	
 			}else {
-				PlotParamTypeBIS.PLOT_WEATHER.setValue(plot, WeatherType.CLEAR);
+				PlotParamType.PLOT_WEATHER.setValue(plot, WeatherType.CLEAR);
 				current = ItemUtils.lore(current, clearWeather);	
 			}
 			current = ItemUtils.loreAdd(current, clickToChange);
-			plot.getPlayers().forEach(pp -> pp.setPlayerWeather( plot.getParameters().getParameter(PlotParamTypeBIS.PLOT_WEATHER)));
+			plot.getPlayers().forEach(pp -> pp.setPlayerWeather( plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER)));
 			
 			break;
 			
@@ -193,21 +192,21 @@ public class PlotParametersGui extends IGui {
 			if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
 				mod = 3;
 			
-			int currentState = plot.getParameters().getParameter(PlotParamTypeBIS.STOPLAG_STATUS);
+			int currentState = plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS);
 			
 			//si le plot est en stoplag forcé et que le joueur n'a pas la perm staff FAKE OWNER EVERYWHERE, return
 			if (currentState == 2 && mod == 2)
 				break;
 			
-			PlotParamTypeBIS.STOPLAG_STATUS.setValue(plot, Math.floorMod(currentState + 1, mod));
+			PlotParamType.STOPLAG_STATUS.setValue(plot, Math.floorMod(currentState + 1, mod));
 			
-			current = ItemUtils.lore(current, stoplagLevels[plot.getParameters().getParameter(PlotParamTypeBIS.STOPLAG_STATUS)]);
+			current = ItemUtils.lore(current, stoplagLevels[plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)]);
 			current = ItemUtils.loreAdd(current, clickToChange);
 			break;
 			
 		default:
 			if (slot - 4 <= switchButtons.size()) {
-				PlotParamTypeBIS<Boolean> param = switchButtons.get(current);
+				PlotParamType<Boolean> param = switchButtons.get(current);
 				switchButtons.remove(current);
 				
 				current = setSwitchState(current, !getSwitchState(current));

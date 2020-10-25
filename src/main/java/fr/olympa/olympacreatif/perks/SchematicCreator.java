@@ -22,20 +22,17 @@ import net.minecraft.server.v1_15_R1.World;
 public class SchematicCreator {
 
 	  private OlympaCreatifMain plugin;
-	  private int plotXsize;
-	  private int plotZsize;
 	  
 	public SchematicCreator(OlympaCreatifMain plugin) {
 	    this.plugin = plugin;
-	    plotXsize = WorldManager.plotSize;
-	    plotZsize = WorldManager.plotSize;
 	}
 	    
 	public String export(Plot plot) {
-		String fileName = plot.getMembers().getOwner().getName() + "-" + plot.getPlotId();
+		return "§4La fonctionnalité d'export de la parcelle est indisponible pendant la bêta, désolé ¯\\_༼ ಥ ‿ ಥ ༽_/¯";
+		//String fileName = plot.getMembers().getOwner().getName() + "-" + plot.getPlotId();
 		
-		return export(fileName, plot.getPlotId().getLocation().getBlockX(), 1, plot.getPlotId().getLocation().getBlockZ(), 
-				plot.getPlotId().getLocation().getBlockX() + plotXsize - 1, 255, plot.getPlotId().getLocation().getBlockZ() + plotZsize - 1);
+		//return export(fileName, plot.getPlotId().getLocation().getBlockX(), 1, plot.getPlotId().getLocation().getBlockZ(), 
+		//		plot.getPlotId().getLocation().getBlockX() + plotXsize - 1, 255, plot.getPlotId().getLocation().getBlockZ() + plotZsize - 1);
 	}
 	
 
