@@ -53,7 +53,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	//A CHANGER AVACE BETA OUVERTE
 	//private int gameMoney = 0;
-	private int gameMoney = 150;
+	private int gameMoney = 1500;
 
 	private Set<KitType> kits = new HashSet<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();

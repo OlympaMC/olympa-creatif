@@ -239,7 +239,7 @@ public class PlotsManager {
 				asyncPlots.add(plot);
 			}
 	}
-	
+	/*
 	public static Integer getPlotIdFromString(String id) {
 		try {
 			return Integer.valueOf(id, 36);
@@ -250,5 +250,5 @@ public class PlotsManager {
 	
 	public static String getPlotIdAsString(int id) {
 		return Integer.toString(id, 36).toUpperCase();
-	}
+	}*/
 }

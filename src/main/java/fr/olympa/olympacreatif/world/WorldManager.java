@@ -22,16 +22,21 @@ import org.bukkit.WorldBorder;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import fr.olympa.api.afk.AfkHandler;
+import fr.olympa.api.afk.AfkPlayer;
 import fr.olympa.api.holograms.Hologram;
 import fr.olympa.api.holograms.Hologram.HologramLine;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.player.OlympaPlayer;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 
 public class WorldManager {
 	private OlympaCreatifMain plugin;
@@ -151,6 +156,33 @@ public class WorldManager {
 					new FixedLine<HologramLine>("§eSi vous souhaitez les obtenir plus rapidement et nous soutenir,"),
 					new FixedLine<HologramLine>("§evous pouvez les acheter sur la boutique !"));
 		}, 100);
+		
+		//task pour donner l'argent aux joueurs périodiquement
+		new BukkitRunnable() {
+			
+			final int cMax = 60;
+			final int noAfkIncome = Integer.valueOf(Message.PARAM_INCOME_NOT_AFK.getValue());
+			final int afkIncome = Integer.valueOf(Message.PARAM_INCOME_AFK.getValue());
+			int c = 0;
+			
+			@Override
+			public void run() {
+				Bukkit.getOnlinePlayers().forEach(p -> {
+					OlympaPlayerCreatif pp = AccountProvider.get(p.getUniqueId());
+					if (AfkHandler.isAfk(p))
+						pp.addGameMoney(afkIncome);
+					else
+						pp.addGameMoney(noAfkIncome);
+					
+					c++;
+					
+					if (c == cMax) {
+						c = 0;
+						p.sendMessage(Message.MSG_PERIODIC_INCOME.getValue());	
+					}
+				});
+			}
+		}.runTaskTimer(plugin, 20*60, 20*60);
 	}
 	
 	public World getWorld() {

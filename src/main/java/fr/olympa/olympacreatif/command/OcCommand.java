@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -213,58 +214,18 @@ public class OcCommand extends OlympaCommand {
 			break;
 		case 2:
 			switch(args[0]) {
-			/*
-			case "protectedarea":
-				plot = plugin.getPlotsManager().getPlot(p.getLocation());
-				if (plot == null) {
-					p.sendMessage(Message.PLOT_NULL_PLOT.getValue());
-					return false;
-				}
-				if (plot.getMembers().getPlayerRank(p) != PlotRank.OWNER) {
-					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
-					return false;
-				}
-				
-				switch (args[1]) {
-				case "create":
-					err = plugin.getWorldEditManager().getPlayerInstance(p).isSelectionValid();
-					if (err == WorldEditError.NO_ERROR) {
-						p.sendMessage(Message.WE_CMD_PROTECTED_AREA_CREATION_SUCCESS.getValue());
-						plot.getParameters().setParameter(PlotParamType.PROTECTED_ZONE_POS1, plugin.getWorldEditManager().getPlayerInstance(p).getPos1().clone());
-						plot.getParameters().setParameter(PlotParamType.PROTECTED_ZONE_POS2, plugin.getWorldEditManager().getPlayerInstance(p).getPos2().clone());
-					}else
-						p.sendMessage(err.getErrorMessage().getValue());
-					break;
-					
-				case "save":
-					err = plugin.getWorldEditManager().getPlayerInstance(p).saveProtectedZone(plot);
-					if (err == WorldEditError.NO_ERROR)
-						p.sendMessage(Message.PLOT_PROTECTED_ZONE_SAVED.getValue());
-					else
-						p.sendMessage(err.getErrorMessage().getValue());
-					break;
-					
-				case "restore":
-					err = plugin.getWorldEditManager().getPlayerInstance(p).restaureProtectedZone(plot);
-					if (err == WorldEditError.NO_ERROR)
-						p.sendMessage(Message.PLOT_PROTECTED_ZONE_RESTORED.getValue());
-					else
-						p.sendMessage(err.getErrorMessage().getValue());
-					break;
-
-				default:
-					sender.sendMessage(Message.COMMAND_HELP.getValue());
-					break;
-				}
-				break;
-				*/
 			
-		case "menu":
-			if (sender instanceof Player) 
-				MainGui.getMainGui(pc, args[1]).create((Player)sender);
+			case "menu":
+				if (sender instanceof Player) 
+					MainGui.getMainGui(pc, args[1]).create((Player)sender);
 			break;
 				
 			case "visit":
+				if (!StringUtils.isNumeric(args[1])) {
+					Bukkit.dispatchCommand(sender, "oc visit " + args[1] + " 1");
+					break;
+				}
+				
 				PlotId id = PlotId.fromString(plugin, args[1]);
 				if (id != null) {
 					p.teleport(id.getLocation());
@@ -272,7 +233,7 @@ public class OcCommand extends OlympaCommand {
 				}else {
 					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
 				}
-				break;
+			break;
 				
 			case "invite":
 				
@@ -389,12 +350,7 @@ public class OcCommand extends OlympaCommand {
 			
 		case 3:
 			switch(args[0]) {
-			case "visit":
-				if (args.length < 3) {
-					sender.sendMessage(Message.COMMAND_HELP.getValue());
-					break;
-				}
-					
+			case "visit":					
 				try {
 					Player plotOwner = Bukkit.getPlayer(args[1]);
 					

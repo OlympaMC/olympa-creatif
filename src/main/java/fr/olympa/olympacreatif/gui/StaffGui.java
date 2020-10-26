@@ -87,17 +87,17 @@ public class StaffGui extends IGui {
 			break;
 			
 		case 5:
-			if (PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS.hasPermission(p))
+			if (PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS.hasPermission(p)) {
 				NBTcontrollerUtil.setDenyAllCustomFlags(!NBTcontrollerUtil.getDenyAllCustomFlags());
-			
-			toggleSwitch(slot);
+				toggleSwitch(slot);	
+			}
 			break;
 			
 		case 6:
-			if (PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT.hasPermission(p) && plugin.getWorldEditManager() != null)
+			if (PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT.hasPermission(p) && plugin.isWeEnabled()) {
 				plugin.disableWorldEdit();
-				
-			toggleSwitch(slot);
+				toggleSwitch(slot);	
+			}
 			break;
 			
 		}

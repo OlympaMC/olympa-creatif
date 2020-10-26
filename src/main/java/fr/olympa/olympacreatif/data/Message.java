@@ -72,6 +72,10 @@ public enum Message {
 	
 	INSUFFICIENT_GROUP_PERMISSION, 
 	WE_ERR_SELECTION_TOO_BIG, 
+	
+	MSG_PERIODIC_INCOME, 
+	PARAM_INCOME_NOT_AFK, 
+	PARAM_INCOME_AFK,
 	;
 	
 	private String message = null;

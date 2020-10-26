@@ -59,6 +59,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private ScoreboardManager<OlympaPlayerCreatif> scm;
 
 	public Random random = new Random();
+	private boolean weEnabled = false;
 
 	/*
 	@Override //defines the custom world generator 
@@ -118,14 +119,17 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		if (awe != null) {
 			awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
 			Bukkit.getLogger().log(Level.FINE, getPrefixConsole() + "Successfully loaded WorldEdit and AWE custom progressbar.");
+			weEnabled = true;
 		}   
 	}
 	
 	public void disableWorldEdit() {
-		getServer().getPluginManager().disablePlugin(getServer().getPluginManager().getPlugin("WorldEdit"));
-		getServer().getPluginManager().disablePlugin(getServer().getPluginManager().getPlugin("AsyncWorldEdit"));
-		we = null;
-		awe = null;
+		permsManager.removeWePerms();
+		weEnabled = false;
+	}
+	
+	public boolean isWeEnabled() {
+		return weEnabled;
 	}
 
 	@Override

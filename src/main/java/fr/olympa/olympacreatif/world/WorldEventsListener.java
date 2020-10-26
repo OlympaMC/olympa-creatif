@@ -191,11 +191,6 @@ public class WorldEventsListener implements Listener{
 	public void onFireSpread(BlockSpreadEvent e) {
 		e.setCancelled(true);
 	}
-
-	@EventHandler
-	public void onBlockForm(BlockFormEvent e) {
-		e.setCancelled(true);
-	}
 	
 	@EventHandler //cancel explosion TNT
 	public void onEntityExplodeEvent(EntityExplodeEvent e) {

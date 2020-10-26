@@ -6,10 +6,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +25,6 @@ import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotParameters;
-import fr.olympa.olympacreatif.utils.PermissionsManager;
 
 public class DataManager implements Listener {
 

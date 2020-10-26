@@ -214,6 +214,8 @@ public class PlotsInstancesListener implements Listener{
 				plot.getStoplagChecker().addEvent(StopLagDetect.LAMP);
 			else if (e.getBlock().getType() == Material.REDSTONE_WIRE)
 				plot.getStoplagChecker().addEvent(StopLagDetect.WIRE);
+		
+		//Bukkit.broadcastMessage("REDSTONE EVENT plot : " + plot + ", new current : " + e.getNewCurrent());
 	}
 	
 	@EventHandler //test print TNT
@@ -290,6 +292,8 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //cancel lava/water flow en dehors du plot. Cancel aussi toute téléportation d'un oeuf de dragon
 	public void onLiquidFlow(BlockFromToEvent e) {
 		Plot plot = plugin.getPlotsManager().getPlot(e.getToBlock().getLocation());
+
+		//Bukkit.broadcastMessage("FROM TO EVENT : " + plot + ", loc : " + e.getBlock().getLocation());
 		
 		if (plot == null || plot.hasStoplag() || !plot.hasLiquidFlow() || e.getBlock().getType() == Material.DRAGON_EGG) {
 			e.setCancelled(true);
@@ -316,8 +320,8 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //cancel pousse céréale, citrouille, ...
 	public void onGrowBlock(BlockGrowEvent e) {
 		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-
-		if (plot == null)
+		
+		if (plot == null || !plot.getPlotId().isInPlot(e.getBlock().getLocation()))
 			e.setCancelled(true);
 	}
 
@@ -340,7 +344,6 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
 		
@@ -553,15 +556,6 @@ public class PlotsInstancesListener implements Listener{
 		if (e.getEntity().getType() == EntityType.PLAYER)
 			if (FakePlayerDeathEvent.fireFakeDeath(plugin, (Player) e.getEntity(), e.getDamager(), e.getFinalDamage(), plot))
 				e.setCancelled(true);
-		
-		/*
-		NBTTagCompound tag = new NBTTagCompound();
-		((CraftEntity)e.getEntity()).getHandle().c(tag);
-		
-		if (tag.hasKey("EntityTag"))
-			if (tag.getCompound("EntityTag").hasKey("Invulnerable"))
-				e.setCancelled(true);
-				*/
 	}
 
 	@EventHandler(priority = EventPriority.LOW) //gestion autorisation dégâts environementaux
@@ -658,8 +652,8 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler(priority = EventPriority.HIGH) //décide si l'entité aura le droit de spawn
 	public void onEntitySpawn(EntitySpawnEvent e) {
-		//Bukkit.broadcastMessage("spawn event");
-		if (e.isCancelled())
+		//return si l'entité spawn sur le plot 1 (pour permettre aux holos de spawn)
+		if (e.isCancelled() || PlotId.fromLoc(plugin, e.getEntity().getLocation()).equals(PlotId.fromId(plugin, 1)))
 			return;
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());
@@ -670,7 +664,7 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	@EventHandler //set birth plot of new entities
-	public void onEntitySpawn(EntityAddToWorldEvent e ) {
+	public void onEntitySpawn(EntityAddToWorldEvent e) {
 		if (e.getEntityType() != EntityType.PLAYER && !CmdSummon.allowedEntities.contains(e.getEntityType())) {
 			e.getEntity().remove();
 			return;

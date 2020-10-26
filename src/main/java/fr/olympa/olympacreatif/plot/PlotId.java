@@ -118,6 +118,7 @@ public class PlotId {
 	 * @param idAsString
 	 * @return
 	 */
+	/*
 	public static PlotId fromString(OlympaCreatifMain plugin, String idAsString) {
 
 		Integer id = PlotsManager.getPlotIdFromString(idAsString);
@@ -126,6 +127,17 @@ public class PlotId {
 			return new PlotId(plugin, id);
 		
 		return null;
+	}*/
+	public static PlotId fromString(OlympaCreatifMain plugin, String idAsString) {
+		try {
+			int id = Integer.valueOf(idAsString);
+			if (id <= plugin.getPlotsManager().getTotalPlotCount())			
+				return new PlotId(plugin, id);
+			else
+				return null;
+		}catch(NumberFormatException e) {
+			return null;
+		}
 	}
 	
 	//retourne un PlotId si la localisation est sur un plot (chargé ou non)
@@ -206,7 +218,7 @@ public class PlotId {
 	
 	@Override
 	public String toString() {
-		return PlotsManager.getPlotIdAsString(plotId);
+		return "" + plotId;
 	}
 	
 	public Location getLocation() {

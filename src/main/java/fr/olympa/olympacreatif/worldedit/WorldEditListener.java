@@ -1,27 +1,15 @@
 package fr.olympa.olympacreatif.worldedit;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
-import com.sk89q.worldedit.event.platform.PlayerInputEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
-import com.sk89q.worldedit.internal.cui.CUIEvent;
-import com.sk89q.worldedit.internal.cui.SelectionPointEvent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.eventbus.EventHandler;
@@ -33,26 +21,13 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
-import net.luckperms.api.model.group.Group;
-import net.luckperms.api.node.Node;
-import net.minecraft.server.v1_15_R1.MinecraftServer;
 
 public class WorldEditListener extends EventHandler implements Listener {
 
 	private OlympaCreatifMain plugin;
-	
-	//contient la dernière fois qu'un joueur a exécuté un /copy.
-	//cancel le /copy si un placement de blocs a été effectué trop récemment.
-	//évite un usebeug possible permettant de /copy d'un plot à l'autre sans être le propriétaire du plot source :
-	//si un joueur fais un /paste puis un /copy dans le même plot juste après, le système de vérif peut être abusé et autoriser le paste alors que le
-	//joueur n'est pas proprio du plot source
-	//private Map<Player, Integer> lastPasteTick = new HashMap<Player, Integer>(); 
-	
-	//private Map<BlockVector3, Plot> storedLocs = new HashMap<BlockVector3, Plot>();
 	
 	public WorldEditListener(OlympaCreatifMain plugin) {
 		super(Priority.NORMAL);
@@ -60,26 +35,11 @@ public class WorldEditListener extends EventHandler implements Listener {
 		this.plugin = plugin;
 		
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
-		
-		/*new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				for (Player p : Bukkit.getOnlinePlayers())
-					plugin.getWorldEditManager().getSession(p).clearHistory();
-			}
-		}.runTaskTimer(plugin, 0, 5);*/
 	}
 	
 	@org.bukkit.event.EventHandler //cancel copy si joueur essaie de copier dans un plot qui n'est pas à lui
-	public void onCopyCmd(PlayerCommandPreprocessEvent e) {
-		
-		/*if (e.getMessage().contains("/pos") && e.getMessage().split(" ").length > 1) {
-			e.setCancelled(true);
-			return;
-		}*/
-		
-		if (!e.getMessage().contains("/copy") || plugin.getWorldEditManager() == null)
+	public void onCopyCmd(PlayerCommandPreprocessEvent e) {		
+		if (!e.getMessage().contains("/copy") || !plugin.isWeEnabled())
 			return;
 		
 		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
@@ -119,88 +79,14 @@ public class WorldEditListener extends EventHandler implements Listener {
 		return new Location(plugin.getWorldManager().getWorld(), vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
 	}
 	
-	/*
-	@org.bukkit.event.EventHandler //cancel copy si plot du joueur null
-	public void onCopyCmd(PlayerCommandPreprocessEvent e) {
-		if (!e.getMessage().contains("/copy"))
-			return;
-		
-		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
-		
-		if (plot == null && ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
-			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue());
-		}
-	}
-	*/
-
-	/*
-	@org.bukkit.event.EventHandler //cancel copy si le joueur n'a pas la permission de copier certains des blocs de sa sélection
-	public void onCopySelection(PlayerCommandPreprocessEvent e) {
-		if (!e.getMessage().contains("/copy"))
-			return;
-		
-		if (lastPasteTick.get(e.getPlayer()) + 40 > MinecraftServer.currentTick) {
-			e.getPlayer().sendMessage(Message.WE_ACTION_TOO_RAPID.getValue());
-			e.setCancelled(true);
-			return;
-		}
-		
-		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
-		
-		try {
-			LocalSession session = plugin.getWorldEditManager().getSession(e.getPlayer());
-			Region selection = session.getSelection(session.getSelectionWorld());
-			
-			Plot plot1 = plugin.getPlotsManager().getPlot(getLoc(selection.getMinimumPoint()));
-			Plot plot2 = plugin.getPlotsManager().getPlot(getLoc(selection.getMaximumPoint()));
-			
-			//si le joueur a bien la permission de copy dans ce plot
-			if (plot1 == null || !plot1.equals(plot2) || plot1.getMembers().getPlayerLevel(p) > 2) {
-				
-				if (session.getBlockChangeLimit() < selection.getWidth() * selection.getLength() * selection.getHeight())		
-					p.setWEclipboardPlot(plot1);
-				
-				else {
-					p.getPlayer().sendMessage(Message.WE_ACTION_TOO_BIG.getValue());
-					p.setWEclipboardPlot(null);
-					e.setCancelled(true);
-				}
-			}else {
-				p.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
-				p.setWEclipboardPlot(null);
-				e.setCancelled(true);
-			}
-			
-		} catch (IncompleteRegionException e1) {
-			p.setWEclipboardPlot(null);
-			return;
-		}
-		
-		//if (plugin.getWorldEditManager().getSession(e.getPlayer()).getSelection((World) plugin.getWorldManager().getWorld()) != null)
-	}
-	*/
-	
-	
-	/*
-	@org.bukkit.event.EventHandler
-	public void onJoin(PlayerJoinEvent e) {
-		lastPasteTick.put(e.getPlayer(), MinecraftServer.currentTick);	
-	}
-	
-	@org.bukkit.event.EventHandler
-	public void onQuit(PlayerQuitEvent e) {
-		lastPasteTick.remove(e.getPlayer());
-		
-	}
-	*/
-	
 	@Subscribe //handle WE place block event
 	public void onEditSessionEvent(EditSessionEvent e) {
 		e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
 
 	        @Override
 	        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+	        	if (!plugin.isWeEnabled())
+	        		return false;
 	        	
 				Actor actor = e.getActor();
 				if (actor == null || !actor.isPlayer())

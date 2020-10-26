@@ -88,6 +88,11 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.PIG_ZOMBIE)
 			.add(EntityType.ZOMBIE)
 			.add(EntityType.ZOMBIE_VILLAGER)
+
+			.add(EntityType.MINECART)
+			.add(EntityType.MINECART_CHEST)
+			.add(EntityType.MINECART_FURNACE)
+			.add(EntityType.MINECART_HOPPER)
 			.build();
 	
 	public CmdSummon(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {

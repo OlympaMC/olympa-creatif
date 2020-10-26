@@ -228,9 +228,9 @@ public class Plot {
 	
 	public boolean hasStoplag() {
 		if (parameters.getParameter(PlotParamType.STOPLAG_STATUS) >= 1)
-			return false;
-		else
 			return true;
+		else
+			return false;
 	}
 	
 	public void sendMessage(OlympaPlayerCreatif pc, String msg) {
@@ -304,9 +304,6 @@ public class Plot {
 			
 			//définition du flymode
 			p.setAllowFlight(parameters.getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS));
-
-			//set max fly speed
-			p.setFlySpeed(0.1f);
 		}
 		
 		//définition de l'heure du joueur
