@@ -135,9 +135,9 @@ public class MainGui extends IGui {
 			break;
 			
 		case 31:
-			if (plot != null && p.getGameMode() == GameMode.CREATIVE) {
+			if (plot != null) {
 				p.closeInventory();
-				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue());
+				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
 				p.teleport(plot.getParameters().getSpawnLoc());	
 			}
 				

@@ -26,7 +26,7 @@ public class InteractionParametersGui extends IGui {
 	
 	@SuppressWarnings("unchecked")
 	public InteractionParametersGui(IGui gui) {
-		super(gui, "§6Interactions du plot " + gui.getPlot().getPlotId(), 6);
+		super(gui, "Interactions parcelle " + gui.getPlot().getPlotId(), 6);
 		
 		//pour tous les items interdits possibles, ajout de l'item au gui selon son état (interdit/autorisé)
 		for (Material mat : PlotParamType.getAllPossibleIntaractibleBlocks()) {

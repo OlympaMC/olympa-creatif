@@ -13,11 +13,14 @@ cb_perms:
   - minecraft.command.team
   - minecraft.command.tellraw
   - minecraft.command.trigger
+  - minecraft.command.setblock
 
   
 we_perms:
+  - worldedit.wand
   - worldedit.analysis.count
   - worldedit.analysis.distr
+  - worldedit.brush.apply
   - worldedit.brush.options.mask
   - worldedit.brush.options.material
   - worldedit.brush.options.range

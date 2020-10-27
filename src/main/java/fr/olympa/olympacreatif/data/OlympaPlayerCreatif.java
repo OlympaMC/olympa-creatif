@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -180,6 +181,15 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			if (plot.getMembers().getPlayerRank(getInformation()) != PlotRank.VISITOR)
 				if (!onlyOwnedPlots || (plot.getMembers().getPlayerRank(getInformation()) == PlotRank.OWNER && onlyOwnedPlots))
 					list.add(plot);
+
+		
+		//tri de la liste de plots par ordre croissant d'id
+		Collections.sort(list, new Comparator<Plot>() {
+			@Override
+			public int compare(Plot p1, Plot p2) {
+				return p1.getPlotId().getId() - p2.getPlotId().getId();
+			}
+		});
 		
 		return list;
 	}

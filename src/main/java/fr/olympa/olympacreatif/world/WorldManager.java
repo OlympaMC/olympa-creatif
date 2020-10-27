@@ -6,32 +6,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.WorldCreator;
-import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.olympa.api.afk.AfkHandler;
-import fr.olympa.api.afk.AfkPlayer;
 import fr.olympa.api.holograms.Hologram;
 import fr.olympa.api.holograms.Hologram.HologramLine;
-import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.lines.FixedLine;
-import fr.olympa.api.permission.OlympaPermission;
-import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -129,6 +116,7 @@ public class WorldManager {
 		plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);
 
 		//création des holos d'aide
+		/*
 		plugin.getTask().runTaskLater(() -> {
 			@SuppressWarnings("unchecked")
 			Hologram holo1 = OlympaCore.getInstance().getHologramsManager().createHologram(Message.getLocFromMessage(Message.PARAM_HOLO_HELP_LOC_1), 
@@ -155,7 +143,7 @@ public class WorldManager {
 					new FixedLine<HologramLine>("§eVous gagnez de l'argent en jouant pour les acheter !"),
 					new FixedLine<HologramLine>("§eSi vous souhaitez les obtenir plus rapidement et nous soutenir,"),
 					new FixedLine<HologramLine>("§evous pouvez les acheter sur la boutique !"));
-		}, 100);
+		}, 100);*/
 		
 		//task pour donner l'argent aux joueurs périodiquement
 		new BukkitRunnable() {
@@ -169,7 +157,7 @@ public class WorldManager {
 			public void run() {
 				Bukkit.getOnlinePlayers().forEach(p -> {
 					OlympaPlayerCreatif pp = AccountProvider.get(p.getUniqueId());
-					if (AfkHandler.isAfk(p))
+					if (OlympaCore.getInstance().getAfkHandler().isAfk(p))
 						pp.addGameMoney(afkIncome);
 					else
 						pp.addGameMoney(noAfkIncome);

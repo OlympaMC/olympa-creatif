@@ -80,6 +80,9 @@ public class TagsValues {
 			case "NBTTagInt":
 				nbt = NBTTagInt.class;
 				break;
+			case "NBTTagShort":
+				nbt = NBTTagShort.class;
+				break;
 			case "NBTTagLong":
 				nbt = NBTTagLong.class;
 				break;
@@ -121,6 +124,9 @@ public class TagsValues {
 				break;
 			case "NBT_INT":
 				listType = NBT.TAG_INT;
+				break;
+			case "NBT_SHORT":
+				listType = NBT.TAG_SHORT;
 				break;
 			case "NBT_COMPOUND":
 				listType = NBT.TAG_COMPOUND;

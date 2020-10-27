@@ -26,16 +26,7 @@ public class PlayerPlotsGui extends IGui {
 		super(gui, "Plots du joueur " + gui.getPlayer().getName(), gui.getPlayer().getPlots(false).size()/9 + 2);
 		
 		playerPlots = p.getPlots(false);
-		
-		//tri de la liste de plots par ordre croissant d'id
-		Collections.sort(playerPlots, new Comparator<Plot>() {
 
-			@Override
-			public int compare(Plot p1, Plot p2) {
-				return p1.getPlotId().getId() - p2.getPlotId().getId();
-			}
-		});
-		
 		//recherche des plots du joueur
 		for (Plot plot : playerPlots) {
 			Material mat = null;
@@ -67,7 +58,7 @@ public class PlayerPlotsGui extends IGui {
 		if (slot < playerPlots.size()) {
 			player.closeInventory();
 			if (click == ClickType.LEFT) {
-				player.teleport(playerPlots.get(slot).getParameters().getSpawnLoc());
+				player.teleport(playerPlots.get(slot).getPlotId().getLocation());
 				player.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(slot)));	
 			}else if (click == ClickType.RIGHT) {
 				MainGui.getMainGui(p, playerPlots.get(slot)).create(player);

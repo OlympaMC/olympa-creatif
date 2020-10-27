@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.utils;
+package fr.olympa.olympacreatif.data;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.PermissionsList;
 
 
 @SuppressWarnings("unchecked")
@@ -35,7 +34,6 @@ public class PermissionsManager implements Listener{
             plugin.saveResource("permissions.yml", false);
          }
         
-        //YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(OlympaCreatifMain.getInstance().getDataFolder(), "tags.yml"));
         try {
 			config.load(file);
 		} catch (IOException | InvalidConfigurationException e1) {

@@ -73,12 +73,12 @@ public class CbTeam {
 		else
 			teamName = JSONtextUtil.getJsonText(newTeamName).toLegacyText();
 		
-		for (Entity e : members)
-			if (e.getType() == EntityType.PLAYER)
-				if (teamName.equals(""))
-					OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
-				else
-					OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
+		//for (Entity e : members)
+			//if (e.getType() == EntityType.PLAYER)
+				//if (teamName.equals(""))
+					//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
+				//else
+					//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
 	}
 	
 	public Plot getPlot() {
@@ -95,8 +95,8 @@ public class CbTeam {
 		
 		members.add(e);
 		
-		if (e.getType() == EntityType.PLAYER && !teamName.equals("")) 
-			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
+		//if (e.getType() == EntityType.PLAYER && !teamName.equals("")) 
+			//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
 		
 		
 		return true;
@@ -105,8 +105,8 @@ public class CbTeam {
 	public void removeMember(Entity e) {
 		members.remove(e);
 		
-		if (e.getType() == EntityType.PLAYER)
-			OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
+		//if (e.getType() == EntityType.PLAYER)
+			//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
 	}
 
 	public List<Entity> getMembers(){
@@ -187,9 +187,9 @@ public class CbTeam {
 	
 	
 	public void executeDeletionActions() {
-		for (Entity e : members)
-			if (e.getType() == EntityType.PLAYER)
-				OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
+		//for (Entity e : members)
+			//if (e.getType() == EntityType.PLAYER)
+				//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
 	}
 	
 }

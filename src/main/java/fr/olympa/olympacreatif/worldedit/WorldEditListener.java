@@ -39,7 +39,7 @@ public class WorldEditListener extends EventHandler implements Listener {
 	
 	@org.bukkit.event.EventHandler //cancel copy si joueur essaie de copier dans un plot qui n'est pas à lui
 	public void onCopyCmd(PlayerCommandPreprocessEvent e) {		
-		if (!e.getMessage().contains("/copy") || !plugin.isWeEnabled())
+		if (!e.getMessage().contains("/copy") || plugin.getWorldEditManager() == null)
 			return;
 		
 		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));

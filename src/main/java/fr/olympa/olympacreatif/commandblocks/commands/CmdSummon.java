@@ -1,27 +1,17 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.plaf.basic.BasicScrollPaneUI.HSBChangeListener;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
-import fr.olympa.olympacreatif.utils.NbtParserUtil;
-import fr.olympa.olympacreatif.utils.NbtParserUtil.EntitySourceType;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public class CmdSummon extends CbCommand {
@@ -93,6 +83,25 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.MINECART_CHEST)
 			.add(EntityType.MINECART_FURNACE)
 			.add(EntityType.MINECART_HOPPER)
+			
+			.add(EntityType.BOAT)
+
+			.add(EntityType.ARROW)
+			.add(EntityType.SNOWBALL)
+			.add(EntityType.ENDER_PEARL)
+			.add(EntityType.FALLING_BLOCK)
+			.add(EntityType.AREA_EFFECT_CLOUD)
+			.add(EntityType.DROPPED_ITEM)
+			
+			.add(EntityType.FISHING_HOOK)
+			.add(EntityType.FIREBALL)
+			.add(EntityType.SMALL_FIREBALL)
+			.add(EntityType.FIREWORK)
+
+			.add(EntityType.SPLASH_POTION)
+			.add(EntityType.DROPPED_ITEM)
+			
+			.add(EntityType.ITEM_FRAME)
 			.build();
 	
 	public CmdSummon(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
