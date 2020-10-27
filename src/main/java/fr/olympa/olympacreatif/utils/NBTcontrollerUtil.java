@@ -116,9 +116,15 @@ public abstract class NBTcontrollerUtil {
 					tag.set(key, newList);
 					}						
 				}else {
-					//Bukkit.broadcastMessage("Clé étudiée : " + key + " - valeur : " + tag.get(key).asString());
+					//transformation du tag si c'est un entier mais d'un mauvais type
 					
-					//si le tag n'est ni un compound ni une liste, vérification				
+					if (!params.getTagNbtClass().equals(tag.get(key).getClass()) && isTagInteger(tag.get(key)))
+						if (tag.get(key) instanceof NBTTagShort)
+							tag.setInt(key, tag.getShort(key));
+						else if (tag.get(key) instanceof NBTTagByte)
+							tag.setInt(key, tag.getByte(key));
+					
+					//si le tag n'est ni un compound ni une liste, vérification
 					if (!isValueValid(params, tag.get(key)))
 						tag.remove(key);	
 				}				
@@ -130,7 +136,7 @@ public abstract class NBTcontrollerUtil {
 	@SuppressWarnings("rawtypes")
 	private static boolean isValueValid(TagParams params, NBTBase nbt) {
 		
-		Bukkit.broadcastMessage("param value : " + params + " - nbt class : " + nbt.getClass().getName() + " - nbt value : " + nbt.asString());
+		//Bukkit.broadcastMessage(params + "\nnbt class : " + nbt.getClass().getName() + " - nbt value : " + nbt.asString());
 		
 		if (!params.getTagNbtClass().equals(nbt.getClass()))
 			return false;
@@ -168,5 +174,12 @@ public abstract class NBTcontrollerUtil {
 				return true;
 		
 		return false;
+	}
+	
+	private static boolean isTagInteger(NBTBase nbt) {
+		if (nbt instanceof NBTTagInt || nbt instanceof NBTTagShort || nbt instanceof NBTTagLong || nbt instanceof NBTTagByte)
+			return true;
+		else
+			return false;
 	}
 }

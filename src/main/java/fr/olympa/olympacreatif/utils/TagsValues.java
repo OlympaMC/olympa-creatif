@@ -139,7 +139,7 @@ public class TagsValues {
 				break;
 			}
 			
-			tags.put(e.getKey(), new TagParams(nbt, min, max, listType));
+			tags.put(e.getKey(), new TagParams(e.getKey(), nbt, min, max, listType));
 		}
 		
 		//Bukkit.getLogger().log(Level.SEVERE, tags.toString());
@@ -152,12 +152,14 @@ public class TagsValues {
 	@SuppressWarnings("rawtypes")
 	public class TagParams{
 		
+		private String tagName;
 		private int min;
 		private int max;
 		private Integer listType;
 		private Class nbtClass;
 		
-		public TagParams(Class nbtClass, int min, int max, Integer listContainType) {
+		public TagParams(String tagName, Class nbtClass, int min, int max, Integer listContainType) {
+			this.tagName = tagName;
 			this.nbtClass= nbtClass; 
 			this.min = min;
 			this.max = max;
@@ -179,7 +181,7 @@ public class TagsValues {
 		}
 		@Override
 		public String toString() {
-			return "[Params: NbtClass:" + nbtClass.getName() + ", min:" + min + ", max:" + max + ", ListType:" + listType + "]";
+			return "--------- Params "+ tagName + " ---------\nNbtClass:" + nbtClass.getName() + ", min:" + min + ", max:" + max + ", ListType:" + listType + "\n---------";
 		}
 	}
 }

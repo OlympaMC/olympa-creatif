@@ -7,7 +7,7 @@ tags:
   HideFlags: NBTTagInt,0,100000,null
   Enchantments: NBTTagCompound,0,100,NBT_COMPOUND
   id: NBTTagString,0,100,null
-  lvl: NBTTagShort,0,100,null
+  lvl: NBTTagInt,0,100,null
   Unbreakable: NBTTagInt,0,1,null
   Damage: NBTTagInt,0,10000,null
   RepairCost: NBTTagInt,0,100,null
