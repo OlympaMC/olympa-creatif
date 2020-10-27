@@ -94,12 +94,7 @@ public class CommandBlocksManager {
 			team.removeMember(p);
 		
 		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomSidebar();
-		
-		//resend tablist packets
-		//OlympaCore.getInstance().getNameTagApi().sendTeams(p);
-		
-		//maj du scoreboard (reset du score du scoreboard du plot et réaffectation du scoreboard
-		//p.getScoreboard().resetScores(p);
+
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		
 		for (PotionEffect eff : p.getActivePotionEffects())

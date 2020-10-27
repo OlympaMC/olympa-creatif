@@ -314,28 +314,19 @@ public class WorldEventsListener implements Listener{
 	}
 
 	
-	@EventHandler //clear l'historique de sneak de ce joueur
+	@EventHandler //clear l'historique de sneak de ce joueur, exécute les actions de sortie de plot
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		sneakHistory.remove(e.getPlayer().getName());
 		e.getPlayer().teleport(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC));
-
-		//setWorldEditPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
-		//setCommandBlockPerms(AccountProvider.get(e.getPlayer().getUniqueId()), false);
+		
+		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
+		
+		if (plot != null)
+			plot.executeExitActions(e.getPlayer());
 	}
-	
-	//PermissionAttachment attachment = null;
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
-		//e.getPlayer().teleport(plugin.getWorldManager().getWorld().getSpawnLocation());
-		
-		/*
-		attachment = e.getPlayer().addAttachment(plugin);
-		attachment.setPermission("minecraft.command.execute", true);
-		attachment.setPermission("worldedit.selection.pos", true);
-		attachment.setPermission("worldedit.help", true);
-
-		Bukkit.broadcastMessage(OlympaGroup.PLAYER.runtimePermissions + "");*/
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());

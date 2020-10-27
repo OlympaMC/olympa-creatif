@@ -3,43 +3,19 @@ package fr.olympa.olympacreatif.commandblocks;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftArmorStand;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftBee;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftSlime;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.event.EventPriority;
 
-import com.google.common.util.concurrent.SettableFuture;
-
+import fr.olympa.api.afk.AfkPlayer;
 import fr.olympa.api.player.OlympaPlayer;
-import fr.olympa.api.scoreboard.sign.ScoreboardManager;
+import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.scoreboard.tab.INametagApi.NametagHandler;
+import fr.olympa.api.scoreboard.tab.Nametag;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.commands.CmdTellraw;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.JSONtextUtil;
-import fr.olympa.olympacreatif.utils.NbtParserUtil;
-import net.minecraft.server.v1_15_R1.ChatMessage;
-import net.minecraft.server.v1_15_R1.EntityArmorStand;
-import net.minecraft.server.v1_15_R1.EntityBee;
-import net.minecraft.server.v1_15_R1.EntitySlime;
-import net.minecraft.server.v1_15_R1.EntityTypes;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent;
-import net.minecraft.server.v1_15_R1.ItemStack;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent.ChatSerializer;
 
 public class CbTeam {
 
@@ -73,12 +49,12 @@ public class CbTeam {
 		else
 			teamName = JSONtextUtil.getJsonText(newTeamName).toLegacyText();
 		
-		//for (Entity e : members)
-			//if (e.getType() == EntityType.PLAYER)
-				//if (teamName.equals(""))
-					//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
-				//else
-					//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
+		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
+		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.get(p.getUniqueId())));
+		
+		for (Entity e : members)
+			if (plotPlayers.stream().filter(p -> p.getUniqueId().equals(e.getUniqueId())).count() > 1)
+				OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.get(e.getUniqueId()), plotPlayers);
 	}
 	
 	public Plot getPlot() {
@@ -95,8 +71,11 @@ public class CbTeam {
 		
 		members.add(e);
 		
-		//if (e.getType() == EntityType.PLAYER && !teamName.equals("")) 
-			//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), " §7(" + getName() + "§7)");
+		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
+		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.get(p.getUniqueId())));
+		
+		if (e.getType() == EntityType.PLAYER)
+			OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.get(e.getUniqueId()), plotPlayers);
 		
 		
 		return true;
@@ -105,8 +84,11 @@ public class CbTeam {
 	public void removeMember(Entity e) {
 		members.remove(e);
 		
-		//if (e.getType() == EntityType.PLAYER)
-			//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
+		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
+		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.get(p.getUniqueId())));
+		
+		if (e.getType() == EntityType.PLAYER)
+			OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.get(e.getUniqueId()), plotPlayers);
 	}
 
 	public List<Entity> getMembers(){
@@ -187,9 +169,12 @@ public class CbTeam {
 	
 	
 	public void executeDeletionActions() {
-		//for (Entity e : members)
-			//if (e.getType() == EntityType.PLAYER)
-				//TODO//OlympaCore.getInstance().getNameTagApi().setSuffix(((Player)e).getName(), "");
-	}
-	
+		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
+		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.get(p.getUniqueId())));
+		
+		for (Entity e : members)
+			if (e.getType() == EntityType.PLAYER)		
+				if (e.getType() == EntityType.PLAYER)
+					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.get(e.getUniqueId()), plotPlayers);
+	}	
 }
