@@ -134,7 +134,7 @@ public class OcCommand extends OlympaCommand {
 							
 							pendingInvitations.get(sender).getPlayers().forEach(pp -> {
 								if (pendingInvitations.get(sender).getMembers().getPlayerLevel(pp) >= 3)
-									pp.sendMessage(Message.PLOT_PLAYER_JOIN.getValue(pp.getName()));
+									pp.sendMessage(Message.PLOT_PLAYER_JOIN.getValue(sender.getName()));
 							});
 							
 							pendingInvitations.remove(sender).getMembers().set(p, PlotRank.MEMBER);	

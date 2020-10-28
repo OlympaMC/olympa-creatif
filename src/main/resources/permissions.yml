@@ -14,6 +14,7 @@ cb_perms:
   - minecraft.command.tellraw
   - minecraft.command.trigger
   - minecraft.command.setblock
+  - minecraft.command.selector
 
   
 we_perms:

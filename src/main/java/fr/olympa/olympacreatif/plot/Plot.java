@@ -294,8 +294,8 @@ public class Plot {
 		
 		//tp au spawn de la zone
 		if (tpToPlotSpawn && parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-			p.teleport(parameters.getSpawnLoc());
 			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plotId));
+			p.teleport(parameters.getSpawnLoc());
 		}
 		
 		if (members.getPlayerRank(pc) == PlotRank.VISITOR) {
