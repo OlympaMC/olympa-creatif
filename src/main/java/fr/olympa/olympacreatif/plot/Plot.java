@@ -107,6 +107,18 @@ public class Plot {
 		for (int i = plotId.getLocation().getChunk().getX() ; i < plotId.getLocation().getChunk().getX() + 2 ; i++)
 			for (int j = plotId.getLocation().getChunk().getZ() ; j < plotId.getLocation().getChunk().getX() + 2 ; j++)
 				plugin.getWorldManager().getWorld().setChunkForceLoaded(i, j, true);
+		
+		//add entities from already loaded chunks
+		for (int i = plotId.getLocation().getChunk().getX() ; i < plotId.getLocation().getChunk().getX() + WorldManager.plotSize / 16 ; i++)
+			for (int j = plotId.getLocation().getChunk().getZ() ; i < plotId.getLocation().getChunk().getZ() + WorldManager.plotSize / 16 ; j++)
+				if (plugin.getWorldManager().getWorld().isChunkLoaded(i, j))
+					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(i, j).getEntities()).forEach(e -> {
+						
+						if (plotId.equals(plugin.getPlotsManager().getBirthPlot(e)))
+							addEntityInPlot(e);
+						else if (e.getType() != EntityType.PLAYER)
+							e.remove();
+					});
 	}
 	
 	private void loadInitialEntitiesOnChunks() {
@@ -158,6 +170,9 @@ public class Plot {
 	
 	//ajoute l'entité à la liste des entités du plot, et supprime la plus vieille entité si le quota est dépassé
 	public void addEntityInPlot(Entity e) {
+		if (entitiesInPlot.contains(e) || e.getType() == EntityType.PLAYER)
+			return;
+		
 		if (entitiesInPlot.size() == WorldManager.maxTotalEntitiesPerPlot) 
 			entitiesInPlot.remove(0).remove();
 		

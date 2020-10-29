@@ -735,8 +735,17 @@ public class PlotsInstancesListener implements Listener{
 			if (ent.getType() == EntityType.PLAYER)
 				return;
 			
-			Plot plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(ent));
-			if (plot != null && plot.getPlotId().equals(plugin.getPlotsManager().getPlot(ent.getLocation()).getPlotId()))
+			PlotId birthPlotId = plugin.getPlotsManager().getBirthPlot(ent);
+			
+			//si l'entité n'est pas dans son plot d'origine, remove
+			if (birthPlotId == null || !birthPlotId.equals(PlotId.fromLoc(plugin, ent.getLocation()))) {
+				ent.remove();
+				return;
+			}
+			
+			//ajout de l'entité au plot si le plot est déjà chargé
+			Plot plot = plugin.getPlotsManager().getPlot(birthPlotId);
+			if (plot != null)
 				plot.addEntityInPlot(ent);
 		});
 	}
