@@ -81,7 +81,7 @@ public class PlotsManager {
 							}
 							if (!hasMemberOnline) {
 								plot.unload();
-								plugin.getDataManager().savePlot(plot, true);
+								plugin.getDataManager().addPlotToSaveQueue(plot, false);
 								loadedPlots.remove(plot);
 							}
 						}	

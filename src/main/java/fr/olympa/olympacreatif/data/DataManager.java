@@ -33,6 +33,7 @@ public class DataManager implements Listener {
 	private OlympaCreatifMain plugin;
 
 	private Vector<PlotId> plotsToLoad = new Vector<PlotId>();
+	private Vector<Plot> plotsToSave = new Vector<Plot>();
 	private Vector<PlotId> loadedPlots = new Vector<PlotId>();
 	
 	//statements de création des tables
@@ -132,19 +133,35 @@ public class DataManager implements Listener {
 		}catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
+		//load plot task
 		new BukkitRunnable() {
-			
 			@Override
 			public void run() {
-				if (plotsToLoad.size() == 0)
-					return;
-				
-				PlotId plotId = plotsToLoad.remove(0);
-				loadPlot(plotId);
+				loadPlot(plotsToLoad.remove(0));
 			}
 		}.runTaskTimerAsynchronously(plugin, 20, 1);
 		
+		//unload plot task
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (plotsToSave.size() > 0)
+					savePlotToBddSync(plotsToSave.get(0));
+			}
+		}.runTaskTimerAsynchronously(plugin, 20, 1);
+		
+	}
+	
+	public void addPlotToLoadQueue(PlotId id) {
+		plugin.getTask().runTaskAsynchronously(() -> plotsToLoad.add(id));
+	}
+	
+	public void addPlotToSaveQueue(Plot plot, boolean forceInstantSave) {
+		if (!forceInstantSave)
+			plugin.getTask().runTaskAsynchronously(() -> plotsToSave.add(plot));
+		else
+			savePlotToBddSync(plot);
 	}
 	
 	@EventHandler //charge les plots des joueurs se connectant
@@ -163,10 +180,6 @@ public class DataManager implements Listener {
 		} catch (SQLException | IllegalArgumentException e1) {
 			e1.printStackTrace();
 		}
-	}
-	
-	public void addPlotToLoadQueue(PlotId id) {
-		plugin.getTask().runTaskAsynchronously(() -> plotsToLoad.add(id));
 	}
 	
 	private synchronized void loadPlot(PlotId plotId) {
@@ -234,16 +247,18 @@ public class DataManager implements Listener {
 	}
 	
 	//sauvegarde les données du plot dans la db
+	/*
 	public synchronized void savePlot(Plot plot, boolean async) {
 		
 		if (async)
 			plugin.getTask().runTaskAsynchronously(() -> savePlotToBddSync(plot));
 		else
 			savePlotToBddSync(plot);
-	}
+	}*/
 	
 	private synchronized void savePlotToBddSync(Plot plot) {
-		loadedPlots.remove(plot.getPlotId());
+		if (!loadedPlots.remove(plot.getPlotId()))
+			return;
 		
 		try {
 			int id = plot.getPlotId().getId();
