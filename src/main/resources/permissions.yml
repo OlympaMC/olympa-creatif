@@ -26,6 +26,18 @@ we_perms:
   - worldedit.brush.options.material
   - worldedit.brush.options.range
   - worldedit.brush.options.size
+  - worldedit.brush.clipboard
+  - worldedit.brush.cylinder
+  - worldedit.brush.deform
+  - worldedit.brush.ex
+  - worldedit.brush.forest
+  - worldedit.brush.lower
+  - worldedit.brush.paint
+  - worldedit.brush.item
+  - worldedit.brush.raise
+  - worldedit.brush.set
+  - worldedit.brush.smooth
+  - worldedit.brush.sphere
   - worldedit.clipboard.copy
   - worldedit.clipboard.cut
   - worldedit.clipboard.flip

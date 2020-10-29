@@ -15,6 +15,7 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -85,10 +86,19 @@ public class PlotsInstancesListener implements Listener{
 			.add(Material.WATER)
 			.add(Material.LAVA_BUCKET)
 			.add(Material.LAVA)
+			
 			.add(Material.HOPPER_MINECART)
 			.add(Material.FURNACE_MINECART)
 			.add(Material.CHEST_MINECART)
 			.add(Material.TNT_MINECART)
+
+			.add(Material.ACACIA_BOAT)
+			.add(Material.JUNGLE_BOAT)
+			.add(Material.DARK_OAK_BOAT)
+			.add(Material.BIRCH_BOAT)
+			.add(Material.OAK_BOAT)
+			.add(Material.SPRUCE_BOAT)
+			
 			.add(Material.MINECART)
 			.add(Material.BONE_MEAL)
 			.build();
@@ -345,23 +355,28 @@ public class PlotsInstancesListener implements Listener{
 		
 		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		
-		if (e.getClickedBlock() == null)
-			return;
+		Block clickedBlock = e.getClickedBlock();
 		
-		plot = plugin.getPlotsManager().getPlot(e.getClickedBlock().getLocation());
+		//detect if clicked on water or on block
+		if (e.getClickedBlock() == null) 
+			for (Block b : e.getPlayer().getLineOfSight(null, 6))
+				if (clickedBlock == null && b.getType() == Material.WATER)
+					clickedBlock = b;
 		
-		if (plot == null) {
+		if (clickedBlock == null) {
 			if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
 				e.setCancelled(true);
 				e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
 			}
 			return;
 		}
+
+		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 		
 		PlotRank playerRank = plot.getMembers().getPlayerRank(e.getPlayer());
 		
 		//test si permission d'interagir avec le bloc donné
-		if (playerRank == PlotRank.VISITOR &&
+		if (playerRank == PlotRank.VISITOR && e.getClickedBlock() != null &&
 				PlotParamType.getAllPossibleIntaractibleBlocks().contains(e.getClickedBlock().getType()) &&
 				!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(e.getClickedBlock().getType()) ) {
 			e.setCancelled(true);
@@ -373,9 +388,9 @@ public class PlotsInstancesListener implements Listener{
 		//cancel interract si un item pouvant faire spawn une entité est utilisé
 		if (e.getItem() != null && playerRank == PlotRank.VISITOR) {
 			Material mat = e.getItem().getType();
-			KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
+			//KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
 			
-			if (interractProhibitedItems.contains(mat) || kit == KitType.HOSTILE_MOBS || kit == KitType.PEACEFUL_MOBS) {
+			if (interractProhibitedItems.contains(mat) || mat.toString().contains("SPAWN_EGG") || mat.toString().contains("BUCKET")) {
 				p.getPlayer().sendMessage(Message.PLOT_ITEM_PROHIBITED_USED.getValue());
 				e.setCancelled(true);
 				return;
