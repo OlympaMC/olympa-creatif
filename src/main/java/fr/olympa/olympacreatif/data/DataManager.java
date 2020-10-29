@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.Vector;
 
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
 import fr.olympa.api.sql.statement.OlympaStatement;
@@ -30,7 +32,8 @@ public class DataManager implements Listener {
 
 	private OlympaCreatifMain plugin;
 
-	private List<PlotId> loadedPlots = new ArrayList<PlotId>();
+	private Vector<PlotId> plotsToLoad = new Vector<PlotId>();
+	private Vector<PlotId> loadedPlots = new Vector<PlotId>();
 	
 	//statements de création des tables
 	private final OlympaStatement osTableCreateMessages = new OlympaStatement(
@@ -122,10 +125,7 @@ public class DataManager implements Listener {
 			osTableCreatePlotMembers.getStatement().execute();
 			
 			ResultSet messages = osSelectMessages.getStatement().executeQuery();
-			while (messages.next()) {
-				/*Bukkit.getLogger().log(Level.INFO, "Message " + messages.getString("message_id") + " : " + 
-						messages.getString("message_string"));*/
-				
+			while (messages.next()) {				
 				if (EnumUtils.isValidEnum(Message.class, messages.getString("message_id")))
 					Message.valueOf(messages.getString("message_id")).setValue(messages.getString("message_string"));
 			}
@@ -133,104 +133,108 @@ public class DataManager implements Listener {
 			e.printStackTrace();
 		}
 		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				if (plotsToLoad.size() == 0)
+					return;
+				
+				PlotId plotId = plotsToLoad.remove(0);
+				loadPlot(plotId);
+			}
+		}.runTaskTimerAsynchronously(plugin, 20, 1);
 		
 	}
 	
 	@EventHandler //charge les plots des joueurs se connectant
 	public void onJoin(OlympaPlayerLoadEvent e) {
-		
-		plugin.getTask().runTaskAsynchronously(() -> {
-			try {
-				//get player plots
-				PreparedStatement getPlayerPlots = osSelectPlayerPlots.getStatement();
-				getPlayerPlots.setLong(1, e.getOlympaPlayer().getId());
-				ResultSet getPlayerPlotsResult = getPlayerPlots.executeQuery();
-				
-				while(getPlayerPlotsResult.next()) {
-					PlotId id = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
-						loadPlot(id);
-				}
-				
-			} catch (SQLException | IllegalArgumentException e1) {
-				e1.printStackTrace();
+		try {
+			//get player plots
+			PreparedStatement getPlayerPlots = osSelectPlayerPlots.getStatement();
+			getPlayerPlots.setLong(1, e.getOlympaPlayer().getId());
+			ResultSet getPlayerPlotsResult = getPlayerPlots.executeQuery();
+			
+			while(getPlayerPlotsResult.next()) {
+				PlotId id = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
+				addPlotToLoadQueue(id);
 			}
-		});
+			
+		} catch (SQLException | IllegalArgumentException e1) {
+			e1.printStackTrace();
+		}
 	}
-
-	public synchronized void loadPlot(PlotId plotId) {
+	
+	public void addPlotToLoadQueue(PlotId id) {
+		plugin.getTask().runTaskAsynchronously(() -> plotsToLoad.add(id));
+	}
+	
+	private synchronized void loadPlot(PlotId plotId) {
 		if (plotId == null || loadedPlots.contains(plotId))
 			return;
 		
-		//Bukkit.broadcastMessage("Load plot " + plotId);
-		
 		loadedPlots.add(plotId);
-		
-		plugin.getTask().runTaskAsynchronously(() -> {
+		//CREATION DU PLOT
+		try {
 			
-			//CREATION DU PLOT
-			try {
+			//création plotParameters
+			PreparedStatement getPlotDatas;
+			getPlotDatas = osSelectPlotDatas.getStatement();
+			getPlotDatas.setInt(1, plotId.getId());
+			ResultSet getPlotDatasResult = getPlotDatas.executeQuery();
+			
+			getPlotDatasResult.next();
+			PlotParameters plotParams = PlotParameters.fromJson(plugin, plotId, getPlotDatasResult.getString("plot_parameters"));
+			
+			//get owner id
+			PreparedStatement getPlotOwner = osSelectPlotOwner.getStatement();
+			getPlotOwner.setInt(1, plotId.getId());
+			getPlotOwner.setInt(2, 4);
+			ResultSet getPlotOwnerResult = getPlotOwner.executeQuery();
+			getPlotOwnerResult.next();
+			
+			//get owner data
+			PreparedStatement getPlayerDatas = osSelectPlayerDatas.getStatement();
+			getPlayerDatas.setLong(1, getPlotOwnerResult.getLong("player_id"));
+			ResultSet getPlotOwnerDatasResult = getPlayerDatas.executeQuery();
+			getPlotOwnerDatasResult.next();
+			
+			//création plotMembers
+			PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(
+					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())));
+			
+			PreparedStatement getPlotMembers = osSelectPlotPlayers.getStatement();
+			getPlotMembers.setInt(1, plotId.getId());
+			ResultSet getPlotPlayersResult = getPlotMembers.executeQuery();
+			
+			while (getPlotPlayersResult.next()) {
+				MemberInformations member = plotMembers.new MemberInformations(
+						getPlotPlayersResult.getLong("player_id"), 
+						getPlotPlayersResult.getString("player_name"), 
+						UUID.fromString(getPlotPlayersResult.getString("player_uuid")));
 				
-				//création plotParameters
-				PreparedStatement getPlotDatas;
-				getPlotDatas = osSelectPlotDatas.getStatement();
-				getPlotDatas.setInt(1, plotId.getId());
-				ResultSet getPlotDatasResult = getPlotDatas.executeQuery();
-				
-				getPlotDatasResult.next();
-				PlotParameters plotParams = PlotParameters.fromJson(plugin, plotId, getPlotDatasResult.getString("plot_parameters"));
-				
-				//get owner id
-				PreparedStatement getPlotOwner = osSelectPlotOwner.getStatement();
-				getPlotOwner.setInt(1, plotId.getId());
-				getPlotOwner.setInt(2, 4);
-				ResultSet getPlotOwnerResult = getPlotOwner.executeQuery();
-				getPlotOwnerResult.next();
-				
-				//get owner data
-				PreparedStatement getPlayerDatas = osSelectPlayerDatas.getStatement();
-				getPlayerDatas.setLong(1, getPlotOwnerResult.getLong("player_id"));
-				ResultSet getPlotOwnerDatasResult = getPlayerDatas.executeQuery();
-				getPlotOwnerDatasResult.next();
-				
-				//création plotMembers
-				PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(
-						getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())));
-				
-				PreparedStatement getPlotMembers = osSelectPlotPlayers.getStatement();
-				getPlotMembers.setInt(1, plotId.getId());
-				ResultSet getPlotPlayersResult = getPlotMembers.executeQuery();
-				
-				while (getPlotPlayersResult.next()) {
-					MemberInformations member = plotMembers.new MemberInformations(
-							getPlotPlayersResult.getLong("player_id"), 
-							getPlotPlayersResult.getString("player_name"), 
-							UUID.fromString(getPlotPlayersResult.getString("player_uuid")));
-					
-					plotMembers.set(member, PlotRank.getPlotRank(getPlotPlayersResult.getInt("player_plot_level")));
-				}
-				
-				//création plotCbData
-				PlotCbData cbData = new PlotCbData(plugin, 
-						UpgradeType.CB_LEVEL.getValueOf(getPlotOwnerDatasResult.getInt(UpgradeType.CB_LEVEL.getBddKey())),
-						getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()) && getPlotOwnerDatasResult.getBoolean(KitType.PEACEFUL_MOBS.getBddKey()),
-						getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey())
-						);
-				
-				AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData, 
-						getPlotOwnerDatasResult.getBoolean(KitType.FLUIDS.getBddKey()));
-				
-				plugin.getPlotsManager().addAsyncPlot(plot, plotId);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				plotMembers.set(member, PlotRank.getPlotRank(getPlotPlayersResult.getInt("player_plot_level")));
 			}
 			
-		});
+			//création plotCbData
+			PlotCbData cbData = new PlotCbData(plugin, 
+					UpgradeType.CB_LEVEL.getValueOf(getPlotOwnerDatasResult.getInt(UpgradeType.CB_LEVEL.getBddKey())),
+					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()) && getPlotOwnerDatasResult.getBoolean(KitType.PEACEFUL_MOBS.getBddKey()),
+					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey())
+					);
+			
+			AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData, 
+					getPlotOwnerDatasResult.getBoolean(KitType.FLUIDS.getBddKey()));
+			
+			plugin.getPlotsManager().addAsyncPlot(plot, plotId);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	//sauvegarde les données du plot dans la db
-	public void savePlot(Plot plot, boolean async) {
-		loadedPlots.remove(plot.getPlotId());
+	public synchronized void savePlot(Plot plot, boolean async) {
 		
 		if (async)
 			plugin.getTask().runTaskAsynchronously(() -> savePlotToBddSync(plot));
@@ -239,8 +243,7 @@ public class DataManager implements Listener {
 	}
 	
 	private synchronized void savePlotToBddSync(Plot plot) {
-		
-		//Bukkit.broadcastMessage("Save plot " + plot);
+		loadedPlots.remove(plot.getPlotId());
 		
 		try {
 			int id = plot.getPlotId().getId();
@@ -273,28 +276,8 @@ public class DataManager implements Listener {
 			e.printStackTrace();
 		}
 	}
-	
-	/*
-	private ResultSet executeRequest(String request) {
-		ResultSet resultSet = null;
-		
-		try {
-			OlympaCore.getInstance().getDatabase();
-			//table  
-			OlympaStatement statement = new OlympaStatement("CREATE TABLE `BDDolympa`.`PlotsMembers` ( `plot-id` VARCHAR(127) NOT NULL , `player-id` BIGINT NOT NULL , `plot-rank` TINYINT NOT NULL , PRIMARY KEY (`plot-id`, `player-id`)) ENGINE = MyISAM;");
-			PreparedStatement preparedStatement = statement.getStatement();
-			preparedStatement.setString(1, "xxxxx");
-			resultSet = preparedStatement.executeQuery();
-			resultSet.close();
-		}catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return resultSet;
-	}
-	*/
 
-	public int getPlotsCount() {
+	public synchronized int getPlotsCount() {
 		try {
 			PreparedStatement ps = osCountPlots.getStatement();
 			ResultSet result = ps.executeQuery();

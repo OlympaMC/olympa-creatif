@@ -352,7 +352,6 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
-		
 		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		
 		Block clickedBlock = e.getClickedBlock();
@@ -366,12 +365,22 @@ public class PlotsInstancesListener implements Listener{
 		if (clickedBlock == null) {
 			if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
 				e.setCancelled(true);
-				e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
+				
+				if (e.getAction() != Action.LEFT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_AIR)
+					e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
 			}
 			return;
 		}
 
 		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
+
+		if (plot == null) {
+			if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
+				e.setCancelled(true);
+				e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
+			}
+			return;
+		}
 		
 		PlotRank playerRank = plot.getMembers().getPlayerRank(e.getPlayer());
 		

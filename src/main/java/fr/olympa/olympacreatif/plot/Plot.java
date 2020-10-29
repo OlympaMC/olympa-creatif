@@ -104,15 +104,15 @@ public class Plot {
 		loadInitialEntitiesOnChunks();
 		
 		//forceload 2*2 chunks à l'origine du plot
-		for (int i = plotId.getLocation().getChunk().getX() ; i < plotId.getLocation().getChunk().getX() + 2 ; i++)
-			for (int j = plotId.getLocation().getChunk().getZ() ; j < plotId.getLocation().getChunk().getX() + 2 ; j++)
-				plugin.getWorldManager().getWorld().setChunkForceLoaded(i, j, true);
+		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + 2 ; x++)
+			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
+				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z, true);
 		
 		//add entities from already loaded chunks
-		for (int i = plotId.getLocation().getChunk().getX() ; i < plotId.getLocation().getChunk().getX() + WorldManager.plotSize / 16 ; i++)
-			for (int j = plotId.getLocation().getChunk().getZ() ; i < plotId.getLocation().getChunk().getZ() + WorldManager.plotSize / 16 ; j++)
-				if (plugin.getWorldManager().getWorld().isChunkLoaded(i, j))
-					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(i, j).getEntities()).forEach(e -> {
+		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + WorldManager.plotSize / 16 ; x++)
+			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getZ() + WorldManager.plotSize / 16 ; z++)
+				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
+					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities()).forEach(e -> {
 						
 						if (plotId.equals(plugin.getPlotsManager().getBirthPlot(e)))
 							addEntityInPlot(e);

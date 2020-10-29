@@ -53,6 +53,8 @@ public class OcCommand extends OlympaCommand {
 			.add("members")
 			.add("setspawn")
 			.add("center")
+			.add("spawn")
+			.add("pspawn")
 			.build();
 
 	private OlympaCreatifMain plugin;
@@ -99,6 +101,21 @@ public class OcCommand extends OlympaCommand {
 			switch(args[0]) {
 			case "help":
 				sender.sendMessage(Message.COMMAND_HELP.getValue());
+				break;
+				
+			case "spawn":
+				p.teleport(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC));
+				sender.sendMessage(Message.TELEPORTED_TO_WORLD_SPAWN.getValue());
+				break;
+				
+			case "pspawn":
+				plot = plugin.getPlotsManager().getPlot(p.getLocation());
+				if (plot == null) {
+					p.sendMessage(Message.INVALID_PLOT_ID.getValue());
+					break;
+				}
+				p.teleport(plot.getParameters().getSpawnLoc());
+				sender.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
 				break;
 				
 			case "find":

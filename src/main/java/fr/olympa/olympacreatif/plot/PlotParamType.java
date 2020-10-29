@@ -62,7 +62,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		return defaultValue;
 	}
 	
-	public void setValue(Plot plot, T val) {
+	public synchronized void setValue(Plot plot, T val) {
 		plot.getParameters().setParameter(this, val);
 	}
 	

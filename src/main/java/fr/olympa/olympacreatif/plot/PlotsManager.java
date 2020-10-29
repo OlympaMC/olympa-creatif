@@ -157,16 +157,16 @@ public class PlotsManager {
 	}
 
 	
-	public void loadExistingPlot(PlotId newId) {
-		if (newId == null)
+	public void loadExistingPlot(PlotId id) {
+		if (id == null)
 			return;
 		
 		for (Plot plot : loadedPlots)
-			if (plot.getPlotId().equals(newId))
+			if (plot.getPlotId().equals(id))
 				return;
 		
 		//si le plot existe mais n'est pas encore chargé, chargement depuis la bdd
-		plugin.getDataManager().loadPlot(newId);
+		plugin.getDataManager().addPlotToLoadQueue(id);
 	}
 	
 	

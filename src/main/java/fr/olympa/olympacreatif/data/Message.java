@@ -75,7 +75,8 @@ public enum Message {
 	
 	MSG_PERIODIC_INCOME, 
 	PARAM_INCOME_NOT_AFK, 
-	PARAM_INCOME_AFK,
+	PARAM_INCOME_AFK, 
+	TELEPORTED_TO_WORLD_SPAWN,
 	;
 	
 	private String message = null;

@@ -1,12 +1,10 @@
 package fr.olympa.olympacreatif.commandblocks;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import fr.olympa.api.afk.AfkPlayer;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -30,7 +28,7 @@ public class CbTeamsListener implements Listener {
 					CbTeam team = plot.getCbData().getTeamOf(player.getPlayer());
 					
 					//ajout du nom de la team au joueur concerné
-					if (team.getName() != "")
+					if (team != null && team.getName() != "")
 						nametag.appendSuffix("§7(§r" + team.getName() + "§r§7)");
 				}
 			}

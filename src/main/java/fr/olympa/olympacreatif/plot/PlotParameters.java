@@ -53,8 +53,10 @@ public class PlotParameters {
 
 	/**
 	 * For internal use only, NEVER use this method!
+	 * To set the spawn location, use the dedicated method setSpawnLoc
 	 */
 	public synchronized void setParameter(PlotParamType<?> param, Object value) {
+		//if (!param.equals(PlotParamType.SPAWN_LOC_X) && !param.equals(PlotParamType.SPAWN_LOC_Y) && !param.equals(PlotParamType.SPAWN_LOC_Z))
 		parameters.put(param, value);
 	}
 	
@@ -90,6 +92,9 @@ public class PlotParameters {
 		
 		for (PlotParamType<?> param : getParameters())
 			json.put(param.getId(), parameters.get(param).toString());
+
+		if (!id.isInPlot(getSpawnLoc()))
+			System.out.println("§cERREUR SAVE SPAWN PLOT " + id + " : " + getSpawnLoc() + " IS OUT OF PLOT AREA");
 		
 		return json.toString();
 	}
@@ -124,6 +129,9 @@ public class PlotParameters {
 							params.setParameter(param, gson.fromJson((String) json.get(param.getId()), new TypeToken<ArrayList<Material>>(){}.getType()));
 						
 					}
+			
+			if (!plotId.isInPlot(params.getSpawnLoc()))
+				System.out.println("§4ERREUR LOAD SPAWN PLOT " + plotId + " : " + params.getSpawnLoc() + " IS OUT OF PLOT AREA");
 			
 			return params;
 		} catch (ParseException e) {
