@@ -79,7 +79,7 @@ public class PlotsManager {
 									hasMemberOnline = true;
 								}
 							}
-							if (!hasMemberOnline) {
+							if (!hasMemberOnline && !plot.getPlotId().equals(PlotId.fromId(plugin, 1))) {
 								plot.unload();
 								plugin.getDataManager().addPlotToSaveQueue(plot, false);
 								loadedPlots.remove(plot);
@@ -116,6 +116,9 @@ public class PlotsManager {
 				});
 			}
 		}.runTaskTimerAsynchronously(plugin, 10, 300);
+
+		//load plot 1
+		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1));
 	}
 	
 	/**

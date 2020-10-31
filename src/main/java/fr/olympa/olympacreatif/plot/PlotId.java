@@ -131,7 +131,7 @@ public class PlotId {
 	public static PlotId fromString(OlympaCreatifMain plugin, String idAsString) {
 		try {
 			int id = Integer.valueOf(idAsString);
-			if (id <= plugin.getPlotsManager().getTotalPlotCount())			
+			if (id > 0 && id <= plugin.getPlotsManager().getTotalPlotCount())			
 				return new PlotId(plugin, id);
 			else
 				return null;

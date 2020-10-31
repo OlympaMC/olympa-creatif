@@ -150,7 +150,6 @@ public class DataManager implements Listener {
 					savePlotToBddSync(plotsToSave.get(0));
 			}
 		}.runTaskTimerAsynchronously(plugin, 20, 1);
-		
 	}
 	
 	public void addPlotToLoadQueue(PlotId id) {

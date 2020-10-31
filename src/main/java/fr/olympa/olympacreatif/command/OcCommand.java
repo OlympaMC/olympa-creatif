@@ -380,7 +380,7 @@ public class OcCommand extends OlympaCommand {
 					
 					int index = Integer.valueOf(args[2]) - 1;
 					
-					if (index < plots.size()) {
+					if (index >= 0 && index < plots.size()) {
 						p.teleport(plots.get(index).getParameters().getSpawnLoc());
 						p.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(plots.get(index)));
 					}else
