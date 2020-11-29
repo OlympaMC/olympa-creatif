@@ -2,15 +2,12 @@ package fr.olympa.olympacreatif.data;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -45,28 +42,26 @@ public class PermissionsManager implements Listener{
 
         //System.out.println("cb perms : " + config.getList("cb_perms"));
         //System.out.println("we perms : " + config.getList("we_perms"));
-		OlympaGroup.PLAYER.runtimePermissions.addAll((List<String>) config.getList("cb_perms"));
-		PermissionsList.USE_WORLD_EDIT.getMinGroup().runtimePermissions.addAll((List<String>) config.getList("we_perms"));
+		config.getStringList("cb_perms").stream().forEach(OlympaGroup.PLAYER::setRuntimePermission);
+		config.getStringList("we_perms").stream().forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::setRuntimePermission);
 
         plugin.getLogger().log(Level.INFO, "§aWorldEdit & vanilla perms successfully respectively added to " + OlympaGroup.PLAYER + " and " + PermissionsList.USE_WORLD_EDIT.getMinGroup());
 	}
 	
 	public void removeCbPerms() {
-		OlympaGroup.PLAYER.runtimePermissions.removeAll((List<String>) config.getList("cb_perms"));
+		config.getStringList("cb_perms").stream().forEach(OlympaGroup.PLAYER::unsetRuntimePermission);
 		Bukkit.getOnlinePlayers().forEach(
 				p -> p.getEffectivePermissions().stream().filter(
 				perms -> perms.getAttachment() != null).forEach(
-				perms -> config.getList("cb_perms").forEach(
-				perm -> perms.getAttachment().unsetPermission((String) perm))));
+								perms -> config.getStringList("cb_perms").forEach(perm -> perms.getAttachment().unsetPermission(perm))));
 	}
 	
 	public void removeWePerms() {
-		PermissionsList.USE_WORLD_EDIT.getMinGroup().runtimePermissions.removeAll((List<String>) config.getList("we_perms"));
+		config.getStringList("we_perms").stream().forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::unsetRuntimePermission);
 		Bukkit.getOnlinePlayers().forEach(
 				p -> p.getEffectivePermissions().stream().filter(
 				perms -> perms.getAttachment() != null).forEach(
-				perms -> config.getList("we_perms").forEach(
-				perm -> perms.getAttachment().unsetPermission((String) perm))));
+								perms -> config.getStringList("we_perms").forEach(perm -> perms.getAttachment().unsetPermission(perm))));
 	}
 }
 
