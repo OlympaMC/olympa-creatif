@@ -22,6 +22,7 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
@@ -94,6 +95,15 @@ public class PlotParametersGui extends IGui {
 		ItemUtils.lore(it, stoplagLevels[plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)]);
 		ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(3, it);
+
+		//5 : Etat stoplag
+		it = ItemUtils.item(Material.MUSIC_DISC_11, "§6Musique de la parcelle", "§7Le grade §a" + PermissionsList.USE_PLOT_MUSIC.getMinGroup().getName(p.getGender()) + "§7 est nécessaire", "§7pour utiliser cette fonctionnalité.");
+		if (plot.getParameters().getParameter(PlotParamType.SONG).equals(""))
+			ItemUtils.loreAdd(it, "§aMusique actuelle : §cAucune");
+		else
+			ItemUtils.loreAdd(it, "§aMusique actuelle : §a" + plot.getParameters().getParameter(PlotParamType.SONG));
+		ItemUtils.loreAdd(it, clickToChange);
+		inv.setItem(4, it);
 		
 		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamType.ALLOW_ENVIRONMENT_DAMAGE);
 		switchButtons.put(ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE"), PlotParamType.ALLOW_PVE);
@@ -154,26 +164,8 @@ public class PlotParametersGui extends IGui {
 			current = ItemUtils.loreAdd(current, clickToChange);
 			plot.getPlayers().forEach(pp -> pp.setPlayerTime(plot.getParameters().getParameter(PlotParamType.PLOT_TIME), false));
 			break;
+
 			
-			/*
-		case 2:
-			//édition du biome réservée au propriétaire
-			if (plot.getMembers().getPlayerRank(pc) != PlotRank.OWNER)
-				return true;
-			
-			int biomeRank = PlotParamType.getAllPossibleBiomes().indexOf(newBiome);
-			newBiome = PlotParamType.getAllPossibleBiomes().get((biomeRank+1) % PlotParamType.getAllPossibleBiomes().size());
-			
-			current = ItemUtils.lore(current, "");
-			for (Biome biome : PlotParamType.getAllPossibleBiomes())
-				if (biome == newBiome)
-					current = ItemUtils.loreAdd(current, "§aActuel : " + biome.toString());
-				else
-					current = ItemUtils.loreAdd(current, "§2Disponible : " + biome.toString());
-			
-			current = ItemUtils.loreAdd(current, clickToChange);			
-			break;
-			*/
 		case 2:
 			if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR) {
 				PlotParamType.PLOT_WEATHER.setValue(plot, WeatherType.DOWNFALL);
@@ -186,6 +178,7 @@ public class PlotParametersGui extends IGui {
 			plot.getPlayers().forEach(pp -> pp.setPlayerWeather( plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER)));
 			
 			break;
+			
 			
 		case 3:
 			int mod = 2;
@@ -204,8 +197,14 @@ public class PlotParametersGui extends IGui {
 			current = ItemUtils.loreAdd(current, clickToChange);
 			break;
 			
+			
+		case 4:
+			if (PermissionsList.USE_PLOT_MUSIC.hasPermission(p))
+				plugin.getPerksManager().getSongManager().openGui(p.getPlayer(), plot);
+			break;
+			
 		default:
-			if (slot - 4 <= switchButtons.size()) {
+			if (switchButtons.containsKey(current)) {
 				PlotParamType<Boolean> param = switchButtons.get(current);
 				switchButtons.remove(current);
 				

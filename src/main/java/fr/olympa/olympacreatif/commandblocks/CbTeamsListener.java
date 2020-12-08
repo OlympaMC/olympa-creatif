@@ -19,8 +19,13 @@ public class CbTeamsListener implements Listener {
 		
 		//update nametags des joueurs 
 		OlympaCore.getInstance().getNameTagApi().addNametagHandler(EventPriority.LOW, (nametag, player, to) -> {
+			PlotId playerPlot = PlotId.fromLoc(plugin, player.getPlayer().getLocation());
+			
+			if (playerPlot == null)
+				return;
+			
 			//si les deux joueurs sont sur le même plot
-			if (PlotId.fromLoc(plugin, player.getPlayer().getLocation()).equals(PlotId.fromLoc(plugin, to.getPlayer().getLocation()))) {
+			if (playerPlot.equals(PlotId.fromLoc(plugin, to.getPlayer().getLocation()))) {
 				//récupération du plot concerné
 				Plot plot = plugin.getPlotsManager().getPlot(player.getPlayer().getLocation());
 				

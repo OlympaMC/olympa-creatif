@@ -89,6 +89,7 @@ public class StaffGui extends IGui {
 		case 5:
 			if (PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS.hasPermission(p)) {
 				NBTcontrollerUtil.setDenyAllCustomFlags(!NBTcontrollerUtil.getDenyAllCustomFlags());
+				p.getPlayer().sendMessage("§aLes tags custom ont été toggle.");
 				toggleSwitch(slot);	
 			}
 			break;
@@ -96,6 +97,7 @@ public class StaffGui extends IGui {
 		case 6:
 			if (PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT.hasPermission(p) && plugin.isWeEnabled()) {
 				plugin.disableWorldEdit();
+				p.getPlayer().sendMessage("§aWorldEdit a bien été désactivé.");
 				toggleSwitch(slot);	
 			}
 			break;

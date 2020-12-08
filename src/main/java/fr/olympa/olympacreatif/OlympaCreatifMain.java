@@ -4,9 +4,6 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -24,20 +21,16 @@ import fr.olympa.olympacreatif.command.OcaCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.DataManager;
-import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.PermissionsManager;
 import fr.olympa.olympacreatif.perks.PerksManager;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
-import fr.olympa.olympacreatif.world.CustomChunkGenerator;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.AWEProgressBar;
 import fr.olympa.olympacreatif.worldedit.WorldEditListener;
-import net.luckperms.api.LuckPerms;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
 
@@ -89,8 +82,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);
-		plotsManager = new PlotsManager(this);
 		perksManager = new PerksManager(this);
+		plotsManager = new PlotsManager(this);
 		cbManager = new CommandBlocksManager(this);
 		permsManager = new PermissionsManager(this);
 
@@ -124,8 +117,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	}
 	
 	public void disableWorldEdit() {
-		permsManager.removeWePerms();
 		weEnabled = false;
+		//permsManager.removeWePerms();
 	}
 	
 	public boolean isWeEnabled() {

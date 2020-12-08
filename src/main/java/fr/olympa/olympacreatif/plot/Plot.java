@@ -327,6 +327,8 @@ public class Plot {
 		//définition de la météo
 		p.setPlayerWeather(parameters.getParameter(PlotParamType.PLOT_WEATHER));
 		
+		//joue la musique par défaut du plot
+		plugin.getPerksManager().getSongManager().startSong(p, getParameters().getParameter(PlotParamType.SONG));
 		return true;
 	}
 

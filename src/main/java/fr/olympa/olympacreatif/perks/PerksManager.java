@@ -9,6 +9,7 @@ public class PerksManager {
 	private SchematicCreator schem;
 	private KitsManager kitsManager;
 	private UpgradesManager upgradesManager;
+	private MusicManager musicManager;
 	
 	public PerksManager(OlympaCreatifMain olympaCreatifMain) {
 		this.plugin = olympaCreatifMain;
@@ -16,6 +17,7 @@ public class PerksManager {
 		schem = new SchematicCreator(plugin);
 		kitsManager = new KitsManager(plugin);
 		upgradesManager = new UpgradesManager(plugin);
+		musicManager = new MusicManager(plugin);
 	}
 
 	public MicroBlocks getMicroBlocks() {
@@ -32,6 +34,10 @@ public class PerksManager {
 	
 	public UpgradesManager getUpgradesManager() {
 		return upgradesManager;
+	}
+	
+	public MusicManager getSongManager() {
+		return musicManager;		
 	}
 
 }

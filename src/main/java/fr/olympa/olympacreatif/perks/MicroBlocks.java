@@ -89,7 +89,6 @@ public class MicroBlocks {
 
 		protected MbGuiInterface(String name, DyeColor color, Collection<ItemStack> collection) {
 			super(name, color, new ArrayList<ItemStack>(Arrays.asList(collection.toArray(new ItemStack[collection.size()]))), 5);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
@@ -101,8 +100,6 @@ public class MicroBlocks {
 		public void click(ItemStack existing, Player p) {
 			ItemStack it = ItemUtils.name(existing.clone(), existing.getItemMeta().getDisplayName());
 			p.getInventory().addItem(it);
-			
-			//Bukkit.broadcastMessage("microblock : " + CraftItemStack.asNMSCopy(it).getTag().asString());
 		}
 		
 	}

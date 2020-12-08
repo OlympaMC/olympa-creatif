@@ -41,6 +41,11 @@
 	    </snapshots>
 	  </repository>
 	  
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	  
 	</repositories>
 	
 	
@@ -80,13 +85,13 @@
             <version>7.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        
-	    <dependency>
-	        <groupId>net.luckperms</groupId>
-	        <artifactId>api</artifactId>
-	        <version>5.1</version>
-	        <scope>provided</scope>
-	    </dependency>
+
+
+		<dependency>
+		    <groupId>com.github.koca2000</groupId>
+		    <artifactId>NoteBlockAPI</artifactId>
+		    <version>-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -201,6 +201,7 @@ public class PlotsManager {
 		return null;
 	}
 
+	/*
 	public List<Plot> getPlotsOf(Player p, boolean onlyOwnedPlots) {
 		List<Plot> list = new ArrayList<Plot>();
 		
@@ -215,7 +216,7 @@ public class PlotsManager {
 		}
 		
 		return list;
-	}
+	}*/
 	
 	public Plot getPlot(PlotId id) {
 		if (id == null)

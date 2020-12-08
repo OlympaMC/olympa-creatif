@@ -34,6 +34,8 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	public static PlotParamType<Integer> SPAWN_LOC_Z = new PlotParamType<Integer>("SPAWN_LOC_Z", 0);
 	
 	public static PlotParamType<Integer> PLOT_TIME = new PlotParamType<Integer>("PLOT_TIME", 6000);
+
+	public static PlotParamType<String> SONG = new PlotParamType<String>("SONG", "");
 	
 	//niveaux de stoplag : 0 aucun; 1 activé; 2 activé et bloqué jusqu'à vérif par un staff
 	public static PlotParamType<Integer> STOPLAG_STATUS = new PlotParamType<Integer>("STOPLAG_STATUS", 0);
@@ -43,6 +45,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	
 	public static PlotParamType<List<Material>> LIST_ALLOWED_INTERRACTION = new PlotParamType<List<Material>>("LIST_ALLOWED_INTERRACTION", new ArrayList<Material>());
 	public static PlotParamType<List<Long>> BANNED_PLAYERS = new PlotParamType<List<Long>>("BANNED_PLAYERS", new ArrayList<Long>());
+	
 	
 	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();
 	

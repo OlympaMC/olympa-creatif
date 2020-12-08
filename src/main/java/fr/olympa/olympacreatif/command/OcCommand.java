@@ -376,7 +376,7 @@ public class OcCommand extends OlympaCommand {
 						break;
 					}
 					
-					List<Plot> plots = plugin.getPlotsManager().getPlotsOf(plotOwner, true);
+					List<Plot> plots = ((OlympaPlayerCreatif)AccountProvider.get(plotOwner.getUniqueId())).getPlots(true);
 					
 					int index = Integer.valueOf(args[2]) - 1;
 					

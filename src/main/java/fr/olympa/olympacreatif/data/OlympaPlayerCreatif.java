@@ -148,15 +148,15 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			kits.add(kit);
 		
 		if (kits.contains(KitType.HOSTILE_MOBS) && kits.contains(KitType.PEACEFUL_MOBS))
-			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
+			for (Plot plot : getPlots(true))
 				plot.getCbData().unlockSummon();
 		
 		if (kits.contains(KitType.HOSTILE_MOBS))
-			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
+			for (Plot plot : getPlots(true))
 				plot.getCbData().unlockSpawnerSetblock();
 		
 		if (kit == KitType.FLUIDS)
-			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
+			for (Plot plot : getPlots(true))
 				plot.setAllowLiquidFlow();
 	}
 	
@@ -169,7 +169,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		
 		//changement du cpt des plots du joueur
 		if (upg == UpgradeType.CB_LEVEL)
-			for (Plot plot : plugin.getPlotsManager().getPlotsOf(getPlayer(), true))
+			for (Plot plot : getPlots(true))
 				plot.getCbData().setCpt(UpgradeType.CB_LEVEL.getValueOf(upgrades.get(UpgradeType.CB_LEVEL)));
 	}
 	
