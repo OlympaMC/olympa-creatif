@@ -31,8 +31,6 @@ public class PlotMembers{
 	
 	public PlotMembers(int maxMembers) {
 		this.maxMembers = maxMembers;
-		
-		//set(p, PlotRank.OWNER);
 	}
 
 	
@@ -54,6 +52,9 @@ public class PlotMembers{
 		if (rank == getPlayerRank(p))
 			return true;
 		
+		if (getOwner() != null && rank == PlotRank.OWNER)
+			return true;
+			
 		if (rank == PlotRank.VISITOR || getCount() < maxMembers) {
 			members.put(p, rank);			
 			return true;
@@ -235,6 +236,7 @@ public class PlotMembers{
 	public String toJson() {
 		return new Gson().toJson(this);
 	}
+	
 	
 	public static PlotMembers fromJson(int maxMembers, String jsonText) {
 		try {

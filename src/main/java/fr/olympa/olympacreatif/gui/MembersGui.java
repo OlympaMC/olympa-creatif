@@ -6,8 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,6 +30,7 @@ import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 public class MembersGui extends IGui {
 	
 	private List<MemberInformations> members = new ArrayList<MemberInformations>();
+	 
 	
 	public MembersGui(IGui gui) {
 		super(gui, "Membres parcelle " + gui.getPlot().getPlotId() + " (" + gui.getPlot().getMembers().getCount() + "/" + 
@@ -43,33 +46,53 @@ public class MembersGui extends IGui {
 			headIndex++;
 			final int thisHeadIndex = headIndex;
 			
-			//création de la tête du joueur
-			Consumer<ItemStack> consumer = sk -> inv.setItem(thisHeadIndex, createLore(sk, e.getKey(), e.getValue()));
+			TriConsumer<ItemStack, ClickType, Integer> action = (it, c, s) -> {
+				MemberInformations target = e.getKey(); 
+				
+				if (c == ClickType.LEFT && canPromote(target))
+					plot.getMembers().set(target, PlotRank.getPlotRank(plot.getMembers().getPlayerLevel(target) + 1));
+				
+				else if (c == ClickType.RIGHT && canDemote(target))
+					plot.getMembers().set(target, PlotRank.getPlotRank(plot.getMembers().getPlayerLevel(target) - 1));
 
-			consumer.accept(ItemUtils.item(Material.PLAYER_HEAD, "§6" + e.getKey().getName()));
-			ItemUtils.skull(consumer, "§6" + e.getKey().getName(), e.getKey().getName());
+				changeItem(it, ItemUtils.lore(it.clone(), getHeadLore(target, plot.getMembers().getPlayerRank(target))));
+			};
+			
+			//création de la tête du joueur
+			Consumer<ItemStack> createHead = sk -> {
+				ItemUtils.lore(sk, getHeadLore(e.getKey(), e.getValue()));
+				
+				setItem(thisHeadIndex, sk, action);
+			};
+
+			createHead.accept(ItemUtils.item(Material.PLAYER_HEAD, "§6" + e.getKey().getName()));
+			ItemUtils.skull(createHead, "§6" + e.getKey().getName(), e.getKey().getName());
 		}
 	}
 	
-	private ItemStack createLore(ItemStack item, MemberInformations member, PlotRank rank) {
-		item = ItemUtils.lore(item, "§6Rang : " + rank.getRankName());
+	private String[] getHeadLore(MemberInformations member, PlotRank rank) {
+		
+		String[] lore = new String[5];
+		
+		lore[0] = "§6Rang : " + rank.getRankName();
+		
 		if (Bukkit.getPlayer(member.getUUID()) != null)
-			item = ItemUtils.loreAdd(item, "§6Statut : §aen ligne");
+			lore[1] = "§6Statut : §aen ligne";
 		else
-			item = ItemUtils.loreAdd(item, "§6Statut : §chors ligne");
+			lore[1] = "§6Statut : §chors ligne";
 
 		boolean promote = canPromote(member);
 		boolean demote = canDemote(member);
 		
 		if (promote || demote) {
-			item = ItemUtils.loreAdd(item, " ");
+			lore[2] = " ";
 			if (promote)
-				item = ItemUtils.loreAdd(item, "§7Clic gauche : promouvoir");
+				lore[3] = "§7Clic gauche : promouvoir";
 			if (demote)
-				item = ItemUtils.loreAdd(item, "§7Clic droit : rétrograder");
+				lore[4] = "§7Clic droit : rétrograder";
 		}
 		
-		return item;
+		return lore;
 	}
 	
 	private boolean canDemote(MemberInformations member) {
@@ -92,6 +115,7 @@ public class MembersGui extends IGui {
 			return false;
 	}
 	
+	/*
 	@Override
 	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
 		super.onClick(player, current, slot, click);
@@ -108,15 +132,34 @@ public class MembersGui extends IGui {
 		else if (click == ClickType.RIGHT && canDemote(target))
 			plot.getMembers().set(target, PlotRank.getPlotRank(plot.getMembers().getPlayerLevel(target) - 1));
 		
-		inv.setItem(slot, createLore(current, target, plot.getMembers().getPlayerRank(target)));
+		inv.setItem(slot, getHeadLore(current, target, plot.getMembers().getPlayerRank(target)));
 		
 		return true;
 	}
-	
 
 	@Override
 	public boolean onClickCursor(Player p, ItemStack current, ItemStack cursor, int slot) {
 		return true;
 	}
+	
+	private class UpdateHeadConsumer implements TriConsumer<ItemStack, ClickType, Integer>{
 
+		private MemberInformations target;
+		
+		private UpdateHeadConsumer(MemberInformations member) {
+			target = member;
+		}
+		
+		@Override
+		public void accept(ItemStack it, ClickType c, Integer s) {
+			
+			if (c == ClickType.LEFT && canPromote(target))
+				plot.getMembers().set(target, PlotRank.getPlotRank(plot.getMembers().getPlayerLevel(target) + 1));
+			
+			else if (c == ClickType.RIGHT && canDemote(target))
+				plot.getMembers().set(target, PlotRank.getPlotRank(plot.getMembers().getPlayerLevel(target) - 1));
+
+			setItem(s, ItemUtils.lore(inv.getItem(s), getHeadLore(target, plot.getMembers().getPlayerRank(target))), new UpdateHeadConsumer(target));
+		}
+	}*/
 }

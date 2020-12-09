@@ -30,49 +30,73 @@ public class MainGui extends IGui {
 		//création de l'interface Olympa
 		for (int i = 0 ; i < 9*6 ; i++) {
 			if ((i+1)%9 >= 3 && (i+1)%9 <= 7)
-				inv.setItem(i, ItemUtils.item(Material.ORANGE_STAINED_GLASS_PANE, " "));
+				setItem(i, ItemUtils.item(Material.ORANGE_STAINED_GLASS_PANE, " "), null);
 			else
-				inv.setItem(i, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
+				setItem(i, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "), null);
 		}
-		inv.setItem(2, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
-		inv.setItem(6, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
-		inv.setItem(38, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
-		inv.setItem(42, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
+
+		setItem(2, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "), null);
+		setItem(6, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "), null);
+		setItem(38, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "), null);
+		setItem(42, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "), null);
 		
 		//génération de l'interface
 		
 		//génération de la tête en async car l'appel aux serveurs mojang est nécessaire
-		Consumer<ItemStack> consumer = sk -> {
-			//Bukkit.broadcastMessage("tête chargée : " + sk.toString());
-			
+		Consumer<ItemStack> headConsumer = sk -> {
 			sk = ItemUtils.name(sk, "§6Paramètres de " + p.getName());
 			sk = ItemUtils.lore(sk, clickToOpenMenu);
-			inv.setItem(12, sk);
 			
+			setItem(12, sk, (it, c, s) -> new PlayerParametersGui(this).create(p.getPlayer()));
 		};
 
-		consumer.accept(new ItemStack(Material.PLAYER_HEAD));
-		ItemUtils.skull(consumer, player.getName(), player.getName());
-		//plugin.getPerksManager().getMicroBlocks().skull(consumer, p.getName(), p.getName());
+		headConsumer.accept(new ItemStack(Material.PLAYER_HEAD));
+		ItemUtils.skull(headConsumer, player.getName(), player.getName());
 
-		inv.setItem(13, ItemUtils.item(Material.BOOK, "§6Mes parcelles", 
+		setItem(13, ItemUtils.item(Material.BOOK, "§6Mes parcelles", 
 				"§eParcelles possédées : " + p.getPlots(true).size() + "/" + p.getPlotsSlots(true),
 				"§eParcelles totales : " + p.getPlots(false).size() + "/" + p.getPlotsSlots(false), 
-				clickToOpenMenu));
-		inv.setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", clickToOpenMenu));
+				clickToOpenMenu), 
+				(it, c, s) -> new PlayerPlotsGui(this).create(p.getPlayer()));
+		
+		setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", clickToOpenMenu), 
+				(it, c, s) -> new ShopGui(this).create(p.getPlayer()));
 		
 		if (plot != null) {
-			inv.setItem(21, ItemUtils.item(Material.PAINTING, "§6Membres parcelle", "§eNombre de membres : " + plot.getMembers().getCount(), clickToOpenMenu));
-			inv.setItem(22, ItemUtils.item(Material.COMPARATOR, "§6Paramètres généraux parcelle", clickToOpenMenu));
-			inv.setItem(23, ItemUtils.item(Material.REPEATER, "§6Paramètres d'interraction parcelle", clickToOpenMenu));
+			setItem(21, ItemUtils.item(Material.PAINTING, "§6Membres parcelle", "§eNombre de membres : " + plot.getMembers().getCount(), clickToOpenMenu), 
+					(it, c, s) -> new MembersGui(this).create(p.getPlayer()));
+			
+			setItem(22, ItemUtils.item(Material.COMPARATOR, "§6Paramètres généraux parcelle", clickToOpenMenu), 
+					(it, c, s) -> new PlotParametersGui(this).create(p.getPlayer()));
+			
+			setItem(23, ItemUtils.item(Material.REPEATER, "§6Paramètres d'interraction parcelle", clickToOpenMenu), 
+					(it, c, s) -> new InteractionParametersGui(this).create(p.getPlayer()));
 
-			inv.setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle"));	
+			setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle"), 
+					(it, c, s) -> {
+						p.getPlayer().closeInventory();
+						p.getPlayer().sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
+						p.getPlayer().teleport(plot.getParameters().getSpawnLoc());
+					});	
 		}
-		inv.setItem(30, ItemUtils.item(Material.RED_BED, "§6Téléportation au spawn"));
-		inv.setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"));
+		
+		setItem(30, ItemUtils.item(Material.RED_BED, "§6Téléportation au spawn"), 
+				(it, c, s) -> p.getPlayer().teleport(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC)));
+		
+		setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"), 
+				(it, c, s) -> {
+					if (plugin.getPlotsManager().getPlots().size() > 0) {
+						Plot plotR = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
+						p.getPlayer().teleport(plotR.getParameters().getSpawnLoc());
+						p.getPlayer().sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plotR));
+					}
+				});
 
-		inv.setItem(40, ItemUtils.item(Material.COMPASS, "§6Trouver une nouvelle parcelle"));
-		inv.setItem(49, ItemUtils.item(Material.PAPER, "§6Ouvrir l'aide"));
+		setItem(40, ItemUtils.item(Material.COMPASS, "§6Trouver une nouvelle parcelle"),
+				(it, c, s) -> Bukkit.dispatchCommand(p.getPlayer(), "oc find"));
+		
+		setItem(49, ItemUtils.item(Material.PAPER, "§6Ouvrir l'aide"), 
+				null);
 		
 		/*Options à intégrer au menu :
 		 * Infos générales parcelle
@@ -93,75 +117,6 @@ public class MainGui extends IGui {
 		 * tp joueur, plot
 		 * ouvrir menu
 		 */
-	}
-
-	@Override
-	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		switch (slot) {			
-		case 21:
-			if (plot != null)
-				new MembersGui(this).create(p);
-			break;
-			
-			
-		case 23:
-			if (plot != null)
-				new InteractionParametersGui(this).create(p);
-			break;
-			
-			
-		case 22:
-			if (plot != null)
-				new PlotParametersGui(this).create(p);
-			break;
-			
-			
-		case 12:
-			new PlayerParametersGui(this).create(p);
-			break;
-			
-			
-		case 13:
-			new PlayerPlotsGui(this).create(p);
-			break;
-			
-			
-		case 14:
-			new ShopGui(this).create(p);
-			break;
-			
-		case 30 :
-			p.teleport(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC));
-			break;
-			
-		case 31:
-			if (plot != null) {
-				p.closeInventory();
-				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
-				p.teleport(plot.getParameters().getSpawnLoc());	
-			}
-				
-			break;
-			
-		case 32:
-			if (plugin.getPlotsManager().getPlots().size()>0) {
-				Plot plot = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
-				p.teleport(plot.getParameters().getSpawnLoc());
-				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
-			}
-			break;
-			
-			
-		case 40:
-			Bukkit.dispatchCommand(p, "oc find");
-			break;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean onClickCursor(Player p, ItemStack current, ItemStack cursor, int slot) {
-		return true;
 	}
 	
 	public Plot getPlot() {

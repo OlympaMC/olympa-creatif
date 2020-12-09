@@ -1,12 +1,17 @@
 package fr.olympa.olympacreatif.gui;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+
+import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Consumer;
 
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -17,6 +22,8 @@ public abstract class IGui extends OlympaGUI{
 	protected Plot plot; 
 	protected OlympaPlayerCreatif p;
 	
+	private Map<ItemStack, TriConsumer<ItemStack, ClickType, Integer>> actionItems = new HashMap<ItemStack, TriConsumer<ItemStack, ClickType, Integer>>(); 
+	
 	public IGui(OlympaCreatifMain plugin, OlympaPlayerCreatif player, Plot plot, String inventoryName, int rows) {
 		super(inventoryName, rows);
 
@@ -24,9 +31,8 @@ public abstract class IGui extends OlympaGUI{
 		this.plot = plot;
 		
 		this.p = player;
-		
-		inv.setItem(inv.getSize() - 1, getBackItem());
-		//inv.setItem(inv.getSize() - 1, ItemUtils.skullCustom("§aVers menu principal", "skull"));
+
+		setItem(inv.getSize() - 1, getBackItem(), (it, c, s) -> MainGui.getMainGui(this.p, this).create(p.getPlayer()));
 	}
 	
 	public IGui(IGui gui, String inventoryName, int rows) {
@@ -49,10 +55,39 @@ public abstract class IGui extends OlympaGUI{
 		return ItemUtils.skullCustom("§aVers menu principal", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ==");
 	}
 
+	/**
+	 * Define which item to place on which slot and the action to execute when clicked
+	 * @param slot
+	 * @param it
+	 * @param consumer may be null
+	 */
+	protected void setItem(int slot, ItemStack it, TriConsumer<ItemStack, ClickType, Integer> consumer) {
+		actionItems.put(it, consumer);
+		inv.setItem(slot, it);
+	}
+	
+	/**
+	 * Change item from its former state to the new one. Copy the action too
+	 * @param from
+	 * @param to
+	 */
+	protected void changeItem(ItemStack from, ItemStack to) {
+		if (!actionItems.containsKey(from))
+			return;
+		
+		if (inv.first(from) == -1)
+			return;
+		
+		inv.setItem(inv.first(from), to);
+		actionItems.put(to, actionItems.remove(from));
+		
+	}
+	
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-		if (slot == inv.getSize() - 1) 
-			MainGui.getMainGui(this.p, this).create(p);
+		if (actionItems.get(current) != null)
+			actionItems.get(current).accept(current, click, slot);
+		
 		return true;
 	}
 }

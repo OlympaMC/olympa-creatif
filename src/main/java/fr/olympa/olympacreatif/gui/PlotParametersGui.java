@@ -224,7 +224,9 @@ public class PlotParametersGui extends IGui {
 		return true;
 	}
 
-	public static ItemStack setSwitchState(ItemStack it, boolean newState) {
+	public static ItemStack setSwitchState(ItemStack item, boolean newState) {
+		ItemStack it = item.clone();
+		
 		List<String> list = it.getItemMeta().getLore();
 		if (list == null)
 			list = new ArrayList<String>();

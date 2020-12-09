@@ -1,15 +1,17 @@
 package fr.olympa.olympacreatif.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
 
 public class PlayerParametersGui extends IGui{
@@ -17,12 +19,23 @@ public class PlayerParametersGui extends IGui{
 	public PlayerParametersGui(IGui gui) {
 		super(gui, "Paramètres de " + gui.getPlayer().getName(), 1);
 		
-		inv.setItem(0, PlotParametersGui.setSwitchState(ItemUtils.item(Material.PAPER, "§6Activation par défaut du chat parcelle"), 
-				p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)));
-		inv.setItem(1, PlotParametersGui.setSwitchState(ItemUtils.item(Material.CRAFTING_TABLE, "§6Double sneak pour ouvrir le menu"), 
-				p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)));
+		setItem(0, PlotParametersGui.setSwitchState(ItemUtils.item(Material.PAPER, "§6Activation par défaut du chat parcelle"), 
+				p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)),
+				(it, i, s) -> {
+					p.setPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT, !p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT));
+					changeItem(it, PlotParametersGui.setSwitchState(it, p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)));
+				});
+		
+		setItem(1, PlotParametersGui.setSwitchState(ItemUtils.item(Material.CRAFTING_TABLE, "§6Double sneak pour ouvrir le menu"), 
+				p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)), 
+				(it, i, s) -> {
+					p.setPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK, !p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK));
+					
+					changeItem(it, PlotParametersGui.setSwitchState(it, p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)));
+				});
 	}
 	
+	/*
 	@Override
 	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
 		super.onClick(player, current, slot, click);
@@ -39,5 +52,5 @@ public class PlayerParametersGui extends IGui{
 		}
 		
 		return true;
-	}
+	}*/
 }
