@@ -98,10 +98,10 @@ public class PlotParametersGui extends IGui {
 
 		//5 : Etat stoplag
 		it = ItemUtils.item(Material.MUSIC_DISC_11, "§6Musique de la parcelle", "§7Le grade §a" + PermissionsList.USE_PLOT_MUSIC.getMinGroup().getName(p.getGender()) + "§7 est nécessaire", "§7pour utiliser cette fonctionnalité.");
-		if (plot.getParameters().getParameter(PlotParamType.SONG).equals(""))
+		if ("".equals(plot.getParameters().getParameter(PlotParamType.SONG)))
 			ItemUtils.loreAdd(it, "§aMusique actuelle : §cAucune");
 		else
-			ItemUtils.loreAdd(it, "§aMusique actuelle : §a" + plot.getParameters().getParameter(PlotParamType.SONG));
+			ItemUtils.loreAdd(it, "§aMusique actuelle : §d" + plot.getParameters().getParameter(PlotParamType.SONG));
 		ItemUtils.loreAdd(it, clickToChange);
 		inv.setItem(4, it);
 		

@@ -7,31 +7,39 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.xxmicloxx.NoteBlockAPI.event.SongNextEvent;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 
 import fr.olympa.api.gui.templates.PagedGUI;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.gui.IGui;
+import fr.olympa.olympacreatif.gui.MainGui;
+import fr.olympa.olympacreatif.gui.PlotParametersGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 
 public class MusicManager implements Listener {
 
 	private static final List<Material> discs = new ArrayList<Material>(Arrays.asList(new Material[] {
-			Material.MUSIC_DISC_11,
-			Material.MUSIC_DISC_13,
 			Material.MUSIC_DISC_BLOCKS,
 			Material.MUSIC_DISC_CAT,
 			Material.MUSIC_DISC_CHIRP,
@@ -39,25 +47,28 @@ public class MusicManager implements Listener {
 			Material.MUSIC_DISC_MALL,
 			Material.MUSIC_DISC_MELLOHI,
 			Material.MUSIC_DISC_STAL,
-			Material.MUSIC_DISC_STRAD,
 			Material.MUSIC_DISC_WAIT,
 			Material.MUSIC_DISC_WARD
 	}));
 	
 	private OlympaCreatifMain plugin;
-	private Map<ItemStack, Song> songs = new LinkedHashMap<ItemStack, Song>();
+	private Map<String, Song> songs = new HashMap<String, Song>();
 	private Map<Player, RadioSongPlayer> radios = new HashMap<Player, RadioSongPlayer>();
+
+	private int i = 0;
 	
 	public MusicManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		
-		if (plugin.getServer().getPluginManager().getPlugin("NoteBlockAPI") == null) 
-			return;
+		if (plugin.getServer().getPluginManager().getPlugin("NoteBlockAPI") == null) {
+			Bukkit.getLogger().warning("NoteBlockAPI wasn't loaded successfully. Music perks may not work.");
+			return;	
+		}
 		
 		//get all songs from config and parse them for later use
-		File path = new File(plugin.getDataFolder() + "\\songs\\");
+		File path = new File(plugin.getDataFolder() + "/songs/");
 		
 		if (!path.exists()) path.mkdir();
 		
@@ -69,17 +80,11 @@ public class MusicManager implements Listener {
 		
 		//store songs and their representative items
 		for (int i = 0 ; i < list.size() ; i++) {
-			Song song = NBSDecoder.parse(list.get(i));
-
-			ItemStack it = ItemUtils.item(discs.get(plugin.random.nextInt(discs.size())), "§7" + i + ". §d" + song.getTitle());
-
-			if (!song.getOriginalAuthor().equals(""))
-				it = ItemUtils.loreAdd(it, "§7Musique par " + song.getOriginalAuthor());
-			if (!song.getAuthor().equals(""))
-				it = ItemUtils.loreAdd(it, "§7Transcription par " + song.getAuthor());
-			
-			songs.put(it, song);	
+			String str = list.get(i).getName().replace(".nbs", "");
+			songs.put(str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase(), NBSDecoder.parse(list.get(i)));
 		}
+		
+		Bukkit.getLogger().log(Level.INFO, "§aLoaded " + songs.size() + " songs.");
 	}
 
 	/**
@@ -90,22 +95,19 @@ public class MusicManager implements Listener {
 	 * @return true if music started, false if the sound wasn't found
 	 */
 	public void startSong(Player p, String music) {
+		stopSong(p);
 		
-		songs.values().forEach(song -> {
-			if (song.getTitle().equals(music)) {
-				
-				stopSong(p);
-				
-				RadioSongPlayer rsp = new RadioSongPlayer(song);
-				rsp.addPlayer(p);
-				rsp.setAutoDestroy(true);
-				rsp.setPlaying(true);
-				
-				radios.put(p, rsp);
-				
-				return;
-			}
-		});
+		Song song = songs.get(music);
+		
+		if (song == null)
+			return;
+		
+		RadioSongPlayer rsp = new RadioSongPlayer(song);
+		rsp.addPlayer(p);
+		rsp.setAutoDestroy(true);
+		rsp.setPlaying(true);
+		
+		radios.put(p, rsp);
 	}
 	
 	/**
@@ -128,10 +130,23 @@ public class MusicManager implements Listener {
 	 */
 	public void openGui(Player p, Plot plot) {
 		if (plot != null) {
-			List<ItemStack> list = new ArrayList<ItemStack>();
-			songs.keySet().forEach(it -> list.add(it.clone()));
+			Map<ItemStack, Song> songsMap = new LinkedHashMap<ItemStack, Song>();
 			
-			new MusicGui(plugin, plot, list).create(p);	
+			i = 0;
+			
+			songs.forEach((songName, song) -> {
+				i++;
+				ItemStack it = ItemUtils.item(discs.get(plugin.random.nextInt(discs.size())), "§7" + i + ". §d" + songName);
+				
+				if (!song.getOriginalAuthor().equals(""))
+					it = ItemUtils.loreAdd(it, "§7Musique par " + song.getOriginalAuthor());
+				if (!song.getAuthor().equals(""))
+					it = ItemUtils.loreAdd(it, "§7Transcription par " + song.getAuthor());
+				
+				songsMap.put(it, song);
+			});
+			
+			new MusicGui(plugin, plot, p, songsMap).create(p);	
 		}
 	}
 	
@@ -142,31 +157,64 @@ public class MusicManager implements Listener {
 
 	public class MusicGui extends PagedGUI<ItemStack> {
 	
-		private Plot plot;
-		private List<ItemStack> items;
+		private Map<ItemStack, Consumer<Player>> items = new HashMap<ItemStack, Consumer<Player>>();
 		
-		protected MusicGui(OlympaCreatifMain plugin, Plot plot, List<ItemStack> items) {
-			super("Musiques disponibles", DyeColor.GREEN, items, 6);
-			this.plot = plot;
-			this.items = items;
+		protected MusicGui(OlympaCreatifMain plugin, Plot plot, Player p0, Map<ItemStack, Song> songsMap) {
+			super("Musiques disponibles", DyeColor.GREEN, new ArrayList<ItemStack>(songsMap.keySet()), 6);
+			//this.plot = plot;
+
+			//building music discs
+			if (plot.getMembers().getPlayerLevel(p0) > 2)
+				songsMap.forEach((it, song) -> items.put(it, p -> {
+					String songName = it.getItemMeta().getDisplayName().split("\\. §d")[1];
+					
+					PlotParamType.SONG.setValue(plot, songName);
+					ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §a" + songName);
+					
+					plot.getPlayers().forEach(player -> startSong(player, songName));
+				}));
+			
+			//set current selected music
+			ItemStack it = ItemUtils.item(Material.MUSIC_DISC_STRAD, "§eMusique sélectionnée : §caucune", "§7Tous les joueurs entrant sur", "§7la parcelle entendront cette musique !");
+			
+			if (!"".equals(plot.getParameters().getParameter(PlotParamType.SONG)))
+				ItemUtils.name(it, "§eMusique sélectionnée : §d" + plot.getParameters().getParameter(PlotParamType.SONG));
+			
+			getInventory().setItem(17, it);
+			
+			//create remove music item
+			getInventory().setItem(26, it = ItemUtils.item(Material.RED_WOOL, "§cSupprimer la musique actuelle"));
+			
+			if (plot.getMembers().getPlayerLevel(p0) > 2)
+				items.put(it, p -> {
+					PlotParamType.SONG.setValue(plot, "");
+					getInventory().setItem(17, ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §caucune"));
+				});
+			
+			//add back item
+			getInventory().setItem(44, it = IGui.getBackItem());
+			items.put(it, p -> {
+				new PlotParametersGui(MainGui.getMainGui(AccountProvider.get(p.getUniqueId()), plot)).create(p);
+			});
 		}
 
 		@Override
 		public ItemStack getItemStack(ItemStack object) {
 			return object;
 		}
-	
+
 		@Override
 		public void click(ItemStack existing, Player p) {
-			Song song = songs.get(existing);
+		}
+
+		@Override
+		public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
+			super.onClick(p, current, slot, click);
+
+			if (items.get(current) != null)
+				items.get(current).accept(p);
 			
-			if (song == null)
-				return;
-			
-			PlotParamType.SONG.setValue(plot, song.getTitle());
-			
-			items.forEach(it -> it = ItemUtils.removeEnchant(it, Enchantment.DURABILITY));
-			existing = ItemUtils.addEnchant(existing, Enchantment.DURABILITY, 1);
+			return true;
 		}
 	}
 }

@@ -25,7 +25,7 @@ public abstract class IGui extends OlympaGUI{
 		
 		this.p = player;
 		
-		inv.setItem(inv.getSize() - 1, ItemUtils.skullCustom("§aVers menu principal", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ=="));
+		inv.setItem(inv.getSize() - 1, getBackItem());
 		//inv.setItem(inv.getSize() - 1, ItemUtils.skullCustom("§aVers menu principal", "skull"));
 	}
 	
@@ -43,6 +43,10 @@ public abstract class IGui extends OlympaGUI{
 	
 	public OlympaPlayerCreatif getPlayer(){
 		return p;
+	}
+	
+	public static ItemStack getBackItem() {
+		return ItemUtils.skullCustom("§aVers menu principal", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ==");
 	}
 
 	@Override

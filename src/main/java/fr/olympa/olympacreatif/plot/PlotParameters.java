@@ -109,9 +109,12 @@ public class PlotParameters {
 			
 			for (PlotParamType<?> param : params.getParameters())
 				if (json.containsKey(param.getId()))
-					
+
 					if (param.getDefaultValue() instanceof Integer) {
 						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Integer.class));
+						
+					}else if (param.getDefaultValue() instanceof String) {
+						params.setParameter(param, (String) json.get(param.getId()));
 						
 					}else if (param.getDefaultValue() instanceof Boolean) {
 						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Boolean.class));

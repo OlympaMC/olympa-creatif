@@ -118,7 +118,7 @@ public class PlotsManager {
 		}.runTaskTimerAsynchronously(plugin, 10, 300);
 
 		//load plot 1
-		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1));
+		//plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1));
 	}
 	
 	/**
