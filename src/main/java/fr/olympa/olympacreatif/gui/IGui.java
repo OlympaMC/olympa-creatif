@@ -56,12 +56,16 @@ public abstract class IGui extends OlympaGUI{
 	}
 
 	/**
-	 * Define which item to place on which slot and the action to execute when clicked
-	 * @param slot
-	 * @param it
-	 * @param consumer may be null
+	 * Define which item to place on which slot and the action to execute when clicked. If the item is placed on a slot already
+	 * occupied by another item, the former one will be erased
+	 * @param slot Slot to place item in
+	 * @param it Concerned item
+	 * @param Consumer executed when item clicked (may be null)
 	 */
 	protected void setItem(int slot, ItemStack it, TriConsumer<ItemStack, ClickType, Integer> consumer) {
+		if (inv.getItem(slot) != null)
+			actionItems.remove(inv.getItem(slot));
+		
 		actionItems.put(it, consumer);
 		inv.setItem(slot, it);
 	}
@@ -79,8 +83,7 @@ public abstract class IGui extends OlympaGUI{
 			return;
 		
 		inv.setItem(inv.first(from), to);
-		actionItems.put(to, actionItems.remove(from));
-		
+		actionItems.put(to, actionItems.remove(from));		
 	}
 	
 	@Override

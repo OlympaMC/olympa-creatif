@@ -2,6 +2,8 @@
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -30,25 +32,27 @@ public class ShopGui extends IGui{
 	private ItemStack kitsRowHead;
 	private ItemStack upgradesRowHead;
 	
-	private ItemStack buyProcessWaitingItem = ItemUtils.item(Material.BEDROCK, "§7Sélectionnez un objet à acheter");
-	private ItemStack buyProcessArrow = ItemUtils.skullCustom(" ", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19");
-	private ItemStack buyProcess1 = ItemUtils.skullCustom("§71...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzFiYzJiY2ZiMmJkMzc1OWU2YjFlODZmYzdhNzk1ODVlMTEyN2RkMzU3ZmMyMDI4OTNmOWRlMjQxYmM5ZTUzMCJ9fX0=");
-	private ItemStack buyProcess2 = ItemUtils.skullCustom("§72...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNkOWVlZWU4ODM0Njg4ODFkODM4NDhhNDZiZjMwMTI0ODVjMjNmNzU3NTNiOGZiZTg0ODczNDE0MTk4NDcifX19");
-	private ItemStack buyProcess3 = ItemUtils.skullCustom("§73...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWQ0ZWFlMTM5MzM4NjBhNmRmNWU4ZTk1NTY5M2I5NWE4YzNiMTVjMzZiOGI1ODc1MzJhYzA5OTZiYzM3ZTUifX19");
-	private ItemStack buyProcessQuestion = ItemUtils.skullCustom("§7En attente...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19");
-	private ItemStack buyProcessAccept = ItemUtils.skullCustom("§aCliquez pour acheter", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQwNjNiYTViMTZiNzAzMGEyMGNlNmYwZWE5NmRjZDI0YjA2NDgzNmY1NzA0NTZjZGJmYzllODYxYTc1ODVhNSJ9fX0=");
-	private ItemStack buyProcessDeny = ItemUtils.skullCustom("§cAchat impossible", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzIwZWYwNmRkNjA0OTk3NjZhYzhjZTE1ZDJiZWE0MWQyODEzZmU1NTcxODg2NGI1MmRjNDFjYmFhZTFlYTkxMyJ9fX0=");
+	private final ItemStack buyProcessNullItem = ItemUtils.item(Material.BEDROCK, "§7Sélectionnez un objet à acheter");
+	private final ItemStack buyProcessArrow = ItemUtils.skullCustom(" ", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19");
+	//private ItemStack buyProcess1 = ItemUtils.skullCustom("§71...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzFiYzJiY2ZiMmJkMzc1OWU2YjFlODZmYzdhNzk1ODVlMTEyN2RkMzU3ZmMyMDI4OTNmOWRlMjQxYmM5ZTUzMCJ9fX0=");
+	//private ItemStack buyProcess2 = ItemUtils.skullCustom("§72...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNkOWVlZWU4ODM0Njg4ODFkODM4NDhhNDZiZjMwMTI0ODVjMjNmNzU3NTNiOGZiZTg0ODczNDE0MTk4NDcifX19");
+	//private ItemStack buyProcess3 = ItemUtils.skullCustom("§73...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWQ0ZWFlMTM5MzM4NjBhNmRmNWU4ZTk1NTY5M2I5NWE4YzNiMTVjMzZiOGI1ODc1MzJhYzA5OTZiYzM3ZTUifX19");
+	private final ItemStack buyProcessQuestion = ItemUtils.skullCustom("§7En attente...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19");
+	private final ItemStack buyProcessAccept = ItemUtils.skullCustom("§aCliquez §2§lICI §r§apour acheter", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQwNjNiYTViMTZiNzAzMGEyMGNlNmYwZWE5NmRjZDI0YjA2NDgzNmY1NzA0NTZjZGJmYzllODYxYTc1ODVhNSJ9fX0=");
+	private final ItemStack buyProcessDeny = ItemUtils.skullCustom("§cAchat impossible", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzIwZWYwNmRkNjA0OTk3NjZhYzhjZTE1ZDJiZWE0MWQyODEzZmU1NTcxODg2NGI1MmRjNDFjYmFhZTFlYTkxMyJ9fX0=");
 	
-	private MarketItemData itemReadyToBuy = null;
-	private boolean readyToBuy = false;
+	private MarketItemData cartItem = null;
+	private boolean cartItemReadyToBuy = false;
 	
-	int firstRankPrice = 10;
-	int secondRankPrice = 20;
+	//int firstRankPrice = 10;
+	//int secondRankPrice = 20;
 
 	private List<MarketItemData> ranks = new ArrayList<MarketItemData>();
 	private List<MarketItemData> kits = new ArrayList<MarketItemData>();
 	private List<MarketItemData> upgrades = new ArrayList<MarketItemData>();
-			
+
+	int buyProcessItemSlot;
+	int buyProcessStateSlot;
 	
 	public ShopGui(IGui gui) {
 		super(gui, "Magasin (monnaie : " + gui.getPlayer().getGameMoney() + " " + gui.getPlayer().getGameMoneyName() + ")", 4);
@@ -84,6 +88,7 @@ public class ShopGui extends IGui{
 		for (KitType kit : KitType.values())
 			if (!p.hasKit(kit) && kit != KitType.ADMIN)
 				hasAllKits = false;
+		
 		if (p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) && hasAllKits)
 			ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 30, ItemUtils.item(Material.DIAMOND_PICKAXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), 
 					"§2En plus des avantages du niveau précédent,",
@@ -190,155 +195,102 @@ public class ShopGui extends IGui{
 		
 		//CREATION GUI
 		
-		inv.setItem(inv.getSize() - 5, buyProcessWaitingItem);
-		inv.setItem(inv.getSize() - 4, buyProcessArrow);
-		inv.setItem(inv.getSize() - 3, buyProcessQuestion);
-
+		buyProcessItemSlot = inv.getSize() - 5;
+		buyProcessStateSlot = inv.getSize() - 3;
+		
+		setItem(buyProcessItemSlot, buyProcessNullItem, null);
+		setItem(inv.getSize() - 4, buyProcessArrow, null);
+		setItem(buyProcessStateSlot, buyProcessQuestion, null);
+		
 		//ajout grades
 		int i = 0;
 		
-		inv.setItem(i, ranksRowHead);
-		i++;
+		setItem(i, ranksRowHead, null);
 		for (MarketItemData e : ranks) {
-			inv.setItem(i, e.getHolder());
 			i++;
+			setItem(i, e.getHolder(), (it, c, s) -> {
+				//si l'objet est achetable, lancement timer d'achat, sinon maj de l'indicateur d'achat
+				if (e.isBuyable())
+					startBuyAcceptTimer(e);
+				else
+					startBuyDenyTimer(e);
+			});
 		}
 		
 		//ajout kits
 		i = 9;
 		
-		inv.setItem(i, kitsRowHead);
-		i++;
+		setItem(i, kitsRowHead, null);
 		for (MarketItemData e : kits) {
-			inv.setItem(i, e.getHolder());
 			i++;
+			setItem(i, e.getHolder(), (it, c, s) -> {
+				//si l'objet est achetable, lancement timer d'achat, sinon maj de l'indicateur d'achat
+				if (e.isBuyable())
+					startBuyAcceptTimer(e);
+				else
+					startBuyDenyTimer(e);
+			});
 		}
 		
 		//ajout upgrades
 		i = 18;
 		
-		inv.setItem(i, upgradesRowHead);
-		i++;
+		setItem(i, upgradesRowHead, null);
 		for (MarketItemData e : upgrades) {
-			inv.setItem(i, e.getHolder());
 			i++;
+			setItem(i, e.getHolder(), (it, c, s) -> {
+				//si l'objet est achetable, lancement timer d'achat, sinon maj de l'indicateur d'achat
+				if (e.isBuyable())
+					startBuyAcceptTimer(e);
+				else
+					startBuyDenyTimer(e);
+			});
 		}
 	}
 
-	
-	@Override
-	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
-		super.onClick(player, current, slot, click);
+	/**
+	 * Set the buy process indicator to deny for 2 seconds
+	 */
+	private void startBuyDenyTimer(MarketItemData data) {
+		setItem(buyProcessItemSlot, ItemUtils.item(data.getHolder().getType(), "§6Achat : " + data.getHolder().getItemMeta().getDisplayName()), null);
+		setItem(buyProcessStateSlot, buyProcessDeny, null);
 		
-		int row = slot / 9;
-		int column = slot % 9;
-		
-		if (column == 0)
-			return true;
-		
-		MarketItemData askedItem = null;
-		
-		//get asked item
-		switch(row) {
-		case 0:
-			if (column <= ranks.size())
-				askedItem = ranks.get(column - 1);
-			break;
-		case 1:
-			if (column <= kits.size())
-				askedItem = kits.get(column - 1);
-			break;
-		case 2:
-			if (column <= upgrades.size())
-				askedItem = upgrades.get(column - 1);
-			break;
-		}
-
-		//tentative d'achat
-		if (slot == inv.getSize() - 3) {
-			if (readyToBuy && itemReadyToBuy != null) 
-				itemReadyToBuy.tryToItem(this);
-			return true;
-		}
-		
-		//lancement du timer pour l'objet désigné
-		if (askedItem != null)
-			if (askedItem.getPrice() == null || askedItem.getPrice() > p.getGameMoney() || !askedItem.isBuyable())
-				startBuyDeniedTimer(askedItem);
-			else
-				startBuyAcceptTimer(askedItem);
-		
-		return true;
-	}
-	
-	private void startBuyDeniedTimer(MarketItemData data) {
-		
-		readyToBuy = false;
-		
-		itemReadyToBuy = data;
-		
-		inv.setItem(inv.getSize() - 5, ItemUtils.item(data.getHolder().getType(), "§dAchat de : " + data.getHolder().getItemMeta().getDisplayName().toLowerCase()));
-		inv.setItem(inv.getSize() - 3, buyProcessDeny);
-		
-		new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				if (data.equals(itemReadyToBuy)) {
-					inv.setItem(inv.getSize() - 5, buyProcessWaitingItem);
-					inv.setItem(inv.getSize() - 4, buyProcessArrow);
-					inv.setItem(inv.getSize() - 3, buyProcessQuestion);	
-				}
+		plugin.getTask().runTaskLater(() -> {
+			if (buyProcessDeny.equals(inv.getItem(buyProcessStateSlot))) {
+				setItem(buyProcessItemSlot, buyProcessNullItem, null);
+				setItem(buyProcessStateSlot, buyProcessQuestion, null);	
 			}
-		}.runTaskLater(plugin, 40);
+		}, 40);
 	}
+	
 	
 	private void startBuyAcceptTimer(MarketItemData data) {
-		useBuyAcceptTimer(data, 3);
+		useBuyAcceptTimer(data, 5, 5, 15, 
+				ItemUtils.item(data.getHolder().getType(), "§6Achat : " + data.getHolder().getItemMeta().getDisplayName()));
 	}
 	
-	private void useBuyAcceptTimer(MarketItemData data, int buyStep) {
+	private void useBuyAcceptTimer(MarketItemData data, int buyStep, int initBuyStep, int tickInterval, final ItemStack cartItem) {
 		
-		readyToBuy = false;
-		
-		if (!data.equals(itemReadyToBuy) && buyStep != 3)
+		//cancel achat si le joueur a cliqué sur un autre item
+		if (buyStep < 0 || (buyStep != initBuyStep && cartItem != null && !inv.getItem(buyProcessItemSlot).equals(cartItem)))
 			return;
 		
-		ItemStack item;
+		if (buyStep == initBuyStep)
+			setItem(buyProcessItemSlot, cartItem, null);
 		
-		switch (buyStep) {
-		case 3:
-			itemReadyToBuy = data;
-			
-			inv.setItem(inv.getSize() - 5, ItemUtils.item(data.getHolder().getType(), "§dAchat de : " + data.getHolder().getItemMeta().getDisplayName().toLowerCase()));
-			//inv.setItem(inv.getSize() - 3, buyProcess3);
-			
-			item = ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, "§73...");
-			item.setAmount(3);
-			inv.setItem(inv.getSize() - 3, item);
-			
-			plugin.getTask().runTaskLater(() -> useBuyAcceptTimer(data, 2), 20);
-			break;
-		case 2:
-			//inv.setItem(inv.getSize() - 3, buyProcess2);
-			
-			item = ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, "§72...");
-			item.setAmount(2);
-			inv.setItem(inv.getSize() - 3, item);
-			
-			plugin.getTask().runTaskLater(() -> useBuyAcceptTimer(data, 1), 20);
-			break;
-		case 1:
-			//inv.setItem(inv.getSize() - 3, buyProcess1);
-			
-			inv.setItem(inv.getSize() - 3, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, "§71..."));
-			plugin.getTask().runTaskLater(() -> useBuyAcceptTimer(data, 0), 20);
-			break;
-		case 0:
-			inv.setItem(inv.getSize() - 3, buyProcessAccept);
-			readyToBuy = true;
-			break;
+		
+		if (buyStep > 0) {
+			ItemStack it = ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, "§7" + buyStep + "...", "§7L'achat sera possible après la fin du timer.");
+			it.setAmount(buyStep);
+			setItem(buyProcessStateSlot, it, null);
 		}
+			
+		if (buyStep == 0)
+			setItem(buyProcessStateSlot, buyProcessAccept, (it, c, s) -> {
+				data.tryToBuy(this);
+			});
+		
+		plugin.getTask().runTaskLater(() -> useBuyAcceptTimer(data, buyStep - 1, initBuyStep, tickInterval, cartItem), tickInterval);
 	}
 
 	public class MarketItemData{
@@ -396,7 +348,7 @@ public class ShopGui extends IGui{
 				String newV = Integer.toString(newValue);
 				
 				if (oldValue == newValue)
-					newV = "§7maximum atteint";
+					newV = "maximum atteint";
 				
 				itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + oldV + " ➔ " + newV);
 				
@@ -431,10 +383,6 @@ public class ShopGui extends IGui{
 			return itemHolder;
 		}
 		
-		/*public ItemStack getCompressedHolder() {
-			return itemHolderCompressed;
-		}*/
-		
 		public Integer getPrice() {
 			return price;
 		}
@@ -443,7 +391,7 @@ public class ShopGui extends IGui{
 			return isBuyable;
 		}
 		
-		public void tryToItem(ShopGui gui) {
+		public void tryToBuy(ShopGui gui) {
 			if (!isBuyable || p.getGameMoney() < price)
 				return;
 			

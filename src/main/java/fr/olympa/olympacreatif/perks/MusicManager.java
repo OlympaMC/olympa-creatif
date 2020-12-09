@@ -48,7 +48,8 @@ public class MusicManager implements Listener {
 			Material.MUSIC_DISC_MELLOHI,
 			Material.MUSIC_DISC_STAL,
 			Material.MUSIC_DISC_WAIT,
-			Material.MUSIC_DISC_WARD
+			Material.MUSIC_DISC_WARD,
+			Material.MUSIC_DISC_STRAD
 	}));
 	
 	private OlympaCreatifMain plugin;
@@ -175,7 +176,7 @@ public class MusicManager implements Listener {
 				}));
 			
 			//set current selected music
-			ItemStack it = ItemUtils.item(Material.MUSIC_DISC_STRAD, "§eMusique sélectionnée : §caucune", "§7Tous les joueurs entrant sur", "§7la parcelle entendront cette musique !");
+			ItemStack it = ItemUtils.item(Material.JUKEBOX, "§eMusique sélectionnée : §caucune", "§7Tous les joueurs entrant sur", "§7la parcelle entendront cette musique !");
 			
 			if (!"".equals(plot.getParameters().getParameter(PlotParamType.SONG)))
 				ItemUtils.name(it, "§eMusique sélectionnée : §d" + plot.getParameters().getParameter(PlotParamType.SONG));

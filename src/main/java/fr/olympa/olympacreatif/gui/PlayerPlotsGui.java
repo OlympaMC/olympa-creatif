@@ -22,11 +22,14 @@ public class PlayerPlotsGui extends IGui {
 	
 	private List<Plot> playerPlots = new ArrayList<Plot>();
 	
+	@SuppressWarnings("incomplete-switch")
 	public PlayerPlotsGui(IGui gui) {
 		super(gui, "Parcelles de " + gui.getPlayer().getName(), gui.getPlayer().getPlots(false).size()/9 + 2);
 		
 		playerPlots = p.getPlots(false);
-
+		
+		int i = -1;
+		
 		//recherche des plots du joueur
 		for (Plot plot : playerPlots) {
 			Material mat = null;
@@ -45,32 +48,24 @@ public class PlayerPlotsGui extends IGui {
 				break;
 			}
 			
-			if (mat != null) 
-				inv.addItem(ItemUtils.item(mat, "§6 Parcelle " + plot.getPlotId().getId(), "§eRang : " + plot.getMembers().getPlayerRank(p).getRankName(), "§7Clic gauche : téléportation vers le plot", "§7Clic droit : ouverture du menu pour celle parcelle"));	
-		}
 			
-	}
-
-	@Override
-	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
-		super.onClick(player, current, slot, click);
-		
-		if (slot < playerPlots.size()) {
-			player.closeInventory();
-			if (click == ClickType.LEFT) {
-				player.teleport(playerPlots.get(slot).getPlotId().getLocation());
-				player.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(slot)));	
-			}else if (click == ClickType.RIGHT) {
-				MainGui.getMainGui(p, playerPlots.get(slot)).create(player);
-			}
+			if (mat != null) {
+				i++;
+				setItem(i, ItemUtils.item(mat, "§6 Parcelle " + plot.getPlotId().getId(), 
+						"§eRang : " + plot.getMembers().getPlayerRank(p).getRankName(), 
+						"§7Clic gauche : téléportation vers le plot", "§7Clic droit : ouverture du menu pour celle parcelle"), 
+						
+						(it, c, s) -> {
+							if (s < playerPlots.size()) 
+								p.getPlayer().closeInventory();
+								if (c == ClickType.LEFT) {
+									p.getPlayer().teleport(playerPlots.get(s).getPlotId().getLocation());
+									p.getPlayer().sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(s)));	
+								}else if (c == ClickType.RIGHT) {
+									MainGui.getMainGui(p, playerPlots.get(s)).create(p.getPlayer());
+								}
+						});
+			}	
 		}
-		
-		return true;
-	}
-
-
-	@Override
-	public boolean onClickCursor(Player p, ItemStack current, ItemStack cursor, int slot) {
-		return true;
 	}
 }
