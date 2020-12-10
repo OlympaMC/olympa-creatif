@@ -153,7 +153,7 @@ public class MusicManager implements Listener {
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
-		radios.remove(e.getPlayer());
+		radios.remove(e.getPlayer()).destroy();
 	}
 
 	public class MusicGui extends PagedGUI<ItemStack> {
