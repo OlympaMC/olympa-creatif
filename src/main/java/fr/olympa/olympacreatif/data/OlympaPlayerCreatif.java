@@ -294,7 +294,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		BYPASS_KICK_AND_BAN(PermissionsList.STAFF_BYPASS_PLOT_KICK_AND_BAN),
 		BYPASS_VANILLA_COMMANDS(PermissionsList.STAFF_BYPASS_VANILLA_COMMANDS),
 		BYPASS_WORLDEDIT(PermissionsList.STAFF_BYPASS_WORLDEDIT),
-		FAKE_OWNER_EVERYWHERE(PermissionsList.STAFF_PLOT_OWNER_EVERYWHERE);
+		FAKE_OWNER_EVERYWHERE(PermissionsList.STAFF_PLOT_FAKE_OWNER);
 		
 		OlympaPermission corePerm;
 		

@@ -87,6 +87,7 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.BOAT)
 
 			.add(EntityType.ARROW)
+			.add(EntityType.SPECTRAL_ARROW)
 			.add(EntityType.SNOWBALL)
 			.add(EntityType.ENDER_PEARL)
 			.add(EntityType.FALLING_BLOCK)

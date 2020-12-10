@@ -19,15 +19,15 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	public static PlotParamType<Boolean> FORCE_SPAWN_LOC = new PlotParamType<Boolean>("FORCE_SPAWN_LOC", false);
 	public static PlotParamType<Boolean> CLEAR_INCOMING_PLAYERS = new PlotParamType<Boolean>("CLEAR_INCOMING_PLAYERS", false);
 	public static PlotParamType<Boolean> ALLOW_FLY_INCOMING_PLAYERS = new PlotParamType<Boolean>("ALLOW_FLY_INCOMING_PLAYERS", true);
-	public static PlotParamType<Boolean> ALLOW_SPLASH_POTIONS = new PlotParamType<Boolean>("ALLOW_SPLASH_POTIONS", false);
+	public static PlotParamType<Boolean> ALLOW_SPLASH_POTIONS = new PlotParamType<Boolean>("ALLOW_SPLASH_POTIONS", true);
 	public static PlotParamType<Boolean> ALLOW_PRINT_TNT = new PlotParamType<Boolean>("ALLOW_PRINT_TNT", false);
 	public static PlotParamType<Boolean> ALLOW_PVP = new PlotParamType<Boolean>("ALLOW_PVP", false);
 	public static PlotParamType<Boolean> ALLOW_PVE = new PlotParamType<Boolean>("ALLOW_PVE", false);
 	public static PlotParamType<Boolean> ALLOW_ENVIRONMENT_DAMAGE = new PlotParamType<Boolean>("ALLOW_ENVIRONMENT_DAMAGE", false);
 	public static PlotParamType<Boolean> ALLOW_DROP_ITEMS = new PlotParamType<Boolean>("ALLOW_DROP_ITEMS", false);
-	public static PlotParamType<Boolean> ALLOW_LAUNCH_PROJECTILES = new PlotParamType<Boolean>("ALLOW_LAUNCH_PROJECTILES", false);
+	public static PlotParamType<Boolean> ALLOW_LAUNCH_PROJECTILES = new PlotParamType<Boolean>("ALLOW_LAUNCH_PROJECTILES", true);
 	public static PlotParamType<Boolean> KEEP_MAX_FOOD_LEVEL = new PlotParamType<Boolean>("KEEP_MAX_FOOD_LEVEL", true);
-	public static PlotParamType<Boolean> KEEP_INVENTORY_ON_DEATH = new PlotParamType<Boolean>("KEEP_INVENTORY_ON_DEATH", false);
+	public static PlotParamType<Boolean> KEEP_INVENTORY_ON_DEATH = new PlotParamType<Boolean>("KEEP_INVENTORY_ON_DEATH", true);
 	
 	public static PlotParamType<Integer> SPAWN_LOC_X = new PlotParamType<Integer>("SPAWN_LOC_X", 0);
 	public static PlotParamType<Integer> SPAWN_LOC_Y = new PlotParamType<Integer>("SPAWN_LOC_Y", 0);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -362,6 +363,9 @@ public class PlotsInstancesListener implements Listener{
 				if (clickedBlock == null && b.getType() == Material.WATER)
 					clickedBlock = b;
 		
+		if (clickedBlock == null)
+			return;
+		/*
 		if (clickedBlock == null) {
 			if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
 				e.setCancelled(true);
@@ -370,7 +374,7 @@ public class PlotsInstancesListener implements Listener{
 					e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
 			}
 			return;
-		}
+		}*/
 
 		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 
@@ -647,19 +651,6 @@ public class PlotsInstancesListener implements Listener{
 		}		
 	}
 	
-	/*
-	@EventHandler
-	public void onHangingPlace(HangingPlaceEvent e) {
-		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
-		
-		if (plot == null || plot.hasStoplag() || plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
-			e.setCancelled(true);
-			return;
-		}
-		
-		//lugin.getPlotsManager().setBirthPlot(plot.getPlotId(), e.getEntity());
-	}*/
-	
 	@EventHandler//cancel spawn entité si paramètre du plot l'interdit
 	public void onProjectileSpawn(ProjectileLaunchEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getLocation());
@@ -671,9 +662,9 @@ public class PlotsInstancesListener implements Listener{
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH) //décide si l'entité aura le droit de spawn
-	public void onEntitySpawn(EntitySpawnEvent e) {
-		//return si l'entité spawn sur le plot 1 (pour permettre aux holos de spawn)
-		if (e.isCancelled() || PlotId.fromLoc(plugin, e.getEntity().getLocation()).equals(PlotId.fromId(plugin, 1)))
+	public void onEntitySpawn(EntitySpawnEvent e) {		
+		
+		if (e.isCancelled())
 			return;
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getLocation());

@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.gui;
 
+import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -9,6 +10,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.region.tracking.BypassCommand;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
@@ -21,184 +24,72 @@ public class StaffGui extends IGui {
 		inv.setItem(inv.getSize() - 1, new ItemStack(Material.AIR));
 		
 		//set items pour staff perms
-		inv.setItem(0, ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Bypass kick/ban plot", "§7Permet d'entrer sur les plots même", "§7si le propriétaire vous en a banni"));
-		inv.setItem(0 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_KICK_AND_BAN.getOlympaPerm().getMinGroup().getName(p.getGender())));
+		OlympaPermission perm = PermissionsList.STAFF_BYPASS_PLOT_KICK_AND_BAN;
+		StaffPerm sPerm = StaffPerm.BYPASS_KICK_AND_BAN;
 		
-		inv.setItem(1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Bypass commandes vanilla", "§7Permet de ne pas être affecté par", "§7les commandes vanilla du type /kill, /tp, ..."));
-		inv.setItem(1 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_VANILLA_COMMANDS.getOlympaPerm().getMinGroup().getName(p.getGender())));
-		
-		inv.setItem(2, ItemUtils.item(Material.WOODEN_AXE, "§6Bypass WorldEdit", "§7Permet d'utiliser les fonctionnalités WorldEdit", "§7sur tous les plots et la route"));
-		inv.setItem(2 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().getMinGroup().getName(p.getGender())));
-		
-		inv.setItem(3, ItemUtils.item(Material.REDSTONE_TORCH, "§6Fake owner", "§7Permet d'éditer les paramètres du plot comme si", "§7vous en étiez le propriétaire"));
-		inv.setItem(3 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + StaffPerm.BYPASS_WORLDEDIT.getOlympaPerm().getMinGroup().getName(p.getGender())));
+		setItem(0, ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Bypass kick/ban plot", "§7Permet d'entrer sur les plots même", "§7si le propriétaire vous en a banni"), getConsumer(perm, sPerm));	
+		setItem(0 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
-		inv.setItem(4, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
-		inv.setItem(4 + 9, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "));
-		
-		//inv.setItem(5, ItemUtils.item(Material.TNT, "§4Reset de la parcelle " + plot, "§cPour reset la parcelle, cliquez ici", "§cavec une TNT dans la main", "§4ATTENTION : Cette action est irréversible !"));
-		
-		inv.setItem(5, ItemUtils.item(Material.PAPER, "§6Désactivation de tous les tags custom", "§2Fonction de sécurité.", "§7Permet de désactiver tous", "§7les tags NBT custom sur le serveur en cas", "§7de problème.", "§cAttention : au redémarage, les tags custom seront de nouveau activés !"));
-		inv.setItem(5 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS.getMinGroup().getName(p.getGender())));
-		
-		inv.setItem(6, ItemUtils.item(Material.DIAMOND_AXE, "§6Désactivation totale de WorldEdit", "§2Fonction de sécurité.", "§7Permet d'interromptre instantanément", "§7toutes les tâches WorldEdit sur le serveur", "§7et de désactiver le plugin.", "§cAttention : au redémarage, WorldEdit sera de nouveau activé !", "§cIl est impossible de réactiver WorldEdit une fois qu'il a été désactivé."));
-		inv.setItem(6 + 9, ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT.getMinGroup().getName(p.getGender())));
-		
-		//TODO clear plot, stoplag plot, ...
-		
-		if (p.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN))
-			toggleSwitch(0);
-		if (p.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
-			toggleSwitch(1);
-		if (p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
-			toggleSwitch(2);
-		if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
-			toggleSwitch(3);
+		perm = PermissionsList.STAFF_BYPASS_VANILLA_COMMANDS;
+		sPerm = StaffPerm.BYPASS_VANILLA_COMMANDS;
+		setItem(1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Bypass commandes vanilla", "§7Permet de ne pas être affecté par", "§7les commandes vanilla du type /kill, /tp, ..."), getConsumer(perm, sPerm));	
+		setItem(1 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
-		if (NBTcontrollerUtil.getDenyAllCustomFlags())
-			toggleSwitch(5);
-		
-		if (plugin.getWorldEditManager() == null || !plugin.getWorldEditManager().isEnabled())
-			toggleSwitch(6);
-	}
+		perm = PermissionsList.STAFF_BYPASS_WORLDEDIT;
+		sPerm = StaffPerm.BYPASS_WORLDEDIT;
+		setItem(2, ItemUtils.item(Material.WOODEN_AXE, "§6Bypass WorldEdit", "§7Permet d'utiliser les fonctionnalités WorldEdit", "§7sur tous les plots et la route"), getConsumer(perm, sPerm));	
+		setItem(2 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
-	@Override
-	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
-		
-		switch (slot) {
-		case 0:
-			if (p.toggleStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) 
-				toggleSwitch(slot);
-			break;
-			
-		case 1:
-			if (p.toggleStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
-				toggleSwitch(slot);
-			break;
-			
-		case 2:
-			if (p.toggleStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
-				toggleSwitch(slot);
-			break;
-			
-		case 3:
-			if (p.toggleStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))	
-				toggleSwitch(slot);
-			break;
-			
-		case 5:
-			if (PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS.hasPermission(p)) {
-				NBTcontrollerUtil.setDenyAllCustomFlags(!NBTcontrollerUtil.getDenyAllCustomFlags());
-				p.getPlayer().sendMessage("§aLes tags custom ont été toggle.");
-				toggleSwitch(slot);	
-			}
-			break;
-			
-		case 6:
-			if (PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT.hasPermission(p) && plugin.isWeEnabled()) {
-				plugin.disableWorldEdit();
-				p.getPlayer().sendMessage("§aWorldEdit a bien été désactivé.");
-				toggleSwitch(slot);	
-			}
-			break;
-			
-		}
-		return true;
-	}
-	
-	/*
-	@SuppressWarnings("deprecation")
-	@Override
-	public boolean onClickCursor(Player player, ItemStack current, ItemStack cursor, int slot) {
-		if (slot != 5 || cursor.getType() != Material.TNT || plot == null || !p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
-			return true;
-		
-		if (plugin.getWorldEditManager() == null)
-			return true;
-		
-		current.setAmount(0);
-		player.closeInventory();
-		player.sendMessage("§cLa parcelle " + plot + " est en train de se régénérer. Merci de ne pas relancer le processus.");
+		perm = PermissionsList.STAFF_PLOT_FAKE_OWNER;
+		sPerm = StaffPerm.FAKE_OWNER_EVERYWHERE;
+		setItem(3, ItemUtils.item(Material.REDSTONE_TORCH, "§6Fake owner", "§7Permet d'éditer les paramètres du plot comme si", "§7vous en étiez le propriétaire"), getConsumer(perm, sPerm));	
+		setItem(3 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
+		setItem(4, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "), null);
+		setItem(4 + 9, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "), null);
+		
+		//désactivation worldedit et tags custom
 
-    	IAsyncWorldEdit awe = (IAsyncWorldEdit) Bukkit.getPluginManager().getPlugin("AsyncWorldEdit");
-    	IThreadSafeEditSession tsSession = ((IAsyncEditSessionFactory)plugin.getWorldEditManager().getSession(player))
-    			.getThreadSafeEditSession(new BukkitWorld(plugin.getWorldManager().getWorld()), 0);
-	
-    	awe.getBlockPlacer().performAsAsyncJob(tsSession, awe.getPlayerManager().getConsolePlayer(), "reset_plot_" + plot, 
-    			new IFuncParamEx<Integer, ICancelabeEditSession, MaxChangedBlocksException>() {
+		final OlympaPermission p1 = PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS;
+		setItem(5, ItemUtils.item(Material.PAPER, "§6Désactivation de tous les tags custom", "§2Fonction de sécurité.", "§2Clic molette pour modifier.", " ", "§7Permet de désactiver tous", "§7les tags NBT custom sur le serveur en cas", "§7de problème.", "§cAttention : au redémarage, les tags custom seront de nouveau activés !"), 
+				(it, c, s) -> {
+					if (!p1.hasPermission(p) || c != ClickType.MIDDLE)
+						return;
 					
-					@Override
-					public Integer execute(ICancelabeEditSession editSession) throws MaxChangedBlocksException {
-						
-						Location pos1 = plot.getPlotId().getLocation().clone();
-						pos1.setY(0);
-						Location pos2 = plot.getPlotId().getLocation().clone();
-						pos2.setY(256);
-						pos2 = pos2.add(WorldManager.plotSize - 1, 0, WorldManager.plotSize - 1);
-						
-						Bukkit.broadcastMessage("pos1 : " + pos1 + " - pos2 : " + pos2);
-						
-					    Region region = new CuboidRegion(editSession.getWorld(), getBlockVector(pos1), getBlockVector(pos2));
-					    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
-					    try {
-						    
-						    for (int x = clipboard.getMinimumPoint().getBlockX() ; x <= clipboard.getMaximumPoint().getBlockX() ; x++)
-							    for (int y = clipboard.getMinimumPoint().getBlockY() ; y <= clipboard.getMaximumPoint().getBlockY() ; y++)
-								    for (int z = clipboard.getMinimumPoint().getBlockZ() ; z <= clipboard.getMaximumPoint().getBlockZ() ; z++)
-								    	if (y > WorldManager.worldLevel)
-											clipboard.setBlock(BlockVector3.at(x, y, z), BlockTypes.AIR.getDefaultState());
-								    	else if (y == 0)
-											clipboard.setBlock(BlockVector3.at(x, y, z), BlockTypes.BEDROCK.getDefaultState());
-								    	else if (y < WorldManager.worldLevel)
-											clipboard.setBlock(BlockVector3.at(x, y, z), BlockTypes.DIRT.getDefaultState());
-								    	else //if (y == WorldManager.worldLevel)
-											clipboard.setBlock(BlockVector3.at(x, y, z), BlockTypes.GRASS.getDefaultState());
-						    
+					NBTcontrollerUtil.setDenyAllCustomFlags(!NBTcontrollerUtil.getDenyAllCustomFlags());
+					setItem(5 + 9, getStateIndicator(NBTcontrollerUtil.getDenyAllCustomFlags(), p1), null);
+				});	
+		setItem(5 + 9, getStateIndicator(NBTcontrollerUtil.getDenyAllCustomFlags(), p1), null);
 
-						    Operation operation = new ClipboardHolder(clipboard)
-						            .createPaste(editSession)
-						            .to(clipboard.getMinimumPoint())
-						            // configure here
-						            .build();
-						    Operations.complete(operation);
-					        //IAsyncWorldEditHandler.registerCompletion(player);
-					    }catch(WorldEditException e) {
-						    	e.printStackTrace();
-						}
-						return 1;
-					}
-	    		});
-	    return true;
+		
+		final OlympaPermission p2 = PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT;
+		setItem(6, ItemUtils.item(Material.DIAMOND_AXE, "§6Désactivation totale de WorldEdit", "§2Fonction de sécurité.", "§2Clic molette pour modifier.", " ", "§7Permet d'interromptre instantanément", "§7toutes les tâches WorldEdit sur le serveur", "§7et de désactiver le plugin.", "§cAttention : au redémarage, WorldEdit sera de nouveau activé !", "§cIl est impossible de réactiver WorldEdit une fois qu'il a été désactivé."),
+				(it, c, s) -> {
+					if (!p2.hasPermission(p) || !plugin.isWeEnabled() || c != ClickType.MIDDLE)
+						return;
+					
+					plugin.disableWorldEdit();
+					
+					setItem(6 + 9, getStateIndicator(!plugin.isWeEnabled(), p2), null);
+				});
+		setItem(6 + 9, getStateIndicator(!plugin.isWeEnabled(), p2), null);
+		
 	}
 
-	
-	private BlockVector3 getBlockVector(Location loc) {
-		return BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+	private TriConsumer<ItemStack, ClickType, Integer> getConsumer(OlympaPermission perm, StaffPerm sPerm){
+		return (it, c, s) -> {
+			if (!perm.hasPermission(p))
+				return;
+			
+			p.toggleStaffPerm(sPerm);
+			setItem(s + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
+		};
 	}
-	*/
 	
-	//switch l'apparence du switch
-	private void toggleSwitch(int slot) {
-		if (inv.getItem(slot) == null)
-			return;
-		
-		ItemStack it = inv.getItem(slot);
-		
-		if (ItemUtils.hasEnchant(it, Enchantment.DURABILITY)) {
-			it = ItemUtils.removeEnchant(it, Enchantment.DURABILITY);
-			
-			inv.getItem(slot + 9).setType(Material.RED_WOOL);
-			inv.setItem(slot + 9, ItemUtils.name(inv.getItem(slot + 9), "§cInactif"));
-		}else {
-			it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
-			
-			ItemMeta itMeta = it.getItemMeta();
-			itMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			it.setItemMeta(itMeta);
-			
-			inv.getItem(slot + 9).setType(Material.GREEN_WOOL);
-			inv.setItem(slot + 9, ItemUtils.name(inv.getItem(slot + 9), "§aActif"));
-		}
+	private ItemStack getStateIndicator(boolean state, OlympaPermission perm) {
+		if (state)
+			return ItemUtils.item(Material.LIME_WOOL, "§aActif", "§7Rang nécessaire : " + perm.getMinGroup().getName(p.getGender()), " ", "§7Pour modifier la valeur, cliquez", "§7sur l'item au dessus");
+		else
+			return ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + perm.getMinGroup().getName(p.getGender()), " ", "§7Pour modifier la valeur, cliquez", "§7sur l'item au dessus");
 	}
 }
