@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
+import com.boydti.fawe.Fawe;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 import fr.olympa.api.command.essentials.tp.TpaHandler;
@@ -30,7 +32,7 @@ import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.AWEProgressBar;
-import fr.olympa.olympacreatif.worldedit.WorldEditListener;
+import fr.olympa.olympacreatif.worldedit.WorldEditManager;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
 
@@ -41,11 +43,12 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private CommandBlocksManager cbManager;
 
 	private PermissionsManager permsManager;
+	private WorldEditManager weManager;
 	
 	//private LuckPerms luckperms;
 	
-	private WorldEditPlugin we = null;
-	private IAsyncWorldEdit awe = null;
+	/*private WorldEditPlugin we = null;
+	private IAsyncWorldEdit awe = null;*/
 	
 	private static OlympaCreatifMain plugin;
 
@@ -87,6 +90,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		cbManager = new CommandBlocksManager(this);
 		permsManager = new PermissionsManager(this);
 
+		weManager = new WorldEditManager(this);
+		
 		//OlympaCorePermissions.GROUP_COMMAND.allowGroup(OlympaGroup.DEV);
 		
 		//get luckperms api provider
@@ -97,6 +102,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		
 		
 		//hook into worldedit & asyncworldedit
+		
+		/*
 		we = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
 	    awe = (IAsyncWorldEdit) getServer().getPluginManager().getPlugin("AsyncWorldEdit");
 	    
@@ -113,16 +120,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
 			Bukkit.getLogger().log(Level.FINE, getPrefixConsole() + "Successfully loaded WorldEdit and AWE custom progressbar.");
 			weEnabled = true;
-		}   
-	}
-	
-	public void disableWorldEdit() {
-		weEnabled = false;
-		//permsManager.removeWePerms();
-	}
-	
-	public boolean isWeEnabled() {
-		return weEnabled;
+		}   */
 	}
 
 	@Override
@@ -166,20 +164,18 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		if (p.getCustomScoreboardLines().size() > i)
 			return p.getCustomScoreboardLines().get(i);
 
-		Plot plot;
+		Plot plot = p.getCurrentPlot();
 		switch (i) {
 		case 0:
 			return "§1";
 
 		case 1:
-			plot = p.getCurrentPlot();
 			if (plot == null)
 				return "§7Parcelle : §eaucune";
 			else
 				return "§7Parcelle : §e" + plot;
 
 		case 2:
-			plot = p.getCurrentPlot();
 			if (plot == null)
 				return "§7Proprio : §eaucun";
 			else
@@ -192,7 +188,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			return "§7Grade : " + p.getGroupNameColored();
 
 		case 5:
-			plot = p.getCurrentPlot();
 			if (plot == null)
 				return "§7Rang : " + PlotRank.VISITOR.getRankName();
 			else
@@ -205,8 +200,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			return "§7" + p.getGameMoneyName() + " : §6" + p.getGameMoney() + p.getGameMoneySymbol();
 
 		case 8:
-			plot = p.getCurrentPlot();
-
 			if (p.getCustomScoreboardLines().size() > 0 && plot != null)
 				return "§8Sidebar plot " + plot;
 			else
@@ -219,14 +212,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		return worldManager;
 	}
 
-	public WorldEditPlugin getWorldEditManager() {
-		return we;
+	
+	public WorldEditManager getWEManager() {
+		return weManager;
 	}
-
-	/*
-	public LuckPerms getLuckPerms() {
-		return luckperms;
-	}*/
 
 	public PlotsManager getPlotsManager() {
 		return plotsManager;

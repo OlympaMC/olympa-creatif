@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
 
 import fr.olympa.api.provider.AccountProvider;
@@ -356,8 +357,8 @@ public class Plot {
 		p.resetPlayerTime();
 		p.resetPlayerWeather();
 		
-		if (plugin.getWorldEditManager() != null) {
-			LocalSession weSession = plugin.getWorldEditManager().getSession(p);
+		if (plugin.getWEManager() != null) {
+			LocalSession weSession = plugin.getWEManager().getWe().getSessionManager().get(BukkitAdapter.adapt(p));
 			
 			if (weSession != null) {
 				//clear clipboard si le joueur n'en est pas le proprio

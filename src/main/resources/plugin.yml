@@ -5,5 +5,5 @@ author: Bullobily
 main: fr.olympa.olympacreatif.OlympaCreatifMain
 
 depend: [OlympaCore]
-softdepend: [WorldEdit, AsyncWorldEdit, JukeBox]
+softdepend: [WorldEdit, AsyncWorldEdit, FastAsyncWorldEdit, JukeBox]
 api-version: 1.15

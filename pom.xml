@@ -41,6 +41,12 @@
 	    </snapshots>
 	  </repository>
 	  
+			  <!-- FAWE -->
+		<repository>
+		  <id>IntellectualSites</id>
+		  <url>https://mvn.intellectualsites.com/content/repositories/releases/</url>
+		</repository>
+	  
 		<repository>
 		    <id>jitpack.io</id>
 		    <url>https://jitpack.io</url>
@@ -50,6 +56,13 @@
 	
 	
 	<dependencies>
+	<!-- FAWE API -->
+		<dependency>
+		  <groupId>com.intellectualsites.fawe</groupId>
+		  <artifactId>FAWE-Bukkit</artifactId>
+		  <version>1.16-448</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.primesoft.asyncworldedit</groupId>
 			<artifactId>AsyncWorldEdit-API</artifactId>
