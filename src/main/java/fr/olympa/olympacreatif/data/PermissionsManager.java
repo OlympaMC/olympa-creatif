@@ -45,7 +45,7 @@ public class PermissionsManager implements Listener{
 		config.getStringList("cb_perms").stream().forEach(OlympaGroup.PLAYER::setRuntimePermission);
 		config.getStringList("we_perms").stream().forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::setRuntimePermission);
 
-        plugin.getLogger().log(Level.INFO, "§aWorldEdit & vanilla perms successfully respectively added to " + OlympaGroup.PLAYER + " and " + PermissionsList.USE_WORLD_EDIT.getMinGroup());
+        plugin.getLogger().log(Level.INFO, "§aVanilla & WorldEdit permissions have been successfully added to " + OlympaGroup.PLAYER + " and " + PermissionsList.USE_WORLD_EDIT.getMinGroup() + " groups.");
 	}
 	
 	public void removeCbPerms() {

@@ -212,7 +212,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		return worldManager;
 	}
 
-	
 	public WorldEditManager getWEManager() {
 		return weManager;
 	}

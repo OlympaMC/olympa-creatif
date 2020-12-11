@@ -87,7 +87,11 @@ public class WorldEditManager extends EventHandler implements Listener {
 	    	if (plot == null || plot.getMembers().getPlayerLevel(p) < 3) {
 	    		p.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue(plot));
 	    		return null;	
+	    	} else if (!isWeEnabled) {
+	    		p.getPlayer().sendMessage("§dPour des raisons de sécurité, WorldEdit a été désactivé temporairement.");
+	    		return null;
 	    	}
+	    		
 	            /*return new FaweMask(new CuboidRegion(
 	            		BlockVector3.at(p.getPlayer().getLocation().getBlockX(), p.getPlayer().getLocation().getBlockY(), p.getPlayer().getLocation().getBlockZ()), 
 	            		BlockVector3.at(p.getPlayer().getLocation().getBlockX(), p.getPlayer().getLocation().getBlockY(), p.getPlayer().getLocation().getBlockZ()))) {

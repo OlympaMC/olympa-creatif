@@ -1,5 +1,10 @@
 package fr.olympa.olympacreatif.data;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,6 +47,15 @@ public class DataManager implements Listener {
 				"`message_id` TINYTEXT NOT NULL DEFAULT ''," + 
 				"`message_string` VARCHAR(512) NOT NULL DEFAULT ''," +
 				"PRIMARY KEY (`message_id`));"
+				);
+	
+	private final OlympaStatement osTableCreatePlotSchems = new OlympaStatement(
+			"CREATE TABLE IF NOT EXISTS `creatif_plotschems` (" + 
+				"`plot_id` INT NOT NULL," + 
+				"`player_id` BIGINT(20) NOT NULL," +
+				"`schem_name` VARCHAR(128) NOT NULL DEFAULT ''," +
+				"`schem_data` BLOB(4) NOT NULL," +
+				"PRIMARY KEY (`plot_id`));"
 				);
 	
 	private final OlympaStatement osTableCreatePlotParameters = new OlympaStatement(
@@ -113,6 +127,15 @@ public class DataManager implements Listener {
 			"ON DUPLICATE KEY UPDATE " +
 			"plot_parameters = VALUES(plot_parameters);"
 			);
+	private final OlympaStatement osUpdatePlotSchem = new OlympaStatement(
+			"INSERT INTO creatif_plotschems" +
+			"(`plot_id`, `player_id`, `schem_name`, `schem_data`) " +
+			"VALUES (?, ?, ?, ?) " + 
+			"ON DUPLICATE KEY UPDATE " +
+			"player_id = VALUES(player_id), " +
+			"schem_name = VALUES(schem_name), " +
+			"schem_data = VALUES(schem_data);"
+			);
 	
 	public DataManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -122,6 +145,7 @@ public class DataManager implements Listener {
 		//création tables
 		try {
 			osTableCreateMessages.getStatement().execute();
+			osTableCreatePlotSchems.getStatement().execute();
 			osTableCreatePlotParameters.getStatement().execute();
 			osTableCreatePlotMembers.getStatement().execute();
 			
@@ -304,4 +328,32 @@ public class DataManager implements Listener {
 			return 0;
 		}
 	}
+	
+	public synchronized void saveSchemToDb(OlympaPlayerCreatif p, Plot plot, File schem) {
+		try {
+			PreparedStatement ps = osUpdatePlotSchem.getStatement();
+
+			ps.setInt(1, plot.getPlotId().getId());
+			ps.setLong(2, p.getId());
+			ps.setString(3, schem.getName());
+			ps.setBlob(4, new FileInputStream(schem));
+			
+		} catch (SQLException | FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

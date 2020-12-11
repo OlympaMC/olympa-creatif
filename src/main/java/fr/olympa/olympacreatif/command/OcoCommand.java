@@ -85,10 +85,9 @@ public class OcoCommand extends OlympaCommand {
 					return false;
 				}
 				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
-				if (plot != null && plot.getMembers().getPlayerRank(p.getPlayer()) == PlotRank.OWNER) {
-					plugin.getPerksManager().getSchematicCreator().export(plot);
-					p.getPlayer().sendMessage(Message.OCO_EXPORT_SUCCESS.getValue(plot));
-				}else
+				if (plot != null && plot.getMembers().getPlayerRank(p.getPlayer()) == PlotRank.OWNER)
+					plugin.getPerksManager().getSchematicCreator().export(plot, p);
+				else
 					p.getPlayer().sendMessage(Message.OCO_EXPORT_FAILED.getValue(plot));					
 					
 				break;

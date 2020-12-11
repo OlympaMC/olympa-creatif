@@ -4,13 +4,30 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
+import org.bukkit.entity.Player;
+
+import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.util.EditSessionBuilder;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.world.WorldManager;
 import net.minecraft.server.v1_15_R1.BlockPosition;
@@ -27,15 +44,63 @@ public class SchematicCreator {
 	    this.plugin = plugin;
 	}
 	    
-	public String export(Plot plot) {
-		return "§4La fonctionnalité d'export de la parcelle est indisponible pendant la bêta, désolé ¯\\_༼ ಥ ‿ ಥ ༽_/¯";
-		//String fileName = plot.getMembers().getOwner().getName() + "-" + plot.getPlotId();
-		
-		//return export(fileName, plot.getPlotId().getLocation().getBlockX(), 1, plot.getPlotId().getLocation().getBlockZ(), 
-		//		plot.getPlotId().getLocation().getBlockX() + plotXsize - 1, 255, plot.getPlotId().getLocation().getBlockZ() + plotZsize - 1);
+	public void export(Plot plot, OlympaPlayerCreatif p) {
+	    if (!plugin.getWEManager().isWeEnabled()) {
+	    	p.getPlayer().sendMessage(Message.WE_DISABLED.getValue());
+	    	return;
+	    }
+	    	
+	    plugin.getTask().runTaskAsynchronously(() -> {
+			
+			//création fichier & dir si existants
+		    File dir = new File(plugin.getDataFolder() + "/schematics");
+		    File schemFile = new File(dir.getAbsolutePath(), plot.getMembers().getOwner().getName() + "_" + plot.getPlotId() + ".schem");
+		    plugin.getDataFolder().mkdir();
+		    dir.mkdir();
+		    try {
+				schemFile.delete();
+				schemFile.createNewFile();
+				schemFile.deleteOnExit();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+		    //create the Clipboard to copy
+		    BlockVector3 v1 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX(), 0, plot.getPlotId().getLocation().getBlockZ());
+		    BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + WorldManager.plotSize - 1, 255, plot.getPlotId().getLocation().getBlockZ() + WorldManager.plotSize - 1);
+		    
+		    CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), v1, v2);
+		    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+
+		    EditSession session = new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld())));
+
+		    ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(session, region, clipboard, region.getMinimumPoint());
+		    forwardExtentCopy.setCopyingEntities(true);
+		    Operations.complete(forwardExtentCopy);
+		    
+		    
+		    //Generates the .schematic file from the clipboard
+			try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(schemFile))) {
+			    writer.write(clipboard);
+			    
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
+		    p.getPlayer().sendMessage(Message.WE_COMPLETE_GENERATING_PLOT_SCHEM.getValue(plot));
+	    });
+	    
+	    p.getPlayer().sendMessage(Message.WE_START_GENERATING_PLOT_SCHEM.getValue(plot));
+		//return "§4La fonctionnalité d'export de la parcelle est indisponible pendant la bêta, désolé ¯\\_༼ ಥ ‿ ಥ ༽_/¯";
 	}
 	
 
+	/*
 	//renvoie le nom du fichier si créé correctement, sinon null
 	public String export(String fileName, int x1, int y1, int z1, int x2, int y2, int z2) {
 		
@@ -158,7 +223,7 @@ public class SchematicCreator {
                 }
             }
         }
-    }
+    }*/
 }
 
 
