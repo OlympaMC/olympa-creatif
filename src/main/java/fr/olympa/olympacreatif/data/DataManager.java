@@ -54,7 +54,7 @@ public class DataManager implements Listener {
 				"`plot_id` INT NOT NULL," + 
 				"`player_id` BIGINT(20) NOT NULL," +
 				"`schem_name` VARCHAR(128) NOT NULL DEFAULT ''," +
-				"`schem_data` BLOB(4) NOT NULL," +
+				"`schem_data` MEDIUMBLOB NOT NULL," +
 				"PRIMARY KEY (`plot_id`));"
 				);
 	
@@ -337,6 +337,7 @@ public class DataManager implements Listener {
 			ps.setLong(2, p.getId());
 			ps.setString(3, schem.getName());
 			ps.setBlob(4, new FileInputStream(schem));
+			ps.executeUpdate();
 			
 		} catch (SQLException | FileNotFoundException e) {
 			e.printStackTrace();
