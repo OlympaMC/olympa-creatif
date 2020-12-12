@@ -55,7 +55,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private ScoreboardManager<OlympaPlayerCreatif> scm;
 
 	public Random random = new Random();
-	private boolean weEnabled = false;
 
 	/*
 	@Override //defines the custom world generator 
@@ -79,7 +78,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		
 		new OcCommand(this, "oc", OcCommand.subArgsList.toArray(new String[OcCommand.subArgsList.size()])).register();
 		new OcoCommand(this, "oco", OcoCommand.subArgsList.toArray(new String[OcoCommand.subArgsList.size()])).register();
-		new OcaCommand(this, "oca", new String[] {}).register();
+		new OcaCommand(this, "oca", OcaCommand.subArgsList.toArray(new String[OcaCommand.subArgsList.size()])).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.TPA), plugin);
 		

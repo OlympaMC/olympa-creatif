@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.Vector;
 
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,7 +40,6 @@ public class DataManager implements Listener {
 
 	private Vector<PlotId> plotsToLoad = new Vector<PlotId>();
 	private Vector<Plot> plotsToSave = new Vector<Plot>();
-	private Vector<PlotId> loadedPlots = new Vector<PlotId>();
 	
 	//statements de création des tables
 	private final OlympaStatement osTableCreateMessages = new OlympaStatement(
@@ -207,10 +207,11 @@ public class DataManager implements Listener {
 	}
 	
 	private synchronized void loadPlot(PlotId plotId) {
-		if (plotId == null || loadedPlots.contains(plotId))
+		if (plotId == null)
 			return;
 		
-		loadedPlots.add(plotId);
+		//Bukkit.broadcastMessage("DATAMANAGER LOADING PLOT " + plotId + " IN PROGRESS");
+		
 		//CREATION DU PLOT
 		try {
 			
@@ -263,7 +264,7 @@ public class DataManager implements Listener {
 			AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData, 
 					getPlotOwnerDatasResult.getBoolean(KitType.FLUIDS.getBddKey()));
 			
-			plugin.getPlotsManager().addAsyncPlot(plot, plotId);
+			plugin.getPlotsManager().addAsyncPlot(plot);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -281,9 +282,6 @@ public class DataManager implements Listener {
 	}*/
 	
 	private synchronized void savePlotToBddSync(Plot plot) {
-		if (!loadedPlots.remove(plot.getPlotId()))
-			return;
-		
 		try {
 			int id = plot.getPlotId().getId();
 			

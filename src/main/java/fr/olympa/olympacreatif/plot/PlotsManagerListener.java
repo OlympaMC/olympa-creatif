@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.plot;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,6 +36,8 @@ public class PlotsManagerListener implements Listener {
 		//si l'ancien/nouveau plot sont égaux, return, sinon chargement du plot
 		PlotId oldId = PlotId.fromLoc(plugin, oldLoc);
 		PlotId newId = PlotId.fromLoc(plugin, newLoc);
+		
+		//Bukkit.broadcastMessage("TRY TO LOAD PLOT "  + newId);
 		
 		if (newId != null && !newId.equals(oldId))
 			plugin.getPlotsManager().loadExistingPlot(newId);

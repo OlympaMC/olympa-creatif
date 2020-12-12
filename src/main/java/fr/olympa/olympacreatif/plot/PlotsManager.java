@@ -32,7 +32,7 @@ public class PlotsManager {
 	
 	private Set<Plot> loadedPlots = new HashSet<Plot>();
 	
-	private List<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
+	private Vector<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
 	
 	private int plotCount;
 	
@@ -51,8 +51,10 @@ public class PlotsManager {
 			public void run() {
 				synchronized (asyncPlots) {
 					for (AsyncPlot ap : asyncPlots)
-						loadedPlots.add(new Plot(ap));
-					
+						if (!isPlotLoaded(ap.getId())) 
+							loadedPlots.add(new Plot(ap));
+							//Bukkit.broadcastMessage("FINALLY LOADED PLOT " + ap.getId());
+						
 					asyncPlots.clear();	
 				}
 			}
@@ -164,14 +166,20 @@ public class PlotsManager {
 		if (id == null)
 			return;
 		
-		for (Plot plot : loadedPlots)
-			if (plot.getPlotId().equals(id))
-				return;
+		if (isPlotLoaded(id))
+			return;
 		
 		//si le plot existe mais n'est pas encore chargé, chargement depuis la bdd
 		plugin.getDataManager().addPlotToLoadQueue(id);
 	}
 	
+	public boolean isPlotLoaded(PlotId id) {
+		for (Plot plot : loadedPlots)
+			if (plot.getPlotId().equals(id))
+				return true;
+		
+		return false;
+	}
 	
 	
 	public Plot createPlot(Player p) {
@@ -237,10 +245,10 @@ public class PlotsManager {
 		return plotCount;
 	}
 	
-	public void addAsyncPlot(AsyncPlot plot, PlotId plotId) {
+	public void addAsyncPlot(AsyncPlot plot) {
 		if (plot != null)
-			synchronized (asyncPlots) {
-				asyncPlots.add(plot);
+			synchronized (plot) {
+				asyncPlots.add(plot);	
 			}
 	}
 	/*
