@@ -3,7 +3,9 @@ package fr.olympa.olympacreatif.data;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,48 +15,44 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.permissions.PermissionAttachment;
-
-import com.google.common.collect.ImmutableMap; 
-
+import fr.olympa.api.economy.OlympaMoney;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;
+import fr.olympa.api.sql.SQLColumn;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
-import fr.olympa.olympacreatif.world.WorldEventsListener;
 
 public class OlympaPlayerCreatif extends OlympaPlayerObject {
-
-	public static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
-			.put("gameMoney", "INT NOT NULL DEFAULT 0")
-			
-			.put("hasRedstoneKit", "TINYINT NOT NULL DEFAULT 0")
-			.put("hasPeacefulMobsKit", "TINYINT NOT NULL DEFAULT 0")
-			.put("hasHostileMobsKit", "TINYINT NOT NULL DEFAULT 0")
-			.put("hasFluidKit", "TINYINT NOT NULL DEFAULT 0")
-			.put("hasCommandblockKit", "TINYINT NOT NULL DEFAULT 0")
-			.put("hasAdminKit", "TINYINT NOT NULL DEFAULT 0")
-
-			.put("upgradeLevelCommandBlock", "TINYINT NOT NULL DEFAULT 0")
-			.put("upgradeLevelBonusPlots", "TINYINT NOT NULL DEFAULT 0")
-			.put("upgradeLevelBonusMembers", "TINYINT NOT NULL DEFAULT 0")
-
-			.put("playerParamDefaultPlotChat", "TINYINT NOT NULL DEFAULT 1")
-			.put("playerParamOpenMenuOnSneak", "TINYINT NOT NULL DEFAULT 1")
-			
-			.build();
+	
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_MONEY = new SQLColumn<OlympaPlayerCreatif>("gameMoney", "INT NOT NULL DEFAULT 0", Types.INTEGER).setUpdatable();
+	
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_REDSTONE_KIT = new SQLColumn<OlympaPlayerCreatif>("hasRedstoneKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PEACEFUL_KIT = new SQLColumn<OlympaPlayerCreatif>("hasPeacefulMobsKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_HOSTILE_KIT = new SQLColumn<OlympaPlayerCreatif>("hasHostileMobsKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_FLUID_KIT = new SQLColumn<OlympaPlayerCreatif>("hasFluidKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_COMMANDBLOCK_KIT = new SQLColumn<OlympaPlayerCreatif>("hasCommandblockKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_ADMIN_KIT = new SQLColumn<OlympaPlayerCreatif>("hasAdminKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_COMMANDBLOCK = new SQLColumn<OlympaPlayerCreatif>("upgradeLevelCommandBlock", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_BONUSPLOTS = new SQLColumn<OlympaPlayerCreatif>("upgradeLevelBonusPlots", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_BONUSMEMBERS = new SQLColumn<OlympaPlayerCreatif>("upgradeLevelBonusMembers", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_DEFAULT_PLOT_CHAT = new SQLColumn<OlympaPlayerCreatif>("playerParamDefaultPlotChat", "TINYINT(1) NOT NULL DEFAULT 1", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_MENU_ON_SNEAK = new SQLColumn<OlympaPlayerCreatif>("playerParamOpenMenuOnSneak", "TINYINT(1) NOT NULL DEFAULT 1", Types.TINYINT).setUpdatable();
+	
+	public static final List<SQLColumn<OlympaPlayerCreatif>> COLUMNS =
+			Arrays.asList(COLUMN_MONEY, COLUMN_REDSTONE_KIT, COLUMN_PEACEFUL_KIT, COLUMN_HOSTILE_KIT, COLUMN_FLUID_KIT, COLUMN_COMMANDBLOCK_KIT, COLUMN_ADMIN_KIT, COLUMN_UPGRADE_COMMANDBLOCK, COLUMN_UPGRADE_BONUSPLOTS, COLUMN_UPGRADE_BONUSMEMBERS, COLUMN_PARAM_DEFAULT_PLOT_CHAT, COLUMN_PARAM_MENU_ON_SNEAK);
 	
 	private OlympaCreatifMain plugin;
 	
 	//A CHANGER AVACE BETA OUVERTE
 	//private int gameMoney = 0;
-	private int gameMoney = 1500;
+	private OlympaMoney gameMoney = new OlympaMoney(0);
 
 	private Set<KitType> kits = new HashSet<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();
@@ -76,11 +74,13 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 
 		playerParams.add(PlayerParamType.DEFAULT_PLOT_CHAT);
 		playerParams.add(PlayerParamType.OPEN_GUI_ON_SNEAK);
+		
+		gameMoney.observe("datas", () -> COLUMN_MONEY.updateValue(this, gameMoney.get()));
 	}
 	
 	@Override
 	public void loadDatas(ResultSet resultSet) throws SQLException {
-		gameMoney = resultSet.getInt("gameMoney");
+		gameMoney.set(resultSet.getInt("gameMoney"));
 		
 		for (KitType kit : KitType.values())
 			if (resultSet.getBoolean(kit.getBddKey()))
@@ -127,15 +127,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 				statement.setBoolean(i, false);
 	}
 	
-	public void addGameMoney(int i) {
-		gameMoney += Math.max(i, 0);
-	}
-	
-	public void removeGameMoney(int i) {
-		gameMoney -= Math.max(i, 0);
-	}
-	
-	public int getGameMoney() {
+	public OlympaMoney getGameMoney() {
 		return gameMoney;
 	}
 	
