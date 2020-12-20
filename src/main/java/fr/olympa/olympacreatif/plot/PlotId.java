@@ -106,7 +106,9 @@ public class PlotId {
 		if (id == null)
 			return null;
 		
-		if (id <= plugin.getPlotsManager().getTotalPlotCount())
+		if (plugin.getPlotsManager() == null)
+			return new PlotId(plugin, id);
+		else if (id <= plugin.getPlotsManager().getTotalPlotCount())
 			return new PlotId(plugin, id);
 		else
 			return null;

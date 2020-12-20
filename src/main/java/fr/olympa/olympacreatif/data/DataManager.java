@@ -198,6 +198,20 @@ public class DataManager implements Listener {
 			
 			while(getPlayerPlotsResult.next()) {
 				PlotId id = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
+
+				//update player name in members table
+				if (!e.getPlayer().getName().equals(getPlayerPlotsResult.getString("player_name")) && !getPlayerPlotsResult.getString("player_name").equals("Spawn")) {
+					PreparedStatement updPlayerMember = osUpdatePlayerPlotRank.getStatement();
+					updPlayerMember.setInt(1, id.getId());
+					updPlayerMember.setLong(2, e.getOlympaPlayer().getId());
+					updPlayerMember.setString(3, e.getPlayer().getName());
+					updPlayerMember.setString(4, e.getOlympaPlayer().getUniqueId().toString());
+					updPlayerMember.setInt(5, getPlayerPlotsResult.getInt("player_plot_level"));
+					
+					updPlayerMember.executeUpdate();
+				}  
+				
+				//add plot to load task
 				addPlotToLoadQueue(id);
 			}
 			
@@ -221,7 +235,9 @@ public class DataManager implements Listener {
 			getPlotDatas.setInt(1, plotId.getId());
 			ResultSet getPlotDatasResult = getPlotDatas.executeQuery();
 			
-			getPlotDatasResult.next();
+			if (!getPlotDatasResult.next())
+				return;
+			
 			PlotParameters plotParams = PlotParameters.fromJson(plugin, plotId, getPlotDatasResult.getString("plot_parameters"));
 			
 			//get owner id
@@ -266,7 +282,6 @@ public class DataManager implements Listener {
 			
 			plugin.getPlotsManager().addAsyncPlot(plot);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -309,7 +324,6 @@ public class DataManager implements Listener {
 				}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

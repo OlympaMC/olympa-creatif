@@ -1,10 +1,5 @@
 package fr.olympa.olympacreatif.world;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
@@ -14,26 +9,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.perks.KitsManager.KitType;
-import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
-import net.minecraft.server.v1_15_R1.ItemStack;
-import net.minecraft.server.v1_15_R1.PacketPlayInBlockPlace;
-import net.minecraft.server.v1_15_R1.PacketPlayInPickItem;
 import net.minecraft.server.v1_15_R1.PacketPlayInSetCreativeSlot;
-import net.minecraft.server.v1_15_R1.PacketPlayInUseItem;
-import net.minecraft.server.v1_15_R1.PacketPlayOutBlockChange;
-import net.minecraft.server.v1_15_R1.PacketPlayOutMultiBlockChange;
-import net.minecraft.server.v1_15_R1.PacketPlayOutSetSlot;
 
 public class PacketListener implements Listener {
 

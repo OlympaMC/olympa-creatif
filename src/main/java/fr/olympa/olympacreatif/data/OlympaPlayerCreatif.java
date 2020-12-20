@@ -25,6 +25,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldEventsListener;
@@ -76,6 +77,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 
 		playerParams.add(PlayerParamType.DEFAULT_PLOT_CHAT);
 		playerParams.add(PlayerParamType.OPEN_GUI_ON_SNEAK);
+		
+		currentPlot = plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, 1));
 	}
 	
 	@Override
@@ -178,7 +181,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		List<Plot> list = new ArrayList<Plot>();
 		
 		for (Plot plot : plugin.getPlotsManager().getPlots())
-			if (plot.getMembers().getPlayerRank(getInformation()) != PlotRank.VISITOR)
+			if (plot.getMembers().getPlayerRank(this) != PlotRank.VISITOR)
 				if (!onlyOwnedPlots || (plot.getMembers().getPlayerRank(getInformation()) == PlotRank.OWNER && onlyOwnedPlots))
 					list.add(plot);
 

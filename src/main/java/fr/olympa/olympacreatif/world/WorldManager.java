@@ -157,16 +157,14 @@ public class WorldManager {
 			public void run() {
 				Bukkit.getOnlinePlayers().forEach(p -> {
 					OlympaPlayerCreatif pp = AccountProvider.get(p.getUniqueId());
-					if (OlympaCore.getInstance().getAfkHandler().isAfk(p))
-						pp.addGameMoney(afkIncome);
-					else
-						pp.addGameMoney(noAfkIncome);
+					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? afkIncome : noAfkIncome;
+					pp.addGameMoney(income);
 					
 					c++;
 					
 					if (c == cMax) {
 						c = 0;
-						p.sendMessage(Message.MSG_PERIODIC_INCOME.getValue());	
+						p.sendMessage(Message.PERIODIC_INCOME_RECEIVED.getValue(income, noAfkIncome, afkIncome));	
 					}
 				});
 			}

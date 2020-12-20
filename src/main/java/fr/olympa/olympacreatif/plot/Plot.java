@@ -340,9 +340,9 @@ public class Plot {
 	public void executeExitActions(Player p) {
 
 		((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCurrentPlot(null);
-		
-		removePlayerInPlot(p);
+
 		plugin.getCommandBlocksManager().excecuteQuitActions(this, p);
+		removePlayerInPlot(p);
 
 		//rendu inventaire si stocké
 		if (inventoryStorage.containsKey(p)) {
@@ -373,6 +373,4 @@ public class Plot {
 			}
 		}
 	}
-	
-	
 }

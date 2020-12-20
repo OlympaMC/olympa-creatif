@@ -38,6 +38,9 @@ public class OcaCommand extends OlympaCommand {
 			return false;
 
 		args = OcCommand.updatedArgs(label, "oca", args);
+		
+		if (args.length == 0)
+			return false;
 
 		Player p = (Player) sender;
 		

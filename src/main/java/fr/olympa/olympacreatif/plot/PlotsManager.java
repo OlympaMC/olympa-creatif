@@ -43,6 +43,7 @@ public class PlotsManager {
 		plugin.getServer().getPluginManager().registerEvents(new PlotsInstancesListener(plugin), plugin);
 		
 		plotCount = plugin.getDataManager().getPlotsCount();
+		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1));
 		
 		//construit les objets Plot chargés depuis la bdd de manière synchrone avec le serveur
 		new BukkitRunnable() {
@@ -53,7 +54,6 @@ public class PlotsManager {
 					for (AsyncPlot ap : asyncPlots)
 						if (!isPlotLoaded(ap.getId())) 
 							loadedPlots.add(new Plot(ap));
-							//Bukkit.broadcastMessage("FINALLY LOADED PLOT " + ap.getId());
 						
 					asyncPlots.clear();	
 				}

@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -90,10 +91,11 @@ public class PlotMembers{
 	}
 	
 	public PlotRank getPlayerRank(MemberInformations p) {
-		if (members.containsKey(p))
-			return members.get(p);
-		else
-			return PlotRank.VISITOR;
+		for (MemberInformations info : members.keySet())
+			if (info.equals(p))
+				return members.get(info);
+		
+		return PlotRank.VISITOR;
 	}
 	
 	
@@ -229,7 +231,15 @@ public class PlotMembers{
 		
 		@Override
 		public boolean equals(Object obj) {
-			return obj instanceof MemberInformations && ((MemberInformations)obj).getId() == id;
+			
+			//Bukkit.broadcastMessage("COMPARE " + this.toString() + " ----TO---- "  + obj.toString() + " ----RESULT---- " + (((MemberInformations)obj).getId() == this.id));
+			
+			return obj instanceof MemberInformations && ((MemberInformations)obj).getId() == this.id;
+		}
+		
+		@Override
+		public String toString() {
+			return new Gson().toJson(this).toString();
 		}
 	}
 	

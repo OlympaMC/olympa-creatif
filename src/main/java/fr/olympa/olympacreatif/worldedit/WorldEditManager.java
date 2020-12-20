@@ -119,10 +119,18 @@ public class WorldEditManager extends EventHandler implements Listener {
 	
 	@org.bukkit.event.EventHandler //cancel copy si joueur essaie de copier dans un plot qui n'est pas à lui
 	public void onCopyCmd(PlayerCommandPreprocessEvent e) {
-		if (!e.getMessage().contains("/copy") || plugin.getWEManager() == null)
-			return;
 		
 		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
+		
+		if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) && e.getMessage().contains("/schem")) {
+			p.getPlayer().sendMessage(Message.WE_ERR_SCHEM_CMD_DISABLED.getValue());
+			e.setCancelled(true);
+			return;
+		}
+		
+		/*
+		if (!e.getMessage().contains("/copy") || !isWeEnabled)
+			return;
 		
 		LocalSession session = getWe().getSessionManager().get(BukkitAdapter.adapt(e.getPlayer()));
 		
@@ -152,7 +160,7 @@ public class WorldEditManager extends EventHandler implements Listener {
 		} catch (IncompleteRegionException e1) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.WE_ERR_SELECTION_TOO_BIG.getValue());
-		}
+		}*/
 	}
 
 	
