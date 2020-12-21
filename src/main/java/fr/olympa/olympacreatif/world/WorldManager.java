@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -16,9 +17,6 @@ import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.olympa.api.holograms.Hologram;
-import fr.olympa.api.holograms.Hologram.HologramLine;
-import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -157,8 +155,14 @@ public class WorldManager {
 			public void run() {
 				Bukkit.getOnlinePlayers().forEach(p -> {
 					OlympaPlayerCreatif pp = AccountProvider.get(p.getUniqueId());
+
 					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? afkIncome : noAfkIncome;
-					pp.addGameMoney(income);
+					pp.addGameMoney(income, null);
+
+					/*if (OlympaCore.getInstance().getAfkHandler().isAfk(p))
+						pp.getGameMoney().give(afkIncome);
+					else
+						pp.getGameMoney().give(noAfkIncome);*/
 					
 					c++;
 					

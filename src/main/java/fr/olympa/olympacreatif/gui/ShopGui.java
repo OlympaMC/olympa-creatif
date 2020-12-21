@@ -3,16 +3,12 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent;
 import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent.ChangeType;
@@ -41,8 +37,8 @@ public class ShopGui extends IGui{
 	private final ItemStack buyProcessAccept = ItemUtils.skullCustom("§aCliquez §2§lICI §r§apour acheter", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQwNjNiYTViMTZiNzAzMGEyMGNlNmYwZWE5NmRjZDI0YjA2NDgzNmY1NzA0NTZjZGJmYzllODYxYTc1ODVhNSJ9fX0=");
 	private final ItemStack buyProcessDeny = ItemUtils.skullCustom("§cAchat impossible", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzIwZWYwNmRkNjA0OTk3NjZhYzhjZTE1ZDJiZWE0MWQyODEzZmU1NTcxODg2NGI1MmRjNDFjYmFhZTFlYTkxMyJ9fX0=");
 	
-	private MarketItemData cartItem = null;
-	private boolean cartItemReadyToBuy = false;
+	//private MarketItemData cartItem = null;
+	//private boolean cartItemReadyToBuy = false;
 	
 	//int firstRankPrice = 10;
 	//int secondRankPrice = 20;
@@ -360,7 +356,7 @@ public class ShopGui extends IGui{
 			
 			if (!isBuyable)
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§7Achat impossible");
-			else if (price > p.getGameMoney())
+			else if (!p.hasGameMoney(price))
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§cPas assez de fonds");
 			else
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§aAchat possible");
@@ -392,47 +388,47 @@ public class ShopGui extends IGui{
 		}
 		
 		public void tryToBuy(ShopGui gui) {
-			if (!isBuyable || p.getGameMoney() < price)
+			if (!isBuyable || !p.hasGameMoney(price))
 				return;
 			
 			if (toBuy instanceof OlympaGroup) {
 				if (p.getGroups().containsKey(toBuy)) 
 					return;
 				
-				p.removeGameMoney(price);
-				p.addGroup((OlympaGroup)toBuy);
+				p.withdrawGameMoney(price, () -> {
+					p.addGroup((OlympaGroup)toBuy);
+
+					String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";
+					
+					if ((OlympaGroup)toBuy == OlympaGroup.CREA_CREATOR)
+						Bukkit.broadcastMessage("§6----------------------------------------------\n§6\n"
+								+ "Le joueur §c" + p.getName() + " §6a découvert le grade secret ! \nFélicitations à " + genreType + " !"
+								+ "\n§6\n----------------------------------------------");	
+				});
 				
-				plugin.getTask().runTaskAsynchronously(()-> {
+				/*plugin.getTask().runTaskAsynchronously(()-> {
 					OlympaCore.getInstance().getServer().getPluginManager().callEvent(new AsyncOlympaPlayerChangeGroupEvent(p.getPlayer(), ChangeType.ADD, p, (OlympaGroup) toBuy));
 					AccountProvider olympaAccount = new AccountProvider(p.getUniqueId());
 					olympaAccount.saveToRedis(p);
-					olympaAccount.saveToDb(p);
-				});
+					//olympaAccount.saveToDb(p);
+				});*/
 				
-				String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";
-				
-				if ((OlympaGroup)toBuy == OlympaGroup.CREA_CREATOR)
-					Bukkit.broadcastMessage("§6----------------------------------------------\n§6\n"
-							+ "Le joueur §c" + p.getName() + " §6a découvert le grade secret ! \nFélicitations à " + genreType + " !"
-							+ "\n§6\n----------------------------------------------");
 
 			}else if (toBuy instanceof KitType) {
 				if (p.hasKit((KitType)toBuy))
 					return;
 
-				p.removeGameMoney(price);
-				p.addKit((KitType)toBuy);
+				p.withdrawGameMoney(price, () -> p.addKit((KitType)toBuy));
 			}else if (toBuy instanceof UpgradeType) {
 				if (p.getUpgradeLevel((UpgradeType)toBuy) >= ((UpgradeType)toBuy).getMaxLevel())
 					return;
 
-				p.removeGameMoney(price);
-				p.incrementUpgradeLevel((UpgradeType)toBuy);
+				p.withdrawGameMoney(price, () -> p.incrementUpgradeLevel((UpgradeType)toBuy));
 			}
 			
 			p.getPlayer().sendMessage(Message.SHOP_BUY_SUCCESS.getValue(itemHolder.getItemMeta().getDisplayName().toLowerCase()));
 			new ShopGui(gui).create(p.getPlayer());
-			new AccountProvider(p.getUniqueId()).saveToDb(p);
+			//new AccountProvider(p.getUniqueId()).saveToDb(p);
 		}
 	}
 }
