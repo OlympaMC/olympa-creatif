@@ -67,7 +67,7 @@ public class PlotsManager {
 			public void run() {
 				//pour tous les plots
 				synchronized (loadedPlots) {
-					
+					 
 					//Bukkit.broadcastMessage("Loaded plots: " + loadedPlots);
 					
 					for (Plot plot : new ArrayList<Plot>(loadedPlots)) {
