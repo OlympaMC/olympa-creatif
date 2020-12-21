@@ -71,7 +71,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	//A CHANGER AVANT BETA OUVERTE
 	//private int gameMoney = 0;
-	private OlympaMoney gameMoney = new OlympaMoney(0);
+	//private OlympaMoney gameMoney = new OlympaMoney(0);
+	private int gameMoney = 0;
 
 	private Set<KitType> kits = new HashSet<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();
@@ -100,7 +101,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	@Override
 	public void loadDatas(ResultSet resultSet) throws SQLException {
-		gameMoney.set(resultSet.getInt("gameMoney"));
+		gameMoney = resultSet.getInt("gameMoney");
 		
 		for (KitType kit : KitType.values())
 			if (resultSet.getBoolean(kit.getBddKey()))
@@ -148,7 +149,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	}*/
 	
 	public int getGameMoney() {
-		return (int) gameMoney.get();
+		return gameMoney;
 	}
 	
 	public boolean hasGameMoney(int money) {
@@ -168,8 +169,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	}
 	
 	public void setGameMoney(int money, Runnable successRunnable) {
-		gameMoney.set(money);
-		//COLUMN_MONEY.updateAsync(this, money, successRunnable, exception -> Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Une erreur est survenue lors de la mise à jour de vos informations. Erreur à signaler au staff : §4" + exception.getCause().getMessage()));
+		gameMoney = money;
+		COLUMN_MONEY.updateAsync(this, gameMoney, successRunnable, exception -> Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Une erreur est survenue lors de la mise à jour de vos informations. Erreur à signaler au staff : §4" + exception.getCause().getMessage()));
 	}
 	
 	public boolean hasKit(KitType kit) {
