@@ -168,7 +168,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	}
 	
 	public void setGameMoney(int money, Runnable successRunnable) {
-		COLUMN_MONEY.updateAsync(this, money, successRunnable, exception -> Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Une erreur est survenue lors de la mise à jour de vos informations. Erreur à signaler au staff : §4" + exception.getCause().getMessage()));
+		gameMoney.set(money);
+		//COLUMN_MONEY.updateAsync(this, money, successRunnable, exception -> Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Une erreur est survenue lors de la mise à jour de vos informations. Erreur à signaler au staff : §4" + exception.getCause().getMessage()));
 	}
 	
 	public boolean hasKit(KitType kit) {

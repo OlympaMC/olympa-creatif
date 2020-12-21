@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
@@ -150,6 +152,9 @@ public class PlotsManager {
 	}
 	
 	public void setBirthPlot(PlotId plot, Entity e) {
+		if (e.getType() == EntityType.PLAYER)
+			return;
+		
 		NBTTagCompound tag = new NBTTagCompound();
 		net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e).getHandle();
 		ent.c(tag);
@@ -158,7 +163,12 @@ public class PlotsManager {
 		list.add(NBTTagString.a(plot.toString()));
 		tag.set("Tags", list);
 		
-		ent.f(tag);
+		try {
+			ent.f(tag);	
+		}catch(Exception ex) {
+			plugin.getLogger().log(Level.WARNING, "§cError set birth plot " + plot + " for " + tag.toString());
+			ex.printStackTrace();
+		}
 	}
 
 	

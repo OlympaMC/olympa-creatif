@@ -18,7 +18,10 @@ public class CmdExperience extends CbCommand {
 	
 	public CmdExperience(CommandType cmdType, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(cmdType, sender, loc, plugin, plot, args);
-	
+		
+		if (args.length == 0)
+			return;
+		
 		switch(args[0]) {
 		case "add":
 			if (args.length >= 3) {

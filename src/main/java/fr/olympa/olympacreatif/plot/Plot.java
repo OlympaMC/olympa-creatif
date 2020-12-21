@@ -77,6 +77,8 @@ public class Plot {
 			allowLiquidFlow = true;
 		
 		executeCommonInstanciationActions();
+		
+		plugin.getDataManager().addPlotToSaveQueue(this, false);
 	}
 	
 	//chargement d'un plot déjà existant
@@ -275,7 +277,6 @@ public class Plot {
 	public boolean executeEntryActions(Player p, boolean tpToPlotSpawn) {
 		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
-		pc.setCurrentPlot(this);
 		
 		//si le joueur est banni, téléportation en dehors du plot
 		if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
@@ -285,6 +286,8 @@ public class Plot {
 				return false;	
 			}
 		}
+
+		pc.setCurrentPlot(this);
 		
 		//ajoute le joueur aux joueurs du plot s'il n'a pas la perm de bypass les commandes vanilla
 		if (!pc.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
