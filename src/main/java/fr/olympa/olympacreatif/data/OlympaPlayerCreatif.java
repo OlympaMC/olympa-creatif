@@ -46,7 +46,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_BONUSPLOTS = new SQLColumn<OlympaPlayerCreatif>("upgradeLevelBonusPlots", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_BONUSMEMBERS = new SQLColumn<OlympaPlayerCreatif>("upgradeLevelBonusMembers", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	
-	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_DEFAULT_PLOT_CHAT = new SQLColumn<OlympaPlayerCreatif>("playerParamDefaultPlotChat", "TINYINT(1) NOT NULL DEFAULT 1", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_DEFAULT_PLOT_CHAT = new SQLColumn<OlympaPlayerCreatif>("playerParamDefaultPlotChat", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_MENU_ON_SNEAK = new SQLColumn<OlympaPlayerCreatif>("playerParamOpenMenuOnSneak", "TINYINT(1) NOT NULL DEFAULT 1", Types.TINYINT).setUpdatable();
 	
 	public static final List<SQLColumn<OlympaPlayerCreatif>> COLUMNS =
@@ -92,7 +92,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		for (UpgradeType upg : UpgradeType.values())
 			upgrades.put(upg, 0);
 
-		playerParams.add(PlayerParamType.DEFAULT_PLOT_CHAT);
+		//playerParams.add(PlayerParamType.DEFAULT_PLOT_CHAT);
 		playerParams.add(PlayerParamType.OPEN_GUI_ON_SNEAK);
 		
 		currentPlot = plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, 1));
@@ -351,9 +351,19 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			playerParams.add(param);
 		else
 			playerParams.remove(param);
+		
+		if (hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT))
+			COLUMN_PARAM_DEFAULT_PLOT_CHAT.updateAsync(this, 1, null, null);
+		else
+			COLUMN_PARAM_DEFAULT_PLOT_CHAT.updateAsync(this, 0, null, null);
+		
+		if (hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK))
+			COLUMN_PARAM_MENU_ON_SNEAK.updateAsync(this, 1, null, null);
+		else
+			COLUMN_PARAM_MENU_ON_SNEAK.updateAsync(this, 0, null, null);
 	}
 	
-	public boolean getPlayerParam(PlayerParamType param) {
+	public boolean hasPlayerParam(PlayerParamType param) {
 		return playerParams.contains(param);
 	}
 	

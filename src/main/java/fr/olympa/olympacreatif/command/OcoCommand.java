@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.common.collect.ImmutableList;
@@ -54,8 +55,9 @@ public class OcoCommand extends OlympaCommand {
 			return false;
 		
 		OlympaPlayerCreatif p = AccountProvider.get(((Player)sender).getUniqueId());
+		Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 		
-		args = OcCommand.updatedArgs(label, "oco", args);
+		args = OcCommand.updatedArgs(label, "oco", args);			
 		
 		switch (args.length) {
 		case 1:
@@ -84,7 +86,6 @@ public class OcoCommand extends OlympaCommand {
 					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_PLOT_EXPORTATION.getMinGroup().getName(p.getGender())));
 					return false;
 				}
-				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 				if (plot != null && plot.getMembers().getPlayerRank(p.getPlayer()) == PlotRank.OWNER)
 					plugin.getPerksManager().getSchematicCreator().export(plot, p);
 				else
@@ -94,19 +95,18 @@ public class OcoCommand extends OlympaCommand {
 				
 				
 			case "debug":
-				Plot plot2 = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
-				if (plot2 == null) {
+				if (plot == null) {
 					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
 					break;
 				}
 				
-				String debug = "\n   §6>>> Débug plot " + plot2.getPlotId() + " :";
-				debug += "\n   §e> Joueurs : §a" + plot2.getPlayers().size();
-				debug += "\n   §e> Entités : §a" + plot2.getEntities().size() + "/" + WorldManager.maxTotalEntitiesPerPlot;
-				debug += "\n   §e> Equipes : §a" + plot2.getCbData().getTeams().size() + "/" + CommandBlocksManager.maxTeamsPerPlot;
-				debug += "\n   §e> Objectifs : §a" + plot2.getCbData().getObjectives().size() + "/" + CommandBlocksManager.maxObjectivesPerPlot;
-				debug += "\n   §e> Tickets commandblocks : §a" + plot2.getCbData().getCommandsTicketsLeft() + "/" +
-						CommandBlocksManager.maxCommandsTicketst + " (+" + plot2.getCbData().getCpt() * 20 + "/s)";
+				String debug = "\n   §6>>> Débug plot " + plot.getPlotId() + " :";
+				debug += "\n   §e> Joueurs : §a" + plot.getPlayers().size();
+				debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + WorldManager.maxTotalEntitiesPerPlot;
+				debug += "\n   §e> Equipes : §a" + plot.getCbData().getTeams().size() + "/" + CommandBlocksManager.maxTeamsPerPlot;
+				debug += "\n   §e> Objectifs : §a" + plot.getCbData().getObjectives().size() + "/" + CommandBlocksManager.maxObjectivesPerPlot;
+				debug += "\n   §e> Tickets commandblocks : §a" + plot.getCbData().getCommandsTicketsLeft() + "/" +
+						CommandBlocksManager.maxCommandsTicketst + " (+" + plot.getCbData().getCpt() * 20 + "/s)";
 				
 				sender.sendMessage(debug);
 				break;
@@ -141,10 +141,7 @@ public class OcoCommand extends OlympaCommand {
 				p.getPlayer().sendMessage(Message.OCO_HEAD_GIVED.getValue());
 				break;
 				
-			case "speed":
-				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
-				
-				if (plot != null)
+			case "speed":if (plot != null)
 					if (plot.getMembers().getPlayerLevel(p) == 0)
 						p.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				

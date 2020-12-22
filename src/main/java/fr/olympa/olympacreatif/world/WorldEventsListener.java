@@ -239,7 +239,7 @@ public class WorldEventsListener implements Listener{
 		if (e.isSneaking())
 			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
 				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis()) {
-					if (((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK))
+					if (((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK))
 						MainGui.getMainGui(AccountProvider.get(e.getPlayer().getUniqueId())).create(e.getPlayer());	
 				}
 		/*
@@ -291,14 +291,20 @@ public class WorldEventsListener implements Listener{
 		if (PermissionsList.USE_COLORED_TEXT.hasPermission(p))
 			e.setMessage(ChatColor.translateAlternateColorCodes('&', e.getMessage()));
 		
-		if (e.getMessage().startsWith("@") || plot == null)
+		boolean invertTarget = false;
+		if (e.getMessage().startsWith("@")) {
 			e.setMessage(e.getMessage().replaceFirst("@", ""));
+			invertTarget = true;
+		}
 		
-		else if (p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)){
+		if (plot == null)
+			return;
+		
+		if ((p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT) && !invertTarget) ||
+				(!p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT) && invertTarget)) {
 			e.getRecipients().clear();
 			plot.sendMessage(p, e.getMessage());
 		}
-		
 	}
 	
 	@EventHandler //color sur pancartes

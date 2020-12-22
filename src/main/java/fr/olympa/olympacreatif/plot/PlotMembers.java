@@ -16,6 +16,8 @@ import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
+import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class PlotMembers{
 
@@ -120,7 +122,13 @@ public class PlotMembers{
 	
 	
 	public Map<MemberInformations, PlotRank> getMembers(){
-		Map<MemberInformations, PlotRank> map = new HashMap<MemberInformations, PlotRank>();
+		Map<MemberInformations, PlotRank> map = new TreeMap<MemberInformations, PlotRank>(new Comparator<MemberInformations>() {
+
+			@Override
+			public int compare(MemberInformations o1, MemberInformations o2) {
+				return members.get(o1).getLevel() - members.get(o2).getLevel();
+			}
+		});
 		
 		for (Entry<MemberInformations, PlotRank> e : members.entrySet())
 			if (e.getValue() != PlotRank.VISITOR)

@@ -392,12 +392,13 @@ public class ShopGui extends IGui{
 				return;
 			
 			if (toBuy instanceof OlympaGroup) {
-				if (p.getGroups().containsKey(toBuy)) 
+				if (p.getGroups().containsKey(toBuy))
 					return;
 				
 				p.withdrawGameMoney(price, () -> {
 					p.addGroup((OlympaGroup)toBuy);
-						
+					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(p);
+					
 					plugin.getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
 					
 					String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";

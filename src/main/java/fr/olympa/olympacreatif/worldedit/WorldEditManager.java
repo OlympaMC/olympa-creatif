@@ -122,7 +122,7 @@ public class WorldEditManager extends EventHandler implements Listener {
 		
 		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		
-		if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) && e.getMessage().contains("/schem")) {
+		if (p == null || !p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) && e.getMessage().contains("/schem")) {
 			p.getPlayer().sendMessage(Message.WE_ERR_SCHEM_CMD_DISABLED.getValue());
 			e.setCancelled(true);
 			return;

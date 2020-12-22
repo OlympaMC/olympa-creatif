@@ -1,42 +1,27 @@
 package fr.olympa.olympacreatif.gui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.BiConsumer;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 
 import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
-import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.player.OlympaPlayerInformations;
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
-import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 
 public class MembersGui extends IGui {
 	
-	private List<MemberInformations> members = new ArrayList<MemberInformations>();
-	 
-	
 	public MembersGui(IGui gui) {
 		super(gui, "Membres parcelle " + gui.getPlot().getPlotId() + " (" + gui.getPlot().getMembers().getCount() + "/" + 
 				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(gui.getPlayer().getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3);
-		
-		members = new ArrayList<MemberInformations>(plot.getMembers().getMembers().keySet());
 		
 		//index de la tête à placer
 		int headIndex = -1;

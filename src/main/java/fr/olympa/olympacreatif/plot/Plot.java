@@ -77,8 +77,6 @@ public class Plot {
 			allowLiquidFlow = true;
 		
 		executeCommonInstanciationActions();
-		
-		plugin.getDataManager().addPlotToSaveQueue(this, false);
 	}
 	
 	//chargement d'un plot déjà existant
@@ -235,9 +233,9 @@ public class Plot {
 		cbData.unload();
 		
 		//unload des forced chunks
-		for (int i = plotId.getLocation().getChunk().getX() ; i < plotId.getLocation().getChunk().getX() + 2 ; i++)
-			for (int j = plotId.getLocation().getChunk().getZ() ; j < plotId.getLocation().getChunk().getX() + 2 ; j++)
-				plugin.getWorldManager().getWorld().setChunkForceLoaded(i, j, false);
+		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + 2 ; x++)
+			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
+				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z , false);
 	}
 
 	public PlotId getPlotId() {

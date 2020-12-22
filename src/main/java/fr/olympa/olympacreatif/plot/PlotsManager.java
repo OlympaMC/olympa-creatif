@@ -194,7 +194,8 @@ public class PlotsManager {
 	
 	public Plot createPlot(Player p) {
 		Plot plot = new Plot(plugin, AccountProvider.get(p.getUniqueId()));
-				
+		
+		plugin.getDataManager().addPlotToSaveQueue(plot, false);
 		loadedPlots.add(plot);
 		return plot;
 	}

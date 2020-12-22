@@ -20,18 +20,18 @@ public class PlayerParametersGui extends IGui{
 		super(gui, "Paramètres de " + gui.getPlayer().getName(), 1);
 		
 		setItem(0, PlotParametersGui.setSwitchState(ItemUtils.item(Material.PAPER, "§6Activation par défaut du chat parcelle"), 
-				p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)),
+				p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)),
 				(it, i, s) -> {
-					p.setPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT, !p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT));
-					changeItem(it, PlotParametersGui.setSwitchState(it, p.getPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)));
+					p.setPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT, !p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT));
+					changeItem(it, PlotParametersGui.setSwitchState(it, p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)));
 				});
 		
 		setItem(1, PlotParametersGui.setSwitchState(ItemUtils.item(Material.CRAFTING_TABLE, "§6Double sneak pour ouvrir le menu"), 
-				p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)), 
+				p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)), 
 				(it, i, s) -> {
-					p.setPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK, !p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK));
+					p.setPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK, !p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK));
 					
-					changeItem(it, PlotParametersGui.setSwitchState(it, p.getPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)));
+					changeItem(it, PlotParametersGui.setSwitchState(it, p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)));
 				});
 	}
 	

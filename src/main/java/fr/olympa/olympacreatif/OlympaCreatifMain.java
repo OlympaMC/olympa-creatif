@@ -18,6 +18,8 @@ import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
+import fr.olympa.api.server.OlympaServer;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.command.OcaCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
@@ -72,6 +74,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		super.onEnable();
 		
 		plugin = this;
+		OlympaCore.getInstance().setOlympaServer(OlympaServer.CREATIF);
+		
 		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
 		OlympaPermission.registerPermissions(PermissionsList.class);
 		createScoreboard();

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
@@ -101,6 +102,10 @@ public class DataManager implements Listener {
 			"SELECT COUNT (*) FROM creatif_plotsdatas;"
 			);
 	
+	private final OlympaStatement osCountPlots2 = new OlympaStatement(
+			"SELECT MAX (plot_id) FROM creatif_plotsdatas;"
+			);
+	
 	private final OlympaStatement osSelectPlayerDatas = new OlympaStatement(
 			"SELECT * FROM creatif_players WHERE `player_id` = ?;"			
 			);
@@ -172,16 +177,16 @@ public class DataManager implements Listener {
 			@Override
 			public void run() {
 				if (plotsToSave.size() > 0)
-					savePlotToBddSync(plotsToSave.get(0));
+					savePlotToBddSync(plotsToSave.remove(0));
 			}
-		}.runTaskTimerAsynchronously(plugin, 20, 1);
+		}.runTaskTimer(plugin, 20, 1);
 	}
 	
-	public void addPlotToLoadQueue(PlotId id) {
+	public synchronized void addPlotToLoadQueue(PlotId id) {
 		plugin.getTask().runTaskAsynchronously(() -> plotsToLoad.add(id));
 	}
 	
-	public void addPlotToSaveQueue(Plot plot, boolean forceInstantSave) {
+	public synchronized void addPlotToSaveQueue(Plot plot, boolean forceInstantSave) {
 		if (!forceInstantSave)
 			plugin.getTask().runTaskAsynchronously(() -> plotsToSave.add(plot));
 		else
@@ -223,8 +228,6 @@ public class DataManager implements Listener {
 	private synchronized void loadPlot(PlotId plotId) {
 		if (plotId == null)
 			return;
-		
-		//Bukkit.broadcastMessage("DATAMANAGER LOADING PLOT " + plotId + " IN PROGRESS");
 		
 		//CREATION DU PLOT
 		try {
@@ -322,8 +325,9 @@ public class DataManager implements Listener {
 					updPlotMember.setInt(5, e.getValue().getLevel());
 					updPlotMember.executeUpdate();
 				}
-			
+			plugin.getLogger().log(Level.INFO, "Plot " + plot + " saved.");	
 		} catch (SQLException e) {
+			plugin.getLogger().log(Level.SEVERE, "§4Failed to save plot" + plot + " !");
 			e.printStackTrace();
 		}
 	}
@@ -333,6 +337,16 @@ public class DataManager implements Listener {
 			PreparedStatement ps = osCountPlots.getStatement();
 			ResultSet result = ps.executeQuery();
 			result.next();
+			
+			PreparedStatement ps2 = osCountPlots2.getStatement();
+			ResultSet result2 = ps2.executeQuery();
+			result2.next();
+			
+			if (result.getInt(1) == result2.getInt(1))
+				plugin.getLogger().log(Level.INFO, "§aIntégrité de la table creatif_plotsdata validée : MAX(plot_id) = COUNT(*)");
+			else
+				plugin.getLogger().log(Level.SEVERE, "§4ATTENTION problème dans la table creatif_plotsdata : nombre d'entrées différent de l'indice du plot maximal !!");
+			
 			return result.getInt(1);
 		} catch (SQLException e) {
 			e.printStackTrace();

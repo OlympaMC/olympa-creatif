@@ -95,7 +95,7 @@ public class PlotParametersGui extends IGui {
 				return;
 			
 			PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
-			ItemStack item2 = ItemUtils.lore(item.clone(), "§eHeure actuelle : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd)/1000 + "h");
+			ItemStack item2 = ItemUtils.item(Material.CLOCK, "§6Heure de la parcelle", "§eHeure actuelle : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd)/1000 + "h");
 			item2 = ItemUtils.loreAdd(item, clickToChange);
 			changeItem(item, item2);
 			
