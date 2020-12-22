@@ -299,7 +299,7 @@ public class WorldEventsListener implements Listener{
 		
 		if (plot == null)
 			return;
-		
+		 
 		if ((p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT) && !invertTarget) ||
 				(!p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT) && invertTarget)) {
 			e.getRecipients().clear();
