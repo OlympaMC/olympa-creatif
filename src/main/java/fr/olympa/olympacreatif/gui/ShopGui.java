@@ -261,7 +261,7 @@ public class ShopGui extends IGui{
 	
 	
 	private void startBuyAcceptTimer(MarketItemData data) {
-		useBuyAcceptTimer(data, 5, 5, 15, 
+		useBuyAcceptTimer(data, 2, 2, 15, 
 				ItemUtils.item(data.getHolder().getType(), "§6Achat : " + data.getHolder().getItemMeta().getDisplayName()));
 	}
 	
@@ -397,7 +397,9 @@ public class ShopGui extends IGui{
 				
 				p.withdrawGameMoney(price, () -> {
 					p.addGroup((OlympaGroup)toBuy);
-
+						
+					plugin.getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
+					
 					String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";
 					
 					if ((OlympaGroup)toBuy == OlympaGroup.CREA_CREATOR)
@@ -418,16 +420,22 @@ public class ShopGui extends IGui{
 				if (p.hasKit((KitType)toBuy))
 					return;
 
-				p.withdrawGameMoney(price, () -> p.addKit((KitType)toBuy));
+				p.withdrawGameMoney(price, () -> {
+					p.addKit((KitType)toBuy);
+					plugin.getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
+				});
 			}else if (toBuy instanceof UpgradeType) {
 				if (p.getUpgradeLevel((UpgradeType)toBuy) >= ((UpgradeType)toBuy).getMaxLevel())
 					return;
 
-				p.withdrawGameMoney(price, () -> p.incrementUpgradeLevel((UpgradeType)toBuy));
+				p.withdrawGameMoney(price, () -> {
+					p.incrementUpgradeLevel((UpgradeType)toBuy);
+					plugin.getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
+				});
 			}
 			
 			p.getPlayer().sendMessage(Message.SHOP_BUY_SUCCESS.getValue(itemHolder.getItemMeta().getDisplayName().toLowerCase()));
-			new ShopGui(gui).create(p.getPlayer());
+			
 			//new AccountProvider(p.getUniqueId()).saveToDb(p);
 		}
 	}

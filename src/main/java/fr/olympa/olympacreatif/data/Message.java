@@ -81,13 +81,15 @@ public enum Message {
 	WE_START_GENERATING_PLOT_SCHEM,
 	WE_COMPLETE_GENERATING_PLOT_SCHEM, 
 	WE_DISABLED, 
-	WE_ERR_SCHEM_CMD_DISABLED,
+	WE_ERR_SCHEM_CMD_DISABLED, 
+	
+	WE_ERR_INSUFFICENT_PERMISSION,
 	;
 	
-	private String message = null;
+	private String message = "";
 	
 	public String getValue(Object...args) {
-		if (message == null)
+		if (message.equals(""))
 			return "§cMissing message : " + this.toString().toLowerCase();
 		
 		String mess = message;

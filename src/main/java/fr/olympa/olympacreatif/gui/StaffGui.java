@@ -121,7 +121,7 @@ public class StaffGui extends IGui {
 		
 		if (plot != null) {
 			final OlympaPermission p3 = PermissionsList.STAFF_RESET_PLOT;
-			setItem(7, ItemUtils.item(Material.TNT, "§6Reset de la parcelle " + plot + " (§7" + plot.getMembers().getOwner().getName() + "§6)", "§2Dropper cet item pour reset la parcelle.", " ", "§7Lance le reset complet de la parcelle", "§7à son état d'origine (herbe seule).", " ", "§cAttention : cette action ne peut pas être annulée !"),
+			setItem(7, ItemUtils.item(Material.TNT, "§6Reset de la parcelle " + plot + " (§7" + plot.getMembers().getOwner().getName() + "§6)", "§2Faire CTRL+drop sur cet item pour reset la parcelle.", " ", "§7Lance le reset complet de la parcelle", "§7à son état d'origine (herbe seule).", " ", "§cAttention : cette action ne peut pas être annulée !"),
 					(it, c, s) -> {
 						if (!p3.hasPermission(p) || c != ClickType.CONTROL_DROP || resetingPlots.contains(plot.getPlotId()))
 							return;	
