@@ -42,8 +42,6 @@ public class PlotParametersGui extends IGui {
 	
 	public PlotParametersGui(IGui gui) {
 		super(gui, "Paramètres du plot " + gui.getPlot().getPlotId(), 3);
-
-		//newBiome = (Biome) plot.getParameters().getParameter(PlotParamType.PLOT_BIOME);
 		
 		canChangeSettings = plot.getMembers().getPlayerLevel(p) >= 3;
 		
@@ -95,8 +93,8 @@ public class PlotParametersGui extends IGui {
 				return;
 			
 			PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
-			ItemStack item2 = ItemUtils.item(Material.CLOCK, "§6Heure de la parcelle", "§eHeure actuelle : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd)/1000 + "h");
-			item2 = ItemUtils.loreAdd(item, clickToChange);
+			ItemStack item2 = ItemUtils.lore(item.clone(), "§eHeure actuelle : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd)/1000 + "h");
+			item2 = ItemUtils.loreAdd(item2, clickToChange);
 			changeItem(item, item2);
 			
 			plot.getPlayers().forEach(pp -> pp.setPlayerTime(plot.getParameters().getParameter(PlotParamType.PLOT_TIME), false));
@@ -125,7 +123,7 @@ public class PlotParametersGui extends IGui {
 				PlotParamType.PLOT_WEATHER.setValue(plot, WeatherType.CLEAR);
 				item2 = ItemUtils.lore(item2, clearWeather);	
 			}
-			item2 = ItemUtils.loreAdd(item, clickToChange);
+			item2 = ItemUtils.loreAdd(item2, clickToChange);
 			changeItem(item, item2);
 			
 			plot.getPlayers().forEach(pp -> pp.setPlayerWeather(plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER)));
@@ -207,97 +205,6 @@ public class PlotParametersGui extends IGui {
 			});
 		}
 	}
-	
-	/*
-	@Override
-	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
-		super.onClick(player, current, slot, click);
-		
-		if (plot.getMembers().getPlayerLevel(player) < 3)
-			return true;
-		
-		//modification des options
-		switch (slot) {
-		case 0:
-			GameMode gm = GameMode.valueOf(ItemUtils.getLore(current)[0].split(" : ")[1]);
-			switch (gm) {
-			case ADVENTURE:
-				gm = GameMode.SURVIVAL;
-				break;
-			case CREATIVE:
-				gm = GameMode.ADVENTURE;
-				break;
-			case SURVIVAL:
-				gm = GameMode.CREATIVE;
-				break;
-			
-			}
-			PlotParamType.GAMEMODE_INCOMING_PLAYERS.setValue(plot, gm);
-			current = ItemUtils.lore(current, "§eMode actuel : " + gm.toString());
-			current = ItemUtils.loreAdd(current, clickToChange);
-			plot.getPlayers().forEach(pp -> pp.setGameMode(plot.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS)));
-			break;
-			
-		case 1:
-			PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
-			current = ItemUtils.lore(current, "§eHeure actuelle : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd)/1000 + "h");
-			current = ItemUtils.loreAdd(current, clickToChange);
-			plot.getPlayers().forEach(pp -> pp.setPlayerTime(plot.getParameters().getParameter(PlotParamType.PLOT_TIME), false));
-			break;
-
-			
-		case 2:
-			if (plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER) == WeatherType.CLEAR) {
-				PlotParamType.PLOT_WEATHER.setValue(plot, WeatherType.DOWNFALL);
-				current = ItemUtils.lore(current, rainyWeather);	
-			}else {
-				PlotParamType.PLOT_WEATHER.setValue(plot, WeatherType.CLEAR);
-				current = ItemUtils.lore(current, clearWeather);	
-			}
-			current = ItemUtils.loreAdd(current, clickToChange);
-			plot.getPlayers().forEach(pp -> pp.setPlayerWeather( plot.getParameters().getParameter(PlotParamType.PLOT_WEATHER)));
-			
-			break;
-			
-			
-		case 3:
-			int mod = 2;
-			if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
-				mod = 3;
-			
-			int currentState = plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS);
-			
-			//si le plot est en stoplag forcé et que le joueur n'a pas la perm staff FAKE OWNER EVERYWHERE, return
-			if (currentState == 2 && mod == 2)
-				break;
-			
-			PlotParamType.STOPLAG_STATUS.setValue(plot, Math.floorMod(currentState + 1, mod));
-			
-			current = ItemUtils.lore(current, stoplagLevels[plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)]);
-			current = ItemUtils.loreAdd(current, clickToChange);
-			break;
-			
-			
-		case 4:
-			if (PermissionsList.USE_PLOT_MUSIC.hasPermission(p))
-				plugin.getPerksManager().getSongManager().openGui(p.getPlayer(), plot);
-			break;
-			
-		default:
-			if (switchButtons.containsKey(current)) {
-				PlotParamType<Boolean> param = switchButtons.get(current);
-				switchButtons.remove(current);
-				
-				current = setSwitchState(current, !getSwitchState(current));
-				switchButtons.put(current, param);
-				
-				param.setValue(plot, getSwitchState(current));
-			}
-			break;
-		}
-		
-		return true;
-	}*/
 
 	public static ItemStack setSwitchState(ItemStack item, boolean newState) {
 		ItemStack it = item.clone();

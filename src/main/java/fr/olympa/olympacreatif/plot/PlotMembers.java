@@ -126,7 +126,7 @@ public class PlotMembers{
 
 			@Override
 			public int compare(MemberInformations o1, MemberInformations o2) {
-				return members.get(o1).getLevel() - members.get(o2).getLevel();
+				return members.get(o2).getLevel() - members.get(o1).getLevel();
 			}
 		});
 		

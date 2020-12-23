@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.StaffGui;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -51,7 +53,18 @@ public class OcaCommand extends OlympaCommand {
 			
 		case "listplots":
 			String lp = "";
-			List<Plot> plots = new ArrayList<Plot>(plugin.getPlotsManager().getPlots());
+			List<Plot> plots = new ArrayList<Plot>();
+			
+			if (args.length == 1)
+				plots.addAll(plugin.getPlotsManager().getPlots());
+			else {
+				Player target = Bukkit.getPlayer(args[1]);
+				if (target != null) {
+					OlympaPlayerCreatif pc = AccountProvider.get(target.getUniqueId());
+					plots.addAll(pc.getPlots(true));
+				}
+			}
+			
 			Collections.sort(plots, new Comparator<Plot>() {
 				@Override
 				public int compare(Plot o1, Plot o2) {
@@ -62,7 +75,12 @@ public class OcaCommand extends OlympaCommand {
 			for (Plot plot : plots)
 				lp += plot + " ";
 			
-			p.sendMessage("§aListe des parcelles actuellement chargées : " + lp);
+			if (args.length == 1)
+				p.sendMessage("§aListe des " + plots.size() + " parcelles actuellement chargées : " + lp);
+			else if (plots.size() > 0)
+				p.sendMessage("§aListe des parcelles possédées par " + args[1] + " : " + lp);
+			else
+				p.sendMessage("§aListe des parcelles possédées par " + args[1] + " : §cjoueur hors ligne ou ne possédant aucune parcelle");
 			break;
 		}
 		

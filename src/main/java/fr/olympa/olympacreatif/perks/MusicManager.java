@@ -192,6 +192,7 @@ public class MusicManager implements Listener {
 				items.put(it, p -> {
 					PlotParamType.SONG.setValue(plot, "");
 					getInventory().setItem(17, ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §caucune"));
+					plot.getPlayers().forEach(pp -> stopSong(pp));
 				});
 			
 			//add back item
