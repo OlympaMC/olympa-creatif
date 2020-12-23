@@ -36,18 +36,18 @@ public class OcaCommand extends OlympaCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!(sender instanceof Player))
-			return false;
 
 		args = OcCommand.updatedArgs(label, "oca", args);
 		
 		if (args.length == 0)
 			return false;
-
-		Player p = (Player) sender;
 		
 		switch (args[0]) {
 		case "menu":
+			if (!(sender instanceof Player))
+				return false;
+			
+			Player p = (Player) sender;
 			new StaffGui(MainGui.getMainGui(AccountProvider.get(p.getUniqueId()))).create(p);
 			break;
 			
@@ -76,11 +76,11 @@ public class OcaCommand extends OlympaCommand {
 				lp += plot + " ";
 			
 			if (args.length == 1)
-				p.sendMessage("§aListe des " + plots.size() + " parcelles actuellement chargées : " + lp);
+				sender.sendMessage("§aListe des " + plots.size() + " parcelles actuellement chargées : " + lp);
 			else if (plots.size() > 0)
-				p.sendMessage("§aListe des parcelles possédées par " + args[1] + " : " + lp);
+				sender.sendMessage("§aListe des parcelles possédées par " + args[1] + " : " + lp);
 			else
-				p.sendMessage("§aListe des parcelles possédées par " + args[1] + " : §cjoueur hors ligne ou ne possédant aucune parcelle");
+				sender.sendMessage("§aListe des parcelles possédées par " + args[1] + " : §cjoueur hors ligne ou ne possédant aucune parcelle");
 			break;
 		}
 		
@@ -93,5 +93,4 @@ public class OcaCommand extends OlympaCommand {
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
 		return subArgsList;
 	}
-
 }

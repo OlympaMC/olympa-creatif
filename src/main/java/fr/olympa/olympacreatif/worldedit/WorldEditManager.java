@@ -110,8 +110,8 @@ public class WorldEditManager extends EventHandler implements Listener {
 
                 @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
-                	//return plot.getMembers().getPlayerLevel(p) >= 3 /*|| p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)*/;
-                	return true;
+                	return plot.getMembers().getPlayerLevel(p) >= 3 /*|| p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)*/;
+                	//return true;
                 }
             };
 	    }
