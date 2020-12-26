@@ -3,14 +3,14 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
-import net.minecraft.server.v1_15_R1.BlockPosition;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.TileEntity;
+import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.TileEntity;
 
 public class CmdSetblock extends CbCommand {
 
@@ -37,7 +37,7 @@ public class CmdSetblock extends CbCommand {
 		
 		plugin.getWorldManager().getWorld().getBlockAt(placingLoc).setType(item.getType());
 		
-		net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+		net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 		
 		if (nmsItem != null && nmsItem.getTag() != null) {
 			TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(placingLoc.getBlockX(), placingLoc.getBlockY(), placingLoc.getBlockZ()));
@@ -47,7 +47,7 @@ public class CmdSetblock extends CbCommand {
 			tag.setInt("y", placingLoc.getBlockY());
 			tag.setInt("z", placingLoc.getBlockZ());
 			
-			tile.load(tag);	
+			tile.load(null, tag);	
 		}
 		return 1;
 	}

@@ -15,8 +15,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_15_R1.command.CraftBlockCommandSender;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.command.CraftBlockCommandSender;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -39,8 +39,8 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotCbData;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import fr.olympa.olympacreatif.utils.NbtParserUtil;
-import net.minecraft.server.v1_15_R1.MojangsonParser;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.MojangsonParser;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
 
 public abstract class CbCommand extends CbCommandI {
 	
@@ -68,7 +68,7 @@ public abstract class CbCommand extends CbCommandI {
 		
 		try {			
 			NBTTagCompound tag = NBTcontrollerUtil.getValidTags(MojangsonParser.parse(s.substring(s.indexOf("{"))));
-			net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+			net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 			nmsItem.setTag(tag);
 			item = CraftItemStack.asBukkitCopy(nmsItem);
 		} catch (CommandSyntaxException e) {

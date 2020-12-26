@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableList;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
 
 public class CmdSummon extends CbCommand {
 
@@ -75,7 +75,7 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.WITHER_SKELETON)
 			.add(EntityType.WOLF)
 			.add(EntityType.ZOMBIE_HORSE)
-			.add(EntityType.PIG_ZOMBIE)
+			//.add(EntityType.PIG_ZOMBIE)
 			.add(EntityType.ZOMBIE)
 			.add(EntityType.ZOMBIE_VILLAGER)
 
@@ -140,7 +140,7 @@ public class CmdSummon extends CbCommand {
 		
 		//application du tag
 		if (tag != null) {
-			((CraftEntity)e).getHandle().f(tag);
+			((CraftEntity)e).getHandle().load(tag);
 			e.teleport(sendingLoc);
 		}
 		

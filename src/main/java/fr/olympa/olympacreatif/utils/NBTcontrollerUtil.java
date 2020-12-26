@@ -4,24 +4,24 @@ import java.util.HashSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.EntityType;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.utils.TagsValues.TagParams;
-import net.minecraft.server.v1_15_R1.MojangsonParser;
-import net.minecraft.server.v1_15_R1.NBTBase;
-import net.minecraft.server.v1_15_R1.NBTTagByte;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.NBTTagDouble;
-import net.minecraft.server.v1_15_R1.NBTTagFloat;
-import net.minecraft.server.v1_15_R1.NBTTagInt;
-import net.minecraft.server.v1_15_R1.NBTTagList;
-import net.minecraft.server.v1_15_R1.NBTTagLong;
-import net.minecraft.server.v1_15_R1.NBTTagShort;
-import net.minecraft.server.v1_15_R1.NBTTagString;
+import net.minecraft.server.v1_16_R3.MojangsonParser;
+import net.minecraft.server.v1_16_R3.NBTBase;
+import net.minecraft.server.v1_16_R3.NBTTagByte;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagDouble;
+import net.minecraft.server.v1_16_R3.NBTTagFloat;
+import net.minecraft.server.v1_16_R3.NBTTagInt;
+import net.minecraft.server.v1_16_R3.NBTTagList;
+import net.minecraft.server.v1_16_R3.NBTTagLong;
+import net.minecraft.server.v1_16_R3.NBTTagShort;
+import net.minecraft.server.v1_16_R3.NBTTagString;
 
 public abstract class NBTcontrollerUtil {
 

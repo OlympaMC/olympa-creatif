@@ -11,8 +11,8 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -21,9 +21,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.NBTTagList;
-import net.minecraft.server.v1_15_R1.NBTTagString;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagList;
+import net.minecraft.server.v1_16_R3.NBTTagString;
 
 public class PlotsManager {
 
@@ -134,7 +134,7 @@ public class PlotsManager {
 		if (e.getType() == EntityType.PLAYER)
 			return null;
 		
-		net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e).getHandle();
+		net.minecraft.server.v1_16_R3.Entity ent = ((CraftEntity)e).getHandle();
 		NBTTagCompound tag = new NBTTagCompound();
 		ent.save(tag);
 		
@@ -156,15 +156,15 @@ public class PlotsManager {
 			return;
 		
 		NBTTagCompound tag = new NBTTagCompound();
-		net.minecraft.server.v1_15_R1.Entity ent = ((CraftEntity)e).getHandle();
-		ent.c(tag);
+		net.minecraft.server.v1_16_R3.Entity ent = ((CraftEntity)e).getHandle();
+		ent.save(tag);
 		
 		NBTTagList list = new NBTTagList();			
 		list.add(NBTTagString.a(plot.toString()));
 		tag.set("Tags", list);
 		
 		try {
-			ent.f(tag);	
+			ent.load(tag);	
 		}catch(Exception ex) {
 			plugin.getLogger().log(Level.WARNING, "§cError set birth plot " + plot + " for " + tag.toString());
 			ex.printStackTrace();

@@ -134,7 +134,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		return blocksWithInteractionsList;
 	}
 
-	public static List<Biome> getAllPossibleBiomes() {
+	/*public static List<Biome> getAllPossibleBiomes() {
 		List<Biome> list = new ArrayList<Biome>();
 
 		list.add(Biome.PLAINS);
@@ -143,5 +143,5 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		list.add(Biome.MUSHROOM_FIELDS);
 		
 		return list;
-	}
+	}*/
 }

@@ -11,9 +11,9 @@ import org.json.simple.parser.ParseException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
-import net.minecraft.server.v1_15_R1.MojangsonParser;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.NBTTagList;
+import net.minecraft.server.v1_16_R3.MojangsonParser;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagList;
 
 public class NbtParserUtil {
 

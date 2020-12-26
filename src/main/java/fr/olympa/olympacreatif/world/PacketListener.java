@@ -1,8 +1,8 @@
 package fr.olympa.olympacreatif.world;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,7 +18,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
-import net.minecraft.server.v1_15_R1.PacketPlayInSetCreativeSlot;
+import net.minecraft.server.v1_16_R3.PacketPlayInSetCreativeSlot;
 
 public class PacketListener implements Listener {
 
@@ -61,7 +61,6 @@ public class PacketListener implements Listener {
             		PacketPlayInSetCreativeSlot packet = ((PacketPlayInSetCreativeSlot) handledPacket);
             		
             		if (packet.getItemStack() != null){
-                		
             			Material mat = CraftItemStack.asBukkitCopy(packet.getItemStack()).getType();
             			
                 		if (!plugin.getPerksManager().getKitsManager().

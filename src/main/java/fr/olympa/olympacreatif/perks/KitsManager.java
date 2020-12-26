@@ -126,7 +126,7 @@ public class KitsManager {
 		list.add(Material.SKELETON_HORSE_SPAWN_EGG);
 		list.add(Material.ZOMBIE_HORSE_SPAWN_EGG);
 		list.add(Material.ZOMBIE_SPAWN_EGG);
-		list.add(Material.ZOMBIE_PIGMAN_SPAWN_EGG);
+		//list.add(Material.ZOMBIE_PIGMAN_SPAWN_EGG);
 		list.add(Material.ZOMBIE_VILLAGER_SPAWN_EGG);
 		list.add(Material.SLIME_SPAWN_EGG);
 		list.add(Material.STRAY_SPAWN_EGG);

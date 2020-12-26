@@ -14,7 +14,7 @@ import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.provider.AccountProvider;
@@ -26,7 +26,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 public class WorldManager {
 	private OlympaCreatifMain plugin;
 	private World world = null;
-	private net.minecraft.server.v1_15_R1.World nmsWorld = null;
+	private net.minecraft.server.v1_16_R3.World nmsWorld = null;
 
 	public static final int plotSize = 256;
 	public static final int roadSize = 16;
@@ -183,7 +183,7 @@ public class WorldManager {
 		return world;
 	}
 	
-	public net.minecraft.server.v1_15_R1.World getNmsWorld(){
+	public net.minecraft.server.v1_16_R3.World getNmsWorld(){
 		return nmsWorld;
 	}
 	

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -16,9 +16,9 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_15_R1.MojangsonParser;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.NBTTagList;
+import net.minecraft.server.v1_16_R3.MojangsonParser;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagList;
 
 public abstract class JSONtextUtil {
 	
@@ -159,7 +159,7 @@ public abstract class JSONtextUtil {
 		subText.setObfuscated(tag.getBoolean("obfuscated"));
 		
 		if (tag.hasKey("color"))
-			if (EnumUtils.isValidEnum(ChatColor.class, tag.getString("color").toUpperCase()))
+			if (ChatColor.valueOf(tag.getString("color").toUpperCase()) != null)
 				subText.setColor(ChatColor.valueOf(tag.getString("color").toUpperCase()));
 		
 		return subText;
