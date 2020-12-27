@@ -83,7 +83,10 @@ public enum Message {
 	WE_DISABLED, 
 	WE_ERR_SCHEM_CMD_DISABLED, 
 	
-	WE_ERR_INSUFFICENT_PERMISSION,
+	WE_ERR_INSUFFICENT_PERMISSION, 
+	
+	PARAM_TUTO_HOLO_LOC, 
+	PARAM_TUTO_HOLO_LINES,
 	;
 	
 	private String message = "";
@@ -108,7 +111,9 @@ public enum Message {
 			return new Location(Bukkit.getWorld(Message.PARAM_WORLD_NAME.getValue()), 
 					Double.valueOf(msg.getValue().split(" ")[0]), 
 					Double.valueOf(msg.getValue().split(" ")[1]), 
-					Double.valueOf(msg.getValue().split(" ")[2]));
+					Double.valueOf(msg.getValue().split(" ")[2]), 
+					Integer.valueOf(msg.getValue().split(" ")[3]), 
+					Integer.valueOf(msg.getValue().split(" ")[4]));
 		}catch(NumberFormatException e) {
 			e.printStackTrace();
 			return null;

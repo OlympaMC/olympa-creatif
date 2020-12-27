@@ -18,8 +18,13 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import fr.olympa.api.holograms.Hologram;
+import fr.olympa.api.holograms.Hologram.HologramLine;
+import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.NBTTagList;
@@ -38,6 +43,7 @@ public class PlotsManager {
 	
 	private int plotCount;
 	
+	@SuppressWarnings("unchecked")
 	public PlotsManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 
@@ -45,7 +51,7 @@ public class PlotsManager {
 		plugin.getServer().getPluginManager().registerEvents(new PlotsInstancesListener(plugin), plugin);
 		
 		plotCount = plugin.getDataManager().getPlotsCount();
-		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1));
+		//plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1));
 		
 		//construit les objets Plot chargés depuis la bdd de manière synchrone avec le serveur
 		new BukkitRunnable() {
@@ -54,8 +60,7 @@ public class PlotsManager {
 			public void run() {
 				synchronized (asyncPlots) {
 					for (AsyncPlot ap : asyncPlots)
-						if (!isPlotLoaded(ap.getId())) 
-							loadedPlots.add(new Plot(ap));
+						loadPlot(ap);
 						
 					asyncPlots.clear();	
 				}
@@ -121,8 +126,24 @@ public class PlotsManager {
 			}
 		}.runTaskTimerAsynchronously(plugin, 10, 300);
 
-		//load plot 1
-		//plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1));
+		//load plot 1 and related tuto holo
+		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1), false);
+		/*try {
+			plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1), true);
+			loadPlot(asyncPlots.get(0));
+			
+			Location loc = Message.getLocFromMessage(Message.PARAM_TUTO_HOLO_LOC);
+			loc.getChunk().load();
+			
+			Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, 
+					false, true);
+			
+			for (String s : Message.PARAM_TUTO_HOLO_LINES.getValue().split(" & "))
+				holo.addLine(new FixedLine<HologramLine>(s));
+		}catch(Exception e) {
+			plugin.getLogger().log(Level.WARNING, "§cLa parcelle 1 (dont le chargement esr forcé dans la classe PlotsManager) ne n'est pas chargée correctement.");
+			e.printStackTrace();
+		}*/
 	}
 	
 	/**
@@ -180,7 +201,7 @@ public class PlotsManager {
 			return;
 		
 		//si le plot existe mais n'est pas encore chargé, chargement depuis la bdd
-		plugin.getDataManager().addPlotToLoadQueue(id);
+		plugin.getDataManager().addPlotToLoadQueue(id, false);
 	}
 	
 	public boolean isPlotLoaded(PlotId id) {
@@ -262,16 +283,9 @@ public class PlotsManager {
 				asyncPlots.add(plot);	
 			}
 	}
-	/*
-	public static Integer getPlotIdFromString(String id) {
-		try {
-			return Integer.valueOf(id, 36);
-		}catch(NumberFormatException e) {
-			return null;
-		}
-	}
 	
-	public static String getPlotIdAsString(int id) {
-		return Integer.toString(id, 36).toUpperCase();
-	}*/
+	private void loadPlot(AsyncPlot ap) {
+		if (!isPlotLoaded(ap.getId())) 
+			loadedPlots.add(new Plot(ap));
+	}
 }

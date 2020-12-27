@@ -182,8 +182,11 @@ public class DataManager implements Listener {
 		}.runTaskTimer(plugin, 20, 1);
 	}
 	
-	public synchronized void addPlotToLoadQueue(PlotId id) {
-		plugin.getTask().runTaskAsynchronously(() -> plotsToLoad.add(id));
+	public synchronized void addPlotToLoadQueue(PlotId id, boolean forceInstantLoad) {
+		if (!forceInstantLoad)
+			plugin.getTask().runTaskAsynchronously(() -> plotsToLoad.add(id));
+		else
+			loadPlot(id);
 	}
 	
 	public synchronized void addPlotToSaveQueue(Plot plot, boolean forceInstantSave) {
@@ -217,7 +220,7 @@ public class DataManager implements Listener {
 				}  
 				
 				//add plot to load task
-				addPlotToLoadQueue(id);
+				addPlotToLoadQueue(id, false);
 			}
 			
 		} catch (SQLException | IllegalArgumentException e1) {

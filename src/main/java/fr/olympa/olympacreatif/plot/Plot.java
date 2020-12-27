@@ -27,7 +27,11 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
 
+import fr.olympa.api.holograms.Hologram;
+import fr.olympa.api.holograms.Hologram.HologramLine;
+import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -93,6 +97,7 @@ public class Plot {
 		executeCommonInstanciationActions();
 	}
 	
+	//actions to execute, wether if the plot is a new one or loaded from an asyncplot
 	private void executeCommonInstanciationActions() {
 		
 		cbData.executeSynchronousInit();
@@ -122,6 +127,21 @@ public class Plot {
 						else if (e.getType() != EntityType.PLAYER)
 							e.remove();
 					});
+		
+		//spawns the tuto holo if it's the plot 1
+		if (plotId.getId() == 1) {
+			plugin.getTask().runTaskLater(() -> {
+				Location loc = Message.getLocFromMessage(Message.PARAM_TUTO_HOLO_LOC);
+				loc.getChunk().load();
+				
+				@SuppressWarnings("unchecked")
+				Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, 
+						false, true);
+				
+				for (String s : Message.PARAM_TUTO_HOLO_LINES.getValue().split(" & "))
+					holo.addLine(new FixedLine<HologramLine>(s));
+			}, 10);
+		}
 	}
 	
 	private void loadInitialEntitiesOnChunks() {
@@ -142,8 +162,6 @@ public class Plot {
 							addEntityInPlot(e);
 						//Bukkit.broadcastMessage("detected entity " + e + " on chunk " + chunk);
 					});
-			
-			
 	}
 	
 	public PlotParameters getParameters() {

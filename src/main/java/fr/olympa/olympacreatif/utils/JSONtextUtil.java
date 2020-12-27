@@ -159,8 +159,10 @@ public abstract class JSONtextUtil {
 		subText.setObfuscated(tag.getBoolean("obfuscated"));
 		
 		if (tag.hasKey("color"))
-			if (ChatColor.valueOf(tag.getString("color").toUpperCase()) != null)
-				subText.setColor(ChatColor.valueOf(tag.getString("color").toUpperCase()));
+			try {
+				subText.setColor(ChatColor.of(tag.getString("color").toUpperCase()));				
+			}catch(Exception e) {
+			}
 		
 		return subText;
 	}
