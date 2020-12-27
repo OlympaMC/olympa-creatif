@@ -133,6 +133,7 @@ public class Plot {
 			plugin.getTask().runTaskLater(() -> {
 				Location loc = Message.getLocFromMessage(Message.PARAM_TUTO_HOLO_LOC);
 				loc.getChunk().load();
+				loc.getChunk().setForceLoaded(true);
 				
 				@SuppressWarnings("unchecked")
 				Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, 

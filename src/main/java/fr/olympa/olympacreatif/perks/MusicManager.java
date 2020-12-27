@@ -104,7 +104,7 @@ public class MusicManager implements Listener {
 			return;
 		
 		RadioSongPlayer rsp = new RadioSongPlayer(song);
-		rsp.addPlayer(p);
+		rsp.setVolume((byte)20);
 		rsp.setAutoDestroy(true);
 		rsp.setPlaying(true);
 		

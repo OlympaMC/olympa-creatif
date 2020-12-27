@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
@@ -146,6 +147,10 @@ public class WorldManager {
 					new FixedLine<HologramLine>("§eSi vous souhaitez les obtenir plus rapidement et nous soutenir,"),
 					new FixedLine<HologramLine>("§evous pouvez les acheter sur la boutique !"));
 		}, 100);*/
+		
+		//set all chunks to non-force loaded
+		for (Chunk ch : world.getLoadedChunks())
+			ch.setForceLoaded(false);
 		
 		//task pour donner l'argent aux joueurs périodiquement
 		new BukkitRunnable() {

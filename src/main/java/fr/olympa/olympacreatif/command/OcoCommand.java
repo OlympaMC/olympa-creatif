@@ -2,6 +2,8 @@ package fr.olympa.olympacreatif.command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
@@ -9,6 +11,7 @@ import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
@@ -39,6 +42,7 @@ public class OcoCommand extends OlympaCommand {
 			.add("export")
 			.add("speed")
 			.add("debug")
+			.add("debugentities")
 			.add("shop")
 			.build();
 	
@@ -94,15 +98,37 @@ public class OcoCommand extends OlympaCommand {
 				break;
 				
 				
+			case "debugentities":
+				if (plot == null) {
+					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
+					break;
+				}
+				List<Entity> entList = plot.getEntities();
+				Collections.sort(entList, new Comparator<Entity>() {
+					@Override
+					public int compare(Entity o1, Entity o2) {
+						return o1.getType().toString().compareTo(o2.getType().toString());
+					}
+				});
+				
+				String deb = "\n   §6>>> Débug entités parcelle " + plot.getPlotId() + " :";
+				for (Entity e : entList)
+					deb += "\n   §e> " + e.getType().toString().toLowerCase() + "§7(" + e.getCustomName() + "§7), " + 
+							e.getLocation().getBlockX() + " " + e.getLocation().getBlockY() + " " + e.getLocation().getBlockZ() + " : " + 
+							(!e.isDead() ? "§avivante" : "§cmorte §(contactez un staff)");
+				
+				sender.sendMessage(deb);
+				break;
+			
 			case "debug":
 				if (plot == null) {
 					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
 					break;
 				}
 				
-				String debug = "\n   §6>>> Débug plot " + plot.getPlotId() + " :";
+				String debug = "\n   §6>>> Débug parcelle " + plot.getPlotId() + " :";
 				debug += "\n   §e> Joueurs : §a" + plot.getPlayers().size();
-				debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + WorldManager.maxTotalEntitiesPerPlot;
+				debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + WorldManager.maxTotalEntitiesPerPlot + " §7(détails avec /debugentities)";
 				debug += "\n   §e> Equipes : §a" + plot.getCbData().getTeams().size() + "/" + CommandBlocksManager.maxTeamsPerPlot;
 				debug += "\n   §e> Objectifs : §a" + plot.getCbData().getObjectives().size() + "/" + CommandBlocksManager.maxObjectivesPerPlot;
 				debug += "\n   §e> Tickets commandblocks : §a" + plot.getCbData().getCommandsTicketsLeft() + "/" +
