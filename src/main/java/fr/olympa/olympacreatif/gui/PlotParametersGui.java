@@ -27,6 +27,7 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
+import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class PlotParametersGui extends IGui {
 	
@@ -43,7 +44,7 @@ public class PlotParametersGui extends IGui {
 	public PlotParametersGui(IGui gui) {
 		super(gui, "Paramètres du plot " + gui.getPlot().getPlotId(), 3);
 		
-		canChangeSettings = plot.getMembers().getPlayerLevel(p) >= 3;
+		canChangeSettings = PlotPerm.CHANGE_PARAM_SETTINGS.has(plot, p);
 		
 		if (canChangeSettings)
 			 clickToChange = new String[] {" ", "§7Cliquez pour changer la valeur"};
@@ -173,7 +174,7 @@ public class PlotParametersGui extends IGui {
 			if (!canChangeSettings)
 				return;
 
-			if (PermissionsList.USE_PLOT_MUSIC.hasPermission(p))
+			if (PlotPerm.DEFINE_MUSIC.has(plot, p))
 				plugin.getPerksManager().getSongManager().openGui(p.getPlayer(), plot);
 		});
 		

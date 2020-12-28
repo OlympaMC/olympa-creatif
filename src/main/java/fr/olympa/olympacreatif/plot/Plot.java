@@ -39,7 +39,7 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class Plot {
@@ -318,7 +318,7 @@ public class Plot {
 		plugin.getCommandBlocksManager().executeJoinActions(this, p);
 		
 		//clear les visiteurs en entrée & stockage de leur inventaire
-		if (parameters.getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS) && members.getPlayerRank(pc) == PlotRank.VISITOR) {
+		if (parameters.getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS) && !PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {
 			List<ItemStack> list = new ArrayList<ItemStack>();
 			for (ItemStack it : p.getInventory().getContents()) {
 				if (it != null && it.getType() != Material.AIR)
@@ -332,13 +332,13 @@ public class Plot {
 				p.removePotionEffect(effect.getType());
 		}
 		
-		//tp au spawn de la zone
-		if (tpToPlotSpawn && parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-			p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plotId));
-			p.teleport(parameters.getSpawnLoc());
-		}
-		
-		if (members.getPlayerRank(pc) == PlotRank.VISITOR) {
+		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {
+			//tp au spawn de la zone
+			if (tpToPlotSpawn && parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
+				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plotId));
+				p.teleport(parameters.getSpawnLoc());
+			}
+			
 			//définition du gamemode
 			p.setGameMode(parameters.getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
 			
@@ -363,7 +363,8 @@ public class Plot {
 	 */
 	public void executeExitActions(Player p) {
 
-		((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCurrentPlot(null);
+		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+		pc.setCurrentPlot(null);
 
 		plugin.getCommandBlocksManager().excecuteQuitActions(this, p);
 		removePlayerInPlot(p);
@@ -386,7 +387,7 @@ public class Plot {
 			
 			if (weSession != null) {
 				//clear clipboard si le joueur n'en est pas le proprio
-				if (members.getPlayerRank(p) != PlotRank.OWNER)
+				if (PlotPerm.BYPASS_EXIT_CLIPBOARD_CLEAR.has(this, pc))
 					weSession.setClipboard(null);
 				
 				World world = weSession.getSelectionWorld();

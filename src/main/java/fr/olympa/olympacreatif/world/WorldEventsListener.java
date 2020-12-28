@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -342,6 +343,9 @@ public class WorldEventsListener implements Listener{
 			plot.executeEntryActions(e.getPlayer(), false);
 
 		e.getPlayer().teleport(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC));
+		
+		//set 1.8 attackspeed
+		e.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(16d);
 	}
 	
 	/*

@@ -3,7 +3,6 @@ package fr.olympa.olympacreatif.command;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,6 @@ import org.bukkit.entity.Player;
 import com.google.common.collect.ImmutableList;
 
 import fr.olympa.api.command.OlympaCommand;
-import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
@@ -30,9 +28,8 @@ import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
-import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
-import fr.olympa.olympacreatif.plot.PlotsManager;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotPerm;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcCommand extends OlympaCommand {
@@ -150,7 +147,7 @@ public class OcCommand extends OlympaCommand {
 							sender.sendMessage(Message.PLOT_ACCEPTED_INVITATION.getValue(pendingInvitations.get(sender)));
 							
 							pendingInvitations.get(sender).getPlayers().forEach(pp -> {
-								if (pendingInvitations.get(sender).getMembers().getPlayerLevel(pp) >= 3)
+								if (PlotPerm.INVITE_MEMBER.has(pc))
 									pp.sendMessage(Message.PLOT_PLAYER_JOIN.getValue(sender.getName()));
 							});
 							
@@ -167,7 +164,7 @@ public class OcCommand extends OlympaCommand {
 				
 			case "center":
 				plot = plugin.getPlotsManager().getPlot(p.getLocation());
-				if (plot == null || plot.getMembers().getPlayerLevel(p) == 0)
+				if (plot == null || PlotPerm.BUILD.has(plot, pc))
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else {
 					p.sendMessage(Message.TELEPORT_PLOT_CENTER.getValue());
@@ -181,7 +178,7 @@ public class OcCommand extends OlympaCommand {
 				
 			case "setspawn":
 				plot = plugin.getPlotsManager().getPlot(p.getLocation());
-				if (plot == null || plot.getMembers().getPlayerLevel(p) < 3)
+				if (plot == null || !PlotPerm.SET_PLOT_SPAWN.has(plot, pc))
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else {
 					plot.getParameters().setSpawnLoc(p.getLocation());
@@ -258,7 +255,7 @@ public class OcCommand extends OlympaCommand {
 				target = Bukkit.getPlayer(args[1]);
 				
 				if (plot != null)
-					if (plot.getMembers().getPlayerLevel(p) >= 3)
+					if (PlotPerm.INVITE_MEMBER.has(plot, pc))
 						if (target != null)
 							if (plot.getMembers().getPlayerRank(target) == PlotRank.VISITOR) {
 								if (plot.getMembers().getMaxMembers() > plot.getMembers().getCount()) {
@@ -286,7 +283,7 @@ public class OcCommand extends OlympaCommand {
 				if (plot == null)
 					p.sendMessage(Message.INVALID_PLOT_ID.getValue());
 				
-				else if (plot.getMembers().getPlayerLevel(pc) < 3)
+				else if (!PlotPerm.KICK_VISITOR.has(plot, pc))
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				
 				else if (plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR || !plot.getPlayers().contains(target))
@@ -315,7 +312,7 @@ public class OcCommand extends OlympaCommand {
 				if (plot == null)
 					p.sendMessage(Message.INVALID_PLOT_ID.getValue());
 				
-				else if (plot.getMembers().getPlayerLevel(pc) < 3)
+				else if (!PlotPerm.BAN_VISITOR.has(plot, pc))
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				
 				else if (!plot.getPlayers().contains(target) || plot.getMembers().getPlayerRank(target) == PlotRank.OWNER)
@@ -350,7 +347,7 @@ public class OcCommand extends OlympaCommand {
 				else if (target == null)
 					p.sendMessage(Message.PLAYER_TARGET_OFFLINE.getValue());
 				
-				else if (plot.getMembers().getPlayerLevel(pc) < 3)
+				else if (PlotPerm.BAN_VISITOR.has(plot, pc))
 					p.sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				
 				else if (plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).remove(AccountProvider.get(target.getUniqueId()).getId()))

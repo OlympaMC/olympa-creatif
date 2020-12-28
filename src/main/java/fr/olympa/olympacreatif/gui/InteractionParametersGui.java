@@ -18,6 +18,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
+import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class InteractionParametersGui extends IGui {
 
@@ -38,13 +39,13 @@ public class InteractionParametersGui extends IGui {
 			if (plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(mat)) {
 				it = ItemUtils.addEnchant(it, Enchantment.DURABILITY, 1);
 
-				if (plot.getMembers().getPlayerLevel(p) < 3)
+				if (!PlotPerm.CHANGE_PARAM_INTERRACTION.has(plot, p))
 					it = ItemUtils.loreAdd(it, "§eEtat : §aautorisé");
 				else
 					it = ItemUtils.loreAdd(it, stateAllowed);
-			}
-			else
-				if (plot.getMembers().getPlayerLevel(p) < 3)
+				
+			}else
+				if (!PlotPerm.CHANGE_PARAM_INTERRACTION.has(plot, p))
 					it = ItemUtils.loreAdd(it, "§eEtat : §cinterdit");
 				else
 					it = ItemUtils.loreAdd(it, stateDenied);
@@ -59,7 +60,7 @@ public class InteractionParametersGui extends IGui {
 		super.onClick(p, current, slot, click);
 		
 		//changement de l'état d'autorisation de l'interraction pour le bloc cliqué si le joueur a la permission
-		if (click == ClickType.LEFT && plot.getMembers().getPlayerLevel(p) >= 3 && slot < PlotParamType.getAllPossibleIntaractibleBlocks().size()) {
+		if (click == ClickType.LEFT && PlotPerm.CHANGE_PARAM_INTERRACTION.has(plot, getPlayer()) && slot < PlotParamType.getAllPossibleIntaractibleBlocks().size()) {
 			if (plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(current.getType())) {
 				plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).remove(current.getType());
 				current = ItemUtils.removeEnchant(current, Enchantment.DURABILITY);

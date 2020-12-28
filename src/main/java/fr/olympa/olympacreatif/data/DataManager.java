@@ -32,8 +32,8 @@ import fr.olympa.olympacreatif.plot.PlotCbData;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotParameters;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class DataManager implements Listener {
 

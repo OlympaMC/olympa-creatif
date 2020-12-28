@@ -32,22 +32,7 @@ public class PlayerPlotsGui extends IGui {
 		
 		//recherche des plots du joueur
 		for (Plot plot : playerPlots) {
-			Material mat = null;
-			switch(plot.getMembers().getPlayerRank(p)) {
-			case OWNER:
-				mat = Material.EMERALD_BLOCK;
-				break;
-			case CO_OWNER:
-				mat = Material.DIAMOND_BLOCK;
-				break;
-			case TRUSTED:
-				mat = Material.GOLD_BLOCK;
-				break;
-			case MEMBER:
-				mat = Material.IRON_BLOCK;
-				break;
-			}
-			
+			Material mat = plot.getMembers().getPlayerRank(p).getMat();			
 			
 			if (mat != null) {
 				i++;

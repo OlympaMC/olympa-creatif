@@ -6,6 +6,7 @@ import fr.olympa.api.permission.OlympaPermission;
 public class PermissionsList {	
 	public static final OlympaPermission USE_MICRO_BLOCKS = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	public static final OlympaPermission USE_PLOT_EXPORTATION = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
+	public static final OlympaPermission USE_PLOT_RESET = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	
 	public static final OlympaPermission USE_SKULL_COMMAND = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	public static final OlympaPermission USE_HAT_COMMAND = new OlympaPermission(OlympaGroup.CREA_CONSTRUCTOR);

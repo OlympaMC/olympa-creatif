@@ -30,7 +30,7 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.PermissionsManager;
 import fr.olympa.olympacreatif.perks.PerksManager;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.AWEProgressBar;

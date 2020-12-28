@@ -5,10 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.command.CommandSender;
@@ -25,9 +23,9 @@ import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -102,9 +100,14 @@ public class CbCommandListener implements Listener {
 	
 	@EventHandler //Handle commandes des joueurs
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e) {
-		
 		//cancel commande si c'est une commande commandblock
-		if (CbCommand.getCommandType(e.getMessage()) != null)
+		CommandType cmdType = CbCommand.getCommandType(e.getMessage());
+		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
+		
+		if (p.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS) && (cmdType == CommandType.teleport || cmdType == CommandType.tp || cmdType == CommandType.clear))
+			return;
+		
+		if (cmdType != null)
 			e.setCancelled(true);
 		else
 			return;
@@ -114,14 +117,11 @@ public class CbCommandListener implements Listener {
 		//return si la commande est nulle
 		if (cmd == null) {
 			e.getPlayer().sendMessage(Message.CB_INVALID_CMD.getValue()); 
-			return;	
+			return;
 		}
-		 
-		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
-		 
+		
 		//si la commandes est un trigger, ou si le joueur a la perm d'exécuter cette commande (selon kit et type cmd)
-		if ((cmd.getPlot().getMembers().getPlayerLevel(p) >= cmd.getMinPlotLevelToExecute() && p.hasKit(KitType.COMMANDBLOCK)) || 
-				cmd.getType() == CommandType.give || cmd.getType() == CommandType.trigger)
+		if (cmd.getMinRankToExecute().has(cmd.getPlot(), p) && (p.hasKit(KitType.COMMANDBLOCK) || !cmd.needCbKitToExecute()))
 			executeCommandBlockCommand(cmd, e.getPlayer());
 		else
 			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());

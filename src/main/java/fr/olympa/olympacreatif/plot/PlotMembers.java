@@ -4,6 +4,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.swing.text.StyledEditorKit.BoldAction;
+
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -11,13 +14,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.sun.source.tree.MemberSelectTree;
 
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class PlotMembers{
 
@@ -101,7 +106,7 @@ public class PlotMembers{
 	}
 	
 	
-	
+	/*
 	public int getPlayerLevel(OlympaPlayerCreatif p) {
 		return getPlayerRank(p).getLevel();
 	}
@@ -116,7 +121,7 @@ public class PlotMembers{
 
 	public int getPlayerLevel(MemberInformations member) {
 		return getPlayerRank(member).getLevel();
-	}
+	}*/
 	
 	
 	
@@ -126,7 +131,7 @@ public class PlotMembers{
 
 			@Override
 			public int compare(MemberInformations o1, MemberInformations o2) {
-				return members.get(o2).getLevel() - members.get(o1).getLevel();
+				return members.get(o2).compare(members.get(o1));
 			}
 		});
 		
@@ -143,60 +148,6 @@ public class PlotMembers{
 	
 	public int getCount() {
 		return getMembers().size(); 
-	}
-
-	public enum PlotRank {
-
-		VISITOR("visitor_level", 0, "§7Visiteur"),
-		MEMBER("member_level", 1, "§bMembre"),
-		TRUSTED("trusted_level", 2, "§3Contremaître"),
-		CO_OWNER("coowner_level", 3, "§9Co-propriétaire"),
-		OWNER("owner_level", 4, "§cPropriétaire");
-		
-		
-		private String s;
-		private int level;
-		private String rankName;
-		
-		PlotRank(String s, int lvl, String desc){
-			this.s = s;
-			this.level = lvl;
-			this.rankName = desc;
-		}
-		
-		@Override
-		public String toString() {
-			return s;
-		}
-		
-		public int getLevel() {
-			return level;
-		}
-		
-		public String getRankName() {
-			return rankName;
-		}
-		
-		public static PlotRank getPlotRank(String plotRankString) {
-			for (PlotRank pr : PlotRank.values())
-				if (pr.toString().equals(plotRankString))
-					return pr;
-			
-			return VISITOR;
-		}
-		
-		public static PlotRank getPlotRank(int plotRank) {
-			if (plotRank < 0)
-				return VISITOR;
-			else if (plotRank > 4)
-				return OWNER;
-			else
-				for (PlotRank pr : PlotRank.values())
-					if (pr.getLevel() == plotRank)
-						return pr;
-			
-			return VISITOR;
-		}
 	}
 
 	

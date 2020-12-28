@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -57,7 +58,6 @@ import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -150,9 +150,8 @@ public class PlotsInstancesListener implements Listener{
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
 		if (e.isCancelled())
 			return;
-		
-		if(((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
-			return;
+
+		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
 		if (plot == null) {
@@ -161,7 +160,7 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
+		if (!PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue(plot));
 			return;
@@ -188,9 +187,10 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //test break block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onBreakBlockEvent(BlockBreakEvent e) {
-		
-		if(((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+		if (e.isCancelled())
 			return;
+
+		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		if (plot == null) {
@@ -198,8 +198,8 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 			return;	
 		}
-		
-		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
+
+		if (!PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue(plot));
 		}
@@ -225,6 +225,8 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //test print TNT
 	public void onPrintTnt(BlockIgniteEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+
+		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		
 		if (plot == null || plot.hasStoplag()) {
 			e.setCancelled(true);
@@ -235,11 +237,11 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-		if (e.getBlock().getType() != Material.TNT && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
+		if (e.getBlock().getType() != Material.TNT && !PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
 			return;
 		}
-		if (!plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT) && plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
+		if (!plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT) && !PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_CANT_PRINT_TNT.getValue());
 		}
@@ -383,10 +385,8 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		}
 		
-		PlotRank playerRank = plot.getMembers().getPlayerRank(e.getPlayer());
-		
 		//test si permission d'interagir avec le bloc donné
-		if (playerRank == PlotRank.VISITOR && e.getClickedBlock() != null &&
+		if (!PlotPerm.BUILD.has(plot, p) && e.getClickedBlock() != null &&
 				PlotParamType.getAllPossibleIntaractibleBlocks().contains(e.getClickedBlock().getType()) &&
 				!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(e.getClickedBlock().getType()) ) {
 			e.setCancelled(true);
@@ -396,7 +396,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 
 		//cancel interract si un item pouvant faire spawn une entité est utilisé
-		if (e.getItem() != null && playerRank == PlotRank.VISITOR) {
+		if (e.getItem() != null && !PlotPerm.BUILD.has(plot, p)) {
 			Material mat = e.getItem().getType();
 			//KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
 			
@@ -409,7 +409,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		//GESTION COMMAND BLOCKS
 		//si édition/placement du commandblock
-		if (plot.getMembers().getPlayerLevel(p) >= 3 && e.getClickedBlock() != null && 
+		if (PlotPerm.COMMAND_BLOCK.has(plot, p) && e.getClickedBlock() != null && 
 				plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getClickedBlock().getType())) {
 			
 			if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -480,14 +480,16 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 
-		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR) {
+		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
+		
+		if (!PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
 			return;
 		}
 		
 		//remove entity si clic droit dessus avec une houe
 		if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && !(e.getRightClicked() instanceof Player) &&
-				plot.getMembers().getPlayerRank(e.getPlayer()) != PlotRank.VISITOR) 
+				PlotPerm.BUILD.has(plot, pc)) 
 			plot.removeEntityInPlot(e.getRightClicked(), true);
 	}
 
@@ -616,7 +618,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 		
-		if (plot.getMembers().getPlayerRank((Player) e.getRemover()) == PlotRank.VISITOR) {
+		if (!PlotPerm.BUILD.has(plot, AccountProvider.get(e.getRemover().getUniqueId()))) {
 			e.setCancelled(true);	
 			return;
 		}
@@ -642,7 +644,7 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (plot.getMembers().getPlayerRank(e.getPlayer()) == PlotRank.VISITOR && !plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS)) {
+		if (!PlotPerm.DROP_ITEM.has(plot, AccountProvider.get(e.getPlayer().getUniqueId())) && !plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS)) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.PLOT_DENY_ITEM_DROP.getValue());
 		}		
@@ -673,7 +675,10 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //set birth plot of new entities
 	public void onEntitySpawn(EntityAddToWorldEvent e) {
-		if (e.getEntityType() != EntityType.PLAYER && !CmdSummon.allowedEntities.contains(e.getEntityType())) {
+		if (e.getEntityType() == EntityType.PLAYER)
+			return;
+		
+		if (!CmdSummon.allowedEntities.contains(e.getEntityType())) {
 			e.getEntity().remove();
 			return;
 		}
@@ -686,6 +691,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot.addEntityInPlot(e.getEntity());
 		plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
+		Bukkit.broadcastMessage("[DEBUG] ADD ENTITY TO " + plot + " : " + e.getEntity().getType());
 	}
 	
 	@EventHandler //remove entities from plot entities list

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class CmdGamemode extends CbCommand {
 
@@ -15,7 +16,8 @@ public class CmdGamemode extends CbCommand {
 			Plot plot, String[] commandString) {
 		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
 		
-		neededPlotLevelToExecute = 1;
+		neededPlotRankToExecute = PlotRank.MEMBER;
+		needCbKitToExecute = false;
 	}
 
 	@Override

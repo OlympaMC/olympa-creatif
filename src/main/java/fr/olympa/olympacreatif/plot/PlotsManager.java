@@ -25,7 +25,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.NBTTagList;
 import net.minecraft.server.v1_16_R3.NBTTagString;

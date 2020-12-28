@@ -29,7 +29,7 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.ShopGui;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcoCommand extends OlympaCommand {
@@ -90,7 +90,7 @@ public class OcoCommand extends OlympaCommand {
 					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_PLOT_EXPORTATION.getMinGroup().getName(p.getGender())));
 					return false;
 				}
-				if (plot != null && plot.getMembers().getPlayerRank(p.getPlayer()) == PlotRank.OWNER)
+				if (plot != null && PlotPerm.EXPORT_PLOT.has(plot, p))
 					plugin.getPerksManager().getSchematicCreator().export(plot, p);
 				else
 					p.getPlayer().sendMessage(Message.OCO_EXPORT_FAILED.getValue(plot));					
@@ -113,7 +113,7 @@ public class OcoCommand extends OlympaCommand {
 				
 				String deb = "\n   §6>>> Débug entités parcelle " + plot.getPlotId() + " :";
 				for (Entity e : entList)
-					deb += "\n   §e> " + e.getType().toString().toLowerCase() + "§7(" + e.getCustomName() + "§7), " + 
+					deb += "\n   §e> " + e.getType().toString().toLowerCase() + "§7(" + (e.getCustomName() == null ? "" : e.getCustomName()) + "§7), " + 
 							e.getLocation().getBlockX() + " " + e.getLocation().getBlockY() + " " + e.getLocation().getBlockZ() + " : " + 
 							(!e.isDead() ? "§avivante" : "§cmorte §(contactez un staff)");
 				
@@ -167,9 +167,11 @@ public class OcoCommand extends OlympaCommand {
 				p.getPlayer().sendMessage(Message.OCO_HEAD_GIVED.getValue());
 				break;
 				
-			case "speed":if (plot != null)
-					if (plot.getMembers().getPlayerLevel(p) == 0)
-						p.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+			case "speed":
+				if (plot != null && !PlotPerm.DEFINE_OWN_FLY_SPEED.has(plot, p)) {
+					p.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+					return false;
+				}
 				
 				float level = 0.1f;
 				

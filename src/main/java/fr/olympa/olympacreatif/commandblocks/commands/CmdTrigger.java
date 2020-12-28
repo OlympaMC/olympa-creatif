@@ -8,6 +8,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbObjective.ObjType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class CmdTrigger extends CbCommand {
 
@@ -15,7 +16,8 @@ public class CmdTrigger extends CbCommand {
 			Plot plot, String[] commandString) {
 		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
 		
-		neededPlotLevelToExecute = 0;
+		neededPlotRankToExecute = PlotRank.VISITOR;
+		needCbKitToExecute = false;
 	}
 
 	@Override

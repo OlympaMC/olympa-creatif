@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 //CETTE COMMANDE EST UN EASTER EGG pas de panique :)
 
@@ -14,7 +15,8 @@ public class CmdOp extends CbCommand {
 			String[] commandString) {
 		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
 		
-		neededPlotLevelToExecute = 0;
+		neededPlotRankToExecute = PlotRank.VISITOR;
+		needCbKitToExecute = false;
 	}
 
 	@Override

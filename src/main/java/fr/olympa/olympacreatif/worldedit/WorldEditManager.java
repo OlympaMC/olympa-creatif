@@ -33,7 +33,7 @@ import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotMembers.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class WorldEditManager extends EventHandler implements Listener {
@@ -84,8 +84,8 @@ public class WorldEditManager extends EventHandler implements Listener {
 	    	
 	    	Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
-	    	if (plot == null || plot.getMembers().getPlayerLevel(p) < 3) {
-	    		p.getPlayer().sendMessage(Message.WE_ERR_NULL_PLOT.getValue(plot));
+	    	if (plot == null || !PlotPerm.USE_WE.has(plot, p)) {
+	    		p.getPlayer().sendMessage(Message.WE_ERR_INSUFFICIENT_PERMISSIOn.getValue(plot));
 	    		return null;	
 	    	} else if (!isWeEnabled) {
 	    		p.getPlayer().sendMessage("§dPour des raisons de sécurité, WorldEdit a été désactivé temporairement.");
@@ -110,7 +110,7 @@ public class WorldEditManager extends EventHandler implements Listener {
 
                 @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
-                	return plot.getMembers().getPlayerLevel(p) >= 3 /*|| p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)*/;
+                	return PlotPerm.USE_WE.has(plot, p);
                 	//return true;
                 }
             };

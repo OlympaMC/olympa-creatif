@@ -36,6 +36,7 @@ import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.PlotParametersGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
+import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class MusicManager implements Listener {
 
@@ -167,7 +168,7 @@ public class MusicManager implements Listener {
 			//this.plot = plot;
 
 			//building music discs
-			if (plot.getMembers().getPlayerLevel(p0) > 2)
+			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProvider.get(p0.getUniqueId())))
 				songsMap.forEach((it, song) -> items.put(it, p -> {
 					String songName = it.getItemMeta().getDisplayName().split("\\. §d")[1];
 					
@@ -188,7 +189,7 @@ public class MusicManager implements Listener {
 			//create remove music item
 			getInventory().setItem(26, it = ItemUtils.item(Material.RED_WOOL, "§cSupprimer la musique actuelle"));
 			
-			if (plot.getMembers().getPlayerLevel(p0) > 2)
+			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProvider.get(p0.getUniqueId())))
 				items.put(it, p -> {
 					PlotParamType.SONG.setValue(plot, "");
 					getInventory().setItem(17, ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §caucune"));
