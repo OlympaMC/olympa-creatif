@@ -69,7 +69,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	}
 
 	
-	@Override //actions on load: STARTUP. Main stuff is done in onEnablePOSTWORLD().
+	@Override 
 	public void onEnable() {
 		super.onEnable();
 		

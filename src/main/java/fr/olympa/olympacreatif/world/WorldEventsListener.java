@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
@@ -416,11 +417,9 @@ public class WorldEventsListener implements Listener{
 				e1.printStackTrace();
 			}
 	}
-	
-	/*
+
 	@EventHandler
-	public void onChunkLoadEvent(ChunkLoadEvent e) {
-		if (!e.getWorld().equals(plugin.getWorldManager().getWorld()))
-			Arrays.asList(e.getChunk().getEntities()).forEach(ent -> ent.remove());
-	}*/
+	public void onLeavesDisappear(LeavesDecayEvent e) {
+		e.setCancelled(true);
+	}
 }

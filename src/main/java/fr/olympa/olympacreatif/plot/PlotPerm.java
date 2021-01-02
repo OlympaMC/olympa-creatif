@@ -151,8 +151,7 @@ public class PlotPerm {
 				for (Field f : PlotPerm.class.getFields())
 					if (f.getType() == PlotPerm.class && Modifier.isStatic(f.getModifiers())) {
 						PlotPerm perm = (PlotPerm) f.get(null);
-						
-						Bukkit.broadcastMessage(this + " : " + f.getName() + " : " + (perm.getRank() == this && perm.getDesc() != null));
+						//Bukkit.broadcastMessage(this + " : " + f.getName() + " : " + (perm.getRank() == this && perm.getDesc() != null));
 						
 						if (perm.getRank() == this && perm.getDesc() != null)
 							relatedPermsDescs.add(perm.getDesc());
