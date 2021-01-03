@@ -55,7 +55,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CmdSummon;
 import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
@@ -155,14 +155,14 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
 		if (plot == null) {
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue("nul"));
+			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_BUILD.getValue("nul"));
 			e.setCancelled(true);
 			return;	
 		}
 		
 		if (!PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue(plot));
+			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_BUILD.getValue(plot));
 			return;
 		}
 		
@@ -194,14 +194,14 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		if (plot == null) {
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue("nul"));
+			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_BUILD.getValue("nul"));
 			e.setCancelled(true);
 			return;	
 		}
 
 		if (!PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_BUILD.getValue(plot));
+			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_BUILD.getValue(plot));
 		}
 	}
 	
@@ -243,7 +243,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 		if (!plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT) && !PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_PRINT_TNT.getValue());
+			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_PRINT_TNT.getValue());
 		}
 	}
 	
@@ -380,7 +380,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null) {
 			if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
 				e.setCancelled(true);
-				e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
+				e.getPlayer().sendMessage(OCmsg.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
 			}
 			return;
 		}
@@ -390,7 +390,7 @@ public class PlotsInstancesListener implements Listener{
 				PlotParamType.getAllPossibleIntaractibleBlocks().contains(e.getClickedBlock().getType()) &&
 				!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(e.getClickedBlock().getType()) ) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT.getValue());
+			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_INTERRACT.getValue());
 			
 			return;
 		}
@@ -401,7 +401,7 @@ public class PlotsInstancesListener implements Listener{
 			//KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
 			
 			if (interractProhibitedItems.contains(mat) || mat.toString().contains("SPAWN_EGG") || mat.toString().contains("BUCKET")) {
-				p.getPlayer().sendMessage(Message.PLOT_ITEM_PROHIBITED_USED.getValue());
+				p.getPlayer().sendMessage(OCmsg.PLOT_ITEM_PROHIBITED_USED.getValue());
 				e.setCancelled(true);
 				return;
 			}
@@ -640,13 +640,13 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (plot == null) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_DENY_ITEM_DROP.getValue());
+			e.getPlayer().sendMessage(OCmsg.PLOT_DENY_ITEM_DROP.getValue());
 			return;	
 		}
 		
 		if (!PlotPerm.DROP_ITEM.has(plot, AccountProvider.get(e.getPlayer().getUniqueId())) && !plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS)) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.PLOT_DENY_ITEM_DROP.getValue());
+			e.getPlayer().sendMessage(OCmsg.PLOT_DENY_ITEM_DROP.getValue());
 		}		
 	}
 	

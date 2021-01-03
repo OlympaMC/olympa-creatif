@@ -33,22 +33,21 @@ public class RedisListener extends JedisPubSub {
 			return;
 		
 		int serverIndex = Integer.valueOf(serverName.substring(serverName.length() - 1));
-		plugin.getDataManager().setServerIndex(serverIndex);
-		plugin.getLogger().log(Level.INFO, "§aINDEX DU SERVEUR CREATIF : " + serverIndex);
+		plugin.getDataManager().updateWithServerIndex(serverIndex);
 		
-		WorldManager.plotSize = Integer.valueOf(Message.valueOf("PARAM_PLOT_SIZE_" + serverName.toUpperCase()).getValue());
+		plugin.getLogger().log(Level.INFO, "§aINDEX DU SERVEUR CREATIF : " + serverIndex);
 		
 		int plotsCount = plugin.getDataManager().getPlotsCount();
 		if (plotsCount != -1)
-			plugin.getLogger().log(Level.INFO, "Intégrité de la table creatif_plotsdata validée : MAX(plot_id) = COUNT(*). Nombre de parcelles détectées : " + plotsCount);
+			plugin.getLogger().log(Level.INFO, "Nombre de parcelles détectées : " + plotsCount);
 		else
 			plugin.getLogger().log(Level.SEVERE, "§4ATTENTION problème dans la table creatif_plotsdata : nombre d'entrées différent de l'indice du plot maximal !!");
 			
 		plugin.getPlotsManager().setTotalPlotCount(plotsCount);
 		plugin.getWorldManager().updateWorldBorder();
 
-		plugin.getLogger().log(Level.INFO, "Taille parcelles définie à " + WorldManager.plotSize + "*" + WorldManager.plotSize);
-		plugin.getServer().getPluginManager().callEvent(new PlotSizeRecievedEvent(WorldManager.plotSize));
+		plugin.getLogger().log(Level.INFO, "Taille parcelles définie à " + OCparam.PLOT_SIZE.getValue() + "*" + OCparam.PLOT_SIZE.getValue());
+		plugin.getServer().getPluginManager().callEvent(new PlotSizeRecievedEvent(OCparam.PLOT_SIZE.getValue()));
 	}
 	
 	public static class PlotSizeRecievedEvent extends Event {

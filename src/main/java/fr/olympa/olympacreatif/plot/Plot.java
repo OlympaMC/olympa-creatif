@@ -33,7 +33,8 @@ import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
@@ -117,8 +118,8 @@ public class Plot {
 				plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getZ() , true);
 		
 		//add entities from already loaded chunks
-		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + WorldManager.plotSize / 16 ; x++)
-			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getZ() + WorldManager.plotSize / 16 ; z++)
+		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.getValue() / 16 ; x++)
+			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getZ() + OCparam.PLOT_SIZE.getValue() / 16 ; z++)
 				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
 					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities()).forEach(e -> {
 						
@@ -131,25 +132,28 @@ public class Plot {
 		//spawns the tuto holo if it's the plot 1
 		if (plotId.getId() == 1) {
 			plugin.getTask().runTaskLater(() -> {
-				Location loc = Message.getLocFromMessage(Message.PARAM_TUTO_HOLO_LOC);
-				loc.getChunk().load();
-				loc.getChunk().setForceLoaded(true);
-				
-				@SuppressWarnings("unchecked")
-				Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, 
-						false, true);
-				
-				for (String s : Message.PARAM_TUTO_HOLO_LINES.getValue().split(" & "))
-					holo.addLine(new FixedLine<HologramLine>(s));
+				setHelpHolo(OCparam.HOLO_HELP_1_LOC.getValue(), OCparam.HOLO_HELP_1_TEXT.getValue().split("&"));
+				setHelpHolo(OCparam.HOLO_HELP_2_LOC.getValue(), OCparam.HOLO_HELP_2_TEXT.getValue().split("&"));
 			}, 10);
 		}
 	}
 	
+	private void setHelpHolo(Location loc, String[] text) {
+		loc.getChunk().load();
+		loc.getChunk().setForceLoaded(true);
+		
+		@SuppressWarnings("unchecked")
+		Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, false, true);
+		
+		for (String s : text)
+			holo.addLine(new FixedLine<HologramLine>(s));
+	}
+	
 	private void loadInitialEntitiesOnChunks() {
 
-		int initialX = plotId.getIndexX() * (Math.floorDiv(WorldManager.plotSize + WorldManager.roadSize, 16));
-		int initialZ = plotId.getIndexZ() * (Math.floorDiv(WorldManager.plotSize + WorldManager.roadSize, 16));
-		int chunksRowCount = Math.floorDiv(WorldManager.plotSize, 16);
+		int initialX = plotId.getIndexX() * (Math.floorDiv(OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize, 16));
+		int initialZ = plotId.getIndexZ() * (Math.floorDiv(OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize, 16));
+		int chunksRowCount = Math.floorDiv(OCparam.PLOT_SIZE.getValue(), 16);
 
 		//Bukkit.broadcastMessage("x min : " + initialX + " - max : " + initialX + chunksRowCount);
 		//Bukkit.broadcastMessage("z min : " + initialZ + " - max : " + initialZ + chunksRowCount);
@@ -195,7 +199,7 @@ public class Plot {
 		if (entitiesInPlot.contains(e) || e.getType() == EntityType.PLAYER)
 			return;
 		
-		if (entitiesInPlot.size() == WorldManager.maxTotalEntitiesPerPlot) 
+		if (entitiesInPlot.size() == OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.getValue()) 
 			entitiesInPlot.remove(0).remove();
 		
 		int count = 0;
@@ -208,7 +212,7 @@ public class Plot {
 					toRemove = ent;
 			}
 		
-		if (count >= WorldManager.maxEntitiesPerTypePerPlot && toRemove != null) {
+		if (count >= OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue() && toRemove != null) {
 			entitiesInPlot.remove(toRemove);
 			toRemove.remove();
 		}
@@ -303,7 +307,7 @@ public class Plot {
 		if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
 			
 			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
-				p.sendMessage(Message.PLOT_CANT_ENTER_BANNED.getValue(members.getOwner().getName()));
+				p.sendMessage(OCmsg.PLOT_CANT_ENTER_BANNED.getValue(members.getOwner().getName()));
 				return false;	
 			}
 		}
@@ -335,7 +339,7 @@ public class Plot {
 		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {
 			//tp au spawn de la zone
 			if (tpToPlotSpawn && parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-				p.sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plotId));
+				p.sendMessage(OCmsg.TELEPORTED_TO_PLOT_SPAWN.getValue(plotId));
 				p.teleport(parameters.getSpawnLoc());
 			}
 			

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
 
 public class PlotStoplagChecker {
@@ -75,7 +75,7 @@ public class PlotStoplagChecker {
 			
 			//message
 			plot.getPlayers().forEach(p -> {
-				p.sendMessage(Message.PLOT_STOPLAG_FIRED.getValue(type, stoplagCount, forcedStoplagStoplagCount));
+				p.sendMessage(OCmsg.PLOT_STOPLAG_FIRED.getValue(type, stoplagCount, forcedStoplagStoplagCount));
 				});
 		}
 		else {
@@ -83,7 +83,7 @@ public class PlotStoplagChecker {
 			
 			//message
 			plot.getPlayers().forEach(p -> {
-				p.sendMessage(Message.PLOT_FORCED_STOPLAG_FIRED.getValue(type));
+				p.sendMessage(OCmsg.PLOT_FORCED_STOPLAG_FIRED.getValue(type));
 				});
 		}
 	}

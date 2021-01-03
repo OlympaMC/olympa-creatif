@@ -21,7 +21,8 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
@@ -58,7 +59,7 @@ public class CbCommandListener implements Listener {
 				Iterator<Entry<Location, Integer>> iter = blockedExecutionLocs.entrySet().iterator();
 				while(iter.hasNext()) {
 					Entry<Location, Integer> e = iter.next();
-					if (e.getValue() + CommandBlocksManager.minTickBetweenEachCbExecution <= MinecraftServer.currentTick)
+					if (e.getValue() + OCparam.CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue() <= MinecraftServer.currentTick)
 						iter.remove();
 				}
 			}
@@ -88,7 +89,7 @@ public class CbCommandListener implements Listener {
 			}else
 				//commandblock lents, max 1 cmd/s
 				if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
-					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - CommandBlocksManager.minTickBetweenEachCbExecution);
+					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - OCparam.CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue());
 				else
 					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
 			
@@ -116,7 +117,7 @@ public class CbCommandListener implements Listener {
 		
 		//return si la commande est nulle
 		if (cmd == null) {
-			e.getPlayer().sendMessage(Message.CB_INVALID_CMD.getValue()); 
+			e.getPlayer().sendMessage(OCmsg.CB_INVALID_CMD.getValue()); 
 			return;
 		}
 		
@@ -124,25 +125,25 @@ public class CbCommandListener implements Listener {
 		if (cmd.getMinRankToExecute().has(cmd.getPlot(), p) && (p.hasKit(KitType.COMMANDBLOCK) || !cmd.needCbKitToExecute()))
 			executeCommandBlockCommand(cmd, e.getPlayer());
 		else
-			e.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+			e.getPlayer().sendMessage(OCmsg.INSUFFICIENT_PLOT_PERMISSION.getValue());
 	}	
 	
 	//exécute la commande et si le CommandSender est un commandblock, mise à jour des ses NBTTags
 	private void executeCommandBlockCommand(CbCommand cmd, CommandSender sender) {
 		
-		Message message = Message.CB_RESULT_FAILED;
+		OCmsg message = OCmsg.CB_RESULT_FAILED;
 		
 		//Bukkit.broadcastMessage(cmd.getType().toString());
 
 		int neededCmdTickets;
 		if (cmd.getType() == CommandType.setblock)
-			neededCmdTickets = CommandBlocksManager.cmdTicketByCmdSetblock;
+			neededCmdTickets = OCparam.CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK.getValue();
 		else
 			neededCmdTickets = 1;
 		
 		if (cmd.getPlot().getCbData().getCommandsTicketsLeft() < neededCmdTickets) {
 			//si le plot n'a plus assez de commandes restantes, cancel exécution
-			sender.sendMessage(Message.CB_NO_COMMANDS_LEFT.getValue());
+			sender.sendMessage(OCmsg.CB_NO_COMMANDS_LEFT.getValue());
 			return;
 		}else
 			//si le plot a assez de commandes restantes, retrait d'une d'entre elles avant de passer à l'exécution
@@ -151,7 +152,7 @@ public class CbCommandListener implements Listener {
 		int result = cmd.execute();
 		
 		if (result > 0)
-			message = Message.CB_RESULT_SUCCESS;
+			message = OCmsg.CB_RESULT_SUCCESS;
 		
 		sender.sendMessage(message.getValue(cmd.getType(), result));
 		

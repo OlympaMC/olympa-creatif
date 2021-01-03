@@ -54,6 +54,7 @@ import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.region.tracking.BypassCommand;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.PlotId;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -130,8 +131,8 @@ public class StaffGui extends IGui {
 							
 							int xMin = plot.getPlotId().getLocation().getBlockX();
 							int zMin = plot.getPlotId().getLocation().getBlockZ();
-							int xMax = xMin + WorldManager.plotSize - 1;
-							int zMax = zMin + WorldManager.plotSize - 1;
+							int xMax = xMin + OCparam.PLOT_SIZE.getValue() - 1;
+							int zMax = zMin + OCparam.PLOT_SIZE.getValue() - 1;
 
 							try (EditSession session = new EditSession(new EditSessionBuilder(FaweAPI.getWorld(plugin.getWorldManager().getWorld().getName())))) {
 								for (int x = xMin ; x <= xMax ; x++)

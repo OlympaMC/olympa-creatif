@@ -9,7 +9,8 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
@@ -22,23 +23,23 @@ public class CommandBlocksManager {
 	//scoreboards inutilisés qui seront réaffectés au besoin à d'autres plots chargés ultérieurement	 
 	//private List<Scoreboard> unusedScoreboards = new ArrayList<Scoreboard>();
 	
-	public static int maxTeamsPerPlot;
+	/*public static int maxTeamsPerPlot;
 	public static int maxObjectivesPerPlot;
 	
 	public static int maxCommandsTicketst;
 
 	public static int minTickBetweenEachCbExecution;
-	public static int cmdTicketByCmdSetblock;
+	public static int cmdTicketByCmdSetblock;*/
 	
 	public CommandBlocksManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-
-		maxTeamsPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_TEAMS_PER_PLOT.getValue());
-		maxObjectivesPerPlot = Integer.valueOf(Message.PARAM_CB_MAX_OBJECTIVES_PER_PLOT.getValue());
-		maxCommandsTicketst = Integer.valueOf(Message.PARAM_CB_MAX_CMDS_LEFT.getValue());
 		
-		minTickBetweenEachCbExecution = Integer.valueOf(Message.PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue());
-		cmdTicketByCmdSetblock = Integer.valueOf(Message.PARAM_CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK.getValue());
+		/*maxTeamsPerPlot = OCparam.CB_MAX_TEAMS_PER_PLOT.getValue();
+		maxObjectivesPerPlot = Integer.valueOf(OCmsg.PARAM_CB_MAX_OBJECTIVES_PER_PLOT.getValue());
+		maxCommandsTicketst = Integer.valueOf(OCmsg.PARAM_CB_MAX_CMDS_LEFT.getValue());
+		
+		minTickBetweenEachCbExecution = Integer.valueOf(OCmsg.PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue());
+		cmdTicketByCmdSetblock = Integer.valueOf(OCmsg.PARAM_CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK.getValue());*/
 
 		plugin.getServer().getPluginManager().registerEvents(new CbObjectivesListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new CbTeamsListener(plugin), plugin);

@@ -16,7 +16,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -31,7 +32,7 @@ public class SchematicCreator {
 	    
 	public void export(Plot plot, OlympaPlayerCreatif p) {
 	    if (!plugin.getWEManager().isWeEnabled()) {
-	    	p.getPlayer().sendMessage(Message.WE_DISABLED.getValue());
+	    	p.getPlayer().sendMessage(OCmsg.WE_DISABLED.getValue());
 	    	return;
 	    }
 	    	
@@ -53,7 +54,7 @@ public class SchematicCreator {
 
 		    //create the Clipboard to copy
 		    BlockVector3 v1 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX(), 0, plot.getPlotId().getLocation().getBlockZ());
-		    BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + WorldManager.plotSize - 1, 255, plot.getPlotId().getLocation().getBlockZ() + WorldManager.plotSize - 1);
+		    BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.getValue() - 1, 255, plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.getValue() - 1);
 		    
 		    CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), v1, v2);
 		    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
@@ -77,10 +78,10 @@ public class SchematicCreator {
 				e.printStackTrace();
 			}
 			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
-		    p.getPlayer().sendMessage(Message.WE_COMPLETE_GENERATING_PLOT_SCHEM.getValue(plot));
+		    p.getPlayer().sendMessage(OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.getValue(plot));
 	    });
 	    
-	    p.getPlayer().sendMessage(Message.WE_START_GENERATING_PLOT_SCHEM.getValue(plot));
+	    p.getPlayer().sendMessage(OCmsg.WE_START_GENERATING_PLOT_SCHEM.getValue(plot));
 		//return "§4La fonctionnalité d'export de la parcelle est indisponible pendant la bêta, désolé ¯\\_༼ ಥ ‿ ಥ ༽_/¯";
 	}
 	

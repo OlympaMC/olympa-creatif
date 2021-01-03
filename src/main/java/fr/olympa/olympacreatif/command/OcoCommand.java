@@ -23,7 +23,8 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.MainGui;
@@ -68,17 +69,17 @@ public class OcoCommand extends OlympaCommand {
 			switch (args[0]) {
 			case "hat":
 				if (!PermissionsList.USE_HAT_COMMAND.hasPermission(p)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_HAT_COMMAND.getMinGroup().getName(p.getGender())));
+					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_HAT_COMMAND.getMinGroup().getName(p.getGender())));
 					return false;
 				}
-				p.getPlayer().sendMessage(Message.OCO_HAT_SUCCESS.getValue());
+				p.getPlayer().sendMessage(OCmsg.OCO_HAT_SUCCESS.getValue());
 				p.getPlayer().getInventory().setHelmet(new ItemStack(p.getPlayer().getInventory().getItemInMainHand().getType()));
 				break;
 				
 				
 			case "mb":
 				if (!PermissionsList.USE_MICRO_BLOCKS.hasPermission(p)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
+					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
 					return false;
 				}
 				plugin.getPerksManager().getMicroBlocks().openGui(p.getPlayer());
@@ -87,20 +88,20 @@ public class OcoCommand extends OlympaCommand {
 				
 			case "export":
 				if (!PermissionsList.USE_PLOT_EXPORTATION.hasPermission(p)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_PLOT_EXPORTATION.getMinGroup().getName(p.getGender())));
+					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_PLOT_EXPORTATION.getMinGroup().getName(p.getGender())));
 					return false;
 				}
 				if (plot != null && PlotPerm.EXPORT_PLOT.has(plot, p))
 					plugin.getPerksManager().getSchematicCreator().export(plot, p);
 				else
-					p.getPlayer().sendMessage(Message.OCO_EXPORT_FAILED.getValue(plot));					
+					p.getPlayer().sendMessage(OCmsg.OCO_EXPORT_FAILED.getValue(plot));					
 					
 				break;
 				
 				
 			case "debugentities":
 				if (plot == null) {
-					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
+					sender.sendMessage(OCmsg.INVALID_PLOT_ID.getValue());
 					break;
 				}
 				List<Entity> entList = plot.getEntities();
@@ -122,17 +123,17 @@ public class OcoCommand extends OlympaCommand {
 			
 			case "debug":
 				if (plot == null) {
-					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());
+					sender.sendMessage(OCmsg.INVALID_PLOT_ID.getValue());
 					break;
 				}
 				
 				String debug = "\n   §6>>> Débug parcelle " + plot.getPlotId() + " :";
 				debug += "\n   §e> Joueurs : §a" + plot.getPlayers().size();
-				debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + WorldManager.maxTotalEntitiesPerPlot + " §7(détails avec /debugentities)";
-				debug += "\n   §e> Equipes : §a" + plot.getCbData().getTeams().size() + "/" + CommandBlocksManager.maxTeamsPerPlot;
-				debug += "\n   §e> Objectifs : §a" + plot.getCbData().getObjectives().size() + "/" + CommandBlocksManager.maxObjectivesPerPlot;
+				debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.getValue() + " (max " + OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue() + " de chaque type) §7(détails avec /debugentities)";
+				debug += "\n   §e> Equipes : §a" + plot.getCbData().getTeams().size() + "/" + OCparam.CB_MAX_TEAMS_PER_PLOT.getValue();
+				debug += "\n   §e> Objectifs : §a" + plot.getCbData().getObjectives().size() + "/" + OCparam.CB_MAX_OBJECTIVES_PER_PLOT.getValue();
 				debug += "\n   §e> Tickets commandblocks : §a" + plot.getCbData().getCommandsTicketsLeft() + "/" +
-						CommandBlocksManager.maxCommandsTicketst + " (+" + plot.getCbData().getCpt() * 20 + "/s)";
+						OCparam.CB_MAX_CMDS_LEFT.getValue() + " (+" + plot.getCbData().getCpt() * 20 + "/s)";
 				
 				sender.sendMessage(debug);
 				break;
@@ -142,7 +143,7 @@ public class OcoCommand extends OlympaCommand {
 				break;
 				
 			default:
-				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
+				sender.sendMessage(OCmsg.OCO_COMMAND_HELP.getValue());
 				break;
 			}
 			break;
@@ -150,26 +151,26 @@ public class OcoCommand extends OlympaCommand {
 			switch(args[0]) {
 			case "mb":
 				if (!PermissionsList.USE_MICRO_BLOCKS.hasPermission(p)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
+					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
 					return false;
 				}
 				ItemStack item = plugin.getPerksManager().getMicroBlocks().getMb(args[1]);
 				if (item != null) {
 					p.getPlayer().getInventory().addItem(item);
-					p.getPlayer().sendMessage(Message.OCO_HEAD_GIVED.getValue());
+					p.getPlayer().sendMessage(OCmsg.OCO_HEAD_GIVED.getValue());
 				}else
-					p.getPlayer().sendMessage(Message.OCO_UNKNOWN_MB.getValue());
+					p.getPlayer().sendMessage(OCmsg.OCO_UNKNOWN_MB.getValue());
 				break;
 				
 			case "skull":
 				Consumer<ItemStack> consumer = sk -> p.getPlayer().getInventory().addItem(sk);
 				ItemUtils.skull(consumer, "§6Tête de " + args[1], args[1]);
-				p.getPlayer().sendMessage(Message.OCO_HEAD_GIVED.getValue());
+				p.getPlayer().sendMessage(OCmsg.OCO_HEAD_GIVED.getValue());
 				break;
 				
 			case "speed":
 				if (plot != null && !PlotPerm.DEFINE_OWN_FLY_SPEED.has(plot, p)) {
-					p.getPlayer().sendMessage(Message.INSUFFICIENT_PLOT_PERMISSION.getValue());
+					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_PLOT_PERMISSION.getValue());
 					return false;
 				}
 				
@@ -181,17 +182,17 @@ public class OcoCommand extends OlympaCommand {
 				}
 				
 				p.getPlayer().setFlySpeed(level);
-				p.getPlayer().sendMessage(Message.OCO_SET_FLY_SPEED.getValue(args[1]));
+				p.getPlayer().sendMessage(OCmsg.OCO_SET_FLY_SPEED.getValue(args[1]));
 				
 				break;
 				
 			default:
-				sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
+				sender.sendMessage(OCmsg.OCO_COMMAND_HELP.getValue());
 				break;
 			}
 			break;
 		default:
-			sender.sendMessage(Message.OCO_COMMAND_HELP.getValue());
+			sender.sendMessage(OCmsg.OCO_COMMAND_HELP.getValue());
 			break;
 		}
 		

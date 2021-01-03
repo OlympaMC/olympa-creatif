@@ -14,7 +14,8 @@ import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -75,20 +76,20 @@ public class MainGui extends IGui {
 			setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle"), 
 					(it, c, s) -> {
 						p.getPlayer().closeInventory();
-						p.getPlayer().sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
+						p.getPlayer().sendMessage(OCmsg.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
 						p.getPlayer().teleport(plot.getParameters().getSpawnLoc());
 					});	
 		}
 		
 		setItem(30, ItemUtils.item(Material.RED_BED, "§6Téléportation au spawn"), 
-				(it, c, s) -> p.getPlayer().teleport(Message.getLocFromMessage(Message.PARAM_SPAWN_LOC)));
+				(it, c, s) -> p.getPlayer().teleport(OCparam.SPAWN_LOC.getValue()));
 		
 		setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"), 
 				(it, c, s) -> {
 					if (plugin.getPlotsManager().getPlots().size() > 0) {
 						Plot plotR = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
 						p.getPlayer().teleport(plotR.getParameters().getSpawnLoc());
-						p.getPlayer().sendMessage(Message.TELEPORTED_TO_PLOT_SPAWN.getValue(plotR));
+						p.getPlayer().sendMessage(OCmsg.TELEPORTED_TO_PLOT_SPAWN.getValue(plotR));
 					}
 				});
 

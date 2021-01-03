@@ -14,7 +14,7 @@ import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 
@@ -45,7 +45,7 @@ public class PlayerPlotsGui extends IGui {
 								p.getPlayer().closeInventory();
 								if (c == ClickType.LEFT) {
 									p.getPlayer().teleport(playerPlots.get(s).getPlotId().getLocation());
-									p.getPlayer().sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(s)));	
+									p.getPlayer().sendMessage(OCmsg.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(s)));	
 								}else if (c == ClickType.RIGHT) {
 									MainGui.getMainGui(p, playerPlots.get(s)).create(p.getPlayer());
 								}

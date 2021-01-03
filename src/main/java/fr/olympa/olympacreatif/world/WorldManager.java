@@ -24,7 +24,8 @@ import fr.olympa.api.redis.RedisAccess;
 import fr.olympa.api.redis.RedisChannel;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.RedisListener;
 
@@ -33,18 +34,12 @@ public class WorldManager {
 	private World world = null;
 	private net.minecraft.server.v1_16_R3.World nmsWorld = null;
 
-	public static int plotSize = 256;
+	//public static int plotSize = 256;
 	public static final int roadSize = 16;
 	public static final int worldLevel = 60;
 	
-	public static int maxEntitiesPerTypePerPlot;
-	public static int maxTotalEntitiesPerPlot;
-	
 	public WorldManager(final OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-		
-		maxEntitiesPerTypePerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue());
-		maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
 		
 		Bukkit.setDefaultGameMode(GameMode.CREATIVE);
 		
@@ -60,7 +55,7 @@ public class WorldManager {
 		
 		System.out.println("world : " + world);*/
 		
-		world = Bukkit.getWorld(Message.PARAM_WORLD_NAME.getValue());
+		world = Bukkit.getWorld(OCparam.WORLD_NAME.getValue());
 		
 		//définition des règles du monde
 		world.setDifficulty(Difficulty.EASY);
@@ -159,8 +154,8 @@ public class WorldManager {
 		new BukkitRunnable() {
 			
 			final int cMax = 60;
-			final int noAfkIncome = Integer.valueOf(Message.PARAM_INCOME_NOT_AFK.getValue());
-			final int afkIncome = Integer.valueOf(Message.PARAM_INCOME_AFK.getValue());
+			final int noAfkIncome = Integer.valueOf(OCparam.INCOME_NOT_AFK.getValue());
+			final int afkIncome = Integer.valueOf(OCparam.INCOME_AFK.getValue());
 			int c = 0;
 			
 			@Override
@@ -175,7 +170,7 @@ public class WorldManager {
 					
 					if (c == cMax) {
 						c = 0;
-						p.sendMessage(Message.PERIODIC_INCOME_RECEIVED.getValue(income, noAfkIncome, afkIncome));	
+						p.sendMessage(OCmsg.PERIODIC_INCOME_RECEIVED.getValue(income, noAfkIncome, afkIncome));	
 					}
 				});
 			}
@@ -195,7 +190,7 @@ public class WorldManager {
 	 */
 	public void updateWorldBorder() {
 		int circleIndex = 1;
-		int newSize = plotSize + roadSize;
+		int newSize = OCparam.PLOT_SIZE.getValue() + roadSize;
 
 		
 		//recherche du premier cercle de plots non plein (plot central = circleIndex 1)
@@ -203,14 +198,14 @@ public class WorldManager {
 				> Math.pow(circleIndex*2-1, 2))
 			circleIndex++;
 		
-		newSize += (circleIndex - 1) * (plotSize + roadSize) * 2;
+		newSize += (circleIndex - 1) * (OCparam.PLOT_SIZE.getValue() + roadSize) * 2;
 		
 		WorldBorder border = world.getWorldBorder();
 		
 		if (border.getSize() == newSize)
 			return;
 		
-		border.setCenter(plotSize/2, plotSize/2);
+		border.setCenter(OCparam.PLOT_SIZE.getValue()/2, OCparam.PLOT_SIZE.getValue()/2);
 		border.setWarningDistance(0);
 		border.setSize(newSize);
 	}

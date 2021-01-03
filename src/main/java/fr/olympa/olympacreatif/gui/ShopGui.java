@@ -17,7 +17,7 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.player.Gender;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
-import fr.olympa.olympacreatif.data.Message;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
@@ -435,7 +435,7 @@ public class ShopGui extends IGui{
 				});
 			}
 			
-			p.getPlayer().sendMessage(Message.SHOP_BUY_SUCCESS.getValue(itemHolder.getItemMeta().getDisplayName().toLowerCase()));
+			p.getPlayer().sendMessage(OCmsg.SHOP_BUY_SUCCESS.getValue(itemHolder.getItemMeta().getDisplayName().toLowerCase()));
 			
 			//new AccountProvider(p.getUniqueId()).saveToDb(p);
 		}

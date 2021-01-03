@@ -6,17 +6,23 @@ import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.logging.Level;
 
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import com.google.gson.Gson;
 
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
 import fr.olympa.api.redis.RedisAccess;
@@ -50,6 +56,13 @@ public class DataManager implements Listener {
 				"`message_id` TINYTEXT NOT NULL DEFAULT ''," + 
 				"`message_string` VARCHAR(512) NOT NULL DEFAULT ''," +
 				"PRIMARY KEY (`message_id`));"
+				);
+	
+	private final OlympaStatement osTableCreateServerParams = new OlympaStatement(
+			"CREATE TABLE IF NOT EXISTS `creatif_server_params` (" + 
+				"`server_id` INT NOT NULL," + 
+				"`server_params` VARCHAR(8192) NOT NULL DEFAULT ''," +
+				"PRIMARY KEY (`server_id`));"
 				);
 	
 	private final OlympaStatement osTableCreatePlotSchems = new OlympaStatement(
@@ -121,6 +134,11 @@ public class DataManager implements Listener {
 			"SELECT * FROM creatif_players WHERE `player_id` = ?;"			
 			);
 	
+	private final OlympaStatement osSelectServerParams = new OlympaStatement(
+			"SELECT * FROM creatif_server_params WHERE `server_id` = ?;"			
+			);
+	
+	
 	//statement update data
 	private final OlympaStatement osUpdatePlayerPlotRank = new OlympaStatement(
 			"INSERT INTO creatif_plotsmembers " +
@@ -156,7 +174,15 @@ public class DataManager implements Listener {
 			"schem_name = VALUES(schem_name), " +
 			"schem_data = VALUES(schem_data);"
 			);
-	
+
+	private final OlympaStatement osUpdateServerParams = new OlympaStatement(
+			"INSERT INTO creatif_server_params " +
+			"(`server_id`, `server_params`) " +
+			"VALUES (?, ?) " + 
+			"ON DUPLICATE KEY UPDATE " +
+			"server_params = VALUES(server_params);"
+			);
+		
 	public DataManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
@@ -167,14 +193,24 @@ public class DataManager implements Listener {
 		//création tables
 		try {
 			osTableCreateMessages.getStatement().execute();
+			osTableCreateServerParams.getStatement().execute();
 			osTableCreatePlotSchems.getStatement().execute();
 			osTableCreatePlotParameters.getStatement().execute();
 			osTableCreatePlotMembers.getStatement().execute();
 			
 			ResultSet messages = osSelectMessages.getStatement().executeQuery();
+			
+			Map<String, OCmsg> ocMsgs = OCmsg.getValues();
+			Set<String> inexistantMessagesInBdd = ocMsgs.keySet(); 
+			
 			while (messages.next()) {				
-				if (EnumUtils.isValidEnum(Message.class, messages.getString("message_id")))
-					Message.valueOf(messages.getString("message_id")).setValue(messages.getString("message_string"));
+				if (ocMsgs.containsKey(messages.getString("message_id"))) {
+					ocMsgs.get(messages.getString("message_id")).setValue(messages.getString("message_string"));
+					inexistantMessagesInBdd.remove(messages.getString("message_id"));
+				}else
+					plugin.getLogger().log(Level.WARNING, "§eMessage " + messages.getString("message_id") + " existant en BDD mais pas dans le plugin, veuillez supprimer l'entrée.");
+				
+				inexistantMessagesInBdd.forEach(msg -> plugin.getLogger().log(Level.WARNING, "§eMessage " + msg + " existant dans le plugin mais pas en BDD, veuiller ajouter l'entrée !"));
 			}
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -426,8 +462,35 @@ public class DataManager implements Listener {
 		}
 	}
 	
-	public void setServerIndex(int i) {
+	public void updateWithServerIndex(int i) {
 		serverIndex = i;
+		try {
+			PreparedStatement ps = osSelectServerParams.getStatement();
+			ps.setInt(1, serverIndex);
+			
+			ResultSet result = ps.executeQuery();
+			result.next();
+			
+			JSONObject json = (JSONObject) new JSONParser().parse(result.getString("server_params"));
+			Gson gson = new Gson();
+			
+			OCparam.getValues().forEach((name, param) -> {
+				if (json.get(name) != null) {
+					
+					Object obj = gson.fromJson((String) json.get(name), param.getParamClass());
+					param.setValueFromBdd(obj);
+				}else
+					plugin.getLogger().log(Level.SEVERE, "§4Pas d'entrée pour le paramètre " + name + " en BDD ! Une valeur par défaut va être définie.");
+			});
+			
+			PreparedStatement ps2 = osUpdateServerParams.getStatement();
+			ps2.setInt(1, serverIndex);
+			ps2.setString(2, OCparam.toJson());
+			ps2.executeUpdate();
+			
+		} catch (SQLException | ParseException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public int getServerIndex() {

@@ -20,6 +20,7 @@ import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 public class PlotCbData {
@@ -46,7 +47,7 @@ public class PlotCbData {
 		this.hasUnlockedSetblockSpawnerCmd = hasUnlockedSummonCmd;
 		this.hasUnlockedSummonCmd = hasUnlockedSummonCmd;
 		
-		commandsLeft = CommandBlocksManager.maxCommandsTicketst;
+		commandsLeft = OCparam.CB_MAX_CMDS_LEFT.getValue();
 	}
 
 	public void executeSynchronousInit() {
@@ -85,7 +86,7 @@ public class PlotCbData {
 	}
 	
 	public void addCommandTickets() {
-		commandsLeft = Math.min(CommandBlocksManager.maxCommandsTicketst, commandsLeft + cpt);
+		commandsLeft = Math.min(OCparam.CB_MAX_CMDS_LEFT.getValue(), commandsLeft + cpt);
 	}
 	
 	public void setCpt(int newCpt) {
@@ -152,7 +153,7 @@ public class PlotCbData {
 				return false;
 		
 		objectives.add(obj);
-		if (objectives.size() > CommandBlocksManager.maxObjectivesPerPlot) {
+		if (objectives.size() > OCparam.CB_MAX_OBJECTIVES_PER_PLOT.getValue()) {
 			objectives.remove(0).clearDisplaySlot();
 		}
 		
@@ -186,7 +187,7 @@ public class PlotCbData {
 		
 		teams.add(team);
 		
-		if (teams.size() > CommandBlocksManager.maxTeamsPerPlot)
+		if (teams.size() > OCparam.CB_MAX_TEAMS_PER_PLOT.getValue())
 			teams.remove(0);
 		
 		return true;
