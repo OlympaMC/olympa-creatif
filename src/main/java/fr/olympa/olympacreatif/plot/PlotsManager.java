@@ -43,15 +43,11 @@ public class PlotsManager {
 	
 	private int plotCount;
 	
-	@SuppressWarnings("unchecked")
 	public PlotsManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 
 		plugin.getServer().getPluginManager().registerEvents(new PlotsManagerListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new PlotsInstancesListener(plugin), plugin);
-		
-		plotCount = plugin.getDataManager().getPlotsCount();
-		//plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1));
 		
 		//construit les objets Plot chargés depuis la bdd de manière synchrone avec le serveur
 		new BukkitRunnable() {
@@ -126,24 +122,8 @@ public class PlotsManager {
 			}
 		}.runTaskTimerAsynchronously(plugin, 10, 300);
 
-		//load plot 1 and related tuto holo
+		//load plot 1 
 		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1), false);
-		/*try {
-			plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1), true);
-			loadPlot(asyncPlots.get(0));
-			
-			Location loc = Message.getLocFromMessage(Message.PARAM_TUTO_HOLO_LOC);
-			loc.getChunk().load();
-			
-			Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, 
-					false, true);
-			
-			for (String s : Message.PARAM_TUTO_HOLO_LINES.getValue().split(" & "))
-				holo.addLine(new FixedLine<HologramLine>(s));
-		}catch(Exception e) {
-			plugin.getLogger().log(Level.WARNING, "§cLa parcelle 1 (dont le chargement esr forcé dans la classe PlotsManager) ne n'est pas chargée correctement.");
-			e.printStackTrace();
-		}*/
 	}
 	
 	/**
@@ -275,6 +255,10 @@ public class PlotsManager {
 	
 	public int getTotalPlotCount() {
 		return plotCount;
+	}
+
+	public void setTotalPlotCount(int plotsCount) {
+		this.plotCount = plotsCount;
 	}
 	
 	public void addAsyncPlot(AsyncPlot plot) {

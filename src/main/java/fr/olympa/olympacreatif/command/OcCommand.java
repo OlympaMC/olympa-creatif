@@ -242,7 +242,12 @@ public class OcCommand extends OlympaCommand {
 				
 				PlotId id = PlotId.fromString(plugin, args[1]);
 				if (id != null) {
-					p.teleport(id.getLocation());
+					plot = plugin.getPlotsManager().getPlot(id);
+					if (plot == null)
+						p.teleport(id.getLocation());
+					else
+						p.teleport(plot.getParameters().getSpawnLoc());
+					
 					sender.sendMessage(Message.TELEPORT_IN_PROGRESS.getValue(id));
 				}else {
 					sender.sendMessage(Message.INVALID_PLOT_ID.getValue());

@@ -87,6 +87,10 @@ public enum Message {
 	
 	PARAM_TUTO_HOLO_LOC, 
 	PARAM_TUTO_HOLO_LINES,
+
+	PARAM_PLOT_SIZE_CREATIF1,
+	PARAM_PLOT_SIZE_CREATIF2,
+	PARAM_PLOT_SIZE_CREATIF3,
 	;
 	
 	private String message = "";

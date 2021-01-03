@@ -2,7 +2,6 @@ package fr.olympa.olympacreatif.worldedit;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.logging.Level;
 
 import org.bukkit.Material;
@@ -20,8 +19,6 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.util.eventbus.EventHandler;
-
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;

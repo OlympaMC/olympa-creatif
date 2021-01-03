@@ -4,6 +4,6 @@ author: Bullobily
 
 main: fr.olympa.olympacreatif.OlympaCreatifMain
 
-depend: [OlympaCore]
+depend: [OlympaCore, OlympaCreatifWorldGen]
 softdepend: [WorldEdit, FastAsyncWorldEdit, NoteBlockAPI]
 api-version: 1.16

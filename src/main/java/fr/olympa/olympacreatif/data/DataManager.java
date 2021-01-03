@@ -3,26 +3,24 @@ package fr.olympa.olympacreatif.data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
+import fr.olympa.api.redis.RedisAccess;
+import fr.olympa.api.redis.RedisChannel;
 import fr.olympa.api.sql.statement.OlympaStatement;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
@@ -42,6 +40,8 @@ public class DataManager implements Listener {
 	private Vector<PlotId> plotsToLoad = new Vector<PlotId>();
 	private Vector<Plot> plotsToSave = new Vector<Plot>();
 	
+	private int serverIndex = -1;
+	
 	//statements de création des tables
 	private final OlympaStatement osTableCreateMessages = new OlympaStatement(
 			"CREATE TABLE IF NOT EXISTS `creatif_messages` (" + 
@@ -52,29 +52,32 @@ public class DataManager implements Listener {
 	
 	private final OlympaStatement osTableCreatePlotSchems = new OlympaStatement(
 			"CREATE TABLE IF NOT EXISTS `creatif_plotschems` (" + 
+				"`server_id` INT NOT NULL," + 
 				"`plot_id` INT NOT NULL," + 
 				"`player_id` BIGINT(20) NOT NULL," +
 				"`schem_name` VARCHAR(128) NOT NULL DEFAULT ''," +
 				"`schem_data` MEDIUMBLOB NOT NULL," +
-				"PRIMARY KEY (`plot_id`));"
+				"PRIMARY KEY (`server_id`, `plot_id`));"
 				);
 	
 	private final OlympaStatement osTableCreatePlotParameters = new OlympaStatement(
 			"CREATE TABLE IF NOT EXISTS `creatif_plotsdatas` (" +
+					"`server_id` INT NOT NULL," + 
 					"`plot_id` INT NOT NULL," +
 					"`plot_creation_date` DATETIME NOT NULL DEFAULT NOW()," +
 					"`plot_parameters` VARCHAR(8192) NOT NULL DEFAULT '', " +
-					"PRIMARY KEY (`plot_Id`) );"
+					"PRIMARY KEY (`server_id`, `plot_Id`));"
 			);
 	
 	private final OlympaStatement osTableCreatePlotMembers = new OlympaStatement(
 			"CREATE TABLE IF NOT EXISTS `creatif_plotsmembers` (" +
+					"`server_id` INT NOT NULL," + 
 					"`plot_id` INT NOT NULL," +
 					"`player_id` BIGINT(20) NOT NULL," +
 					"`player_name` VARCHAR(64) NOT NULL," +
 					"`player_uuid` VARCHAR(256) NOT NULL," +
 					"`player_plot_level` TINYINT NOT NULL DEFAULT 0," +
-					"PRIMARY KEY (`plot_id`, `player_id`) );"
+					"PRIMARY KEY (`server_id`, `plot_id`, `player_id`));"
 			);
 	
 	//statements select
@@ -82,28 +85,34 @@ public class DataManager implements Listener {
 			"SELECT * FROM creatif_messages;"
 			);
 	
+	
 	private final OlympaStatement osSelectPlotOwner = new OlympaStatement(
-			"SELECT * FROM creatif_plotsmembers WHERE `plot_id` = ? AND `player_plot_level` = ?;"
+			"SELECT * FROM creatif_plotsmembers WHERE `server_id` = ? AND `plot_id` = ? AND `player_plot_level` = ?;"
 			);
+	
 	
 	private final OlympaStatement osSelectPlotPlayers = new OlympaStatement(
-			"SELECT * FROM creatif_plotsmembers WHERE `plot_id` = ?;"
+			"SELECT * FROM creatif_plotsmembers WHERE `server_id` = ? AND `plot_id` = ?;"
 			);
+	
 	
 	private final OlympaStatement osSelectPlotDatas = new OlympaStatement(
-			"SELECT * FROM creatif_plotsdatas WHERE `plot_id` = ?;"
+			"SELECT * FROM creatif_plotsdatas WHERE `server_id` = ? AND `plot_id` = ?;"
 			);
+	
 	
 	private final OlympaStatement osSelectPlayerPlots = new OlympaStatement(
-			"SELECT * FROM creatif_plotsmembers WHERE `player_id` = ?;"
+			"SELECT * FROM creatif_plotsmembers WHERE `server_id` = ? AND `player_id` = ?;"
 			);
+
 	
 	private final OlympaStatement osCountPlots = new OlympaStatement(
-			"SELECT COUNT (*) FROM creatif_plotsdatas;"
+			"SELECT COUNT (*) FROM creatif_plotsdatas WHERE `server_id` = ?;"
 			);
+
 	
 	private final OlympaStatement osCountPlots2 = new OlympaStatement(
-			"SELECT MAX (plot_id) FROM creatif_plotsdatas;"
+			"SELECT MAX (plot_id) FROM creatif_plotsdatas WHERE `server_id` = ?;"
 			);
 	
 	private final OlympaStatement osSelectPlayerDatas = new OlympaStatement(
@@ -113,29 +122,33 @@ public class DataManager implements Listener {
 	//statement update data
 	private final OlympaStatement osUpdatePlayerPlotRank = new OlympaStatement(
 			"INSERT INTO creatif_plotsmembers " +
-			"(`plot_id`, `player_id`, `player_name`, `player_uuid`, `player_plot_level`) " + 
-			"VALUES (?, ?, ?, ?, ?) " +
+			"(`server_id`, `plot_id`, `player_id`, `player_name`, `player_uuid`, `player_plot_level`) " + 
+			"VALUES (?, ?, ?, ?, ?, ?) " +
 			"ON DUPLICATE KEY UPDATE " + 
 			"player_name = VALUES(player_name)," +
 			"player_uuid = VALUES(player_uuid)," +
 			"player_plot_level = VALUES(player_plot_level);"
 			);
 	
+
 	private final OlympaStatement osDeletePlayerPlotRank = new OlympaStatement(
-			"DELETE FROM creatif_plotsmembers WHERE `plot_id`= ? AND `player_id`= ?;"
+			"DELETE FROM creatif_plotsmembers WHERE `server_id` = ? AND `plot_id`= ? AND `player_id`= ?;"
 			);
+	
 	
 	private final OlympaStatement osUpdatePlotDatas = new OlympaStatement(
 			"INSERT INTO creatif_plotsdatas " +
-			"(`plot_id`, `plot_parameters`) " +
-			"VALUES (?, ?) " + 
+			"(`server_id`, `plot_id`, `plot_parameters`) " +
+			"VALUES (?, ?, ?) " + 
 			"ON DUPLICATE KEY UPDATE " +
 			"plot_parameters = VALUES(plot_parameters);"
 			);
+	
+	
 	private final OlympaStatement osUpdatePlotSchem = new OlympaStatement(
 			"INSERT INTO creatif_plotschems" +
-			"(`plot_id`, `player_id`, `schem_name`, `schem_data`) " +
-			"VALUES (?, ?, ?, ?) " + 
+			"(`server_id`, `plot_id`, `server_id`, `player_id`, `schem_name`, `schem_data`) " +
+			"VALUES (?, ?, ?, ?, ?) " + 
 			"ON DUPLICATE KEY UPDATE " +
 			"player_id = VALUES(player_id), " +
 			"schem_name = VALUES(schem_name), " +
@@ -146,6 +159,8 @@ public class DataManager implements Listener {
 		this.plugin = plugin;
 		
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+		//register redis
+		OlympaCore.getInstance().registerRedisSub(RedisAccess.INSTANCE.connect(), new RedisListener(plugin), RedisChannel.BUNGEE_ASK_SEND_SERVERNAME.name());
 		
 		//création tables
 		try {
@@ -167,7 +182,7 @@ public class DataManager implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (plotsToLoad.size() > 0)
+				if (plotsToLoad.size() > 0 && serverIndex > -1)
 					loadPlot(plotsToLoad.remove(0));
 			}
 		}.runTaskTimerAsynchronously(plugin, 20, 1);
@@ -176,7 +191,7 @@ public class DataManager implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (plotsToSave.size() > 0)
+				if (plotsToSave.size() > 0 && serverIndex > -1)
 					savePlotToBddSync(plotsToSave.remove(0));
 			}
 		}.runTaskTimer(plugin, 20, 1);
@@ -198,10 +213,16 @@ public class DataManager implements Listener {
 	
 	@EventHandler //charge les plots des joueurs se connectant
 	public void onJoin(OlympaPlayerLoadEvent e) {
+		if (serverIndex == -1) {
+			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de charger un nouveau joueur !");
+			return;
+		}
+		
 		try {
 			//get player plots
 			PreparedStatement getPlayerPlots = osSelectPlayerPlots.getStatement();
-			getPlayerPlots.setLong(1, e.getOlympaPlayer().getId());
+			getPlayerPlots.setLong(1, serverIndex);
+			getPlayerPlots.setLong(2, e.getOlympaPlayer().getId());
 			ResultSet getPlayerPlotsResult = getPlayerPlots.executeQuery();
 			
 			while(getPlayerPlotsResult.next()) {
@@ -210,11 +231,12 @@ public class DataManager implements Listener {
 				//update player name in members table
 				if (!e.getPlayer().getName().equals(getPlayerPlotsResult.getString("player_name")) && !getPlayerPlotsResult.getString("player_name").equals("Spawn")) {
 					PreparedStatement updPlayerMember = osUpdatePlayerPlotRank.getStatement();
-					updPlayerMember.setInt(1, id.getId());
-					updPlayerMember.setLong(2, e.getOlympaPlayer().getId());
-					updPlayerMember.setString(3, e.getPlayer().getName());
-					updPlayerMember.setString(4, e.getOlympaPlayer().getUniqueId().toString());
-					updPlayerMember.setInt(5, getPlayerPlotsResult.getInt("player_plot_level"));
+					updPlayerMember.setInt(1, serverIndex);
+					updPlayerMember.setInt(2, id.getId());
+					updPlayerMember.setLong(3, e.getOlympaPlayer().getId());
+					updPlayerMember.setString(4, e.getPlayer().getName());
+					updPlayerMember.setString(5, e.getOlympaPlayer().getUniqueId().toString());
+					updPlayerMember.setInt(6, getPlayerPlotsResult.getInt("player_plot_level"));
 					
 					updPlayerMember.executeUpdate();
 				}  
@@ -232,13 +254,19 @@ public class DataManager implements Listener {
 		if (plotId == null)
 			return;
 		
+		if (serverIndex == -1) {
+			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de charger une parcelle !");
+			return;
+		}
+		
 		//CREATION DU PLOT
 		try {
 			
 			//création plotParameters
 			PreparedStatement getPlotDatas;
 			getPlotDatas = osSelectPlotDatas.getStatement();
-			getPlotDatas.setInt(1, plotId.getId());
+			getPlotDatas.setInt(1, serverIndex);
+			getPlotDatas.setInt(2, plotId.getId());
 			ResultSet getPlotDatasResult = getPlotDatas.executeQuery();
 			
 			if (!getPlotDatasResult.next())
@@ -248,8 +276,9 @@ public class DataManager implements Listener {
 			
 			//get owner id
 			PreparedStatement getPlotOwner = osSelectPlotOwner.getStatement();
-			getPlotOwner.setInt(1, plotId.getId());
-			getPlotOwner.setInt(2, 4);
+			getPlotOwner.setInt(1, serverIndex);
+			getPlotOwner.setInt(2, plotId.getId());
+			getPlotOwner.setInt(3, 4);
 			ResultSet getPlotOwnerResult = getPlotOwner.executeQuery();
 			getPlotOwnerResult.next();
 			
@@ -264,7 +293,8 @@ public class DataManager implements Listener {
 					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())));
 			
 			PreparedStatement getPlotMembers = osSelectPlotPlayers.getStatement();
-			getPlotMembers.setInt(1, plotId.getId());
+			getPlotMembers.setInt(1, serverIndex);
+			getPlotMembers.setInt(2, plotId.getId());
 			ResultSet getPlotPlayersResult = getPlotMembers.executeQuery();
 			
 			while (getPlotPlayersResult.next()) {
@@ -303,29 +333,37 @@ public class DataManager implements Listener {
 	}*/
 	
 	private synchronized void savePlotToBddSync(Plot plot) {
+		if (serverIndex == -1) {
+			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de sauvegarder une parcelle !");
+			return;
+		}
+		
 		try {
 			int id = plot.getPlotId().getId();
 			
 			//update plot datas
 			PreparedStatement updPlotParams = osUpdatePlotDatas.getStatement();
-			updPlotParams.setInt(1, id);
-			updPlotParams.setString(2, plot.getParameters().toJson());
+			updPlotParams.setInt(1, serverIndex);
+			updPlotParams.setInt(2, id);
+			updPlotParams.setString(3, plot.getParameters().toJson());
 			updPlotParams.executeUpdate();
 			
 			//update plot members
 			for (Entry<MemberInformations, PlotRank> e : plot.getMembers().getList().entrySet())
 				if (e.getValue() == PlotRank.VISITOR) {
 					PreparedStatement delPlotMember = osDeletePlayerPlotRank.getStatement();
-					delPlotMember.setInt(1, id);
-					delPlotMember.setLong(2, e.getKey().getId());
+					delPlotMember.setInt(1, serverIndex);
+					delPlotMember.setInt(2, id);
+					delPlotMember.setLong(3, e.getKey().getId());
 					delPlotMember.executeUpdate();
 				}else {
 					PreparedStatement updPlotMember = osUpdatePlayerPlotRank.getStatement();
-					updPlotMember.setInt(1, id);
-					updPlotMember.setLong(2, e.getKey().getId());
-					updPlotMember.setString(3, e.getKey().getName());
-					updPlotMember.setString(4, e.getKey().getUUID().toString());
-					updPlotMember.setInt(5, e.getValue().getLevel());
+					updPlotMember.setInt(1, serverIndex);
+					updPlotMember.setInt(2, id);
+					updPlotMember.setLong(3, e.getKey().getId());
+					updPlotMember.setString(4, e.getKey().getName());
+					updPlotMember.setString(5, e.getKey().getUUID().toString());
+					updPlotMember.setInt(6, e.getValue().getLevel());
 					updPlotMember.executeUpdate();
 				}
 			plugin.getLogger().log(Level.INFO, "Plot " + plot + " saved.");	
@@ -336,19 +374,21 @@ public class DataManager implements Listener {
 	}
 
 	public synchronized int getPlotsCount() {
+		if (serverIndex == -1) {
+			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de récupérer le nombre de parcelles !");
+			return 0;
+		}
+		
 		try {
 			PreparedStatement ps = osCountPlots.getStatement();
+			ps.setInt(1, serverIndex);
 			ResultSet result = ps.executeQuery();
 			result.next();
 			
 			PreparedStatement ps2 = osCountPlots2.getStatement();
+			ps2.setInt(1, serverIndex);
 			ResultSet result2 = ps2.executeQuery();
 			result2.next();
-			
-			if (result.getInt(1) == result2.getInt(1))
-				plugin.getLogger().log(Level.INFO, "§aIntégrité de la table creatif_plotsdata validée : MAX(plot_id) = COUNT(*)");
-			else
-				plugin.getLogger().log(Level.SEVERE, "§4ATTENTION problème dans la table creatif_plotsdata : nombre d'entrées différent de l'indice du plot maximal !!");
 			
 			return result.getInt(1);
 		} catch (SQLException e) {
@@ -359,18 +399,32 @@ public class DataManager implements Listener {
 	}
 	
 	public synchronized void saveSchemToDb(OlympaPlayerCreatif p, Plot plot, File schem) {
+		if (serverIndex == -1) {
+			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de sauvegarder une parcelle en schematic !");
+			return;
+		}
+		
 		try {
 			PreparedStatement ps = osUpdatePlotSchem.getStatement();
 
-			ps.setInt(1, plot.getPlotId().getId());
-			ps.setLong(2, p.getId());
-			ps.setString(3, schem.getName());
-			ps.setBlob(4, new FileInputStream(schem));
+			ps.setInt(1, serverIndex);
+			ps.setInt(2, plot.getPlotId().getId());
+			ps.setLong(3, p.getId());
+			ps.setString(4, schem.getName());
+			ps.setBlob(5, new FileInputStream(schem));
 			ps.executeUpdate();
 			
 		} catch (SQLException | FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void setServerIndex(int i) {
+		serverIndex = i;
+	}
+
+	public int getServerIndex() {
+		return serverIndex;
 	}
 }
 

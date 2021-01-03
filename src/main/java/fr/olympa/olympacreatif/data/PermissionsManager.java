@@ -13,7 +13,6 @@ import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 
-@SuppressWarnings("unchecked")
 public class PermissionsManager implements Listener{
 	
 	private OlympaCreatifMain plugin;

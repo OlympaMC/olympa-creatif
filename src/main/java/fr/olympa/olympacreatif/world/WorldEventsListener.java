@@ -38,6 +38,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -45,6 +46,8 @@ import org.bukkit.potion.PotionEffect;
 import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.core.bungee.servers.ServersConnection;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -402,17 +405,18 @@ public class WorldEventsListener implements Listener{
 		}
 	}
 	
-	@EventHandler //MAJ worldborder au démarage du serveur
-	public void onServerLoad(ServerLoadEvent e) {
-		plugin.getWorldManager().updateWorldBorder();
-	}
-	
-	@EventHandler
+	@EventHandler //cancel join if plot size hos not been set yet, or cancel 1st join to avoid errors
 	public void onPrePlayerJoin(AsyncPlayerPreLoginEvent e) {
+		if (WorldManager.plotSize == -1) {
+			e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§cImpossible de se connecter, le générateur de monde n'a pas été chargé correctement. Veuillez réessayer dans quelques instants.");
+			return;
+		}
+		
 		if (Bukkit.getOnlinePlayers().size() == 0)
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e1) {
+				e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§cUne erreur interne est survenue, merci de réessayer dans quelques instants.");
 				plugin.getLogger().log(Level.WARNING, "Failed to delay first player join");
 				e1.printStackTrace();
 			}
@@ -423,3 +427,6 @@ public class WorldEventsListener implements Listener{
 		e.setCancelled(true);
 	}
 }
+
+
+

@@ -18,28 +18,31 @@ import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import fr.olympa.api.plugin.OlympaSpigot;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.redis.RedisAccess;
+import fr.olympa.api.redis.RedisChannel;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Message;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.RedisListener;
 
 public class WorldManager {
 	private OlympaCreatifMain plugin;
 	private World world = null;
 	private net.minecraft.server.v1_16_R3.World nmsWorld = null;
 
-	public static final int plotSize = 256;
+	public static int plotSize = 256;
 	public static final int roadSize = 16;
 	public static final int worldLevel = 60;
 	
-	//TODO remplir la liste
 	public static int maxEntitiesPerTypePerPlot;
 	public static int maxTotalEntitiesPerPlot;
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-
+		
 		maxEntitiesPerTypePerPlot = Integer.valueOf(Message.PARAM_MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue());
 		maxTotalEntitiesPerPlot = Integer.valueOf(Message.PARAM_MAX_TOTAL_ENTITIES_PER_PLOT.getValue());
 		
@@ -167,11 +170,6 @@ public class WorldManager {
 
 					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? afkIncome : noAfkIncome;
 					pp.addGameMoney(income, null);
-
-					/*if (OlympaCore.getInstance().getAfkHandler().isAfk(p))
-						pp.getGameMoney().give(afkIncome);
-					else
-						pp.getGameMoney().give(noAfkIncome);*/
 					
 					c++;
 					
@@ -198,9 +196,10 @@ public class WorldManager {
 	public void updateWorldBorder() {
 		int circleIndex = 1;
 		int newSize = plotSize + roadSize;
+
 		
 		//recherche du premier cercle de plots non plein (plot central = circleIndex 1)
-		while (plugin.getPlotsManager().getTotalPlotCount() > Math.pow(circleIndex*2-1, 2))
+		while (plugin.getDataManager().getPlotsCount() > Math.pow(circleIndex*2-1, 2))
 			circleIndex++;
 		
 		newSize += (circleIndex - 1) * (plotSize + roadSize) * 2;
