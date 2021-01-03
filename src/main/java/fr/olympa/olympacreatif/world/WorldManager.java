@@ -199,7 +199,8 @@ public class WorldManager {
 
 		
 		//recherche du premier cercle de plots non plein (plot central = circleIndex 1)
-		while (plugin.getDataManager().getPlotsCount() > Math.pow(circleIndex*2-1, 2))
+		while ((plugin.getPlotsManager() == null ? plugin.getDataManager().getPlotsCount() : plugin.getPlotsManager().getTotalPlotCount())  
+				> Math.pow(circleIndex*2-1, 2))
 			circleIndex++;
 		
 		newSize += (circleIndex - 1) * (plotSize + roadSize) * 2;

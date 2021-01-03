@@ -14,6 +14,8 @@ import java.util.logging.Level;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
@@ -211,6 +213,12 @@ public class DataManager implements Listener {
 			savePlotToBddSync(plot);
 	}
 	
+	@EventHandler
+	public void onJoinAsync(AsyncPlayerPreLoginEvent e) {
+		if (serverIndex == -1)
+			e.disallow(Result.KICK_OTHER, "§cGénérateur de monde non chargé. Réessayez dans quelques instants...");
+	}
+	
 	@EventHandler //charge les plots des joueurs se connectant
 	public void onJoin(OlympaPlayerLoadEvent e) {
 		if (serverIndex == -1) {
@@ -365,10 +373,9 @@ public class DataManager implements Listener {
 					updPlotMember.setString(5, e.getKey().getUUID().toString());
 					updPlotMember.setInt(6, e.getValue().getLevel());
 					updPlotMember.executeUpdate();
-				}
-			plugin.getLogger().log(Level.INFO, "Plot " + plot + " saved.");	
+				}	
 		} catch (SQLException e) {
-			plugin.getLogger().log(Level.SEVERE, "§4Failed to save plot" + plot + " !");
+			plugin.getLogger().log(Level.SEVERE, "§4Failed to save plot " + plot + " !");
 			e.printStackTrace();
 		}
 	}
