@@ -118,8 +118,8 @@ public class Plot {
 				plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getZ() , true);
 		
 		//add entities from already loaded chunks
-		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.getValue() / 16 ; x++)
-			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getZ() + OCparam.PLOT_SIZE.getValue() / 16 ; z++)
+		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
+			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getZ() + OCparam.PLOT_SIZE.get() / 16 ; z++)
 				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
 					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities()).forEach(e -> {
 						
@@ -132,8 +132,8 @@ public class Plot {
 		//spawns the tuto holo if it's the plot 1
 		if (plotId.getId() == 1) {
 			plugin.getTask().runTaskLater(() -> {
-				setHelpHolo(OCparam.HOLO_HELP_1_LOC.getValue(), OCparam.HOLO_HELP_1_TEXT.getValue().split("&"));
-				setHelpHolo(OCparam.HOLO_HELP_2_LOC.getValue(), OCparam.HOLO_HELP_2_TEXT.getValue().split("&"));
+				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get(), OCparam.HOLO_HELP_1_TEXT.get().split("&"));
+				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get(), OCparam.HOLO_HELP_2_TEXT.get().split("&"));
 			}, 10);
 		}
 	}
@@ -151,9 +151,9 @@ public class Plot {
 	
 	private void loadInitialEntitiesOnChunks() {
 
-		int initialX = plotId.getIndexX() * (Math.floorDiv(OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize, 16));
-		int initialZ = plotId.getIndexZ() * (Math.floorDiv(OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize, 16));
-		int chunksRowCount = Math.floorDiv(OCparam.PLOT_SIZE.getValue(), 16);
+		int initialX = plotId.getIndexX() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
+		int initialZ = plotId.getIndexZ() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
+		int chunksRowCount = Math.floorDiv(OCparam.PLOT_SIZE.get(), 16);
 
 		//Bukkit.broadcastMessage("x min : " + initialX + " - max : " + initialX + chunksRowCount);
 		//Bukkit.broadcastMessage("z min : " + initialZ + " - max : " + initialZ + chunksRowCount);
@@ -199,7 +199,7 @@ public class Plot {
 		if (entitiesInPlot.contains(e) || e.getType() == EntityType.PLAYER)
 			return;
 		
-		if (entitiesInPlot.size() == OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.getValue()) 
+		if (entitiesInPlot.size() == OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.get()) 
 			entitiesInPlot.remove(0).remove();
 		
 		int count = 0;
@@ -212,7 +212,7 @@ public class Plot {
 					toRemove = ent;
 			}
 		
-		if (count >= OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue() && toRemove != null) {
+		if (count >= OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.get() && toRemove != null) {
 			entitiesInPlot.remove(toRemove);
 			toRemove.remove();
 		}

@@ -208,9 +208,9 @@ public class DataManager implements Listener {
 					ocMsgs.get(messages.getString("message_id")).setValue(messages.getString("message_string"));
 					inexistantMessagesInBdd.remove(messages.getString("message_id"));
 				}else
-					plugin.getLogger().log(Level.WARNING, "§eMessage " + messages.getString("message_id") + " existant en BDD mais pas dans le plugin, veuillez supprimer l'entrée.");
+					plugin.getLogger().log(Level.WARNING, "§eMessage " + messages.getString("message_id") + " existant EN BDD mais pas dans le plugin, veuillez supprimer l'entrée.");
 				
-				inexistantMessagesInBdd.forEach(msg -> plugin.getLogger().log(Level.WARNING, "§eMessage " + msg + " existant dans le plugin mais pas en BDD, veuiller ajouter l'entrée !"));
+				inexistantMessagesInBdd.forEach(msg -> plugin.getLogger().log(Level.WARNING, "§eMessage " + msg + " existant DANS LE PLUGIN mais pas en bdd, veuiller ajouter l'entrée !"));
 			}
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -469,26 +469,18 @@ public class DataManager implements Listener {
 			ps.setInt(1, serverIndex);
 			
 			ResultSet result = ps.executeQuery();
-			result.next();
 			
-			JSONObject json = (JSONObject) new JSONParser().parse(result.getString("server_params"));
-			Gson gson = new Gson();
-			
-			OCparam.getValues().forEach((name, param) -> {
-				if (json.get(name) != null) {
-					
-					Object obj = gson.fromJson((String) json.get(name), param.getParamClass());
-					param.setValueFromBdd(obj);
-				}else
-					plugin.getLogger().log(Level.SEVERE, "§4Pas d'entrée pour le paramètre " + name + " en BDD ! Une valeur par défaut va être définie.");
-			});
+			if (result.next())
+				OCparam.fromJson(result.getString("server_params"));
+			else
+				plugin.getLogger().warning("§ePas de paramètres existant pour le serveur " + serverIndex + ". Création des paramètres par défaut.");
 			
 			PreparedStatement ps2 = osUpdateServerParams.getStatement();
 			ps2.setInt(1, serverIndex);
 			ps2.setString(2, OCparam.toJson());
 			ps2.executeUpdate();
 			
-		} catch (SQLException | ParseException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}

@@ -2,15 +2,20 @@ package fr.olympa.olympacreatif.data;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import org.bukkit.Location;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import fr.olympa.olympacreatif.plot.PlotParamType;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class OCparam<T> {
 	public static final OCparam<Integer> CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK = new OCparam<Integer>(4);
@@ -22,7 +27,7 @@ public class OCparam<T> {
 	public static final OCparam<Integer> MAX_ENTITIES_PER_TYPE_PER_PLOT = new OCparam<Integer>(0);
 	public static final OCparam<Integer> MAX_TOTAL_ENTITIES_PER_PLOT = new OCparam<Integer>(0);
 	
-	public static final OCparam<String> WORLD_NAME = new OCparam<String>("");
+	public static final OCparam<String> WORLD_NAME = new OCparam<String>("world");
 	public static final OCparam<Location> SPAWN_LOC = new OCparam<Location>(new Location(null, 0, 0, 0));
 	
 	public static final OCparam<Location> HOLO_HELP_1_LOC = new OCparam<Location>(new Location(null, 0, 0, 0));
@@ -33,7 +38,7 @@ public class OCparam<T> {
 	public static final OCparam<Integer> INCOME_NOT_AFK = new OCparam<Integer>(0); 
 	public static final OCparam<Integer> INCOME_AFK = new OCparam<Integer>(0); 
 	
-	public static final OCparam<Integer> PLOT_SIZE = new OCparam<Integer>(-1);
+	public static final OCparam<Integer> PLOT_SIZE = new OCparam<Integer>(0);
 	
 	private T value;
 	private Class<T> paramClass;
@@ -42,14 +47,16 @@ public class OCparam<T> {
 	private OCparam(T value) {
 		this.value = value;
 		paramClass = (Class<T>) value.getClass();
+		
 	}
 	
-	public T getValue() {
+	public T get() {
 		return value;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void setValueFromBdd(Object value) {
+		//if (value.getClass().equals(paramClass))
 		this.value = (T) value;
 	}
 	
@@ -57,11 +64,11 @@ public class OCparam<T> {
 		this.value = value;
 	}
 	
-	public Class<T> getParamClass(){
-		return paramClass;
+	public Type getType(){
+		return new TypeToken<OCparam<T>>() {}.getType();
 	}
 	
-	public static Map<String, OCparam<?>> getValues() {
+	public static Map<String, OCparam<?>> values() {
 		Map<String, OCparam<?>> map = new HashMap<String, OCparam<?>>();
 		
 		Field[] fields = OCparam.class.getDeclaredFields();
@@ -78,12 +85,34 @@ public class OCparam<T> {
 	}
 	
 	
+	public static void fromJson(String jsonText) {
+		try {
+			JSONObject json = (JSONObject) new JSONParser().parse(jsonText);
+			Gson gson = new GsonBuilder().serializeNulls().create();
+			
+			for (Entry<String, OCparam<?>> e : values().entrySet()) {
+				if (json.containsKey(e.getKey())) {
+					if (e.getValue().get() instanceof Integer)
+						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), Integer.class));
+					else if (e.getValue().get() instanceof String)
+						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), String.class));
+					else if (e.getValue().get() instanceof Location)
+						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), Location.class));
+				}else
+					OlympaCreatifMain.getInstance().getLogger().warning("§eLe paramètre " + e.getKey() + " n'existe pas en bdd ! Une valeur par défaut a été définie");
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static String toJson() {
 		JSONObject json = new JSONObject();
+		Gson gson = new GsonBuilder().serializeNulls().create();
 		
-		for (Entry<String, OCparam<?>> param : getValues().entrySet())
-			json.put(param.getKey(), param.getValue().getValue());
+		for (Entry<String, OCparam<?>> param : values().entrySet())
+			json.put(param.getKey(), gson.toJson(param.getValue().get()));
 
 		return json.toString();
 	}

@@ -54,7 +54,7 @@ public class SchematicCreator {
 
 		    //create the Clipboard to copy
 		    BlockVector3 v1 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX(), 0, plot.getPlotId().getLocation().getBlockZ());
-		    BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.getValue() - 1, 255, plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.getValue() - 1);
+		    BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 255, plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
 		    
 		    CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), v1, v2);
 		    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);

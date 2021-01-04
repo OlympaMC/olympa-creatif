@@ -131,8 +131,8 @@ public class StaffGui extends IGui {
 							
 							int xMin = plot.getPlotId().getLocation().getBlockX();
 							int zMin = plot.getPlotId().getLocation().getBlockZ();
-							int xMax = xMin + OCparam.PLOT_SIZE.getValue() - 1;
-							int zMax = zMin + OCparam.PLOT_SIZE.getValue() - 1;
+							int xMax = xMin + OCparam.PLOT_SIZE.get() - 1;
+							int zMax = zMin + OCparam.PLOT_SIZE.get() - 1;
 
 							try (EditSession session = new EditSession(new EditSessionBuilder(FaweAPI.getWorld(plugin.getWorldManager().getWorld().getName())))) {
 								for (int x = xMin ; x <= xMax ; x++)

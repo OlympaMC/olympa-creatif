@@ -44,24 +44,36 @@ public class RedisListener extends JedisPubSub {
 			plugin.getLogger().log(Level.SEVERE, "§4ATTENTION problème dans la table creatif_plotsdata : nombre d'entrées différent de l'indice du plot maximal !!");
 			
 		plugin.getPlotsManager().setTotalPlotCount(plotsCount);
-		plugin.getWorldManager().updateWorldBorder();
+		plugin.getWorldManager().defineWorldParams();
 
-		plugin.getLogger().log(Level.INFO, "Taille parcelles définie à " + OCparam.PLOT_SIZE.getValue() + "*" + OCparam.PLOT_SIZE.getValue());
-		plugin.getServer().getPluginManager().callEvent(new PlotSizeRecievedEvent(OCparam.PLOT_SIZE.getValue()));
+		plugin.getLogger().log(Level.INFO, "Taille parcelles définie à " + OCparam.PLOT_SIZE.get() + "*" + OCparam.PLOT_SIZE.get());
+		plugin.getServer().getPluginManager().callEvent(new PlotSizeRecievedEvent(OCparam.PLOT_SIZE.get(), WorldManager.roadSize, WorldManager.worldLevel));
 	}
 	
 	public static class PlotSizeRecievedEvent extends Event {
 	    private static final HandlerList HANDLERS_LIST = new HandlerList();
 
 	    private int plotSize;
+	    private int roadSize;
+	    private int worldLevel;
 	    
-	    private PlotSizeRecievedEvent(int plotSize) {
+	    private PlotSizeRecievedEvent(int plotSize, int roadSize, int worldLevel) {
 	    	super(true);
 	    	this.plotSize = plotSize;
+	    	this.roadSize = roadSize;
+	    	this.worldLevel = worldLevel;
 	    }
 	    
-	    public int getServerPlotSize() {
+	    public int getPlotSize() {
 	    	return plotSize;
+	    }
+	    
+	    public int getRoadSize() {
+	    	return roadSize;
+	    }
+	    
+	    public int getWorldLevel() {
+	    	return worldLevel;
 	    }
 	    
 	    @Override

@@ -47,7 +47,7 @@ public class PlotCbData {
 		this.hasUnlockedSetblockSpawnerCmd = hasUnlockedSummonCmd;
 		this.hasUnlockedSummonCmd = hasUnlockedSummonCmd;
 		
-		commandsLeft = OCparam.CB_MAX_CMDS_LEFT.getValue();
+		commandsLeft = OCparam.CB_MAX_CMDS_LEFT.get();
 	}
 
 	public void executeSynchronousInit() {
@@ -86,7 +86,7 @@ public class PlotCbData {
 	}
 	
 	public void addCommandTickets() {
-		commandsLeft = Math.min(OCparam.CB_MAX_CMDS_LEFT.getValue(), commandsLeft + cpt);
+		commandsLeft = Math.min(OCparam.CB_MAX_CMDS_LEFT.get(), commandsLeft + cpt);
 	}
 	
 	public void setCpt(int newCpt) {
@@ -153,7 +153,7 @@ public class PlotCbData {
 				return false;
 		
 		objectives.add(obj);
-		if (objectives.size() > OCparam.CB_MAX_OBJECTIVES_PER_PLOT.getValue()) {
+		if (objectives.size() > OCparam.CB_MAX_OBJECTIVES_PER_PLOT.get()) {
 			objectives.remove(0).clearDisplaySlot();
 		}
 		
@@ -187,7 +187,7 @@ public class PlotCbData {
 		
 		teams.add(team);
 		
-		if (teams.size() > OCparam.CB_MAX_TEAMS_PER_PLOT.getValue())
+		if (teams.size() > OCparam.CB_MAX_TEAMS_PER_PLOT.get())
 			teams.remove(0);
 		
 		return true;

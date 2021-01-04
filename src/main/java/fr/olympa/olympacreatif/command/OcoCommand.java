@@ -129,11 +129,11 @@ public class OcoCommand extends OlympaCommand {
 				
 				String debug = "\n   §6>>> Débug parcelle " + plot.getPlotId() + " :";
 				debug += "\n   §e> Joueurs : §a" + plot.getPlayers().size();
-				debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.getValue() + " (max " + OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.getValue() + " de chaque type) §7(détails avec /debugentities)";
-				debug += "\n   §e> Equipes : §a" + plot.getCbData().getTeams().size() + "/" + OCparam.CB_MAX_TEAMS_PER_PLOT.getValue();
-				debug += "\n   §e> Objectifs : §a" + plot.getCbData().getObjectives().size() + "/" + OCparam.CB_MAX_OBJECTIVES_PER_PLOT.getValue();
+				debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.get() + " (max " + OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.get() + " de chaque type) §7(détails avec /debugentities)";
+				debug += "\n   §e> Equipes : §a" + plot.getCbData().getTeams().size() + "/" + OCparam.CB_MAX_TEAMS_PER_PLOT.get();
+				debug += "\n   §e> Objectifs : §a" + plot.getCbData().getObjectives().size() + "/" + OCparam.CB_MAX_OBJECTIVES_PER_PLOT.get();
 				debug += "\n   §e> Tickets commandblocks : §a" + plot.getCbData().getCommandsTicketsLeft() + "/" +
-						OCparam.CB_MAX_CMDS_LEFT.getValue() + " (+" + plot.getCbData().getCpt() * 20 + "/s)";
+						OCparam.CB_MAX_CMDS_LEFT.get() + " (+" + plot.getCbData().getCpt() * 20 + "/s)";
 				
 				sender.sendMessage(debug);
 				break;

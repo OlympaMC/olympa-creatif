@@ -68,9 +68,9 @@ public class PlotId {
 		}
 		
 		loc = new Location(plugin.getWorldManager().getWorld(), 
-				indexX * (OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize) + 0.5, 
+				indexX * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + 0.5, 
 				WorldManager.worldLevel + 1, 
-				indexZ * (OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize) + 0.5);
+				indexZ * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + 0.5);
 	}
 	
 	private PlotId(OlympaCreatifMain plugin, int id, int x, int z) {
@@ -80,9 +80,9 @@ public class PlotId {
 		indexZ = z;
 		
 		loc = new Location(plugin.getWorldManager().getWorld(), 
-				indexX * (OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize) + 0.5, 
+				indexX * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + 0.5, 
 				WorldManager.worldLevel + 1, 
-				indexZ * (OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize) + 0.5);
+				indexZ * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + 0.5);
 	}
 	
 	/**
@@ -145,11 +145,11 @@ public class PlotId {
 	
 	//retourne un PlotId si la localisation est sur un plot (chargé ou non)
 	public static PlotId fromLoc(OlympaCreatifMain plugin, Location loc) {
-		int x = Math.floorMod(loc.getBlockX(), OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize);
-		int z = Math.floorMod(loc.getBlockZ(), OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize);
+		int x = Math.floorMod(loc.getBlockX(), OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
+		int z = Math.floorMod(loc.getBlockZ(), OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
 		
 		//return null si route
-		if (x >= OCparam.PLOT_SIZE.getValue() || z >= OCparam.PLOT_SIZE.getValue())
+		if (x >= OCparam.PLOT_SIZE.get() || z >= OCparam.PLOT_SIZE.get())
 			return null;
 		
 		//Bukkit.broadcastMessage("x = " + x + " - z = " + z);
@@ -157,8 +157,8 @@ public class PlotId {
 		//recherche de l'id du plot selon ses coords
 		int plotId = 0;
 		
-		int plotX = Math.floorDiv(loc.getBlockX(), OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize);
-		int plotZ = Math.floorDiv(loc.getBlockZ(), OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize);
+		int plotX = Math.floorDiv(loc.getBlockX(), OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
+		int plotZ = Math.floorDiv(loc.getBlockZ(), OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
 		
 		int circleIndex = Math.max(Math.abs(plotX), Math.abs(plotZ)) + 1;
 		plotId += Math.pow((circleIndex - 1) * 2 - 1, 2);
@@ -234,10 +234,10 @@ public class PlotId {
 	
 	public boolean isInPlot(int x, int z) {
 		
-		return x >= indexX * (OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize) && 
-				x < indexX * (OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize) + OCparam.PLOT_SIZE.getValue() && 
-				z >= indexZ * (OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize) && 
-				z < indexZ * (OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize) + OCparam.PLOT_SIZE.getValue(); 
+		return x >= indexX * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) && 
+				x < indexX * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + OCparam.PLOT_SIZE.get() && 
+				z >= indexZ * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) && 
+				z < indexZ * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + OCparam.PLOT_SIZE.get(); 
 	}
 	
 	public boolean isOnInteriorDiameter(Location loc, int radius) {
@@ -248,12 +248,12 @@ public class PlotId {
 		if (!isInPlot(x, z))
 			return false;
 		
-		x = Math.floorMod(x, OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize);
-		z = Math.floorMod(z, OCparam.PLOT_SIZE.getValue() + WorldManager.roadSize);
+		x = Math.floorMod(x, OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
+		z = Math.floorMod(z, OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
 		
-		if (getMinimalDifference(x, OCparam.PLOT_SIZE.getValue()) >= radius)
+		if (getMinimalDifference(x, OCparam.PLOT_SIZE.get()) >= radius)
 			return false;
-		if (getMinimalDifference(z, OCparam.PLOT_SIZE.getValue()) >= radius)
+		if (getMinimalDifference(z, OCparam.PLOT_SIZE.get()) >= radius)
 			return false;
 		
 		return true;

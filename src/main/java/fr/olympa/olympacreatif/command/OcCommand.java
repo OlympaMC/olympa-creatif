@@ -102,7 +102,7 @@ public class OcCommand extends OlympaCommand {
 				break;
 				
 			case "spawn":
-				p.teleport(OCparam.SPAWN_LOC.getValue());
+				p.teleport(OCparam.SPAWN_LOC.get());
 				sender.sendMessage(OCmsg.TELEPORTED_TO_WORLD_SPAWN.getValue());
 				break;
 				
@@ -169,8 +169,8 @@ public class OcCommand extends OlympaCommand {
 					p.sendMessage(OCmsg.INSUFFICIENT_PLOT_PERMISSION.getValue());
 				else {
 					p.sendMessage(OCmsg.TELEPORT_PLOT_CENTER.getValue());
-					double x = plot.getPlotId().getLocation().getX() + (double)OCparam.PLOT_SIZE.getValue()/2.0;
-					double z = plot.getPlotId().getLocation().getZ() + (double)OCparam.PLOT_SIZE.getValue()/2.0;
+					double x = plot.getPlotId().getLocation().getX() + (double)OCparam.PLOT_SIZE.get()/2.0;
+					double z = plot.getPlotId().getLocation().getZ() + (double)OCparam.PLOT_SIZE.get()/2.0;
 					
 					p.teleport(new Location(plugin.getWorldManager().getWorld(), 
 							x, plugin.getWorldManager().getWorld().getHighestBlockYAt((int)x, (int)z) + 1, z));

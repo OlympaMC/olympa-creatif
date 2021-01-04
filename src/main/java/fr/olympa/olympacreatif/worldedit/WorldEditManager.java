@@ -99,8 +99,8 @@ public class WorldEditManager /*extends EventHandler*/ implements Listener {
 
 	    	BlockVector3 v1 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX(), 0, 
 	    			plot.getPlotId().getLocation().getBlockZ());
-	    	BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.getValue() - 1, 256, 
-	    			plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.getValue() - 1);
+	    	BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 256, 
+	    			plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
 
 	    	//Bukkit.broadcastMessage("[DEBUG] MASK for " + wePlayer.getName() + " in " + new CuboidRegion(v1, v2) + " : " + PlotPerm.USE_WE.has(plot, p));
 	    	
@@ -126,8 +126,8 @@ public class WorldEditManager /*extends EventHandler*/ implements Listener {
 		public void calculateRegions() {			
 			for (Plot plot : plots)
 				add(BlockVector2.at(plot.getPlotId().getLocation().getBlockX(), plot.getPlotId().getLocation().getBlockZ()), 
-						BlockVector2.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.getValue() - 1, 
-						plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.getValue() - 1));
+						BlockVector2.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 
+						plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1));
 		}
 	}
 	

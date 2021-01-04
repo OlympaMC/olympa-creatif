@@ -27,7 +27,7 @@ public class OCmsg {
 	
 	public static final OCmsg OCO_COMMAND_HELP = new OCmsg("");
 	public static final OCmsg OCO_EXPORT_FAILED = new OCmsg("");
-	public static final OCmsg OCO_EXPORT_SUCCESS = new OCmsg("");
+	//public static final OCmsg OCO_EXPORT_SUCCESS = new OCmsg("");
 	public static final OCmsg OCO_HAT_SUCCESS = new OCmsg("");
 	public static final OCmsg OCO_HEAD_GIVED = new OCmsg("");
 	public static final OCmsg OCO_SET_FLY_SPEED = new OCmsg("");
@@ -59,7 +59,7 @@ public class OCmsg {
 	public static final OCmsg PLOT_SEND_INVITATION = new OCmsg("");
 	public static final OCmsg PLOT_SPAWN_LOC_SET = new OCmsg("");
 	public static final OCmsg PLOT_UNBAN_PLAYER = new OCmsg("");
-	public static final OCmsg PROHIBITED_BLOCK_PLACED = new OCmsg("");
+	//public static final OCmsg PROHIBITED_BLOCK_PLACED = new OCmsg("");
 	public static final OCmsg SHOP_BUY_SUCCESS = new OCmsg("");
 	public static final OCmsg TELEPORT_IN_PROGRESS = new OCmsg("");
 	public static final OCmsg TELEPORT_PLOT_CENTER = new OCmsg("");
@@ -81,7 +81,7 @@ public class OCmsg {
 	public static final OCmsg WE_DISABLED = new OCmsg(""); 
 	public static final OCmsg WE_ERR_SCHEM_CMD_DISABLED = new OCmsg(""); 
  
-	public static final OCmsg WE_ERR_INSUFFICENT_PERMISSION = new OCmsg(""); 
+	//public static final OCmsg WE_ERR_INSUFFICENT_PERMISSION = new OCmsg(""); 
 
 	
 	private String message;
@@ -116,7 +116,7 @@ public class OCmsg {
 	public static Map<String, OCmsg> getValues() {
 		Map<String, OCmsg> map = new HashMap<String, OCmsg>();
 		
-		Field[] fields = OCparam.class.getDeclaredFields();
+		Field[] fields = OCmsg.class.getDeclaredFields();
 		for (Field field : fields)
 			if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers()))
 				try {

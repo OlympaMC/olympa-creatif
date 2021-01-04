@@ -55,7 +55,37 @@ public class WorldManager {
 		
 		System.out.println("world : " + world);*/
 		
-		world = Bukkit.getWorld(OCparam.WORLD_NAME.getValue());
+		//task pour donner l'argent aux joueurs périodiquement
+		new BukkitRunnable() {
+			
+			final int cMax = 60;
+			final int noAfkIncome = Integer.valueOf(OCparam.INCOME_NOT_AFK.get());
+			final int afkIncome = Integer.valueOf(OCparam.INCOME_AFK.get());
+			int c = 0;
+			
+			@Override
+			public void run() {
+				Bukkit.getOnlinePlayers().forEach(p -> {
+					OlympaPlayerCreatif pp = AccountProvider.get(p.getUniqueId());
+
+					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? afkIncome : noAfkIncome;
+					pp.addGameMoney(income, null);
+					
+					c++;
+					
+					if (c == cMax) {
+						c = 0;
+						p.sendMessage(OCmsg.PERIODIC_INCOME_RECEIVED.getValue(income, noAfkIncome, afkIncome));	
+					}
+				});
+			}
+		}.runTaskTimer(plugin, 20*60, 20*60);
+	}
+	
+	public void defineWorldParams() {
+		
+		world = Bukkit.getWorld(OCparam.WORLD_NAME.get());
+		nmsWorld = ((CraftWorld) world).getHandle();
 		
 		//définition des règles du monde
 		world.setDifficulty(Difficulty.EASY);
@@ -109,72 +139,16 @@ public class WorldManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-		nmsWorld = ((CraftWorld) world).getHandle();
 		
 		//register listeners
 		plugin.getServer().getPluginManager().registerEvents(new WorldEventsListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);
-
-		//création des holos d'aide
-		/*
-		plugin.getTask().runTaskLater(() -> {
-			@SuppressWarnings("unchecked")
-			Hologram holo1 = OlympaCore.getInstance().getHologramsManager().createHologram(Message.getLocFromMessage(Message.PARAM_HOLO_HELP_LOC_1), 
-					false, 
-					new FixedLine<HologramLine>("§6Bienvenue sur le serveur Créatif Olympa !"),
-					new FixedLine<HologramLine>(" "),
-					new FixedLine<HologramLine>("§6Commandes principales :"),
-					new FixedLine<HologramLine>("§e/menu : §aouvrir le menu principal"),
-					new FixedLine<HologramLine>("§e/find : §atrouver et claim une parcelle"),
-					new FixedLine<HologramLine>("§e/visit [id] : §avisiter la parcelle [id]"),
-					new FixedLine<HologramLine>("§e/shop : §aouvrir le magasin"));
-			
-			@SuppressWarnings("unchecked")
-			Hologram holo2 = OlympaCore.getInstance().getHologramsManager().createHologram(Message.getLocFromMessage(Message.PARAM_HOLO_HELP_LOC_2), 
-					false, 
-					new FixedLine<HologramLine>("§6Bienvenue sur le serveur Créatif Olympa !"),
-					new FixedLine<HologramLine>(" "),
-					new FixedLine<HologramLine>("§c>>> EXCLUSIVITE OLYMPA : LES COMMANDBLOCKS SONT ACTIVES <<<"),
-					new FixedLine<HologramLine>("§cEt bien évidemment, tous les items redstone sont gratuits !"),
-					new FixedLine<HologramLine>(" "),
-					new FixedLine<HologramLine>("§eVous vous trouvez sur un Play2Win, c'est pourquoi seuls les éléments"),
-					new FixedLine<HologramLine>("§eprovoquant des lags (WorldEdit, commandblocks) sont restreints."),
-					new FixedLine<HologramLine>(" "),
-					new FixedLine<HologramLine>("§eVous gagnez de l'argent en jouant pour les acheter !"),
-					new FixedLine<HologramLine>("§eSi vous souhaitez les obtenir plus rapidement et nous soutenir,"),
-					new FixedLine<HologramLine>("§evous pouvez les acheter sur la boutique !"));
-		}, 100);*/
 		
 		//set all chunks to non-force loaded
 		for (Chunk ch : world.getLoadedChunks())
 			ch.setForceLoaded(false);
 		
-		//task pour donner l'argent aux joueurs périodiquement
-		new BukkitRunnable() {
-			
-			final int cMax = 60;
-			final int noAfkIncome = Integer.valueOf(OCparam.INCOME_NOT_AFK.getValue());
-			final int afkIncome = Integer.valueOf(OCparam.INCOME_AFK.getValue());
-			int c = 0;
-			
-			@Override
-			public void run() {
-				Bukkit.getOnlinePlayers().forEach(p -> {
-					OlympaPlayerCreatif pp = AccountProvider.get(p.getUniqueId());
-
-					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? afkIncome : noAfkIncome;
-					pp.addGameMoney(income, null);
-					
-					c++;
-					
-					if (c == cMax) {
-						c = 0;
-						p.sendMessage(OCmsg.PERIODIC_INCOME_RECEIVED.getValue(income, noAfkIncome, afkIncome));	
-					}
-				});
-			}
-		}.runTaskTimer(plugin, 20*60, 20*60);
+		updateWorldBorder();
 	}
 	
 	public World getWorld() {
@@ -190,7 +164,7 @@ public class WorldManager {
 	 */
 	public void updateWorldBorder() {
 		int circleIndex = 1;
-		int newSize = OCparam.PLOT_SIZE.getValue() + roadSize;
+		int newSize = OCparam.PLOT_SIZE.get() + roadSize;
 
 		
 		//recherche du premier cercle de plots non plein (plot central = circleIndex 1)
@@ -198,14 +172,14 @@ public class WorldManager {
 				> Math.pow(circleIndex*2-1, 2))
 			circleIndex++;
 		
-		newSize += (circleIndex - 1) * (OCparam.PLOT_SIZE.getValue() + roadSize) * 2;
+		newSize += (circleIndex - 1) * (OCparam.PLOT_SIZE.get() + roadSize) * 2;
 		
 		WorldBorder border = world.getWorldBorder();
 		
 		if (border.getSize() == newSize)
 			return;
 		
-		border.setCenter(OCparam.PLOT_SIZE.getValue()/2, OCparam.PLOT_SIZE.getValue()/2);
+		border.setCenter(OCparam.PLOT_SIZE.get()/2, OCparam.PLOT_SIZE.get()/2);
 		border.setWarningDistance(0);
 		border.setSize(newSize);
 	}

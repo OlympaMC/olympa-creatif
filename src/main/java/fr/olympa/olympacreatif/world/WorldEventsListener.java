@@ -323,7 +323,7 @@ public class WorldEventsListener implements Listener{
 	@EventHandler //clear l'historique de sneak de ce joueur, exécute les actions de sortie de plot
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		sneakHistory.remove(e.getPlayer().getName());
-		e.getPlayer().teleport(OCparam.SPAWN_LOC.getValue());
+		e.getPlayer().teleport(OCparam.SPAWN_LOC.get());
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		
@@ -337,11 +337,11 @@ public class WorldEventsListener implements Listener{
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
 		
-		Plot plot = plugin.getPlotsManager().getPlot(OCparam.SPAWN_LOC.getValue());
+		Plot plot = plugin.getPlotsManager().getPlot(OCparam.SPAWN_LOC.get());
 		if (plot != null)
 			plot.executeEntryActions(e.getPlayer(), false);
 
-		e.getPlayer().teleport(OCparam.SPAWN_LOC.getValue());
+		e.getPlayer().teleport(OCparam.SPAWN_LOC.get());
 		
 		//set 1.8 attackspeed
 		e.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(16d);
@@ -402,7 +402,7 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler //cancel join if plot size hos not been set yet, or cancel 1st join to avoid errors
 	public void onPrePlayerJoin(AsyncPlayerPreLoginEvent e) {
-		if (OCparam.PLOT_SIZE.getValue() == -1) {
+		if (OCparam.PLOT_SIZE.get() == -1) {
 			e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§cImpossible de se connecter, le générateur de monde n'a pas été chargé correctement. Veuillez réessayer dans quelques instants.");
 			return;
 		}

@@ -59,7 +59,7 @@ public class CbCommandListener implements Listener {
 				Iterator<Entry<Location, Integer>> iter = blockedExecutionLocs.entrySet().iterator();
 				while(iter.hasNext()) {
 					Entry<Location, Integer> e = iter.next();
-					if (e.getValue() + OCparam.CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue() <= MinecraftServer.currentTick)
+					if (e.getValue() + OCparam.CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.get() <= MinecraftServer.currentTick)
 						iter.remove();
 				}
 			}
@@ -89,7 +89,7 @@ public class CbCommandListener implements Listener {
 			}else
 				//commandblock lents, max 1 cmd/s
 				if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
-					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - OCparam.CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue());
+					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - OCparam.CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.get());
 				else
 					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
 			
@@ -137,7 +137,7 @@ public class CbCommandListener implements Listener {
 
 		int neededCmdTickets;
 		if (cmd.getType() == CommandType.setblock)
-			neededCmdTickets = OCparam.CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK.getValue();
+			neededCmdTickets = OCparam.CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK.get();
 		else
 			neededCmdTickets = 1;
 		
