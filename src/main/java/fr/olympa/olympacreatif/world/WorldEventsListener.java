@@ -323,7 +323,7 @@ public class WorldEventsListener implements Listener{
 	@EventHandler //clear l'historique de sneak de ce joueur, exécute les actions de sortie de plot
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		sneakHistory.remove(e.getPlayer().getName());
-		e.getPlayer().teleport(OCparam.SPAWN_LOC.get());
+		OCparam.SPAWN_LOC.get().teleport(e.getPlayer());
 		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		
@@ -337,11 +337,11 @@ public class WorldEventsListener implements Listener{
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
 		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
 		
-		Plot plot = plugin.getPlotsManager().getPlot(OCparam.SPAWN_LOC.get());
+		Plot plot = plugin.getPlotsManager().getPlot(OCparam.SPAWN_LOC.get().toLoc());
 		if (plot != null)
 			plot.executeEntryActions(e.getPlayer(), false);
 
-		e.getPlayer().teleport(OCparam.SPAWN_LOC.get());
+		OCparam.SPAWN_LOC.get().teleport(e.getPlayer());
 		
 		//set 1.8 attackspeed
 		e.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(16d);

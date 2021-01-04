@@ -6,6 +6,8 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.plot.Position;
 
 public class OCparam<T> {
 	public static final OCparam<Integer> CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK = new OCparam<Integer>(4);
@@ -28,10 +31,10 @@ public class OCparam<T> {
 	public static final OCparam<Integer> MAX_TOTAL_ENTITIES_PER_PLOT = new OCparam<Integer>(0);
 	
 	public static final OCparam<String> WORLD_NAME = new OCparam<String>("world");
-	public static final OCparam<Location> SPAWN_LOC = new OCparam<Location>(new Location(null, 0, 0, 0));
+	public static final OCparam<Position> SPAWN_LOC = new OCparam<Position>(new Position());
 	
-	public static final OCparam<Location> HOLO_HELP_1_LOC = new OCparam<Location>(new Location(null, 0, 0, 0));
-	public static final OCparam<Location> HOLO_HELP_2_LOC = new OCparam<Location>(new Location(null, 0, 0, 0));
+	public static final OCparam<Position> HOLO_HELP_1_LOC = new OCparam<Position>(new Position());
+	public static final OCparam<Position> HOLO_HELP_2_LOC = new OCparam<Position>(new Position());
 	public static final OCparam<String> HOLO_HELP_1_TEXT = new OCparam<String>("");
 	public static final OCparam<String> HOLO_HELP_2_TEXT = new OCparam<String>("");
 	
@@ -67,7 +70,12 @@ public class OCparam<T> {
 	public Type getType(){
 		return new TypeToken<OCparam<T>>() {}.getType();
 	}
+
 	
+	/**
+	 * Return all public static fields of the class
+	 * @return
+	 */
 	public static Map<String, OCparam<?>> values() {
 		Map<String, OCparam<?>> map = new HashMap<String, OCparam<?>>();
 		
@@ -84,7 +92,10 @@ public class OCparam<T> {
 		return map;
 	}
 	
-	
+	/**
+	 * Set values of all public static fields according to provided json data
+	 * @param jsonText
+	 */
 	public static void fromJson(String jsonText) {
 		try {
 			JSONObject json = (JSONObject) new JSONParser().parse(jsonText);
@@ -96,24 +107,30 @@ public class OCparam<T> {
 						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), Integer.class));
 					else if (e.getValue().get() instanceof String)
 						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), String.class));
-					else if (e.getValue().get() instanceof Location)
-						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), Location.class));
+					else if (e.getValue().get() instanceof Position)
+						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), Position.class));
 				}else
 					OlympaCreatifMain.getInstance().getLogger().warning("§eLe paramètre " + e.getKey() + " n'existe pas en bdd ! Une valeur par défaut a été définie");
 			}
+			
+			OlympaCreatifMain.getInstance().getLogger().info("§aParamètres du serveur correctement chargés.");	
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * Return all public static fields of this class as a json string
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public static String toJson() {
 		JSONObject json = new JSONObject();
-		Gson gson = new GsonBuilder().serializeNulls().create();
+		//Gson gson = new GsonBuilder().serializeNulls().create();
 		
 		for (Entry<String, OCparam<?>> param : values().entrySet())
-			json.put(param.getKey(), gson.toJson(param.getValue().get()));
-
+			json.put(param.getKey(), new Gson().toJson(param.getValue().get()));
+		
 		return json.toString();
 	}
 }

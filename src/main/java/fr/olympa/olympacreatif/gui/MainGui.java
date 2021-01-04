@@ -82,7 +82,7 @@ public class MainGui extends IGui {
 		}
 		
 		setItem(30, ItemUtils.item(Material.RED_BED, "§6Téléportation au spawn"), 
-				(it, c, s) -> p.getPlayer().teleport(OCparam.SPAWN_LOC.get()));
+				(it, c, s) -> OCparam.SPAWN_LOC.get().teleport(p.getPlayer()));
 		
 		setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"), 
 				(it, c, s) -> {

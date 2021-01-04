@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -200,18 +202,20 @@ public class DataManager implements Listener {
 			
 			ResultSet messages = osSelectMessages.getStatement().executeQuery();
 			
-			Map<String, OCmsg> ocMsgs = OCmsg.getValues();
-			Set<String> inexistantMessagesInBdd = ocMsgs.keySet(); 
+			Map<String, OCmsg> ocMsgs = OCmsg.values();
+			Set<String> inexistantMessagesInBdd = new HashSet<String>();
+			inexistantMessagesInBdd.addAll(ocMsgs.keySet());
 			
-			while (messages.next()) {				
+			while (messages.next()) 
 				if (ocMsgs.containsKey(messages.getString("message_id"))) {
 					ocMsgs.get(messages.getString("message_id")).setValue(messages.getString("message_string"));
 					inexistantMessagesInBdd.remove(messages.getString("message_id"));
+					//plugin.getLogger().info("§aMessage " + messages.getString("message_id") + " : " + ocMsgs.get(messages.getString("message_id")).getValue());
 				}else
-					plugin.getLogger().log(Level.WARNING, "§eMessage " + messages.getString("message_id") + " existant EN BDD mais pas dans le plugin, veuillez supprimer l'entrée.");
+					plugin.getLogger().info("Message " + messages.getString("message_id") + " existant EN BDD mais pas dans le plugin, veuillez supprimer l'entrée.");
 				
-				inexistantMessagesInBdd.forEach(msg -> plugin.getLogger().log(Level.WARNING, "§eMessage " + msg + " existant DANS LE PLUGIN mais pas en bdd, veuiller ajouter l'entrée !"));
-			}
+			inexistantMessagesInBdd.forEach(msg -> plugin.getLogger().warning("§eMessage " + msg + " existant DANS LE PLUGIN mais pas en bdd, veuiller ajouter l'entrée !"));
+			//System.out.println(ocMsgs);
 		}catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -472,9 +476,16 @@ public class DataManager implements Listener {
 			
 			if (result.next())
 				OCparam.fromJson(result.getString("server_params"));
-			else
-				plugin.getLogger().warning("§ePas de paramètres existant pour le serveur " + serverIndex + ". Création des paramètres par défaut.");
-			
+			else {
+				plugin.getLogger().warning("§ePas de paramètres existant pour le serveur " + serverIndex + ". Création des paramètres par défaut. Le serveur va s'arrêter.");
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						Bukkit.getServer().shutdown();
+					}
+				}.runTaskLater(plugin, 1);
+			}
+
 			PreparedStatement ps2 = osUpdateServerParams.getStatement();
 			ps2.setInt(1, serverIndex);
 			ps2.setString(2, OCparam.toJson());
@@ -483,6 +494,9 @@ public class DataManager implements Listener {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
+		//load plot 1 
+		addPlotToLoadQueue(PlotId.fromId(plugin, 1), false);
 	}
 
 	public int getServerIndex() {

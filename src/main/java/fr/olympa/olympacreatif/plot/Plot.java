@@ -115,7 +115,11 @@ public class Plot {
 			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
 				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z, true);*/
 		plugin.getWorldManager().getWorld().setChunkForceLoaded(
-				plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getZ() , true);
+				plotId
+				.getLocation()
+				.getChunk()
+				.getX(), 
+				plotId.getLocation().getChunk().getZ() , true);
 		
 		//add entities from already loaded chunks
 		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
@@ -132,8 +136,8 @@ public class Plot {
 		//spawns the tuto holo if it's the plot 1
 		if (plotId.getId() == 1) {
 			plugin.getTask().runTaskLater(() -> {
-				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get(), OCparam.HOLO_HELP_1_TEXT.get().split("&"));
-				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get(), OCparam.HOLO_HELP_2_TEXT.get().split("&"));
+				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get().split("&"));
+				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get().split("&"));
 			}, 10);
 		}
 	}

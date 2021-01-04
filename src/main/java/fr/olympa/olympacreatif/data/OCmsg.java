@@ -11,6 +11,14 @@ import java.util.Set;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class OCmsg {
 
@@ -106,14 +114,23 @@ public class OCmsg {
 	}
 	
 	public OCmsg valueOf(String s) {		
-		for (Entry<String, OCmsg> entry : getValues().entrySet())
+		for (Entry<String, OCmsg> entry : values().entrySet())
 			if (entry.getKey().equals(s))
 				return entry.getValue();
 		
 		return null;
 	}
 	
-	public static Map<String, OCmsg> getValues() {
+	@Override
+	public String toString() {
+		return message;
+	}
+	
+	/**
+	 * Return all public static fields of the class
+	 * @return
+	 */
+	public static Map<String, OCmsg> values() {
 		Map<String, OCmsg> map = new HashMap<String, OCmsg>();
 		
 		Field[] fields = OCmsg.class.getDeclaredFields();

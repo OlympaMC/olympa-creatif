@@ -102,7 +102,7 @@ public class OcCommand extends OlympaCommand {
 				break;
 				
 			case "spawn":
-				p.teleport(OCparam.SPAWN_LOC.get());
+				OCparam.SPAWN_LOC.get().teleport(p);
 				sender.sendMessage(OCmsg.TELEPORTED_TO_WORLD_SPAWN.getValue());
 				break;
 				

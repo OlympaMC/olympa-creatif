@@ -40,7 +40,7 @@ public class FakePlayerDeathEvent extends Event{
 		this.p = p;
 		this.plot = deathPlot;
 		
-		Location respawnLoc = OCparam.SPAWN_LOC.get();
+		Location respawnLoc = OCparam.SPAWN_LOC.get().toLoc();
 		
 		for (PotionEffect pot : p.getActivePotionEffects())
 			p.removePotionEffect(pot.getType());

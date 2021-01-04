@@ -104,26 +104,24 @@ public class PlotsManager {
 				//Map<Entity, Plot> listToRemove = new HashMap<Entity, Plot>();		
 				
 				//parcours les entités du monde. Si elles sont en dehors de leur plot, elles sont supprimées
-				new ArrayList<Entity>(plugin.getWorldManager().getWorld().getEntities()).forEach(e ->{
-					if (e.getType() == EntityType.PLAYER)
-						return;
-					
-					PlotId id = getBirthPlot(e);
-					
-					if (id  == null || !id.equals(PlotId.fromLoc(plugin, e.getLocation()))) {
-						Plot plot = plugin.getPlotsManager().getPlot(id);
+				if (plugin.getWorldManager().getWorld() != null)
+					new ArrayList<Entity>(plugin.getWorldManager().getWorld().getEntities()).forEach(e ->{
+						if (e.getType() == EntityType.PLAYER)
+							return;
 						
-						if (plot != null)
-							plot.removeEntityInPlot(e, true);
-						else
-							e.remove();
-					}
-				});
+						PlotId id = getBirthPlot(e);
+						
+						if (id  == null || !id.equals(PlotId.fromLoc(plugin, e.getLocation()))) {
+							Plot plot = plugin.getPlotsManager().getPlot(id);
+							
+							if (plot != null)
+								plot.removeEntityInPlot(e, true);
+							else
+								e.remove();
+						}
+					});
 			}
 		}.runTaskTimerAsynchronously(plugin, 10, 300);
-
-		//load plot 1 
-		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromId(plugin, 1), false);
 	}
 	
 	/**
