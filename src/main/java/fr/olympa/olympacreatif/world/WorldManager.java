@@ -197,19 +197,22 @@ public class WorldManager {
 
 			CraftServer craftServer = ((CraftServer)Bukkit.getServer());
 			MinecraftServer server = craftServer.getServer();
-			DedicatedServer dediServer = (DedicatedServer) CraftServer.class.getDeclaredField("console").get(craftServer);
+			
+			Field field1 = CraftServer.class.getDeclaredField("console");
+			field1.setAccessible(true);
+			DedicatedServer dediServer = (DedicatedServer) field1.get(craftServer);
 
 			//create bukkit ChunkGenerator instance
 			OCChunkGenerator bukkitGenerator = new OCChunkGenerator(plugin);
 			
 			//set custom generator in bukkit World
-			Field field = CraftWorld.class.getDeclaredField("generator");
-			field.setAccessible(true);
-			field.set(craftWorld, bukkitGenerator);
-			
-			Field field2 = WorldServer.class.getDeclaredField("chunkProvider");
+			Field field2 = CraftWorld.class.getDeclaredField("generator");
 			field2.setAccessible(true);
-			ChunkProviderServer oldChunkProvider = (ChunkProviderServer) field2.get(worldServer);
+			field2.set(craftWorld, bukkitGenerator);
+			
+			Field field3 = WorldServer.class.getDeclaredField("chunkProvider");
+			field3.setAccessible(true);
+			ChunkProviderServer oldChunkProvider = (ChunkProviderServer) field3.get(worldServer);
 			
 			//new chunk generator which will be used below
 			net.minecraft.server.v1_16_R3.ChunkGenerator generator = new CustomChunkGenerator(worldServer, oldChunkProvider.chunkGenerator, bukkitGenerator);
@@ -220,10 +223,14 @@ public class WorldManager {
 					dediServer.executorService, generator, plugin.getServer().getViewDistance(), server.isSyncChunkWrites(), 
 					server.worldLoadListenerFactory.create(11), () -> server.E().getWorldPersistentData());
 			
-			field2.set(worldServer, newChunkProvider);
+			field3.set(worldServer, newChunkProvider);
+			
+			plugin.getLogger().info("§aGénérateur de chunks chargé avec succès §2(#ReflectionPower)");
 			
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			plugin.getLogger().severe("§4Erreur lors du chargement du générateur de chunks custom. Arrêt du serveur.");
 			e.printStackTrace();
+			Bukkit.getServer().shutdown();
 		}
 	}
 }

@@ -34,29 +34,31 @@ public class RedisListener extends JedisPubSub {
 			return;
 		
 		int serverIndex = Integer.valueOf(serverName.substring(serverName.length() - 1));
-		plugin.getLogger().info("§aINDEX DU SERVEUR CREATIF : " + serverIndex);
 		
 		plugin.getDataManager().updateWithServerIndex(serverIndex);
 		
 		int plotsCount = plugin.getDataManager().getPlotsCount();
-		if (plotsCount != -1)
-			plugin.getLogger().log(Level.INFO, "Nombre de parcelles détectées : " + plotsCount);
-		else
-			plugin.getLogger().log(Level.SEVERE, "§4ATTENTION problème dans la table creatif_plotsdata : nombre d'entrées différent de l'indice du plot maximal !!");
+		if (plotsCount == -1) {
+			plugin.getLogger().log(Level.SEVERE, "§4ATTENTION problème dans la table creatif_plotsdata : nombre d'entrées différent de l'indice du plot maximal !! Arrêt du serveur.");
+			Bukkit.getServer().shutdown();
+			return;
+		}
 			
 		plugin.getPlotsManager().setTotalPlotCount(plotsCount);
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				plugin.getWorldManager().defineWorldParams();	
+				plugin.getWorldManager().loadCustomWorldGenerator();
 			}
 		}.runTask(plugin);
 
 		//create default scoreboard
 		plugin.createScoreboard(serverIndex);
 		
-		plugin.getLogger().log(Level.INFO, "Taille parcelles définie à " + OCparam.PLOT_SIZE.get() + "*" + OCparam.PLOT_SIZE.get());
-		plugin.getWorldManager().loadCustomWorldGenerator();
+		plugin.getLogger().info("§aINDEX DU SERVEUR CREATIF : " + serverIndex + "§7 - Nombre de parcelles : " + plotsCount + " - Taille parcelles : " + OCparam.PLOT_SIZE.get() + "*" + OCparam.PLOT_SIZE.get());
+		
+		//plugin.getLogger().log(Level.INFO, "Taille parcelles définie à " + OCparam.PLOT_SIZE.get() + "*" + OCparam.PLOT_SIZE.get());
 		//plugin.getServer().getPluginManager().callEvent(new PlotSizeRecievedEvent(OCparam.PLOT_SIZE.get(), WorldManager.roadSize, WorldManager.worldLevel));
 	}
 	
