@@ -56,9 +56,11 @@ public class RedisListener extends JedisPubSub {
 		plugin.createScoreboard(serverIndex);
 		
 		plugin.getLogger().log(Level.INFO, "Taille parcelles définie à " + OCparam.PLOT_SIZE.get() + "*" + OCparam.PLOT_SIZE.get());
-		plugin.getServer().getPluginManager().callEvent(new PlotSizeRecievedEvent(OCparam.PLOT_SIZE.get(), WorldManager.roadSize, WorldManager.worldLevel));
+		plugin.getWorldManager().loadCustomWorldGenerator();
+		//plugin.getServer().getPluginManager().callEvent(new PlotSizeRecievedEvent(OCparam.PLOT_SIZE.get(), WorldManager.roadSize, WorldManager.worldLevel));
 	}
 	
+	@Deprecated
 	public static class PlotSizeRecievedEvent extends Event {
 	    private static final HandlerList HANDLERS_LIST = new HandlerList();
 

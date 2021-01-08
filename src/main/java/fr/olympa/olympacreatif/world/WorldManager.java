@@ -188,7 +188,7 @@ public class WorldManager {
 	}
 	
 	
-	public void setCustomWorldGenerator() {
+	public void loadCustomWorldGenerator() {
 		try {
 
 			//get copy as NMS of all required classes
@@ -207,18 +207,20 @@ public class WorldManager {
 			field.setAccessible(true);
 			field.set(craftWorld, bukkitGenerator);
 			
-			field = WorldServer.class.getDeclaredField("chunkProvider");
-			field.setAccessible(true);
-			ChunkProviderServer oldChunkProvider = (ChunkProviderServer) field.get(worldServer);
+			Field field2 = WorldServer.class.getDeclaredField("chunkProvider");
+			field2.setAccessible(true);
+			ChunkProviderServer oldChunkProvider = (ChunkProviderServer) field2.get(worldServer);
 			
+			//new chunk generator which will be used below
 			net.minecraft.server.v1_16_R3.ChunkGenerator generator = new CustomChunkGenerator(worldServer, oldChunkProvider.chunkGenerator, bukkitGenerator);
 			
+			//create new chunk provider
 			ChunkProviderServer newChunkProvider = new ChunkProviderServer(worldServer, 
 					worldServer.convertable, server.getDataFixer(), server.getDefinedStructureManager(), 
 					dediServer.executorService, generator, plugin.getServer().getViewDistance(), server.isSyncChunkWrites(), 
 					server.worldLoadListenerFactory.create(11), () -> server.E().getWorldPersistentData());
 			
-			field.set(worldServer, newChunkProvider);
+			field2.set(worldServer, newChunkProvider);
 			
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();

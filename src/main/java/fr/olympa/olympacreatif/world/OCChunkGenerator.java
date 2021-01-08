@@ -16,6 +16,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.generator.ChunkGenerator;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OCparam;
 
 public class OCChunkGenerator extends ChunkGenerator {
 	
@@ -28,6 +29,10 @@ public class OCChunkGenerator extends ChunkGenerator {
 	Schematic roadZschem = null;
 	
     public OCChunkGenerator(OlympaCreatifMain plugin) {
+    	plotSize = OCparam.PLOT_SIZE.get();
+    	roadSize = WorldManager.roadSize;
+    	worldLevel = WorldManager.worldLevel;
+    	
 		try {
 			File fileX = File.createTempFile("creatif_schematic_X", ".schem");
 			File fileZ = File.createTempFile("creatif_schematic_Z", ".schem");
