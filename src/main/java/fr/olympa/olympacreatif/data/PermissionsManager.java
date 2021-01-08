@@ -42,9 +42,9 @@ public class PermissionsManager implements Listener{
         //System.out.println("cb perms : " + config.getList("cb_perms"));
         //System.out.println("we perms : " + config.getList("we_perms"));
 		config.getStringList("cb_perms").stream().forEach(OlympaGroup.PLAYER::setRuntimePermission);
-		config.getStringList("we_perms").stream().forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::setRuntimePermission);
+		config.getStringList("we_perms").stream().forEach(PermissionsList.CREA_USE_WORLD_EDIT.getMinGroup()::setRuntimePermission);
 
-        plugin.getLogger().log(Level.INFO, "§aVanilla & WorldEdit permissions have been successfully added to " + OlympaGroup.PLAYER + " and " + PermissionsList.USE_WORLD_EDIT.getMinGroup() + " groups.");
+        plugin.getLogger().log(Level.INFO, "§aVanilla & WorldEdit permissions have been successfully added to " + OlympaGroup.PLAYER + " and " + PermissionsList.CREA_USE_WORLD_EDIT.getMinGroup() + " groups.");
 	}
 	
 	public void removeCbPerms() {
@@ -56,7 +56,7 @@ public class PermissionsManager implements Listener{
 	}
 	
 	public void removeWePerms() {
-		config.getStringList("we_perms").stream().forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::unsetRuntimePermission);
+		config.getStringList("we_perms").stream().forEach(PermissionsList.CREA_USE_WORLD_EDIT.getMinGroup()::unsetRuntimePermission);
 		Bukkit.getOnlinePlayers().forEach(
 				p -> p.getEffectivePermissions().stream().filter(
 				perms -> perms.getAttachment() != null).forEach(

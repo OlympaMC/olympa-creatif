@@ -68,8 +68,8 @@ public class OcoCommand extends OlympaCommand {
 		case 1:
 			switch (args[0]) {
 			case "hat":
-				if (!PermissionsList.USE_HAT_COMMAND.hasPermission(p)) {
-					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_HAT_COMMAND.getMinGroup().getName(p.getGender())));
+				if (!PermissionsList.CREA_USE_HAT_COMMAND.hasPermission(p)) {
+					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.CREA_USE_HAT_COMMAND.getMinGroup().getName(p.getGender())));
 					return false;
 				}
 				p.getPlayer().sendMessage(OCmsg.OCO_HAT_SUCCESS.getValue());
@@ -78,8 +78,8 @@ public class OcoCommand extends OlympaCommand {
 				
 				
 			case "mb":
-				if (!PermissionsList.USE_MICRO_BLOCKS.hasPermission(p)) {
-					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
+				if (!PermissionsList.CREA_USE_MICRO_BLOCKS.hasPermission(p)) {
+					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.CREA_USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
 					return false;
 				}
 				plugin.getPerksManager().getMicroBlocks().openGui(p.getPlayer());
@@ -87,8 +87,8 @@ public class OcoCommand extends OlympaCommand {
 				
 				
 			case "export":
-				if (!PermissionsList.USE_PLOT_EXPORTATION.hasPermission(p)) {
-					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_PLOT_EXPORTATION.getMinGroup().getName(p.getGender())));
+				if (!PermissionsList.CREA_USE_PLOT_EXPORTATION.hasPermission(p)) {
+					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.CREA_USE_PLOT_EXPORTATION.getMinGroup().getName(p.getGender())));
 					return false;
 				}
 				if (plot != null && PlotPerm.EXPORT_PLOT.has(plot, p))
@@ -150,8 +150,8 @@ public class OcoCommand extends OlympaCommand {
 		case 2:
 			switch(args[0]) {
 			case "mb":
-				if (!PermissionsList.USE_MICRO_BLOCKS.hasPermission(p)) {
-					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
+				if (!PermissionsList.CREA_USE_MICRO_BLOCKS.hasPermission(p)) {
+					p.getPlayer().sendMessage(OCmsg.INSUFFICIENT_GROUP_PERMISSION.getValue(PermissionsList.CREA_USE_MICRO_BLOCKS.getMinGroup().getName(p.getGender())));
 					return false;
 				}
 				ItemStack item = plugin.getPerksManager().getMicroBlocks().getMb(args[1]);

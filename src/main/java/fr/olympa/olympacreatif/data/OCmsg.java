@@ -87,7 +87,8 @@ public class OCmsg {
 	public static final OCmsg WE_START_GENERATING_PLOT_SCHEM = new OCmsg("");
 	public static final OCmsg WE_COMPLETE_GENERATING_PLOT_SCHEM = new OCmsg(""); 
 	public static final OCmsg WE_DISABLED = new OCmsg(""); 
-	public static final OCmsg WE_ERR_SCHEM_CMD_DISABLED = new OCmsg(""); 
+	public static final OCmsg WE_ERR_SCHEM_CMD_DISABLED = new OCmsg("");
+	public static final OCmsg WE_NO_KIT_FOR_MATERIAL = new OCmsg(""); 
  
 	//public static final OCmsg WE_ERR_INSUFFICENT_PERMISSION = new OCmsg(""); 
 

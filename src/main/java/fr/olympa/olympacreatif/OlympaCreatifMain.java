@@ -78,13 +78,12 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		
 		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
 		OlympaPermission.registerPermissions(PermissionsList.class);
-		createScoreboard();
 		
 		new OcCommand(this, "oc", OcCommand.subArgsList.toArray(new String[OcCommand.subArgsList.size()])).register();
 		new OcoCommand(this, "oco", OcoCommand.subArgsList.toArray(new String[OcoCommand.subArgsList.size()])).register();
 		new OcaCommand(this, "oca", OcaCommand.subArgsList.toArray(new String[OcaCommand.subArgsList.size()])).register();
 
-		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.TPA), plugin);
+		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA), plugin);
 		
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);
@@ -141,8 +140,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	//crée le scoreboard du joueur avec des lignes dynamiques, pour afficher le scoreboard custom du plot si besoin
 	@SuppressWarnings("unchecked")
-	private void createScoreboard() {
-		scm = new ScoreboardManager<OlympaPlayerCreatif>(plugin, "§6Olympa Créatif");
+	public void createScoreboard(int serverIndex) {
+		scm = new ScoreboardManager<OlympaPlayerCreatif>(plugin, "§6Olympa Créatif - " + serverIndex);
 
 		//initialisation lignes scoreboard
 		for (int i = 0; i < OlympaPlayerCreatif.scoreboardLinesSize; i++) {

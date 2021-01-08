@@ -16,8 +16,8 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 
 public class PlotPerm {
 
-	public static final PlotPerm EXPORT_PLOT = new PlotPerm(PlotRank.OWNER, "Exporter la parcelle en schematic", PermissionsList.USE_PLOT_EXPORTATION);
-	public static final PlotPerm RESET_PLOT = new PlotPerm(PlotRank.OWNER, "Reset la parcelle ", PermissionsList.USE_PLOT_RESET);
+	public static final PlotPerm EXPORT_PLOT = new PlotPerm(PlotRank.OWNER, "Exporter la parcelle en schematic", PermissionsList.CREA_USE_PLOT_EXPORTATION);
+	//public static final PlotPerm RESET_PLOT = new PlotPerm(PlotRank.OWNER, "Reset la parcelle ", PermissionsList.CREA_USE_PLOT_RESET);
 	public static final PlotPerm BYPASS_EXIT_CLIPBOARD_CLEAR = new PlotPerm(PlotRank.OWNER, null);
 
 	public static final PlotPerm INVITE_MEMBER = new PlotPerm(PlotRank.CO_OWNER, "Inviter des membres");
@@ -28,8 +28,8 @@ public class PlotPerm {
 	public static final PlotPerm SET_PLOT_SPAWN = new PlotPerm(PlotRank.CO_OWNER, "Définir le spawn parcelle");
 	public static final PlotPerm BAN_VISITOR = new PlotPerm(PlotRank.CO_OWNER, "Bannir un visiteur");
 	
-	public static final PlotPerm USE_WE = new PlotPerm(PlotRank.TRUSTED, "Utiliser WorldEdit", PermissionsList.USE_WORLD_EDIT);
-	public static final PlotPerm DEFINE_MUSIC = new PlotPerm(PlotRank.TRUSTED, "Définir la musique", PermissionsList.USE_PLOT_MUSIC);
+	public static final PlotPerm USE_WE = new PlotPerm(PlotRank.TRUSTED, "Utiliser WorldEdit", PermissionsList.CREA_USE_WORLD_EDIT);
+	public static final PlotPerm DEFINE_MUSIC = new PlotPerm(PlotRank.TRUSTED, "Définir la musique", PermissionsList.CREA_USE_PLOT_MUSIC);
 	public static final PlotPerm EXECUTE_CB_CMD = new PlotPerm(PlotRank.TRUSTED, "Utiliser les commandes vanilla");
 	public static final PlotPerm KICK_VISITOR = new PlotPerm(PlotRank.TRUSTED, "Ejecter un visiteur");
 

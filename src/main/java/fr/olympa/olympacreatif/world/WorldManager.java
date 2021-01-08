@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.world;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,19 +16,21 @@ import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.olympa.api.plugin.OlympaSpigot;
 import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.redis.RedisAccess;
-import fr.olympa.api.redis.RedisChannel;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.RedisListener;
+import net.minecraft.server.v1_16_R3.ChunkProviderServer;
+import net.minecraft.server.v1_16_R3.DedicatedServer;
+import net.minecraft.server.v1_16_R3.MinecraftServer;
+import net.minecraft.server.v1_16_R3.WorldServer;
 
 public class WorldManager {
 	private OlympaCreatifMain plugin;
@@ -182,6 +185,44 @@ public class WorldManager {
 		border.setCenter(OCparam.PLOT_SIZE.get()/2, OCparam.PLOT_SIZE.get()/2);
 		border.setWarningDistance(0);
 		border.setSize(newSize);
+	}
+	
+	
+	public void setCustomWorldGenerator() {
+		try {
+
+			//get copy as NMS of all required classes
+			CraftWorld craftWorld = ((CraftWorld)world);
+			WorldServer worldServer = craftWorld.getHandle();
+
+			CraftServer craftServer = ((CraftServer)Bukkit.getServer());
+			MinecraftServer server = craftServer.getServer();
+			DedicatedServer dediServer = (DedicatedServer) CraftServer.class.getDeclaredField("console").get(craftServer);
+
+			//create bukkit ChunkGenerator instance
+			OCChunkGenerator bukkitGenerator = new OCChunkGenerator(plugin);
+			
+			//set custom generator in bukkit World
+			Field field = CraftWorld.class.getDeclaredField("generator");
+			field.setAccessible(true);
+			field.set(craftWorld, bukkitGenerator);
+			
+			field = WorldServer.class.getDeclaredField("chunkProvider");
+			field.setAccessible(true);
+			ChunkProviderServer oldChunkProvider = (ChunkProviderServer) field.get(worldServer);
+			
+			net.minecraft.server.v1_16_R3.ChunkGenerator generator = new CustomChunkGenerator(worldServer, oldChunkProvider.chunkGenerator, bukkitGenerator);
+			
+			ChunkProviderServer newChunkProvider = new ChunkProviderServer(worldServer, 
+					worldServer.convertable, server.getDataFixer(), server.getDefinedStructureManager(), 
+					dediServer.executorService, generator, plugin.getServer().getViewDistance(), server.isSyncChunkWrites(), 
+					server.worldLoadListenerFactory.create(11), () -> server.E().getWorldPersistentData());
+			
+			field.set(worldServer, newChunkProvider);
+			
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
 	}
 }
 

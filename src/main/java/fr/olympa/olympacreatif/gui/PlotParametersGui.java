@@ -166,7 +166,7 @@ public class PlotParametersGui extends IGui {
 		else
 			ItemUtils.loreAdd(it, "§aMusique actuelle : §d" + plot.getParameters().getParameter(PlotParamType.SONG));
 		
-		ItemUtils.loreAdd(it, " ", "§7Le grade " + PermissionsList.USE_PLOT_MUSIC.getMinGroup().getPrefix(p.getGender()) + "§7 est nécessaire", "§7pour utiliser cette fonctionnalité.");
+		ItemUtils.loreAdd(it, " ", "§7Le grade " + PermissionsList.CREA_USE_PLOT_MUSIC.getMinGroup().getPrefix(p.getGender()) + "§7 est nécessaire", "§7pour utiliser cette fonctionnalité.");
 		
 		ItemUtils.loreAdd(it, clickToChange);
 		

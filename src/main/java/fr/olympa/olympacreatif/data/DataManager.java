@@ -30,6 +30,7 @@ import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
 import fr.olympa.api.redis.RedisAccess;
 import fr.olympa.api.redis.RedisChannel;
 import fr.olympa.api.sql.statement.OlympaStatement;
+import fr.olympa.api.utils.ColorUtils;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;

@@ -34,9 +34,9 @@ public class RedisListener extends JedisPubSub {
 			return;
 		
 		int serverIndex = Integer.valueOf(serverName.substring(serverName.length() - 1));
-		plugin.getDataManager().updateWithServerIndex(serverIndex);
-		
 		plugin.getLogger().info("§aINDEX DU SERVEUR CREATIF : " + serverIndex);
+		
+		plugin.getDataManager().updateWithServerIndex(serverIndex);
 		
 		int plotsCount = plugin.getDataManager().getPlotsCount();
 		if (plotsCount != -1)
@@ -52,6 +52,9 @@ public class RedisListener extends JedisPubSub {
 			}
 		}.runTask(plugin);
 
+		//create default scoreboard
+		plugin.createScoreboard(serverIndex);
+		
 		plugin.getLogger().log(Level.INFO, "Taille parcelles définie à " + OCparam.PLOT_SIZE.get() + "*" + OCparam.PLOT_SIZE.get());
 		plugin.getServer().getPluginManager().callEvent(new PlotSizeRecievedEvent(OCparam.PLOT_SIZE.get(), WorldManager.roadSize, WorldManager.worldLevel));
 	}

@@ -5,10 +5,14 @@ import java.util.Collection;
 import java.util.logging.Level;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.bukkit.regions.BukkitMaskManager;
@@ -19,22 +23,26 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.eventbus.EventHandler;
+import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 
-public class WorldEditManager /*extends EventHandler*/ implements Listener {
+public class WorldEditManager implements Listener {
 
 	private OlympaCreatifMain plugin;
 	private boolean isWePresent = false;
 	private boolean isWeEnabled = false;
 	public WorldEditManager(OlympaCreatifMain plugin) {
-		//super(Priority.NORMAL);
 		
 		this.plugin = plugin;
 		
@@ -42,15 +50,16 @@ public class WorldEditManager /*extends EventHandler*/ implements Listener {
 			return;
 		
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
-		//Fawe.get().getWorldEdit().getEventBus().register(this);
-		
+
+
 		FaweAPI.addMaskManager(new OlympaCreatifMask());
+		//Impossible de récupérer la liste des blocs dans un EditSession, impossible d'utiliser l'évent pour détecter les blocs par type... 
+		//Fawe.get().getWorldEdit().getEventBus().register(new WorldEditEventHandler(plugin));		
 		
 		LocalConfiguration config = Fawe.get().getWorldEdit().getConfiguration();
 		for (Material mat : Material.values())
 			if (plugin.getPerksManager().getKitsManager().getKitOf(mat) != null)
 				config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());
-		
 		plugin.getLogger().log(Level.INFO, "§aCustom FAWE Mask Manager has been loaded. All kits blocks added to blacklist.");
 
 		isWePresent = true;
@@ -142,10 +151,9 @@ public class WorldEditManager /*extends EventHandler*/ implements Listener {
 			return;
 		}
 	}*/
-	
-	/*@Subscribe
-	public void onEditSession(EditSessionEvent e) {
-		Bukkit.broadcastMessage("TRY TO SET EXTENT");
+		
+					
+		/*Bukkit.broadcastMessage("TRY TO SET EXTENT");
 		Extent extent = e.getExtent();
 		Region region = new CuboidRegion(e.getExtent().getMinimumPoint(), e.getExtent().getMaximumPoint());
 		//Filter filter = new BlockMaskBuilder().add(BlockTypes.STONE).build(extent).toFilter(new OcFilter());
@@ -155,10 +163,9 @@ public class WorldEditManager /*extends EventHandler*/ implements Listener {
 		//extent.
 		extent.apply(region, new OcFilter(), true);
 		e.setExtent(extent);
-		Bukkit.broadcastMessage("EXTENT SET");
-	}
+		Bukkit.broadcastMessage("EXTENT SET");*/
 	
-	
+	/*
 	private class OcFilter implements Filter {
 
 		public final void applyBlock(FilterBlock block) {
@@ -187,3 +194,4 @@ public class WorldEditManager /*extends EventHandler*/ implements Listener {
         }
 	}*/
 }
+
