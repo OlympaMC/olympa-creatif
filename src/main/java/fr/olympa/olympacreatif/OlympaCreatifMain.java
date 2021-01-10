@@ -141,7 +141,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	//crée le scoreboard du joueur avec des lignes dynamiques, pour afficher le scoreboard custom du plot si besoin
 	@SuppressWarnings("unchecked")
 	public void createScoreboard(int serverIndex) {
-		scm = new ScoreboardManager<OlympaPlayerCreatif>(plugin, "§6Olympa Créatif - " + serverIndex);
+		scm = new ScoreboardManager<OlympaPlayerCreatif>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
 
 		//initialisation lignes scoreboard
 		for (int i = 0; i < OlympaPlayerCreatif.scoreboardLinesSize; i++) {
@@ -157,7 +157,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 				new TimerLine<Scoreboard<OlympaPlayerCreatif>>(p -> {
 					return getLine(p.getOlympaPlayer(), OlympaPlayerCreatif.scoreboardLinesSize + 1);
 				}, plugin, 20),
-
+				
 				new FixedLine<Scoreboard<OlympaPlayerCreatif>>("§6play.olympa.fr"));
 	}
 
@@ -210,6 +210,21 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 				return "§4";
 		}
 		return "";
+	}
+	
+	private String getAsRomanNumber(int i) {
+		switch (i) {
+		case 1:
+			return "I";
+		case 2:
+			return "II";
+		case 3:
+			return "III";
+		case 4:
+			return "IV";
+		default:
+			return "" + i;
+		}
 	}
 
 	public WorldManager getWorldManager() {

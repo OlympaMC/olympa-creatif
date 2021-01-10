@@ -192,6 +192,7 @@ public class PlotParametersGui extends IGui {
 		switchButtons.put(ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Forcer le spawn parcelle"), PlotParamType.FORCE_SPAWN_LOC);
 		switchButtons.put(ItemUtils.item(Material.FEATHER, "§6Vol des visiteurs"), PlotParamType.ALLOW_FLY_INCOMING_PLAYERS);
 		switchButtons.put(ItemUtils.item(Material.ARROW, "§6Activation des projectiles"), PlotParamType.ALLOW_LAUNCH_PROJECTILES);
+		switchButtons.put(ItemUtils.item(Material.FEATHER, "§6Reset vitesse de vol des visiteurs"), PlotParamType.RESET_VISITOR_FLY_SPEED);
 		
 		int i = 4;
 		

@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.plot;
+package fr.olympa.olympacreatif.data;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

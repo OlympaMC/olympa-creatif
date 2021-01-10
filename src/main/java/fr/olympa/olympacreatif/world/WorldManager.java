@@ -210,6 +210,7 @@ public class WorldManager {
 			field2.setAccessible(true);
 			field2.set(craftWorld, bukkitGenerator);
 			
+			//get old chunk provider which will be used to create the new one
 			Field field3 = WorldServer.class.getDeclaredField("chunkProvider");
 			field3.setAccessible(true);
 			ChunkProviderServer oldChunkProvider = (ChunkProviderServer) field3.get(worldServer);

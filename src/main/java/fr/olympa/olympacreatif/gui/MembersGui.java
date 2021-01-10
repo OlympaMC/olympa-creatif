@@ -32,7 +32,7 @@ public class MembersGui extends IGui {
 			if (r.getLevel() == 1)
 				it = ItemUtils.lore(it, "§7Permissions incluses :", " ");				
 			else
-				it = ItemUtils.lore(it, "§7Permissions de " + r.getDowngrade() + "§7, et :", " ");
+				it = ItemUtils.lore(it, "§7Permissions de " + r.getDowngrade().getRankName() + "§7, et :", " ");
 			
 			//Bukkit.broadcastMessage(r + " : " + r.getPermsDescs());
 			

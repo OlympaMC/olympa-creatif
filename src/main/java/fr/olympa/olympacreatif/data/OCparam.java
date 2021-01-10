@@ -18,7 +18,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.plot.Position;
 
 public class OCparam<T> {
 	public static final OCparam<Integer> CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK = new OCparam<Integer>(4);
@@ -42,6 +41,9 @@ public class OCparam<T> {
 	public static final OCparam<Integer> INCOME_AFK = new OCparam<Integer>(0); 
 	
 	public static final OCparam<Integer> PLOT_SIZE = new OCparam<Integer>(0);
+
+	public static final OCparam<String> ROAD_SCHEM_NAME_X = new OCparam<String>("fileName");
+	public static final OCparam<String> ROAD_SCHEM_NAME_Z = new OCparam<String>("fileName");
 	
 	private T value;
 	private Class<T> paramClass;
@@ -110,7 +112,7 @@ public class OCparam<T> {
 					else if (e.getValue().get() instanceof Position)
 						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), Position.class));
 				}else
-					OlympaCreatifMain.getInstance().getLogger().warning("§eLe paramètre " + e.getKey() + " n'existe pas en bdd ! Une valeur par défaut a été définie");
+					OlympaCreatifMain.getInstance().getLogger().warning("§eLe paramètre " + e.getKey() + " n'existe pas en bdd ! Une valeur par défaut a été définie : " + e.getValue().get());
 			}
 			
 			OlympaCreatifMain.getInstance().getLogger().info("§aParamètres du serveur correctement chargés.");	

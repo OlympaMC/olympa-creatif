@@ -16,14 +16,14 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 
 public class PlotPerm {
 
-	public static final PlotPerm EXPORT_PLOT = new PlotPerm(PlotRank.OWNER, "Exporter la parcelle en schematic", PermissionsList.CREA_USE_PLOT_EXPORTATION);
+	public static final PlotPerm EXPORT_PLOT = new PlotPerm(PlotRank.OWNER, "Exporter la parcelle", PermissionsList.CREA_USE_PLOT_EXPORTATION);
 	//public static final PlotPerm RESET_PLOT = new PlotPerm(PlotRank.OWNER, "Reset la parcelle ", PermissionsList.CREA_USE_PLOT_RESET);
 	public static final PlotPerm BYPASS_EXIT_CLIPBOARD_CLEAR = new PlotPerm(PlotRank.OWNER, null);
 
 	public static final PlotPerm INVITE_MEMBER = new PlotPerm(PlotRank.CO_OWNER, "Inviter des membres");
 	public static final PlotPerm PROMOTE_DEMOTE = new PlotPerm(PlotRank.CO_OWNER, "Promouvoir/Dégrader un membre");
-	public static final PlotPerm CHANGE_PARAM_SETTINGS = new PlotPerm(PlotRank.CO_OWNER, "Modifier les params généraux");
-	public static final PlotPerm CHANGE_PARAM_INTERRACTION = new PlotPerm(PlotRank.CO_OWNER, "Modifier des params d'interraction");
+	public static final PlotPerm CHANGE_PARAM_SETTINGS = new PlotPerm(PlotRank.CO_OWNER, "Modifier params généraux");
+	public static final PlotPerm CHANGE_PARAM_INTERRACTION = new PlotPerm(PlotRank.CO_OWNER, "Modifier params d'interraction");
 	public static final PlotPerm COMMAND_BLOCK = new PlotPerm(PlotRank.CO_OWNER, "Interragir avec les commandblocks");
 	public static final PlotPerm SET_PLOT_SPAWN = new PlotPerm(PlotRank.CO_OWNER, "Définir le spawn parcelle");
 	public static final PlotPerm BAN_VISITOR = new PlotPerm(PlotRank.CO_OWNER, "Bannir un visiteur");
@@ -49,7 +49,7 @@ public class PlotPerm {
 	
 	private PlotPerm(PlotRank minRank, String desc, OlympaPermission perm) {
 		this.minRank = minRank;
-		this.description = desc + "§7(" + perm.getMinGroup().getName() + " requis)";
+		this.description = desc + " §7(" + perm.getMinGroup().getName() + " requis)";
 		this.requiredPerm = perm;
 	}
 	

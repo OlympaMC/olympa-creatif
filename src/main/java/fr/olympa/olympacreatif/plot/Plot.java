@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import com.boydti.fawe.FaweAPI;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
@@ -136,8 +137,8 @@ public class Plot {
 		//spawns the tuto holo if it's the plot 1
 		if (plotId.getId() == 1) {
 			plugin.getTask().runTaskLater(() -> {
-				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get().split("&"));
-				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get().split("&"));
+				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get().split(" & "));
+				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get().split(" & "));
 			}, 10);
 		}
 	}
@@ -362,6 +363,11 @@ public class Plot {
 		
 		//joue la musique par défaut du plot
 		plugin.getPerksManager().getSongManager().startSong(p, getParameters().getParameter(PlotParamType.SONG));
+		
+		//reset fly speed if needed
+		if (!PlotPerm.DEFINE_OWN_FLY_SPEED.has(this, pc) && getParameters().getParameter(PlotParamType.RESET_VISITOR_FLY_SPEED))
+			pc.getPlayer().setFlySpeed(0.1f);
+		
 		return true;
 	}
 

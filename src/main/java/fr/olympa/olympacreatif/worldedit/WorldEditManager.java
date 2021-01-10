@@ -5,14 +5,10 @@ import java.util.Collection;
 import java.util.logging.Level;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.event.extent.EditSessionEvent;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.bukkit.regions.BukkitMaskManager;
@@ -23,19 +19,13 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.util.eventbus.EventHandler;
-import com.sk89q.worldedit.util.eventbus.Subscribe;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
-import fr.olympa.olympacreatif.world.WorldManager;
 
 public class WorldEditManager implements Listener {
 
@@ -84,7 +74,6 @@ public class WorldEditManager implements Listener {
 
 		public OlympaCreatifMask() {
 			super(plugin.getName());
-			plugin.getLogger().log(Level.INFO, "Generating FAWE Mask...");
 		}
 		
 	    @Override
@@ -101,7 +90,7 @@ public class WorldEditManager implements Listener {
 	    	if (plot == null || !PlotPerm.USE_WE.has(plot, p)) {
 	    		p.getPlayer().sendMessage(OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.getValue(plot));
 	    		return null;
-	    	} else if (!isWeEnabled) {
+	    	} else if (!isWeEnabled()) {
 	    		p.getPlayer().sendMessage("§dPour des raisons de sécurité, WorldEdit a été désactivé temporairement.");
 	    		return null;
 	    	}

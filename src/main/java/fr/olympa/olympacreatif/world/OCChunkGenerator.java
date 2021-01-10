@@ -37,12 +37,13 @@ public class OCChunkGenerator extends ChunkGenerator {
 			File fileX = File.createTempFile("creatif_schematic_X", ".schem");
 			File fileZ = File.createTempFile("creatif_schematic_Z", ".schem");
 
-			copyResource("schematics/roadX.schem", fileX.getAbsolutePath());
-			copyResource("schematics/roadZ.schem", fileZ.getAbsolutePath());
+			copyResource("schematics/" + OCparam.ROAD_SCHEM_NAME_X.get(), fileX.getAbsolutePath());
+			copyResource("schematics/" + OCparam.ROAD_SCHEM_NAME_Z.get(), fileZ.getAbsolutePath());
 			
 			roadXschem = Schematic.load(new FileInputStream(fileX));
 			roadZschem = Schematic.load(new FileInputStream(fileZ));
-			plugin.getLogger().info("Les fichier roadX.schem et roadZ.schem se sont chargés correctement.");
+			plugin.getLogger().info("Les fichier " + OCparam.ROAD_SCHEM_NAME_X.get() + 
+					" et " + OCparam.ROAD_SCHEM_NAME_X.get() + " se sont chargés correctement.");
 		} catch (IOException e) {
 			plugin.getLogger().severe("Attention : L'un des fichiers road<X|Z>.schem n'a pas été trouvé dans le dossier 'resources'. Veuillez le(s) renseigner pour créer des routes personnalisées.");
 			e.printStackTrace();
