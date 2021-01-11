@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.logging.Level;
 
 import org.bukkit.Material;
-import org.bukkit.event.Listener;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -27,7 +26,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
-public class WorldEditManager implements Listener {
+public class WorldEditManager {
 
 	private OlympaCreatifMain plugin;
 	private boolean isWePresent = false;
@@ -39,7 +38,7 @@ public class WorldEditManager implements Listener {
 		if (plugin.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") == null)
 			return;
 		
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+		//plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
 
 		FaweAPI.addMaskManager(new OlympaCreatifMask());
@@ -52,6 +51,7 @@ public class WorldEditManager implements Listener {
 				config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());
 		plugin.getLogger().log(Level.INFO, "§aCustom FAWE Mask Manager has been loaded. All kits blocks added to blacklist.");
 
+		
 		isWePresent = true;
 		isWeEnabled = true;
 
@@ -87,11 +87,8 @@ public class WorldEditManager implements Listener {
 	    	final OlympaPlayerCreatif p = AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId());
 	    	final Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
-	    	if (plot == null || !PlotPerm.USE_WE.has(plot, p)) {
+	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p)) {
 	    		p.getPlayer().sendMessage(OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.getValue(plot));
-	    		return null;
-	    	} else if (!isWeEnabled()) {
-	    		p.getPlayer().sendMessage("§dPour des raisons de sécurité, WorldEdit a été désactivé temporairement.");
 	    		return null;
 	    	}
 
@@ -99,14 +96,13 @@ public class WorldEditManager implements Listener {
 	    			plot.getPlotId().getLocation().getBlockZ());
 	    	BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 256, 
 	    			plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
-
-	    	//Bukkit.broadcastMessage("[DEBUG] MASK for " + wePlayer.getName() + " in " + new CuboidRegion(v1, v2) + " : " + PlotPerm.USE_WE.has(plot, p));
 	    	
             return new FaweMask(new CuboidRegion(v1, v2)) {
             	
                 @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
-                	return PlotPerm.USE_WE.has(plot, p);
+                	return isWeEnabled() ? PlotPerm.USE_WE.has(plot, p) : false;
+                	//return PlotPerm.USE_WE.has(plot, p);
                 }
             };
 	    }
