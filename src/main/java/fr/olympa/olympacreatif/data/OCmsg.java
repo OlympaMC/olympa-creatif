@@ -106,7 +106,7 @@ public class OCmsg {
 		
 		String mess = message;
 		for (int i = 0 ; i < args.length ; i++)
-			mess = mess.replace("&" + (i + 1), args[i].toString());
+			mess = mess.replace("&" + (i + 1), "" + args[i]);
 		
 		return mess;
 	}

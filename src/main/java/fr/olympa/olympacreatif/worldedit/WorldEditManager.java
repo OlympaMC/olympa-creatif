@@ -1,57 +1,56 @@
 package fr.olympa.olympacreatif.worldedit;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
+import java.util.function.BiFunction;
 import java.util.logging.Level;
 
 import org.bukkit.Material;
+import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
+
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.bukkit.regions.BukkitMaskManager;
-import com.boydti.fawe.regions.FaweMask;
-import com.boydti.fawe.regions.general.CuboidRegionFilter;
-import com.boydti.fawe.regions.general.RegionFilter;
-import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.eventbus.EventHandler;
+import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
-public class WorldEditManager {
+public class WorldEditManager extends EventHandler {
 
 	private OlympaCreatifMain plugin;
 	private boolean isWePresent = false;
 	private boolean isWeEnabled = false;
 	public WorldEditManager(OlympaCreatifMain plugin) {
+		super(Priority.NORMAL);
 		
 		this.plugin = plugin;
 		
-		if (plugin.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") == null)
-			return;
-		
 		//plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
-
-		FaweAPI.addMaskManager(new OlympaCreatifMask());
+		WorldEdit.getInstance().getEventBus().register(this);
+		//FaweAPI.addMaskManager(new OlympaCreatifMask());
 		//Impossible de récupérer la liste des blocs dans un EditSession, impossible d'utiliser l'évent pour détecter les blocs par type... 
-		//Fawe.get().getWorldEdit().getEventBus().register(new WorldEditEventHandler(plugin));		
+		IAsyncWorldEdit awe = (IAsyncWorldEdit) plugin.getServer().getPluginManager().getPlugin("AsyncWorldEdit");
+		awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
 		
-		LocalConfiguration config = Fawe.get().getWorldEdit().getConfiguration();
+		getWe().getEventBus().register(this);		
+		
+		LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
 		for (Material mat : Material.values())
 			if (plugin.getPerksManager().getKitsManager().getKitOf(mat) != null)
 				config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());
-		plugin.getLogger().log(Level.INFO, "§aCustom FAWE Mask Manager has been loaded. All kits blocks added to blacklist.");
+		plugin.getLogger().log(Level.INFO, "§dWE EventHandler registered. All kits blocks added to blacklist.");
 
-		
 		isWePresent = true;
 		isWeEnabled = true;
 
@@ -66,9 +65,67 @@ public class WorldEditManager {
 	}
 	
 	public WorldEdit getWe() {
-		return Fawe.get().getWorldEdit();
+		return WorldEdit.getInstance();
+	}
+
+	@Subscribe
+	public void onEditSession(EditSessionEvent e) {	
+		if (e.getActor() == null || e.getActor().getUniqueId() == null)
+			return;
+		
+		OlympaPlayerCreatif p = AccountProvider.get(e.getActor().getUniqueId());
+		
+		Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
+
+		/*Material mat = BukkitAdapter.adapt(e.getExtent().getBlock(BlockVector3.at(x, y, z)).getBlockType());
+		KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);*/
+		
+		if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) && (plot == null || !PlotPerm.USE_WE.has(plot, p))) {
+			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
+		        @Override
+		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+		        	return false;
+		        }
+		    });
+			
+			p.getPlayer().sendMessage(OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.getValue(plot));
+		}
+		else
+			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
+		        @Override
+		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+		        	return plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
+		        }
+		    });		
+	}
+
+	@Override
+	public void dispatch(Object event) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int hashCode() {
+		return 1;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return this == obj;
 	}
 	
+	@SuppressWarnings({ "unused", "rawtypes" })
+	private AbstractDelegateExtent getExtent(Plot plot, Extent extent, BiFunction<BlockVector3, BlockStateHolder, Boolean> function) {
+		return new AbstractDelegateExtent(extent) {
+	        @Override
+	        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+	        	return plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
+	        };
+		};
+	}
+	
+	/*
 	//class model: https://github.com/IntellectualSites/FastAsyncWorldEdit/blob/d4c0ab37909f1b473feeb726c0d158f83da86a5a/worldedit-bukkit/src/main/java/com/boydti/fawe/bukkit/regions/GriefPreventionFeature.java#L43
 	private class OlympaCreatifMask extends BukkitMaskManager {
 
@@ -123,7 +180,7 @@ public class WorldEditManager {
 						BlockVector2.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 
 						plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1));
 		}
-	}
+	}*/
 	
 	/*@org.bukkit.event.EventHandler //cancel copy si joueur essaie de copier dans un plot qui n'est pas à lui
 	public void onCopyCmd(PlayerCommandPreprocessEvent e) {

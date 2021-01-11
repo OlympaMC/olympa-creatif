@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import com.boydti.fawe.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
@@ -59,24 +60,21 @@ public class SchematicCreator {
 		    CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), v1, v2);
 		    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
 
-		    EditSession session = new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld())));
+		    EditSession session = WorldEdit.getInstance().getEditSessionFactory().getEditSession(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), -1);
 
 		    ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(session, region, clipboard, region.getMinimumPoint());
 		    forwardExtentCopy.setCopyingEntities(true);
-		    Operations.complete(forwardExtentCopy);
 		    
 		    
 		    //Generates the .schematic file from the clipboard
 			try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(schemFile))) {
+			    Operations.complete(forwardExtentCopy);
 			    writer.write(clipboard);
 			    
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+			} catch (IOException | WorldEditException e) {
 				e.printStackTrace();
 			}
+			
 			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
 		    p.getPlayer().sendMessage(OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.getValue(plot));
 	    });

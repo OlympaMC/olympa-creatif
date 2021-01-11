@@ -16,7 +16,10 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
+import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class WorldEditEventHandler {
 
@@ -24,6 +27,7 @@ public class WorldEditEventHandler {
 	
 	protected WorldEditEventHandler(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		plugin.getLogger().info("§aEditSessionEvent handler enregistré");
 	}
 
 	@Subscribe
@@ -37,26 +41,24 @@ public class WorldEditEventHandler {
 		Bukkit.broadcastMessage("vec 1 : " + vecMin + " --- " + vecMax);
 		
 		OlympaPlayerCreatif p = AccountProvider.get(e.getActor().getUniqueId());
-		
-		for (int x = vecMin.getBlockX() ; x <= vecMax.getBlockX() ; x++)
-			for (int y = vecMin.getBlockY() ; y <= vecMax.getBlockY() ; y++)
-				for (int z = vecMin.getBlockZ() ; z <= vecMax.getBlockZ() ; z++) {
-					Material mat = BukkitAdapter.adapt(e.getExtent().getBlock(x, y, z).getBlockType());
-					KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
+		Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 
-					
-					if (p.hasKit(kit)) {
-						p.getPlayer().sendMessage(OCmsg.WE_NO_KIT_FOR_MATERIAL.getValue(kit.getName(), mat.toString().toLowerCase()));
-						
-						e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
-					        @Override
-					        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
-					            return false;
-					        }
-					    });
-						
-						return;
-					}
-				}
+		/*Material mat = BukkitAdapter.adapt(e.getExtent().getBlock(BlockVector3.at(x, y, z)).getBlockType());
+		KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);*/
+		
+		if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) && (plot == null || !PlotPerm.USE_WE.has(plot, p)))
+			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
+		        @Override
+		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+		        	return false;
+		        }
+		    });
+		else
+			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
+		        @Override
+		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+		        	return plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
+		        }
+		    });		
 	}
 }

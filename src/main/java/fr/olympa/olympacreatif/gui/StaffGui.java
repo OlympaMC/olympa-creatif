@@ -34,9 +34,8 @@ import org.primesoft.asyncworldedit.api.worldedit.ICancelabeEditSession;
 import org.primesoft.asyncworldedit.api.worldedit.IEditSession;
 import org.primesoft.asyncworldedit.api.worldedit.IThreadSafeEditSession;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EditSession.Stage;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -134,24 +133,27 @@ public class StaffGui extends IGui {
 							int xMax = xMin + OCparam.PLOT_SIZE.get() - 1;
 							int zMax = zMin + OCparam.PLOT_SIZE.get() - 1;
 
-							try (EditSession session = new EditSession(new EditSessionBuilder(FaweAPI.getWorld(plugin.getWorldManager().getWorld().getName())))) {
+							try (EditSession session = plugin.getWEManager().getWe().getEditSessionFactory().getEditSession(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), -1)) {
 								for (int x = xMin ; x <= xMax ; x++)
 									for (int z = zMin ; z <= zMax ; z++)
-										session.setBlock(x, 0, z, BlockTypes.BEDROCK);
+										session.setBlock(BlockVector3.at(x,  0,  z), BlockTypes.BEDROCK.getDefaultState(), Stage.BEFORE_CHANGE);
 
 								for (int x = xMin ; x <= xMax ; x++)
 									for (int z = zMin ; z <= zMax ; z++)
 										for (int y = 1 ; y < WorldManager.worldLevel ; y++)
-											session.setBlock(x, y, z, BlockTypes.DIRT);
+											session.setBlock(BlockVector3.at(x,  y,  z), BlockTypes.DIRT.getDefaultState(), Stage.BEFORE_CHANGE);
 
 								for (int x = xMin ; x <= xMax ; x++)
 									for (int z = zMin ; z <= zMax ; z++)
-										session.setBlock(x, WorldManager.worldLevel, z, BlockTypes.GRASS_BLOCK);
+										session.setBlock(BlockVector3.at(x,  WorldManager.worldLevel,  z), BlockTypes.GRASS_BLOCK.getDefaultState(), Stage.BEFORE_CHANGE);
 
 								for (int x = xMin ; x <= xMax ; x++)
 									for (int z = zMin ; z <= zMax ; z++)
 										for (int y = WorldManager.worldLevel + 1 ; y < 256 ; y++)
-											session.setBlock(x, y, z, BlockTypes.AIR);							
+											session.setBlock(BlockVector3.at(x,  y,  z), BlockTypes.AIR.getDefaultState(), Stage.BEFORE_CHANGE);		
+							} catch (WorldEditException e) {
+								plugin.getLogger().warning("§cFailed to reset plot " + plot);
+								e.printStackTrace();
 							}
 							
 							p.getPlayer().sendMessage("§dLa réinitialisation de la parcelle " + plot + " est terminé !");

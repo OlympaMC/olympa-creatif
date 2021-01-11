@@ -6,7 +6,6 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
-import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
