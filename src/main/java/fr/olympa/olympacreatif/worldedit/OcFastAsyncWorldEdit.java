@@ -81,7 +81,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 			int xMax = xMin + OCparam.PLOT_SIZE.get() - 1;
 			int zMax = zMin + OCparam.PLOT_SIZE.get() - 1;
 
-			try (EditSession session = new EditSession(new EditSessionBuilder(FaweAPI.getWorld(plugin.getWorldManager().getWorld().getName())))) {
+			try (EditSession session = new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld())))) {
 				requester.sendMessage("§dLa réinitialisation de la parcelle " + plot + " a commencé.");
 				for (int x = xMin ; x <= xMax ; x++)
 					for (int z = zMin ; z <= zMax ; z++)

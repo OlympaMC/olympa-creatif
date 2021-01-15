@@ -113,7 +113,7 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 
 	@Override
 	public void resetPlot(Player requester, Plot plot) {
-		requester.sendMessage("§dLa réinitialisation de la parcelle " + plot + " a commencé. Vous ne serez pas averti de la fin de l'opération");
+		requester.sendMessage("§dLa réinitialisation de la parcelle " + plot + " a commencé. Vous ne serez pas averti de la fin de l'opération.");
 		
 		BlockVector3 vec1 = getBV3(plot.getPlotId().getLocation()).withY(0);
 		BlockVector3 vec2 = getBV3(plot.getPlotId().getLocation()).withY(0).add(OCparam.PLOT_SIZE.get() - 1, 0, OCparam.PLOT_SIZE.get() - 1);
@@ -147,6 +147,7 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 			
 			es.setFastMode(true);
 			reg.forEach(loc -> es.setBlock(loc, block.getDefaultState()));
+			es.flushSession();
 			es.close();
 		} catch (WorldEditException e1) {
 			e1.printStackTrace();
