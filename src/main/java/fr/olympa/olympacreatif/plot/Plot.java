@@ -395,20 +395,7 @@ public class Plot {
 		p.resetPlayerTime();
 		p.resetPlayerWeather();
 		
-		if (plugin.getWEManager() != null) {
-			LocalSession weSession = plugin.getWEManager().getWe().getSessionManager().get(BukkitAdapter.adapt(p));
-			
-			if (weSession != null) {
-				//clear clipboard si le joueur n'en est pas le proprio
-				if (PlotPerm.BYPASS_EXIT_CLIPBOARD_CLEAR.has(this, pc))
-					weSession.setClipboard(null);
-				
-				World world = weSession.getSelectionWorld();
-				
-				//reset positions worldedit
-				if (world != null && weSession.getRegionSelector(world) != null)
-					weSession.getRegionSelector(world).clear();	
-			}
-		}
+		if (plugin.getWEManager() != null)
+			plugin.getWEManager().clearClipboard(this, p);
 	}
 }

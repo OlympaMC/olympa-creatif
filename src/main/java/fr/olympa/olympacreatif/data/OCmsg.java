@@ -89,7 +89,8 @@ public class OCmsg {
 	public static final OCmsg WE_DISABLED = new OCmsg(null); 
 	public static final OCmsg WE_ERR_SCHEM_CMD_DISABLED = new OCmsg(null);
 	public static final OCmsg WE_NO_KIT_FOR_MATERIAL = new OCmsg(null);
-	public static final OCmsg WE_DEACTIVATED_FOR_SAFETY = new OCmsg(null); 
+	public static final OCmsg WE_DEACTIVATED_FOR_SAFETY = new OCmsg(null);
+	public static final OCmsg WE_PLOT_RESET = new OCmsg(null); 
  
 	//public static final OCmsg WE_ERR_INSUFFICENT_PERMISSION = new OCmsg(null); 
 
@@ -102,7 +103,7 @@ public class OCmsg {
 	
 	public String getValue(Object...args) {
 		if (message == null)
-			return "§cMissing message : " + this.toString().toLowerCase();
+			return "§cMessage manquant, veuillez vérifier les logs.";
 		
 		String mess = message;
 		for (int i = 0 ; i < args.length ; i++)

@@ -16,10 +16,13 @@ import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
@@ -27,8 +30,10 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import net.minecraft.server.v1_16_R3.ChunkGenerator;
 import net.minecraft.server.v1_16_R3.ChunkProviderServer;
 import net.minecraft.server.v1_16_R3.DedicatedServer;
+import net.minecraft.server.v1_16_R3.IChunkProvider;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
 import net.minecraft.server.v1_16_R3.WorldServer;
 
@@ -40,6 +45,8 @@ public class WorldManager {
 	//public static int plotSize = 256;
 	public static final int roadSize = 16;
 	public static final int worldLevel = 60;
+	
+	private ChunkProviderServer newChunkProvider;
 	
 	public WorldManager(final OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -110,6 +117,7 @@ public class WorldManager {
 		world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
 		world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
 		world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+		world.setGameRule(GameRule.RANDOM_TICK_SPEED, 0);
 		world.setPVP(true);
 		
 		//édition server.properties
@@ -158,8 +166,27 @@ public class WorldManager {
 		return world;
 	}
 	
-	public net.minecraft.server.v1_16_R3.World getNmsWorld(){
+	public net.minecraft.server.v1_16_R3.World getNmsWorld() {
 		return nmsWorld;
+	}
+	
+	public void regenerateChunk(Chunk ch) {
+		world.unloadChunk(ch);
+
+	    //newChunkProvider.unloadQueue.remove(x, z);
+		net.minecraft.server.v1_16_R3.Chunk chunk = ((CraftChunk)ch).getHandle();
+		//world.loadc
+		//.removeTileEntity(blockposition);
+		
+		/*if (!unloadChunk0(x, z, false)) 
+			return false;  
+		long chunkKey = ChunkCoordIntPair.a(x, z); 
+		(this.world.getChunkProvider()).unloadQueue.remove(chunkKey); 
+		Chunk chunk = this.world.getChunkProvider().generateChunk(x, z); 
+		PlayerChunk playerChunk = this.world.getPlayerChunkMap().getChunk(x, z); 
+		if (playerChunk != null) playerChunk.chunk = chunk;  
+		if (chunk != null) refreshChunk(x, z);  
+		return (chunk != null);*/
 	}
 	
 	/**
@@ -219,7 +246,7 @@ public class WorldManager {
 			net.minecraft.server.v1_16_R3.ChunkGenerator generator = new CustomChunkGenerator(worldServer, oldChunkProvider.chunkGenerator, bukkitGenerator);
 			
 			//create new chunk provider
-			ChunkProviderServer newChunkProvider = new ChunkProviderServer(worldServer, 
+			newChunkProvider = new ChunkProviderServer(worldServer, 
 					worldServer.convertable, server.getDataFixer(), server.getDefinedStructureManager(), 
 					dediServer.executorService, generator, plugin.getServer().getViewDistance(), server.isSyncChunkWrites(), 
 					server.worldLoadListenerFactory.create(11), () -> server.E().getWorldPersistentData());

@@ -3,33 +3,61 @@ package fr.olympa.olympacreatif.worldedit;
 import java.util.function.BiFunction;
 import java.util.logging.Level;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
+import org.primesoft.asyncworldedit.api.utils.IAsyncCommand;
+import org.primesoft.asyncworldedit.api.worldedit.IAsyncEditSessionFactory;
+import org.primesoft.asyncworldedit.api.worldedit.IEditSession;
 
+import com.sk89q.worldedit.EditSessionFactory;
 import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extension.factory.PatternFactory;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.Mask2D;
+import com.sk89q.worldedit.function.mask.MaskUnion;
+import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.util.eventbus.EventHandler;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
+import fr.olympa.olympacreatif.world.WorldManager;
 
-public class WorldEditManager extends EventHandler {
+public class WorldEditManager extends EventHandler implements Listener {
 
 	private OlympaCreatifMain plugin;
 	private boolean isWePresent = false;
 	private boolean isWeEnabled = false;
+	private IAsyncWorldEdit awe ;
+	
 	public WorldEditManager(OlympaCreatifMain plugin) {
 		super(Priority.NORMAL);
 		
@@ -40,10 +68,19 @@ public class WorldEditManager extends EventHandler {
 		WorldEdit.getInstance().getEventBus().register(this);
 		//FaweAPI.addMaskManager(new OlympaCreatifMask());
 		//Impossible de récupérer la liste des blocs dans un EditSession, impossible d'utiliser l'évent pour détecter les blocs par type... 
-		IAsyncWorldEdit awe = (IAsyncWorldEdit) plugin.getServer().getPluginManager().getPlugin("AsyncWorldEdit");
-		awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
-		
-		getWe().getEventBus().register(this);		
+		awe = (IAsyncWorldEdit) plugin.getServer().getPluginManager().getPlugin("AsyncWorldEdit");
+		//(IAsyncWorldEdit) plugin.getServer().getPluginManager().getPlugin("AsyncWorldEdit").getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
+
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+		/*
+		IAsyncCommand cmd = awe.getOperations().getChunkOperations().createRelight(awe.getPlayerManager().getConsolePlayer(), new CuboidRegion(getWeWorld(), null, null));
+		IAsyncEditSessionFactory factory = (IAsyncEditSessionFactory) WorldEdit.getInstance().getEditSessionFactory();
+		awe.getBlockPlacer().performAsAsyncJob(factory.getThreadSafeEditSession(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), -1), cmd);
+		*/
+		//WorldEdit.getInstance().getMaskFactory().parseFromInput("minecraft:bedrock", new ParserContext());
+		//WorldEdit.getInstance().getPatternFactory().parseFromInput("minecraft:bedrock", new ParserContext());
+		//awe.getOperations().getChunkOperations().set
+		//getWe().getEventBus().register(this);		
 		
 		LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
 		for (Material mat : Material.values())
@@ -64,7 +101,7 @@ public class WorldEditManager extends EventHandler {
 		isWeEnabled = isWePresent && !isWeEnabled;
 	}
 	
-	public WorldEdit getWe() {
+	private WorldEdit getWe() {
 		return WorldEdit.getInstance();
 	}
 
@@ -77,8 +114,6 @@ public class WorldEditManager extends EventHandler {
 		
 		Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 
-		/*Material mat = BukkitAdapter.adapt(e.getExtent().getBlock(BlockVector3.at(x, y, z)).getBlockType());
-		KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);*/
 		
 		if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) && (plot == null || !PlotPerm.USE_WE.has(plot, p))) {
 			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
@@ -87,13 +122,13 @@ public class WorldEditManager extends EventHandler {
 		        	return false;
 		        }
 		    });
-			
 			p.getPlayer().sendMessage(OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.getValue(plot));
 		}
 		else
 			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
 		        @Override
 		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+		    		//plugin.getPerksManager().getKitsManager().getKitOf(BukkitAdapter.adapt(block.getBlockType()));
 		        	return plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
 		        }
 		    });		
@@ -114,16 +149,78 @@ public class WorldEditManager extends EventHandler {
 	public boolean equals(Object obj) {
 		return this == obj;
 	}
-	
-	@SuppressWarnings({ "unused", "rawtypes" })
-	private AbstractDelegateExtent getExtent(Plot plot, Extent extent, BiFunction<BlockVector3, BlockStateHolder, Boolean> function) {
-		return new AbstractDelegateExtent(extent) {
-	        @Override
-	        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
-	        	return plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
-	        };
-		};
+	/*
+	public void resetPlot(Plot plot) {
+		BlockVector3 vec1 = getBV3(plot.getPlotId().getLocation()).withY(0);
+		BlockVector3 vec2 = getBV3(plot.getPlotId().getLocation()).withY(0).add(OCparam.PLOT_SIZE.get() - 1, 0, OCparam.PLOT_SIZE.get() - 1);
+		
+		plugin.getTask().runTaskAsynchronously(() -> {
+			setLayer(new CuboidRegion(getWeWorld(), vec1, vec2), BlockTypes.BEDROCK);
+			setLayer(new CuboidRegion(getWeWorld(), vec1.withY(2), vec2.withY(WorldManager.worldLevel - 1)), BlockTypes.DIRT);
+			setLayer(new CuboidRegion(getWeWorld(), vec1.withY(WorldManager.worldLevel), vec2.withY(WorldManager.worldLevel)), BlockTypes.GRASS_BLOCK);
+			setLayer(new CuboidRegion(getWeWorld(), vec1.withY(WorldManager.worldLevel + 1), vec2.withY(255)), BlockTypes.AIR);
+		});
 	}
+
+	@SuppressWarnings("deprecation")
+	private void setLayer(final CuboidRegion reg, final BlockType block) {		
+		try {
+			IEditSession es = ((IEditSession) ((IAsyncEditSessionFactory) 
+					we.getEditSessionFactory()).getEditSession(getWeWorld(), -1));
+			
+			es.setMask(new Mask() {
+				@Override
+				public boolean test(BlockVector3 vector) {
+					return !es.getBlock(vector).getBlockType().getMaterial().equals(block.getMaterial());					
+				}
+				@Override
+				public Mask2D toMask2D() {return null;}
+				@Override
+				public Mask copy() {
+					return this;
+				}
+			});
+			
+			es.setFastMode(true);
+			reg.forEach(loc -> es.setBlock(loc, block.getDefaultState()));
+			es.close();
+		} catch (WorldEditException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	/*
+	@org.bukkit.event.EventHandler
+	public void onChat(PlayerChatEvent e) {
+		e.getPlayer().sendMessage("Trying to set blocks ! 4");
+		
+		//mettre ça en commentaire !!
+		IAsyncCommand cmd = awe.
+				getOperations().
+				getChunkOperations().createSet(
+				awe.getPlayerManager().getPlayer(e.getPlayer().getUniqueId()), 
+				new CuboidRegion(getWeWorld(), getBV3(e.getPlayer().getLocation()), getBV3(e.getPlayer().getLocation().clone().add(10, 10, 10))), 
+				new BlockPattern(BlockTypes.BEDROCK.getDefaultState()), 
+				null, true);
+
+		IAsyncEditSessionFactory factory = (IAsyncEditSessionFactory) WorldEdit.getInstance().getEditSessionFactory();
+		//awe.getBlockPlacer().performAsAsyncJob(factory.getThreadSafeEditSession(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), -1), cmd);
+		try {
+			IEditSession es = ((IEditSession)factory.getEditSession(getWeWorld(), -1));
+			es.setFastMode(true);
+			es.enableQueue();
+			
+			es.setBlocks(
+					new CuboidRegion(getWeWorld(), getBV3(e.getPlayer().getLocation()), getBV3(e.getPlayer().getLocation().clone().add(100, 100, 100))), 
+					BlockTypes.ACACIA_PLANKS.getDefaultState());
+			
+			//Operations.complete(es.commit());
+		} catch (WorldEditException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+	}*/
 	
 	/*
 	//class model: https://github.com/IntellectualSites/FastAsyncWorldEdit/blob/d4c0ab37909f1b473feeb726c0d158f83da86a5a/worldedit-bukkit/src/main/java/com/boydti/fawe/bukkit/regions/GriefPreventionFeature.java#L43

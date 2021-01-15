@@ -52,7 +52,9 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.region.tracking.BypassCommand;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
@@ -106,63 +108,33 @@ public class StaffGui extends IGui {
 		setItem(5 + 9, getStateIndicator(NBTcontrollerUtil.getDenyAllCustomFlags(), p1), null);
 
 		
-		final OlympaPermission p2 = PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT;
-		setItem(6, ItemUtils.item(Material.DIAMOND_AXE, "§6Désactivation totale de WorldEdit", "§2Fonction de sécurité.", "§2Clic molette pour modifier.", " ", "§7Permet d'interromptre instantanément", "§7toutes les tâches WorldEdit sur le serveur", "§7et de désactiver le plugin.", " ", "§cAttention : au redémarage, WorldEdit sera de nouveau activé !"),
-				(it, c, s) -> {
-					if (!p2.hasPermission(p) || c != ClickType.MIDDLE)
-						return;
-					
-					plugin.getWEManager().toggleWeActivation();
-					
-					setItem(6 + 9, getStateIndicator(!plugin.getWEManager().isWeEnabled(), p2), null);
-				});
-		setItem(6 + 9, getStateIndicator(!plugin.getWEManager().isWeEnabled(), p2), null);
+		if (plugin.getWEManager() != null) {
+			final OlympaPermission p2 = PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT;
+			setItem(6, ItemUtils.item(Material.DIAMOND_AXE, "§6Désactivation totale de WorldEdit", "§2Fonction de sécurité.", "§2Clic molette pour modifier.", " ", "§7Permet d'interromptre instantanément", "§7toutes les tâches WorldEdit sur le serveur", "§7et de désactiver le plugin.", " ", "§cAttention : au redémarage, WorldEdit sera de nouveau activé !"),
+					(it, c, s) -> {
+						if (!p2.hasPermission(p) || c != ClickType.MIDDLE)
+							return;
+						
+						plugin.getWEManager().setWeActivationState(!plugin.getWEManager().isWeEnabled());
+						
+						setItem(6 + 9, getStateIndicator(!plugin.getWEManager().isWeEnabled(), p2), null);
+					});
+			setItem(6 + 9, getStateIndicator(!plugin.getWEManager().isWeEnabled(), p2), null);
+		}
 		
 		
 		if (plot != null) {
 			final OlympaPermission p3 = PermissionsList.STAFF_RESET_PLOT;
 			setItem(7, ItemUtils.item(Material.TNT, "§6Reset de la parcelle " + plot + " (§7" + plot.getMembers().getOwner().getName() + "§6)", "§2Faire CTRL+drop sur cet item pour reset la parcelle.", " ", "§7Lance le reset complet de la parcelle", "§7à son état d'origine (herbe seule).", " ", "§cAttention : cette action ne peut pas être annulée !"),
 					(it, c, s) -> {
-						if (!p3.hasPermission(p) || c != ClickType.CONTROL_DROP || resetingPlots.contains(plot.getPlotId()))
+						if (plot == null || !p3.hasPermission(p) || c != ClickType.CONTROL_DROP || resetingPlots.contains(plot.getPlotId()))
 							return;	
 						
-						plugin.getTask().runTaskAsynchronously(() -> {
-							
-							int xMin = plot.getPlotId().getLocation().getBlockX();
-							int zMin = plot.getPlotId().getLocation().getBlockZ();
-							int xMax = xMin + OCparam.PLOT_SIZE.get() - 1;
-							int zMax = zMin + OCparam.PLOT_SIZE.get() - 1;
-
-							try (EditSession session = plugin.getWEManager().getWe().getEditSessionFactory().getEditSession(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), -1)) {
-								for (int x = xMin ; x <= xMax ; x++)
-									for (int z = zMin ; z <= zMax ; z++)
-										session.setBlock(BlockVector3.at(x,  0,  z), BlockTypes.BEDROCK.getDefaultState(), Stage.BEFORE_CHANGE);
-
-								for (int x = xMin ; x <= xMax ; x++)
-									for (int z = zMin ; z <= zMax ; z++)
-										for (int y = 1 ; y < WorldManager.worldLevel ; y++)
-											session.setBlock(BlockVector3.at(x,  y,  z), BlockTypes.DIRT.getDefaultState(), Stage.BEFORE_CHANGE);
-
-								for (int x = xMin ; x <= xMax ; x++)
-									for (int z = zMin ; z <= zMax ; z++)
-										session.setBlock(BlockVector3.at(x,  WorldManager.worldLevel,  z), BlockTypes.GRASS_BLOCK.getDefaultState(), Stage.BEFORE_CHANGE);
-
-								for (int x = xMin ; x <= xMax ; x++)
-									for (int z = zMin ; z <= zMax ; z++)
-										for (int y = WorldManager.worldLevel + 1 ; y < 256 ; y++)
-											session.setBlock(BlockVector3.at(x,  y,  z), BlockTypes.AIR.getDefaultState(), Stage.BEFORE_CHANGE);		
-							} catch (WorldEditException e) {
-								plugin.getLogger().warning("§cFailed to reset plot " + plot);
-								e.printStackTrace();
-							}
-							
-							p.getPlayer().sendMessage("§dLa réinitialisation de la parcelle " + plot + " est terminé !");
-							resetingPlots.remove(plot.getPlotId());
-						});
-
-						resetingPlots.add(plot.getPlotId());
+						plugin.getWEManager().resetPlot(p.getPlayer(), plot);
+						//resetingPlots.remove(plot.getPlotId());
+						//resetingPlots.add(plot.getPlotId());
 						
-						p.getPlayer().sendMessage("§dLa parcelle " + plot + " va bientôt se réinitialiser.");
+						p.getPlayer().sendMessage(OCmsg.WE_PLOT_RESET.getValue(plot));
 						setItem(7 + 9, getStateIndicator(true, p3), null);
 					});
 			setItem(7 + 9, getStateIndicator(resetingPlots.contains(plot.getPlotId()), p3), null);	

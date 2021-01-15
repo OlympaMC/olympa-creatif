@@ -13,7 +13,11 @@
 		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
 
-	<repositories>
+	<repositories><!-- FAWE -->
+		<repository>
+		  <id>IntellectualSites</id>
+		  <url>https://mvn.intellectualsites.com/content/repositories/releases/</url>
+		</repository>
 	
 	  <repository>
 		  <id>github-asyncworldedit-api</id>
@@ -50,13 +54,14 @@
 	
 	
 	<dependencies>
-	<!-- WE API -->
-        <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>6.1.4-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
+
+		<!-- FAWE API -->
+		<dependency>
+		  <groupId>com.intellectualsites.fawe</groupId>
+		  <artifactId>FAWE-Bukkit</artifactId>
+		  <version>1.16-555</version>
+		  <scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.primesoft.asyncworldedit</groupId>

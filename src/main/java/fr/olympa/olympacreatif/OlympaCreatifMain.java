@@ -32,7 +32,9 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldManager;
-import fr.olympa.olympacreatif.worldedit.AWEProgressBar;
+import fr.olympa.olympacreatif.worldedit.IWorldEditManager;
+import fr.olympa.olympacreatif.worldedit.OcFastAsyncWorldEdit;
+import fr.olympa.olympacreatif.worldedit.OcWorldEdit;
 import fr.olympa.olympacreatif.worldedit.WorldEditManager;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
@@ -44,7 +46,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private CommandBlocksManager cbManager;
 
 	private PermissionsManager permsManager;
-	private WorldEditManager weManager;
+	private IWorldEditManager weManager = null;
 	
 	//private LuckPerms luckperms;
 	
@@ -90,8 +92,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		plotsManager = new PlotsManager(this);
 		cbManager = new CommandBlocksManager(this);
 		permsManager = new PermissionsManager(this);
-
-		weManager = new WorldEditManager(this);
+		
+		if (getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") != null)
+			weManager = new OcFastAsyncWorldEdit(this);
+		else if (getServer().getPluginManager().getPlugin("WorldEdit") != null && getServer().getPluginManager().getPlugin("AsyncWorldEdit") != null)
+			weManager = new OcWorldEdit(this);
 		
 		//OlympaCorePermissions.GROUP_COMMAND.allowGroup(OlympaGroup.DEV);
 		
@@ -230,7 +235,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		return worldManager;
 	}
 
-	public WorldEditManager getWEManager() {
+	public IWorldEditManager getWEManager() {
 		return weManager;
 	}
 
