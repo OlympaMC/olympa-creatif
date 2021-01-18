@@ -21,6 +21,7 @@ import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
+@Deprecated
 public class WorldEditEventHandler {
 
 	private OlympaCreatifMain plugin;

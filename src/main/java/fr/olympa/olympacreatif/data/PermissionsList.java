@@ -27,8 +27,6 @@ public class PermissionsList {
 	
 	public static final OlympaPermission CREA_TPA = new OlympaPermission(OlympaGroup.PLAYER);
 	
-	public static final OlympaPermission CLAIM = new OlympaPermission(OlympaGroup.PLAYER);
-	
 	 
 	/*nb de plots propriétaire :
 	 * Joueur : 1

@@ -124,14 +124,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 				weSession.getRegionSelector(world).clear();	
 		}
 	}
-
-	private BlockVector3 getBV3(Location loc) {
-		return BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-	}
 	
-	private World getWeWorld() {
-		return BukkitAdapter.adapt(plugin.getWorldManager().getWorld());
-	}
 	private class OlympaCreatifMask extends BukkitMaskManager {
 
 		public OlympaCreatifMask() {
@@ -169,7 +162,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 	    }
 	}
 	
-	public class OlympaCreatifRegionFilter extends CuboidRegionFilter{
+	public class OlympaCreatifRegionFilter extends CuboidRegionFilter {
 		Collection<Plot> plots;
 
 		public OlympaCreatifRegionFilter() {

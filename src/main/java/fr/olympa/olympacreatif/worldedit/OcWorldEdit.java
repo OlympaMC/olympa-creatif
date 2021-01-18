@@ -12,6 +12,7 @@ import org.primesoft.asyncworldedit.api.playerManager.IPlayerEntry;
 import org.primesoft.asyncworldedit.api.progressDisplay.IProgressDisplay;
 import org.primesoft.asyncworldedit.api.worldedit.IAsyncEditSessionFactory;
 import org.primesoft.asyncworldedit.api.worldedit.IEditSession;
+import org.primesoft.asyncworldedit.api.worldedit.IThreadSafeEditSession;
 
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -129,8 +130,9 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 	@SuppressWarnings("deprecation")
 	private void setLayer(final CuboidRegion reg, final BlockType block) {		
 		try {
-			IEditSession es = ((IEditSession) ((IAsyncEditSessionFactory) 
-					we.getEditSessionFactory()).getEditSession(getWeWorld(), -1));
+			IThreadSafeEditSession es = ((IAsyncEditSessionFactory) we.getEditSessionFactory())
+					.getThreadSafeEditSession(getWeWorld(), -1);
+			es.setFastMode(true);
 			
 			es.setMask(new Mask() {
 				@Override
@@ -145,7 +147,6 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 				}
 			});
 			
-			es.setFastMode(true);
 			reg.forEach(loc -> es.setBlock(loc, block.getDefaultState()));
 			es.flushSession();
 			es.close();

@@ -77,12 +77,14 @@ public class PlotParameters {
 	}
 	
 	
-	public synchronized void setSpawnLoc(Location loc) {
+	public synchronized boolean setSpawnLoc(Location loc) {
 		if (id.isInPlot(loc)) {
 			setParameter(PlotParamType.SPAWN_LOC_X, loc.getBlockX());
 			setParameter(PlotParamType.SPAWN_LOC_Y, loc.getBlockY());
 			setParameter(PlotParamType.SPAWN_LOC_Z, loc.getBlockZ());
-		}
+			return true;
+		} else
+			return false;
 	}
 	
 	

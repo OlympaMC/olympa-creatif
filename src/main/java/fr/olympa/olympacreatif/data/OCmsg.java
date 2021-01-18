@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -90,12 +91,15 @@ public class OCmsg {
 	public static final OCmsg WE_ERR_SCHEM_CMD_DISABLED = new OCmsg(null);
 	public static final OCmsg WE_NO_KIT_FOR_MATERIAL = new OCmsg(null);
 	public static final OCmsg WE_DEACTIVATED_FOR_SAFETY = new OCmsg(null);
-	public static final OCmsg WE_PLOT_RESET = new OCmsg(null); 
+	public static final OCmsg WE_PLOT_RESET = new OCmsg(null);
+	
+	public static final OCmsg PLOT_UNLOADED = new OCmsg(null);
+	public static final OCmsg PLOT_JOIN_ERR_SENDER_OFFLINE = new OCmsg(null); 
  
 	//public static final OCmsg WE_ERR_INSUFFICENT_PERMISSION = new OCmsg(null); 
 
 	
-	private String message = null;
+	private String message;
 	
 	private OCmsg(String s) {
 		message = s;
@@ -105,9 +109,12 @@ public class OCmsg {
 		if (message == null)
 			return "§cMessage manquant, veuillez vérifier les logs.";
 		
+		if (message.chars().filter(ch -> ch == '&').count() > args.length)
+			throw new RuntimeException("Le plugin a tenté d'envoyer un message pour lequel un nombre d'arguments insuffisant a été renseigné.");
+		
 		String mess = message;
 		for (int i = 0 ; i < args.length ; i++)
-			mess = mess.replace("&" + (i + 1), "" + args[i]);
+			mess = mess.replace("&" + (i + 1), "" + args[i]);	
 		
 		return mess;
 	}
@@ -116,7 +123,7 @@ public class OCmsg {
 		message = StringEscapeUtils.unescapeJava(s);
 	}
 	
-	public OCmsg valueOf(String s) {		
+	public OCmsg valueOf(String s) {
 		for (Entry<String, OCmsg> entry : values().entrySet())
 			if (entry.getKey().equals(s))
 				return entry.getValue();
@@ -127,6 +134,14 @@ public class OCmsg {
 	@Override
 	public String toString() {
 		return message;
+	}
+	
+	public void send(Player p, Object... objs) {
+		p.sendMessage(getValue(objs));
+	}
+	
+	public void send(OlympaPlayerCreatif pc, Object... objs) {
+		send(pc.getPlayer(), objs);
 	}
 	
 	/**

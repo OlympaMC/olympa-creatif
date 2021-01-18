@@ -22,7 +22,8 @@ import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.command.OcaCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
-import fr.olympa.olympacreatif.command_reborn.ClaimCmd;
+import fr.olympa.olympacreatif.command_reborn.OcCmd;
+import fr.olympa.olympacreatif.command_reborn.CmdsLogic;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -45,6 +46,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private PlotsManager plotsManager;
 	private PerksManager perksManager;
 	private CommandBlocksManager cbManager;
+	
+	private CmdsLogic cmdLogic;
 
 	private PermissionsManager permsManager;
 	private IWorldEditManager weManager = null;
@@ -84,7 +87,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		//new OcCommand(this, "oc", OcCommand.subArgsList.toArray(new String[OcCommand.subArgsList.size()])).register();
 		//new OcoCommand(this, "oco", OcoCommand.subArgsList.toArray(new String[OcoCommand.subArgsList.size()])).register();
 		//new OcaCommand(this, "oca", OcaCommand.subArgsList.toArray(new String[OcaCommand.subArgsList.size()])).register();
-		new ClaimCmd(this).register();
+		new OcCmd(this).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA), plugin);
 		
@@ -94,6 +97,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		plotsManager = new PlotsManager(this);
 		cbManager = new CommandBlocksManager(this);
 		permsManager = new PermissionsManager(this);
+		
+		cmdLogic = new CmdsLogic(this);
 		
 		if (getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") != null)
 			weManager = new OcFastAsyncWorldEdit(this);
@@ -255,5 +260,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	public CommandBlocksManager getCommandBlocksManager() {
 		return cbManager;
+	}
+	
+	public CmdsLogic getCmdLogic() {
+		return cmdLogic;
 	}
 }

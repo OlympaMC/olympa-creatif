@@ -51,6 +51,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 
+@Deprecated
 public class WorldEditManager extends EventHandler implements Listener {
 
 	private OlympaCreatifMain plugin;

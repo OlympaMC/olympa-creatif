@@ -122,7 +122,7 @@ public class OcCommand extends OlympaCommand {
 				if (pc.getPlotsSlots(true) - pc.getPlots(true).size() > 0) {
 					if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
 						
-						plot = plugin.getPlotsManager().createPlot(p);
+						plot = plugin.getPlotsManager().createNewPlot(pc);
 						p.teleport(plot.getPlotId().getLocation());
 						//PlotsInstancesListener.executeEntryActions(plugin, p, plot);
 						sender.sendMessage(OCmsg.PLOT_NEW_CLAIM.getValue(plot));	

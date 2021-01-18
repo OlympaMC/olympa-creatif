@@ -25,6 +25,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.NBTTagList;
@@ -191,8 +192,8 @@ public class PlotsManager {
 	}
 	
 	
-	public Plot createPlot(Player p) {
-		Plot plot = new Plot(plugin, AccountProvider.get(p.getUniqueId()));
+	public Plot createNewPlot(OlympaPlayerCreatif pc) {
+		Plot plot = new Plot(plugin, pc);
 		
 		plugin.getDataManager().addPlotToSaveQueue(plot, false);
 		loadedPlots.add(plot);
