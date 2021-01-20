@@ -139,10 +139,10 @@ public class OcCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Afficher la liste des membres de la parcelle")
 	public void members(CommandContext cmd) {
-		IGui main = MainGui.getMainGui(getOlympaPlayer());
+		IGui main = MainGui.getMainGui((OlympaPlayerCreatif)getOlympaPlayer());
 
 		if (main.getPlot() != null)
-			new MembersGui(main).create(getOlympaPlayer());
+			new MembersGui(main).create(getPlayer());
 		else
 			OCmsg.INVALID_PLOT_ID.send(getPlayer());
 	}
@@ -185,8 +185,8 @@ public class OcCmd extends AbstractCmd {
 		
 		if (cmd.getArgumentsLength() == 0)
 			plugin.getPerksManager().getMicroBlocks().openGui(getPlayer());
-		else if (plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0)) != null)
-			getPlayer().getInventory().addItem(plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0)));
+		else if (plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0).toString()) != null)
+			getPlayer().getInventory().addItem(plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0).toString()));
 		else
 			OCmsg.UNKNOWN_MB.send(getPlayer(), cmd.getArgument(0));
 	}
@@ -203,7 +203,7 @@ public class OcCmd extends AbstractCmd {
 		
 		float level = 0.1f;
 
-		level = Math.min(Math.max(((int)cmd.getArgument(0))/18f, 0.1f), 1f);
+		level = Math.min(Math.max(Float.valueOf(cmd.getArgument(0).toString())/18f, 0.1f), 1f);
 		
 		getPlayer().setFlySpeed(level);
 		OCmsg.OCO_SET_FLY_SPEED.send(getPlayer(), cmd.getArgument(0));

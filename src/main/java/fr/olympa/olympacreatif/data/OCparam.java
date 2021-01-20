@@ -46,13 +46,9 @@ public class OCparam<T> {
 	public static final OCparam<String> ROAD_SCHEM_NAME_Z = new OCparam<String>("fileName");
 	
 	private T value;
-	private Class<T> paramClass;
 	
-	@SuppressWarnings("unchecked")
 	private OCparam(T value) {
 		this.value = value;
-		paramClass = (Class<T>) value.getClass();
-		
 	}
 	
 	public T get() {

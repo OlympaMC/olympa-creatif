@@ -33,7 +33,7 @@ public class OcaCmd extends AbstractCmd {
 
 	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|nbttags"}, min = 1)
 	public void activate(CommandContext cmd) {
-		switch((String) cmd.getArgument(0)) {
+		switch(cmd.getArgument(0).toString()) {
 		case "worldedit":
 			plugin.getWEManager().setWeActivationState(true);
 			break;
@@ -52,7 +52,7 @@ public class OcaCmd extends AbstractCmd {
 
 	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|nbttags"}, min = 1)
 	public void deactivate(CommandContext cmd) {
-		switch((String) cmd.getArgument(0)) {
+		switch(cmd.getArgument(0).toString()) {
 		case "worldedit":
 			plugin.getWEManager().setWeActivationState(false);
 			break;
