@@ -139,12 +139,12 @@ public class OcCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Afficher la liste des membres de la parcelle")
 	public void members(CommandContext cmd) {
-		IGui main = MainGui.getMainGui((OlympaPlayerCreatif)getOlympaPlayer());
-
-		if (main.getPlot() != null)
-			new MembersGui(main).create(getPlayer());
-		else
+		if (((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot() == null) {
 			OCmsg.INVALID_PLOT_ID.send(getPlayer());
+			return;
+		}
+
+		new MembersGui(MainGui.getMainGui(getOlympaPlayer())).create(player);
 	}
 
 	
@@ -206,7 +206,7 @@ public class OcCmd extends AbstractCmd {
 		level = Math.min(Math.max(Float.valueOf(cmd.getArgument(0).toString())/18f, 0.1f), 1f);
 		
 		getPlayer().setFlySpeed(level);
-		OCmsg.OCO_SET_FLY_SPEED.send(getPlayer(), cmd.getArgument(0));
+		OCmsg.OCO_SET_FLY_SPEED.send(getPlayer(), cmd.getArgument(0).toString());
 	}
 
 	@Cmd(player = true, syntax = "Afficher le magasin du Créatif")
