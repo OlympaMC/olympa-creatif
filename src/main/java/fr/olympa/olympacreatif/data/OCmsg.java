@@ -94,7 +94,11 @@ public class OCmsg {
 	public static final OCmsg WE_PLOT_RESET = new OCmsg(null);
 	
 	public static final OCmsg PLOT_UNLOADED = new OCmsg(null);
-	public static final OCmsg PLOT_JOIN_ERR_SENDER_OFFLINE = new OCmsg(null); 
+	public static final OCmsg PLOT_JOIN_ERR_SENDER_OFFLINE = new OCmsg(null);
+
+	public static final OCmsg STAFF_ACTIVATE_COMPONENT = new OCmsg(null); 
+	public static final OCmsg STAFF_DEACTIVATE_COMPONENT = new OCmsg(null);
+	public static final OCmsg UNKNOWN_MB = new OCmsg(null);
  
 	//public static final OCmsg WE_ERR_INSUFFICENT_PERMISSION = new OCmsg(null); 
 

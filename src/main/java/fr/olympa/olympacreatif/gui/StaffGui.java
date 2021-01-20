@@ -73,22 +73,22 @@ public class StaffGui extends IGui {
 		OlympaPermission perm = PermissionsList.STAFF_BYPASS_PLOT_KICK_AND_BAN;
 		StaffPerm sPerm = StaffPerm.BYPASS_KICK_AND_BAN;
 		
-		setItem(0, ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Bypass kick/ban plot", "§7Permet d'entrer sur les plots même", "§7si le propriétaire vous en a banni"), getConsumer(perm, sPerm));	
+		setItem(0, ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Bypass kick/ban plot", "§7Permet d'entrer sur les plots même", "§7si le propriétaire vous en a banni"), getStaffPermSwitchConsumer(perm, sPerm));	
 		setItem(0 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
 		perm = PermissionsList.STAFF_BYPASS_VANILLA_COMMANDS;
 		sPerm = StaffPerm.BYPASS_VANILLA_COMMANDS;
-		setItem(1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Bypass commandes vanilla", "§7Permet de ne pas être affecté par", "§7les commandes vanilla du type /kill, /tp, ..."), getConsumer(perm, sPerm));	
+		setItem(1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Bypass commandes vanilla", "§7Permet de ne pas être affecté par", "§7les commandes vanilla du type /kill, /tp, ..."), getStaffPermSwitchConsumer(perm, sPerm));	
 		setItem(1 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
 		perm = PermissionsList.STAFF_BYPASS_WORLDEDIT;
 		sPerm = StaffPerm.BYPASS_WORLDEDIT;
-		setItem(2, ItemUtils.item(Material.WOODEN_AXE, "§6Bypass WorldEdit", "§7Permet d'utiliser les fonctionnalités WorldEdit", "§7sur tous les plots et la route"), getConsumer(perm, sPerm));	
+		setItem(2, ItemUtils.item(Material.WOODEN_AXE, "§6Bypass WorldEdit", "§7Permet d'utiliser les fonctionnalités WorldEdit", "§7sur tous les plots et la route"), getStaffPermSwitchConsumer(perm, sPerm));	
 		setItem(2 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
 		perm = PermissionsList.STAFF_PLOT_FAKE_OWNER;
 		sPerm = StaffPerm.FAKE_OWNER_EVERYWHERE;
-		setItem(3, ItemUtils.item(Material.REDSTONE_TORCH, "§6Fake owner", "§7Permet d'éditer les paramètres du plot comme si", "§7vous en étiez le propriétaire"), getConsumer(perm, sPerm));	
+		setItem(3, ItemUtils.item(Material.REDSTONE_TORCH, "§6Fake owner", "§7Permet d'éditer les paramètres du plot comme si", "§7vous en étiez le propriétaire"), getStaffPermSwitchConsumer(perm, sPerm));	
 		setItem(3 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
 		setItem(4, ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, " "), null);
@@ -141,7 +141,7 @@ public class StaffGui extends IGui {
 		}	
 	}
 	
-	private TriConsumer<ItemStack, ClickType, Integer> getConsumer(OlympaPermission perm, StaffPerm sPerm){
+	private TriConsumer<ItemStack, ClickType, Integer> getStaffPermSwitchConsumer(OlympaPermission perm, StaffPerm sPerm){
 		return (it, c, s) -> {
 			if (!perm.hasPermission(p))
 				return;

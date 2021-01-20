@@ -94,10 +94,10 @@ public class MainGui extends IGui {
 				});
 
 		setItem(40, ItemUtils.item(Material.COMPASS, "§6Trouver une nouvelle parcelle"),
-				(it, c, s) -> Bukkit.dispatchCommand(p.getPlayer(), "oc find"));
+				(it, c, s) -> plugin.getCmdLogic().claimNewPlot(getPlayer()));
 		
 		setItem(49, ItemUtils.item(Material.PAPER, "§6Ouvrir l'aide"), 
-				null);
+				(it, c, s) -> getPlayer().getPlayer().sendMessage("§7L'aide n'a pas encore été définie. En attendant, vous pouvez utiliser /oc ou /oco help !"));
 		
 		/*Options à intégrer au menu :
 		 * Infos générales parcelle

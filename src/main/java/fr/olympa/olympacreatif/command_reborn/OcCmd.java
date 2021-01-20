@@ -1,27 +1,35 @@
 package fr.olympa.olympacreatif.command_reborn;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
+
+import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
+import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.gui.IGui;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.MembersGui;
 import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
+import fr.olympa.olympacreatif.gui.ShopGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
-public class OcCmd extends AOcCmd {
+public class OcCmd extends AbstractCmd {
 
 	public OcCmd(OlympaCreatifMain plugin) {
-		super(plugin, "oc", null, "Préfixe à toutes les commandes du Créatif d'Olympa.");
-		// TODO Auto-generated constructor stub
+		super(plugin, "oc", null, "Commandes principales du Créatif d'Olympa");
 	}
 
 
@@ -70,10 +78,7 @@ public class OcCmd extends AOcCmd {
 	
 	
 	@Cmd(player = true, syntax = "Expulser un visiteur de la parcelle (pour supprimer un membre, faites /members)", args = "PLAYERS", min = 1)
-	public void kick(CommandContext cmd) {
-		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
-		
-		plugin.getCmdLogic().kickPlayerFromPlot(getOlympaPlayer(), cmd.getArgument(0));
+	public void kick(CommandContext cmd) {plugin.getCmdLogic().kickPlayerFromPlot(getOlympaPlayer(), cmd.getArgument(0));
 	}
 	
 	
@@ -161,8 +166,53 @@ public class OcCmd extends AOcCmd {
 			OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(getPlayer(), plot);	
 		}
 	}
+
 	
-	
+	@Cmd(player = true, syntax = "Obtenir la tête d'un joueur", args = "PLAYERS", min = 1)
+	public void skull(CommandContext cmd) {
+		if (!PermissionsList.USE_SKULL_COMMAND.hasPermissionWithMsg(getOlympaPlayer()))
+			return;
+		
+		Consumer<ItemStack> consumer = sk -> getPlayer().getInventory().addItem(sk);
+		ItemUtils.skull(consumer, "§6Tête de " + cmd.getArgument(0), cmd.getArgument(0));
+		getPlayer().sendMessage(OCmsg.OCO_HEAD_GIVED.getValue(cmd.getArgument(0)));
+	}
+
+	@Cmd(player = true, syntax = "Ouvrir le menu des microblocs ou en obtenir une définie")
+	public void mb(CommandContext cmd) {
+		if (!PermissionsList.USE_MICRO_BLOCKS.hasPermissionWithMsg(getOlympaPlayer()) || !PlotPerm.BUILD.has((OlympaPlayerCreatif) getOlympaPlayer()))
+			return;
+		
+		if (cmd.getArgumentsLength() == 0)
+			plugin.getPerksManager().getMicroBlocks().openGui(getPlayer());
+		else if (plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0)) != null)
+			getPlayer().getInventory().addItem(plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0)));
+		else
+			OCmsg.UNKNOWN_MB.send(getPlayer(), cmd.getArgument(0));
+	}
+
+
+	@Cmd(player = true, syntax = "Définir votre vitesse de vol", args = "INTEGER", min = 1)
+	public void speed(CommandContext cmd) {
+		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
+		
+		if (plot != null && !PlotPerm.DEFINE_OWN_FLY_SPEED.has(plot, getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer());
+			return;
+		}
+		
+		float level = 0.1f;
+
+		level = Math.min(Math.max(((int)cmd.getArgument(0))/18f, 0.1f), 1f);
+		
+		getPlayer().setFlySpeed(level);
+		OCmsg.OCO_SET_FLY_SPEED.send(getPlayer(), cmd.getArgument(0));
+	}
+
+	@Cmd(player = true, syntax = "Afficher le magasin du Créatif")
+	public void shop(CommandContext cmd) {
+		new ShopGui(MainGui.getMainGui(getOlympaPlayer())).create(getPlayer());
+	}
 }
 
 

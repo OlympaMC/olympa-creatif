@@ -23,6 +23,8 @@ import fr.olympa.olympacreatif.command.OcCommand;
 import fr.olympa.olympacreatif.command.OcaCommand;
 import fr.olympa.olympacreatif.command.OcoCommand;
 import fr.olympa.olympacreatif.command_reborn.OcCmd;
+import fr.olympa.olympacreatif.command_reborn.OcaCmd;
+import fr.olympa.olympacreatif.command_reborn.OcoCmd;
 import fr.olympa.olympacreatif.command_reborn.CmdsLogic;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.data.DataManager;
@@ -88,6 +90,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		//new OcoCommand(this, "oco", OcoCommand.subArgsList.toArray(new String[OcoCommand.subArgsList.size()])).register();
 		//new OcaCommand(this, "oca", OcaCommand.subArgsList.toArray(new String[OcaCommand.subArgsList.size()])).register();
 		new OcCmd(this).register();
+		new OcoCmd(this).register();
+		new OcaCmd(this).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA), plugin);
 		

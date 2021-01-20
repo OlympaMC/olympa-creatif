@@ -1,6 +1,9 @@
 package fr.olympa.olympacreatif.command_reborn;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -242,7 +245,33 @@ public class CmdsLogic {
 	}
 	
 	
+	public void sendPlotsList(OlympaPlayerCreatif pc, Player target) {
+		String lp = "";
+		List<Plot> plots = new ArrayList<Plot>();
+		
+		if (target == null)
+			plots.addAll(plugin.getPlotsManager().getPlots());
+		else
+			plots.addAll(((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).getPlots(true));
 	
+		
+		Collections.sort(plots, new Comparator<Plot>() {
+			@Override
+			public int compare(Plot o1, Plot o2) {
+				return o1.getPlotId().getId() - o2.getPlotId().getId(); 
+			}
+		});
+		
+		for (Plot plot : plots)
+			lp += plot + " ";
+		
+		if (target == null)
+			pc.getPlayer().sendMessage("§aListe des " + plots.size() + " parcelles actuellement chargées : " + lp);
+		else if (plots.size() > 0)
+			pc.getPlayer().sendMessage("§aListe des parcelles possédées par " + target.getName() + " : " + lp);
+		else
+			pc.getPlayer().sendMessage("§aListe des parcelles possédées par " + target.getName() + " : §cjoueur hors ligne ou ne possédant aucune parcelle");
+	}
 }
 
 
