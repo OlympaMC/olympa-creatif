@@ -33,7 +33,7 @@ public class SchematicCreator {
 	    
 	public void export(Plot plot, OlympaPlayerCreatif p) {
 	    if (!plugin.getWEManager().isWeEnabled()) {
-	    	p.getPlayer().sendMessage(OCmsg.WE_DISABLED.getValue());
+	    	OCmsg.WE_DISABLED.send(p);
 	    	return;
 	    }
 	    	
@@ -49,7 +49,6 @@ public class SchematicCreator {
 				schemFile.createNewFile();
 				schemFile.deleteOnExit();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
@@ -76,10 +75,10 @@ public class SchematicCreator {
 			}
 			
 			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
-		    p.getPlayer().sendMessage(OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.getValue(plot));
+			OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.send(p, plot);
 	    });
-	    
-	    p.getPlayer().sendMessage(OCmsg.WE_START_GENERATING_PLOT_SCHEM.getValue(plot));
+
+		OCmsg.WE_START_GENERATING_PLOT_SCHEM.send(p, plot);
 		//return "§4La fonctionnalité d'export de la parcelle est indisponible pendant la bêta, désolé ¯\\_༼ ಥ ‿ ಥ ༽_/¯";
 	}
 	

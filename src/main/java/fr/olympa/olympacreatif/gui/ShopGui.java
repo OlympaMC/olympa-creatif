@@ -17,6 +17,7 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.player.Gender;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
+import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
@@ -289,7 +290,7 @@ public class ShopGui extends IGui{
 		plugin.getTask().runTaskLater(() -> useBuyAcceptTimer(data, buyStep - 1, initBuyStep, tickInterval, cartItem), tickInterval);
 	}
 
-	public class MarketItemData{
+	public static class MarketItemData{
 		
 		private OlympaPlayerCreatif p;
 		private Object toBuy;
@@ -399,7 +400,7 @@ public class ShopGui extends IGui{
 					p.addGroup((OlympaGroup)toBuy);
 					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(p);
 					
-					plugin.getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
+					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
 					
 					String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";
 					
@@ -423,7 +424,7 @@ public class ShopGui extends IGui{
 
 				p.withdrawGameMoney(price, () -> {
 					p.addKit((KitType)toBuy);
-					plugin.getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
+					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
 				});
 			}else if (toBuy instanceof UpgradeType) {
 				if (p.getUpgradeLevel((UpgradeType)toBuy) >= ((UpgradeType)toBuy).getMaxLevel())
@@ -431,11 +432,11 @@ public class ShopGui extends IGui{
 
 				p.withdrawGameMoney(price, () -> {
 					p.incrementUpgradeLevel((UpgradeType)toBuy);
-					plugin.getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
+					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
 				});
 			}
 			
-			p.getPlayer().sendMessage(OCmsg.SHOP_BUY_SUCCESS.getValue(itemHolder.getItemMeta().getDisplayName().toLowerCase()));
+			OCmsg.SHOP_BUY_SUCCESS.send(p, this);
 			
 			//new AccountProvider(p.getUniqueId()).saveToDb(p);
 		}

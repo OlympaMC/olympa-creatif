@@ -87,6 +87,9 @@ public class PlotMembers{
 	}
 	
 	public PlotRank getPlayerRank(OlympaPlayerCreatif p) {
+		if (p == null)
+			return PlotRank.VISITOR;
+		
 		if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
 			return PlotRank.OWNER;
 		

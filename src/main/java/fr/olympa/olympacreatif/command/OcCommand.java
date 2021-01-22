@@ -62,7 +62,8 @@ public class OcCommand extends OlympaCommand {
 		super(plugin, command, alias);
 		this.plugin = plugin;
 	}
-
+	
+	/*
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -407,7 +408,7 @@ public class OcCommand extends OlympaCommand {
 		}
 		
 		return false;
-	}
+	}*/
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
@@ -457,5 +458,11 @@ public class OcCommand extends OlympaCommand {
 		List<String> list = new ArrayList<String>(Arrays.asList(args));
 		list.add(0, label);
 		return (String[]) list.toArray(new String[list.size()]);
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

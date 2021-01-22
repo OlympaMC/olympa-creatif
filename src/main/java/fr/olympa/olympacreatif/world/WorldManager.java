@@ -69,12 +69,14 @@ public class WorldManager {
 		new BukkitRunnable() {
 			
 			final int cMax = 60;
-			final int noAfkIncome = Integer.valueOf(OCparam.INCOME_NOT_AFK.get());
-			final int afkIncome = Integer.valueOf(OCparam.INCOME_AFK.get());
 			int c = 0;
 			
 			@Override
 			public void run() {
+
+				int noAfkIncome = OCparam.INCOME_NOT_AFK.get();
+				int afkIncome = OCparam.INCOME_AFK.get();
+				
 				Bukkit.getOnlinePlayers().forEach(p -> {
 					OlympaPlayerCreatif pp = AccountProvider.get(p.getUniqueId());
 
@@ -85,7 +87,7 @@ public class WorldManager {
 					
 					if (c == cMax) {
 						c = 0;
-						p.sendMessage(OCmsg.PERIODIC_INCOME_RECEIVED.getValue(income, noAfkIncome, afkIncome));	
+						OCmsg.PERIODIC_INCOME_RECEIVED.send(p);	
 					}
 				});
 			}

@@ -155,14 +155,14 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
 		if (plot == null) {
-			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_BUILD.getValue("nul"));
+			OCmsg.PLOT_CANT_BUILD.send(pc);
 			e.setCancelled(true);
 			return;	
 		}
 		
 		if (!PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_BUILD.getValue(plot));
+			OCmsg.PLOT_CANT_BUILD.send(pc);
 			return;
 		}
 		
@@ -194,14 +194,14 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		if (plot == null) {
-			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_BUILD.getValue("nul"));
 			e.setCancelled(true);
+			OCmsg.PLOT_CANT_BUILD.send(pc);
 			return;	
 		}
 
 		if (!PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_BUILD.getValue(plot));
+			OCmsg.PLOT_CANT_BUILD.send(pc);
 		}
 	}
 	
@@ -243,7 +243,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 		if (!plot.getParameters().getParameter(PlotParamType.ALLOW_PRINT_TNT) && !PlotPerm.BUILD.has(plot, pc)) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_PRINT_TNT.getValue());
+			OCmsg.PLOT_CANT_PRINT_TNT.send(pc);
 		}
 	}
 	
@@ -352,7 +352,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
-		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
+		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		
 		Block clickedBlock = e.getClickedBlock();
 		
@@ -378,30 +378,30 @@ public class PlotsInstancesListener implements Listener{
 		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 
 		if (plot == null) {
-			if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
+			if (!pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
 				e.setCancelled(true);
-				e.getPlayer().sendMessage(OCmsg.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
+				OCmsg.PLOT_CANT_INTERRACT_NULL_PLOT.send(pc);
 			}
 			return;
 		}
 		
 		//test si permission d'interagir avec le bloc donné
-		if (!PlotPerm.BUILD.has(plot, p) && e.getClickedBlock() != null &&
+		if (!PlotPerm.BUILD.has(plot, pc) && e.getClickedBlock() != null &&
 				PlotParamType.getAllPossibleIntaractibleBlocks().contains(e.getClickedBlock().getType()) &&
 				!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(e.getClickedBlock().getType()) ) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(OCmsg.PLOT_CANT_INTERRACT.getValue());
+			OCmsg.PLOT_CANT_INTERRACT.send(pc);
 			
 			return;
 		}
 
 		//cancel interract si un item pouvant faire spawn une entité est utilisé
-		if (e.getItem() != null && !PlotPerm.BUILD.has(plot, p)) {
+		if (e.getItem() != null && !PlotPerm.BUILD.has(plot, pc)) {
 			Material mat = e.getItem().getType();
 			//KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
 			
 			if (interractProhibitedItems.contains(mat) || mat.toString().contains("SPAWN_EGG") || mat.toString().contains("BUCKET")) {
-				p.getPlayer().sendMessage(OCmsg.PLOT_ITEM_PROHIBITED_USED.getValue());
+				OCmsg.PLOT_ITEM_PROHIBITED_USED.send(pc);
 				e.setCancelled(true);
 				return;
 			}
@@ -409,8 +409,8 @@ public class PlotsInstancesListener implements Listener{
 		
 		//GESTION COMMAND BLOCKS
 		//si édition/placement du commandblock
-		if (PlotPerm.COMMAND_BLOCK.has(plot, p) && e.getClickedBlock() != null && 
-				plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getClickedBlock().getType())) {
+		if (PlotPerm.COMMAND_BLOCK.has(plot, pc) && e.getClickedBlock() != null && 
+				plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(pc, e.getClickedBlock().getType())) {
 			
 			if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				Block block = e.getClickedBlock();
@@ -640,13 +640,13 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (plot == null) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(OCmsg.PLOT_DENY_ITEM_DROP.getValue());
+			OCmsg.PLOT_DENY_ITEM_DROP.send(e.getPlayer());
 			return;	
 		}
 		
 		if (!PlotPerm.DROP_ITEM.has(plot, AccountProvider.get(e.getPlayer().getUniqueId())) && !plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS)) {
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(OCmsg.PLOT_DENY_ITEM_DROP.getValue());
+			OCmsg.PLOT_DENY_ITEM_DROP.send(e.getPlayer());
 		}		
 	}
 	

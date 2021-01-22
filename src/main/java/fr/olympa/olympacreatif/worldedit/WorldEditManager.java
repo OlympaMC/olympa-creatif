@@ -123,7 +123,7 @@ public class WorldEditManager extends EventHandler implements Listener {
 		        	return false;
 		        }
 		    });
-			p.getPlayer().sendMessage(OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.getValue(plot));
+			OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.send(p);
 		}
 		else
 			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {

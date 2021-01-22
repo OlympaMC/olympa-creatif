@@ -22,7 +22,6 @@ public class PlayerPlotsGui extends IGui {
 	
 	private List<Plot> playerPlots = new ArrayList<Plot>();
 	
-	@SuppressWarnings("incomplete-switch")
 	public PlayerPlotsGui(IGui gui) {
 		super(gui, "Parcelles de " + gui.getPlayer().getName(), gui.getPlayer().getPlots(false).size()/9 + 2);
 		
@@ -45,7 +44,7 @@ public class PlayerPlotsGui extends IGui {
 								p.getPlayer().closeInventory();
 								if (c == ClickType.LEFT) {
 									p.getPlayer().teleport(playerPlots.get(s).getPlotId().getLocation());
-									p.getPlayer().sendMessage(OCmsg.TELEPORT_IN_PROGRESS.getValue(playerPlots.get(s)));	
+									OCmsg.TELEPORT_IN_PROGRESS.send(p);	
 								}else if (c == ClickType.RIGHT) {
 									MainGui.getMainGui(p, playerPlots.get(s)).create(p.getPlayer());
 								}

@@ -53,7 +53,7 @@ public class OcoCommand extends OlympaCommand {
 		super(plugin, cmd, aliases);
 		this.plugin = plugin;
 	}
-
+/*
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player))
@@ -73,7 +73,7 @@ public class OcoCommand extends OlympaCommand {
 					return false;
 				}
 				p.getPlayer().sendMessage(OCmsg.OCO_HAT_SUCCESS.getValue());
-				p.getPlayer().getInventory().setHelmet(new ItemStack(p.getPlayer().getInventory().getItemInMainHand().getType()));*/
+				p.getPlayer().getInventory().setHelmet(new ItemStack(p.getPlayer().getInventory().getItemInMainHand().getType()));
 				break;
 				
 				
@@ -198,7 +198,7 @@ public class OcoCommand extends OlympaCommand {
 		
 		return false;
 	}
-
+*/
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
 		
@@ -222,4 +222,9 @@ public class OcoCommand extends OlympaCommand {
 		
 		return response;
 	}
+@Override
+public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	// TODO Auto-generated method stub
+	return false;
+}
 }

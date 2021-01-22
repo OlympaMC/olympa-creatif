@@ -143,7 +143,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 	    	final Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
 	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p)) {
-	    		p.getPlayer().sendMessage(OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.getValue(plot));
+	    		OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.send(p);
 	    		return null;
 	    	}
 

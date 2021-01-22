@@ -76,8 +76,8 @@ public class MainGui extends IGui {
 			setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle"), 
 					(it, c, s) -> {
 						p.getPlayer().closeInventory();
-						p.getPlayer().sendMessage(OCmsg.TELEPORTED_TO_PLOT_SPAWN.getValue(plot));
 						p.getPlayer().teleport(plot.getParameters().getSpawnLoc());
+						OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(p);
 					});	
 		}
 		
@@ -89,7 +89,7 @@ public class MainGui extends IGui {
 					if (plugin.getPlotsManager().getPlots().size() > 0) {
 						Plot plotR = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
 						p.getPlayer().teleport(plotR.getParameters().getSpawnLoc());
-						p.getPlayer().sendMessage(OCmsg.TELEPORTED_TO_PLOT_SPAWN.getValue(plotR));
+						OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(p);
 					}
 				});
 

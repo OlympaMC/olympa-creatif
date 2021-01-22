@@ -75,7 +75,7 @@ public class PlotStoplagChecker {
 			
 			//message
 			plot.getPlayers().forEach(p -> {
-				p.sendMessage(OCmsg.PLOT_STOPLAG_FIRED.getValue(type, stoplagCount, forcedStoplagStoplagCount));
+				OCmsg.PLOT_STOPLAG_FIRED.send(p, type);
 				});
 		}
 		else {
@@ -83,7 +83,7 @@ public class PlotStoplagChecker {
 			
 			//message
 			plot.getPlayers().forEach(p -> {
-				p.sendMessage(OCmsg.PLOT_FORCED_STOPLAG_FIRED.getValue(type));
+				OCmsg.PLOT_FORCED_STOPLAG_FIRED.send(p, type);
 				});
 		}
 	}

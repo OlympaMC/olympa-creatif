@@ -49,11 +49,12 @@ public class CmdsLogic {
 				Plot plot = plugin.getPlotsManager().createNewPlot(pc);
 				pc.getPlayer().teleport(plot.getPlotId().getLocation());
 
-				pc.getPlayer().sendMessage(OCmsg.PLOT_NEW_CLAIM.getValue(plot));
+				//TODO vérifier si le getCurrentPlot est bien MAJ
+				OCmsg.PLOT_NEW_CLAIM.send(pc);
 			}else
-				pc.getPlayer().sendMessage(OCmsg.MAX_PLOT_COUNT_REACHED.getValue());
+				OCmsg.MAX_PLOT_COUNT_REACHED.send(pc);
 		}else
-			pc.getPlayer().sendMessage(OCmsg.MAX_PLOT_COUNT_OWNER_REACHED.getValue());
+			OCmsg.MAX_PLOT_COUNT_OWNER_REACHED.send(pc);
 	}
 	
 	public void invitePlayer(OlympaPlayerCreatif pc, Player target) {
@@ -94,17 +95,19 @@ public class CmdsLogic {
 		
 		Plot plot = plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, plotId));
 		
+		String plotIdStr = plotId + "";
+		
 		if (plot == null)
-			OCmsg.PLOT_UNLOADED.send(pc, plotId);
+			OCmsg.PLOT_UNLOADED.send(pc, plotIdStr);
 		
 		else if (pc.getPlotsSlots(false) - pc.getPlots(false).size() <= 0)
-			OCmsg.MAX_PLOT_COUNT_REACHED.send(pc, plotId);
+			OCmsg.MAX_PLOT_COUNT_REACHED.send(pc, plot);
 		
 		else if (!invitations.containsKey(plot.getPlotId()) || !invitations.get(plot.getPlotId()).getValue().equals(pc.getPlayer()))
-			OCmsg.PLOT_NO_PENDING_INVITATION.send(pc, plotId);
+			OCmsg.PLOT_NO_PENDING_INVITATION.send(pc, plot);
 		
 		else if (!invitations.get(plot.getPlotId()).getKey().getPlayer().isOnline())
-			OCmsg.PLOT_JOIN_ERR_SENDER_OFFLINE.send(pc, plotId, invitations.get(plot.getPlotId()).getKey().getName());
+			OCmsg.PLOT_JOIN_ERR_SENDER_OFFLINE.send(pc, plot, invitations.get(plot.getPlotId()).getKey().getName());
 		
 		else if (plot.getMembers().getMembers().size() >= plot.getMembers().getMaxMembers())
 			OCmsg.PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS.send(pc, plot);
@@ -228,7 +231,7 @@ public class CmdsLogic {
 				pc.getPlayer().teleport(id.getLocation());
 			else
 				pc.getPlayer().teleport(plot.getParameters().getSpawnLoc());
-			OCmsg.TELEPORT_IN_PROGRESS.send(pc, id);
+			OCmsg.TELEPORT_IN_PROGRESS.send(pc);
 		}
 	}
 

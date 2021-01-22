@@ -60,13 +60,13 @@ public class OcoCmd extends AbstractCmd {
 			}
 		});
 		
-		String deb = "\n   §6>>> Débug entités parcelle " + plot.getPlotId() + " :";
+		String debug = "\n   §6>>> Débug entités parcelle " + plot.getPlotId() + " :";
 		for (Entity e : entList)
-			deb += "\n   §e> " + e.getType().toString().toLowerCase() + "§7(" + (e.getCustomName() == null ? "" : e.getCustomName()) + "§7), " + 
+			debug += "\n   §e> " + e.getType().toString().toLowerCase() + "§7(" + (e.getCustomName() == null ? "" : e.getCustomName()) + "§7), " + 
 					e.getLocation().getBlockX() + " " + e.getLocation().getBlockY() + " " + e.getLocation().getBlockZ() + " : " + 
 					(!e.isDead() ? "§avivante" : "§cmorte §4(contactez un staff)");
 		
-		getPlayer().sendMessage(deb);
+		getPlayer().sendMessage(debug);
 	}
 	
 	@Cmd(player = true, syntax = "Exporter sa parcelle en .schematic")
@@ -82,6 +82,24 @@ public class OcoCmd extends AbstractCmd {
 		}
 
 		plugin.getPerksManager().getSchematicCreator().export(plot, getOlympaPlayer());
+	}
+
+
+	@Cmd(player = true, syntax = "Définir votre vitesse de vol", args = "INTEGER", min = 1)
+	public void speed(CommandContext cmd) {
+		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
+		
+		if (plot != null && !PlotPerm.DEFINE_OWN_FLY_SPEED.has(plot, getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer());
+			return;
+		}
+		
+		float level = 0.1f;
+
+		level = Math.min(Math.max(Float.valueOf(cmd.getArgument(0).toString())/18f, 0.1f), 1f);
+		
+		getPlayer().setFlySpeed(level);
+		OCmsg.OCO_SET_FLY_SPEED.send(getPlayer(), cmd.getArgument(0).toString());
 	}
 
 }

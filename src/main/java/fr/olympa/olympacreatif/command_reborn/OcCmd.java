@@ -78,7 +78,8 @@ public class OcCmd extends AbstractCmd {
 	
 	
 	@Cmd(player = true, syntax = "Expulser un visiteur de la parcelle (pour supprimer un membre, faites /members)", args = "PLAYERS", min = 1)
-	public void kick(CommandContext cmd) {plugin.getCmdLogic().kickPlayerFromPlot(getOlympaPlayer(), cmd.getArgument(0));
+	public void kick(CommandContext cmd) {
+		plugin.getCmdLogic().kickPlayerFromPlot(getOlympaPlayer(), cmd.getArgument(0));
 	}
 	
 	
@@ -90,7 +91,7 @@ public class OcCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Débannir un visiteur de la parcelle", args = "PLAYERS", min = 1)
 	public void unban(CommandContext cmd) {
-		plugin.getCmdLogic().banPlayerFromPlot(getOlympaPlayer(), cmd.getArgument(0));
+		plugin.getCmdLogic().unbanPlayerFromPlot(getOlympaPlayer(), cmd.getArgument(0));
 	}
 	
 	
@@ -128,11 +129,11 @@ public class OcCmd extends AbstractCmd {
 			OCmsg.INVALID_PLOT_ID.send(getPlayer());
 		
 		else if (!PlotPerm.SET_PLOT_SPAWN.has(plot, getOlympaPlayer()))
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.SET_PLOT_SPAWN.getRank().getRankName());
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.SET_PLOT_SPAWN);
 				
 		else {
 			if (plot.getParameters().setSpawnLoc(getPlayer().getLocation()))
-				OCmsg.PLOT_SPAWN_LOC_SET.send(getPlayer(), getPlayer().getLocation().getBlockX(), getPlayer().getLocation().getBlockY(), getPlayer().getLocation().getBlockZ());
+				OCmsg.PLOT_SPAWN_LOC_SET.send(getPlayer());
 		}
 	}
 
@@ -175,7 +176,7 @@ public class OcCmd extends AbstractCmd {
 		
 		Consumer<ItemStack> consumer = sk -> getPlayer().getInventory().addItem(sk);
 		ItemUtils.skull(consumer, "§6Tête de " + cmd.getArgument(0), cmd.getArgument(0));
-		getPlayer().sendMessage(OCmsg.OCO_HEAD_GIVED.getValue(cmd.getArgument(0)));
+		OCmsg.OCO_HEAD_GIVED.send(getPlayer(), cmd.getArgument(0));
 	}
 
 	@Cmd(player = true, syntax = "Ouvrir le menu des microblocs ou en obtenir une définie")
@@ -189,24 +190,6 @@ public class OcCmd extends AbstractCmd {
 			getPlayer().getInventory().addItem(plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0).toString()));
 		else
 			OCmsg.UNKNOWN_MB.send(getPlayer(), cmd.getArgument(0));
-	}
-
-
-	@Cmd(player = true, syntax = "Définir votre vitesse de vol", args = "INTEGER", min = 1)
-	public void speed(CommandContext cmd) {
-		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
-		
-		if (plot != null && !PlotPerm.DEFINE_OWN_FLY_SPEED.has(plot, getOlympaPlayer())) {
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer());
-			return;
-		}
-		
-		float level = 0.1f;
-
-		level = Math.min(Math.max(Float.valueOf(cmd.getArgument(0).toString())/18f, 0.1f), 1f);
-		
-		getPlayer().setFlySpeed(level);
-		OCmsg.OCO_SET_FLY_SPEED.send(getPlayer(), cmd.getArgument(0).toString());
 	}
 
 	@Cmd(player = true, syntax = "Afficher le magasin du Créatif")

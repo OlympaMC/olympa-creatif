@@ -311,7 +311,7 @@ public class Plot {
 		if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
 			
 			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
-				p.sendMessage(OCmsg.PLOT_CANT_ENTER_BANNED.getValue(members.getOwner().getName()));
+				OCmsg.PLOT_CANT_ENTER_BANNED.send(pc, this);
 				return false;	
 			}
 		}
@@ -343,8 +343,8 @@ public class Plot {
 		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {
 			//tp au spawn de la zone
 			if (tpToPlotSpawn && parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-				p.sendMessage(OCmsg.TELEPORTED_TO_PLOT_SPAWN.getValue(plotId));
 				p.teleport(parameters.getSpawnLoc());
+				OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc);
 			}
 			
 			//définition du gamemode

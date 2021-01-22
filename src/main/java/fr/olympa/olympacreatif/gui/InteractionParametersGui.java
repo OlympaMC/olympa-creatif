@@ -25,7 +25,6 @@ public class InteractionParametersGui extends IGui {
 	private String[] stateAllowed = new String[] {" ", "§eEtat : §aautorisé", "§7Cliquez pour changer l'état. Si autorisé, les visiteurs", "§7pourront interragir avec ce bloc, sinon non."};
 	private String[] stateDenied = new String[] {" ", "§eEtat : §cinterdit", "§7Cliquez pour changer l'état. Si autorisé, les visiteurs", "§7pourront interragir avec ce bloc, sinon non."}; 
 	
-	@SuppressWarnings("unchecked")
 	public InteractionParametersGui(IGui gui) {
 		super(gui, "Interactions parcelle " + gui.getPlot().getPlotId(), 6);
 		

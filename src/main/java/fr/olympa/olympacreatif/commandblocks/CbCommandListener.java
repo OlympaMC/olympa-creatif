@@ -117,7 +117,7 @@ public class CbCommandListener implements Listener {
 		
 		//return si la commande est nulle
 		if (cmd == null) {
-			e.getPlayer().sendMessage(OCmsg.CB_INVALID_CMD.getValue()); 
+			OCmsg.CB_INVALID_CMD.send(e.getPlayer()); 
 			return;
 		}
 		
@@ -125,7 +125,7 @@ public class CbCommandListener implements Listener {
 		if (cmd.getMinRankToExecute().has(cmd.getPlot(), p) && (p.hasKit(KitType.COMMANDBLOCK) || !cmd.needCbKitToExecute()))
 			executeCommandBlockCommand(cmd, e.getPlayer());
 		else
-			e.getPlayer().sendMessage(OCmsg.INSUFFICIENT_PLOT_PERMISSION.getValue());
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer());
 	}	
 	
 	//exécute la commande et si le CommandSender est un commandblock, mise à jour des ses NBTTags
@@ -143,7 +143,7 @@ public class CbCommandListener implements Listener {
 		
 		if (cmd.getPlot().getCbData().getCommandsTicketsLeft() < neededCmdTickets) {
 			//si le plot n'a plus assez de commandes restantes, cancel exécution
-			sender.sendMessage(OCmsg.CB_NO_COMMANDS_LEFT.getValue());
+			OCmsg.CB_NO_COMMANDS_LEFT.send(sender);
 			return;
 		}else
 			//si le plot a assez de commandes restantes, retrait d'une d'entre elles avant de passer à l'exécution
@@ -154,7 +154,7 @@ public class CbCommandListener implements Listener {
 		if (result > 0)
 			message = OCmsg.CB_RESULT_SUCCESS;
 		
-		sender.sendMessage(message.getValue(cmd.getType(), result));
+		message.send(sender, new CbCmdResult(cmd.getType(), result));
 		
 		//mise à jour NBTTags command block
 		if (!(sender instanceof CraftBlockCommandSender))
@@ -241,5 +241,25 @@ public class CbCommandListener implements Listener {
 				tag.setBoolean("conditionMet", true);
 		
 		cb.load(null, tag);
+	}
+	
+	public static class CbCmdResult {
+		
+		private CommandType cmd;
+		private int result;
+		
+		public CbCmdResult (CommandType cmd, int result) {
+			this.cmd = cmd;
+			this.result = result;
+		}
+		
+		public CommandType getCmd() {
+			return cmd;
+		}
+		
+		public int getResult() {
+			return result;
+		}
+		
 	}
 }

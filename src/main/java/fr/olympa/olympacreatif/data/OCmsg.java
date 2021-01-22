@@ -7,19 +7,32 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.CbCommandListener.CbCmdResult;
+import fr.olympa.olympacreatif.gui.ShopGui.MarketItemData;
+import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotPerm;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
+import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 
 public class OCmsg {
 
@@ -37,7 +50,7 @@ public class OCmsg {
 	public static final OCmsg OCO_COMMAND_HELP = new OCmsg(null);
 	public static final OCmsg OCO_EXPORT_FAILED = new OCmsg(null);
 	//public static final OCmsg OCO_EXPORT_SUCCESS = new OCmsg(null);
-	public static final OCmsg OCO_HAT_SUCCESS = new OCmsg(null);
+	//public static final OCmsg OCO_HAT_SUCCESS = new OCmsg(null);
 	public static final OCmsg OCO_HEAD_GIVED = new OCmsg(null);
 	public static final OCmsg OCO_SET_FLY_SPEED = new OCmsg(null);
 	public static final OCmsg OCO_UNKNOWN_MB = new OCmsg(null);
@@ -102,6 +115,77 @@ public class OCmsg {
  
 	//public static final OCmsg WE_ERR_INSUFFICENT_PERMISSION = new OCmsg(null); 
 
+	private static final Map<String, Function<OlympaPlayerCreatif, String>> playerPlaceHolders = ImmutableMap.<String, Function<OlympaPlayerCreatif,String>>builder()
+			.put("%playerName", pc -> {return pc.getName();})
+			.put("%playerPlot", pc -> {return pc.getCurrentPlot() == null ? "aucun" : pc.getCurrentPlot().toString();})
+			
+			.put("%playerGroup", pc -> {return pc.getGroupName();})
+			.put("%playerPlotRank", pc -> {return pc.getCurrentPlot() == null ? PlotRank.VISITOR.getRankName() : pc.getCurrentPlot().getMembers().getPlayerRank(pc).getRankName();})
+			
+			.put("%playerMoney", pc -> {return pc.getGameMoney() + "";})
+			.put("%playerMoneyAndSymbol", pc -> {return pc.getGameMoney() + " " + pc.getGameMoneySymbol();})
+			
+			.put("%playerPlotsCount", pc -> {return pc.getPlots(false).size() + "";})
+			.put("%playerPlotsMaxCount", pc -> {return pc.getPlotsSlots(false) + "";})
+			.put("%playerOwnedPlotsCount", pc -> {return pc.getPlots(true).size() + "";})
+			.put("%playerOwnedPlotsMaxCount", pc -> {return pc.getPlotsSlots(true) + "";})
+			.build();
+
+	@SuppressWarnings("deprecation")
+	private static final Map<String, BiFunction<OlympaPlayerCreatif, OlympaPermission, String>> permissionPlaceHolders = ImmutableMap.<String, BiFunction<OlympaPlayerCreatif, OlympaPermission,String>>builder()
+			.put("%permMinGroup", (pc, perm) -> {return pc == null ? perm.getMinGroup().getName() : perm.getMinGroup().getName(pc.getGender());})
+			.put("%permName", (pc, perm) -> {return perm.getName();})
+			.build();
+
+
+	@SuppressWarnings("deprecation")
+	private static final Map<String, BiFunction<OlympaPlayerCreatif, PlotPerm, String>> plotPermissionPlaceHolders = ImmutableMap.<String, BiFunction<OlympaPlayerCreatif, PlotPerm,String>>builder()
+			.put("%plotPermDesc", (pc, perm) -> {return perm.getDesc();})
+			.put("%plotPermMinGroup", (pc, perm) -> {return perm.getPerm() == null ? "aucun" : pc == null ? perm.getPerm().getMinGroup().getName() : perm.getPerm().getMinGroup().getName(pc.getGender());})
+			.put("%plotPermMinPlotRank", (pc, perm) -> {return perm.getRank().getRankName();})
+			.build();
+
+	
+	private static final Map<String, Function<CbCmdResult, String>> commandblockPlaceHolders = ImmutableMap.<String, Function<CbCmdResult,String>>builder()
+			.put("%cbcmdName", (cmd) -> {return cmd.getCmd().toString().toLowerCase();})
+			.put("%cbcmdResult", (cmd) -> {return cmd.getResult() + "";})
+			.build();
+
+
+	private static final Map<String, Function<MarketItemData, String>> shopPlaceHolders = ImmutableMap.<String, Function<MarketItemData,String>>builder()
+			.put("%shopItemName", item -> {return item.getHolder().getItemMeta() == null ? item.getItem().toString() : item.getHolder().getItemMeta().getDisplayName();})
+			.put("%shopItemPrice", item -> {return item.getPrice() + "";})
+			.build();
+
+	
+	private static final Map<String, BiFunction<OlympaPlayerCreatif, Plot, String>> plotPlaceHolders = ImmutableMap.<String, BiFunction<OlympaPlayerCreatif, Plot,String>>builder()
+			.put("%playerPlotRank", (pc, plot) -> {return plot.getMembers().getPlayerRank(pc).getRankName();})
+			//.put("%playerPlot", (pc, plot) -> {return plot.getPlotId().getId() + "";})
+			.put("%plotId", (pc, plot) -> {return plot.getPlotId().getId() + "";})
+			
+			.put("%plotOwnerName", (pc, plot) -> {return plot.getMembers().getOwner().getName();})
+			.put("%plotMembersSize", (pc, plot) -> {return plot.getMembers().getMembers().size() + "";})
+			.put("%plotMembersMaxSize", (pc, plot) -> {return plot.getMembers().getMaxMembers() + "";})
+			
+			.build();
+
+	
+	private static final Map<String, Function<StopLagDetect, String>> stoplagPlaceHolders = ImmutableMap.<String, Function<StopLagDetect,String>>builder()
+			.put("%stopLagType", sl -> {return sl.toString();})
+			.build();
+
+	
+	private static final Map<String, Function<String, String>> stringPlaceHolders = ImmutableMap.<String, Function<String,String>>builder()
+			.put("%s", s -> {return s;})
+			.build();
+	
+	
+	private static final Map<String, Supplier<String>> fixedPlaceHolders = ImmutableMap.<String, Supplier<String>>builder()
+			.put("%incomeAsAfk", () -> {return OCparam.INCOME_AFK.get() + "";})
+			.put("%incomeAsNotAfk", () -> {return OCparam.INCOME_NOT_AFK.get() + "";})
+			.put("%serverIndex", () -> {return (OlympaCreatifMain.getInstance() == null || OlympaCreatifMain.getInstance().getDataManager() == null) ? "???" : OlympaCreatifMain.getInstance().getDataManager().getServerIndex() + "";})
+			.build();
+	
 	
 	private String message;
 	
@@ -109,18 +193,58 @@ public class OCmsg {
 		message = s;
 	}
 	
-	public String getValue(Object...args) {
+	private String getValue(OlympaPlayerCreatif pc, Object... args) {
 		if (message == null)
 			return "§cMessage manquant, veuillez vérifier les logs.";
 		
+		/*
 		if (message.chars().filter(ch -> ch == '&').count() > args.length)
 			throw new RuntimeException("Le plugin a tenté d'envoyer un message pour lequel un nombre d'arguments insuffisant a été renseigné.");
 		
-		String mess = message;
 		for (int i = 0 ; i < args.length ; i++)
-			mess = mess.replace("&" + (i + 1), "" + args[i]);	
+			mess = mess.replace("&" + (i + 1), "" + args[i]);	*/
+
+		String msg = message;
+
+		for (Entry<String, Supplier<String>> e : fixedPlaceHolders.entrySet())
+			msg = msg.replace(e.getKey(), e.getValue().get());
 		
-		return mess;
+		if (pc != null)
+			for (Entry<String, Function<OlympaPlayerCreatif, String>> e : playerPlaceHolders.entrySet())
+				msg = msg.replace(e.getKey(), e.getValue().apply(pc));	
+		
+
+		//remplacement des placeholders
+		for (Object o : args)
+			if (o instanceof PlotPerm)
+				for (Entry<String, BiFunction<OlympaPlayerCreatif, PlotPerm, String>> e : plotPermissionPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply(pc, (PlotPerm) o));
+		
+			else if (o instanceof OlympaPermission)
+				for (Entry<String, BiFunction<OlympaPlayerCreatif, OlympaPermission, String>> e : permissionPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply(pc, (OlympaPermission) o));
+
+			else if (o instanceof CbCmdResult)
+				for (Entry<String, Function<CbCmdResult, String>> e : commandblockPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((CbCmdResult) o));
+
+			else if (o instanceof MarketItemData)
+				for (Entry<String, Function<MarketItemData, String>> e : shopPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((MarketItemData) o));
+
+			else if (o instanceof Plot)
+				for (Entry<String, BiFunction<OlympaPlayerCreatif, Plot, String>> e : plotPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply(pc, (Plot) o));
+
+			else if (o instanceof StopLagDetect)
+				for (Entry<String, Function<StopLagDetect, String>> e : stoplagPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((StopLagDetect) o));
+
+			else if (o instanceof String)
+				for (Entry<String, Function<String, String>> e : stringPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((String) o));
+		
+		return msg;
 	}
 	
 	public void setValue(String s) {
@@ -135,17 +259,23 @@ public class OCmsg {
 		return null;
 	}
 	
+	@Deprecated
 	@Override
 	public String toString() {
 		return message;
 	}
 	
+	@Deprecated
+	public void send(CommandSender sender, Object... objs) {
+		sender.sendMessage(getValue(null, objs));
+	}
+	
 	public void send(Player p, Object... objs) {
-		p.sendMessage(getValue(objs));
+		send((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()), objs);
 	}
 	
 	public void send(OlympaPlayerCreatif pc, Object... objs) {
-		send(pc.getPlayer(), objs);
+		pc.getPlayer().sendMessage(getValue(pc, objs));
 	}
 	
 	/**
