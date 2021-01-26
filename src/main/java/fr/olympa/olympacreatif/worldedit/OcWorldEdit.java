@@ -1,17 +1,17 @@
 package fr.olympa.olympacreatif.worldedit;
 
 import java.text.DecimalFormat;
-
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
+import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacerListener;
+import org.primesoft.asyncworldedit.api.blockPlacer.entries.IJobEntry;
 import org.primesoft.asyncworldedit.api.playerManager.IPlayerEntry;
 import org.primesoft.asyncworldedit.api.progressDisplay.IProgressDisplay;
 import org.primesoft.asyncworldedit.api.worldedit.IAsyncEditSessionFactory;
-import org.primesoft.asyncworldedit.api.worldedit.IEditSession;
 import org.primesoft.asyncworldedit.api.worldedit.IThreadSafeEditSession;
 
 import com.sk89q.worldedit.LocalConfiguration;
@@ -40,16 +40,16 @@ import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 
 	private boolean weEnabled = true;
 	private  OlympaCreatifMain plugin;
 	private WorldEdit we;
+	private IAsyncWorldEdit awe;
 	
 	public OcWorldEdit(OlympaCreatifMain plugin) {
 		super(Priority.NORMAL);
@@ -58,8 +58,8 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 		we = ((WorldEditPlugin) plugin.getServer().getPluginManager().getPlugin("WorldEdit")).getWorldEdit();
 		we.getEventBus().register(this);
 		
-		((IAsyncWorldEdit) plugin.getServer().getPluginManager().getPlugin("AsyncWorldEdit"))
-				.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
+		awe = ((IAsyncWorldEdit) plugin.getServer().getPluginManager().getPlugin("AsyncWorldEdit"));
+		awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
 		
 		LocalConfiguration config = we.getConfiguration();
 		for (Material mat : Material.values())
@@ -114,18 +114,67 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 
 	@Override
 	public void resetPlot(Player requester, Plot plot) {
-		requester.sendMessage("§dLa réinitialisation de la parcelle " + plot + " a commencé. Vous ne serez pas averti de la fin de l'opération.");
-		
-		BlockVector3 vec1 = getBV3(plot.getPlotId().getLocation()).withY(0);
-		BlockVector3 vec2 = getBV3(plot.getPlotId().getLocation()).withY(0).add(OCparam.PLOT_SIZE.get() - 1, 0, OCparam.PLOT_SIZE.get() - 1);
-		
-		plugin.getTask().runTaskAsynchronously(() -> {
-			setLayer(new CuboidRegion(getWeWorld(), vec1, vec2), BlockTypes.BEDROCK);
-			setLayer(new CuboidRegion(getWeWorld(), vec1.withY(2), vec2.withY(WorldManager.worldLevel - 1)), BlockTypes.DIRT);
-			setLayer(new CuboidRegion(getWeWorld(), vec1.withY(WorldManager.worldLevel), vec2.withY(WorldManager.worldLevel)), BlockTypes.GRASS_BLOCK);
-			setLayer(new CuboidRegion(getWeWorld(), vec1.withY(WorldManager.worldLevel + 1), vec2.withY(255)), BlockTypes.AIR);
-		});
+		throw new UnsupportedOperationException("Impossible de régénérer une parcelle avec AsyncWorldEdit.");
 	}
+
+	/*
+	@Override
+	public void resetPlot(Player requester, Plot plot) {
+		requester.sendMessage("§dLa réinitialisation de la parcelle " + plot + " a commencé. Vous ne serez pas averti de la fin de l'opération.");
+
+		int maxX = OCparam.PLOT_SIZE.get() / 16;
+		int maxZ = OCparam.PLOT_SIZE.get() / 16;
+		
+		plugin.getWorldManager().getWorld().getChunkAtAsync(plot.getPlotId().getLocation(), true, 
+				ch -> plugin.getTask().runTaskAsynchronously(() -> resetChunk(plot.getPlotId(), ch)));
+	}
+	
+	private void resetChunk(PlotId plot, Chunk toReset) {
+		IThreadSafeEditSession es = ((IAsyncEditSessionFactory) we.getEditSessionFactory())
+				.getThreadSafeEditSession(getWeWorld(), -1);
+		es.setFastMode(true);
+		
+		es.getBlockPlacer().addListener(new IBlockPlacerListener() {
+			
+			private IJobEntry job = null;
+			
+			@Override
+			public void jobRemoved(IJobEntry j) {
+				//if (job != null && job.getJobId() == j.getJobId())
+					System.out.println("FIN DU SET DU CHUNK " + job);
+			}
+			
+			@Override
+			public void jobAdded(IJobEntry j) {
+				System.out.println("AJOUT DU JOB " + job);
+				job = job == null ?  j : job;
+			}
+		});
+		
+		es.setMask(new Mask() {
+			
+			@Override
+			public boolean test(BlockVector3 arg0) {
+				return !es.getBlock(arg0).getBlockType().equals(BlockTypes.AIR);
+			}
+			
+			@Override
+			public Mask copy() {return null;}
+		});
+		
+		//es.regenerateChunk(toReset.getX(), toReset.getZ(), BiomeTypes.PLAINS, plugin.getWorldManager().getWorld().getSeed());
+
+		
+		for (int x = toReset.getX() * 16 ; x < (toReset.getX() + 1) * 16 ; x++)
+			for (int z = toReset.getZ() * 16 ; z < (toReset.getZ() + 1) * 16 ; z++) {
+				es.smartSetBlock(BlockVector3.at(x, 0, z), BlockTypes.BEDROCK.getDefaultState());
+				es.smartSetBlock(BlockVector3.at(x, WorldManager.worldLevel, z), BlockTypes.GRASS_BLOCK.getDefaultState());
+				for (int y = 1 ; y < WorldManager.worldLevel ; y++) 
+					es.smartSetBlock(BlockVector3.at(x, y, z), BlockTypes.DIRT.getDefaultState());
+				for (int y = WorldManager.worldLevel + 1 ; y <= 256 ; y++) 
+					es.smartSetBlock(BlockVector3.at(x, y, z), BlockTypes.AIR.getDefaultState());
+			}
+	}*/
 	
 	@SuppressWarnings("deprecation")
 	private void setLayer(final CuboidRegion reg, final BlockType block) {		

@@ -87,7 +87,7 @@ public class WorldManager {
 					
 					if (c == cMax) {
 						c = 0;
-						OCmsg.PERIODIC_INCOME_RECEIVED.send(p);	
+						OCmsg.PERIODIC_INCOME_RECEIVED.send(p, "" + income);	
 					}
 				});
 			}

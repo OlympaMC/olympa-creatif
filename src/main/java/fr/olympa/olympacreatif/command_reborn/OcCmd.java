@@ -189,7 +189,7 @@ public class OcCmd extends AbstractCmd {
 		else if (plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0).toString()) != null)
 			getPlayer().getInventory().addItem(plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0).toString()));
 		else
-			OCmsg.UNKNOWN_MB.send(getPlayer(), cmd.getArgument(0));
+			OCmsg.OCO_UNKNOWN_MB.send(getPlayer(), cmd.getArgument(0));
 	}
 
 	@Cmd(player = true, syntax = "Afficher le magasin du Créatif")
