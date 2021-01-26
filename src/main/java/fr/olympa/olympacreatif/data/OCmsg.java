@@ -169,7 +169,7 @@ public class OCmsg {
     public static final OCmsg WE_DISABLED = new OCmsg(null);
     public static final OCmsg WE_ERR_INSUFFICIENT_PERMISSION = new OCmsg(null);
     public static final OCmsg WE_PLOT_EXPORT_FAILED = new OCmsg(null);
-    public static final OCmsg WE_PLOT_RESETING = new OCmsg(null);
+    //public static final OCmsg WE_PLOT_RESETING = new OCmsg(null);
     public static final OCmsg WE_START_GENERATING_PLOT_SCHEM = new OCmsg(null);
     
     public static final OCmsg PLOT_LEAVED = new OCmsg(null);
@@ -263,7 +263,7 @@ public class OCmsg {
 			if (o instanceof Plot)
 				setPlayerPlot = false;
 		
-		if (setPlayerPlot) {
+		if (setPlayerPlot && pc != null) {
 			Object[] args2 = new Object[args.length + 1];
 			for (int i = 0 ; i < args.length ; i++)
 				args2[i] = args[i];

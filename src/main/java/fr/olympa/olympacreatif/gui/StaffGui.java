@@ -134,7 +134,7 @@ public class StaffGui extends IGui {
 						//resetingPlots.remove(plot.getPlotId());
 						//resetingPlots.add(plot.getPlotId());
 						
-						OCmsg.WE_PLOT_RESETING.send(p, plot);
+						//OCmsg.WE_PLOT_RESETING.send(p, plot);
 						
 						setItem(7 + 9, getStateIndicator(true, p3), null);
 					});

@@ -137,7 +137,7 @@ public class DataManager implements Listener {
 
 	private final OlympaStatement osUpdatePlotSchem = new OlympaStatement(
 			"INSERT INTO creatif_plotschems" +
-					"(`server_id`, `plot_id`, `server_id`, `player_id`, `schem_name`, `schem_data`) " +
+					"(`server_id`, `plot_id`, `player_id`, `schem_name`, `schem_data`) " +
 					"VALUES (?, ?, ?, ?, ?) " +
 					"ON DUPLICATE KEY UPDATE " +
 					"player_id = VALUES(player_id), " +

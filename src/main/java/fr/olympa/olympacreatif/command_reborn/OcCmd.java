@@ -78,13 +78,13 @@ public class OcCmd extends AbstractCmd {
 
 	
 	
-	@Cmd(player = true, syntax = "Expulser un visiteur de la parcelle (pour supprimer un membre, faites /members)", args = "PLAYERS", min = 1)
+	@Cmd(player = true, syntax = "Expulser un visiteur de la parcelle", args = "PLAYERS", min = 1)
 	public void kick(CommandContext cmd) {
 		plugin.getCmdLogic().kickPlayerFromPlot(getOlympaPlayer(), cmd.getArgument(0));
 	}
 	
 	
-	@Cmd(player = true, syntax = "Bannir un visiteur de la parcelle (pour supprimer un membre, faites /members)", args = "PLAYERS", min = 1)
+	@Cmd(player = true, syntax = "Bannir un visiteur de la parcelle", args = "PLAYERS", min = 1)
 	public void ban(CommandContext cmd) {
 		plugin.getCmdLogic().banPlayerFromPlot(getOlympaPlayer(), cmd.getArgument(0));
 	}
@@ -107,7 +107,7 @@ public class OcCmd extends AbstractCmd {
 		plugin.getCmdLogic().visitPlot(getOlympaPlayer(),PlotId.fromId(plugin, cmd.getArgument(0)));
 	}
 	
-	@Cmd(player = true, syntax = "Visiter la parcelle d'un joueur (§7/oc visitp <pseudo> [id]", args = {"PLAYERS", "INTEGER"}, min = 1)
+	@Cmd(player = true, syntax = "Visiter la parcelle d'un joueur", args = {"PLAYERS", "INTEGER"}, min = 1)
 	public void visitp(CommandContext cmd) {
 		if (cmd.getArgumentsLength() >= 2)
 			plugin.getCmdLogic().visitPlotFrom(getOlympaPlayer(), cmd.getArgument(0), cmd.getArgument(1));
