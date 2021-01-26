@@ -25,6 +25,7 @@ import fr.olympa.olympacreatif.gui.ShopGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
+import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class OcCmd extends AbstractCmd {
 
@@ -195,6 +196,20 @@ public class OcCmd extends AbstractCmd {
 	@Cmd(player = true, syntax = "Afficher le magasin du Créatif")
 	public void shop(CommandContext cmd) {
 		new ShopGui(MainGui.getMainGui(getOlympaPlayer())).create(getPlayer());
+	}
+
+	@Cmd(player = true, syntax = "Redevenir simple visiteur sur la parcelle actuelle")
+	public void leave(CommandContext cmd) {
+		OlympaPlayerCreatif pc = getOlympaPlayer();
+		PlotRank rank = pc.getCurrentPlot().getMembers().getPlayerRank(pc);
+		
+		if (pc.getCurrentPlot() == null || rank == PlotRank.VISITOR || rank == PlotRank.OWNER) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.BUILD);
+			return;
+		}
+		
+		OCmsg.PLOT_LEAVED.send(pc);
+			
 	}
 }
 

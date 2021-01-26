@@ -172,6 +172,8 @@ public class OCmsg {
     public static final OCmsg WE_PLOT_RESETING = new OCmsg(null);
     public static final OCmsg WE_START_GENERATING_PLOT_SCHEM = new OCmsg(null);
     
+    public static final OCmsg PLOT_LEAVED = new OCmsg(null);
+    
 	private static final Map<String, Function<OlympaPlayerCreatif, String>> playerPlaceHolders = ImmutableMap.<String, Function<OlympaPlayerCreatif,String>>builder()
 			.put("%playerName", pc -> {return pc.getName();})
 			//.put("%plotOwnerName", pc -> {return pc.getCurrentPlot() == null ? "aucun" : pc.getCurrentPlot().getMembers().getOwner().getName();})
