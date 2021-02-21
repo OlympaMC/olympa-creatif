@@ -84,7 +84,7 @@ public class OcoCmd extends AbstractCmd {
 		plugin.getPerksManager().getSchematicCreator().export(plot, getOlympaPlayer());
 	}
 
-
+	/*
 	@Cmd(player = true, syntax = "Définir votre vitesse de vol", args = "INTEGER", min = 1)
 	public void speed(CommandContext cmd) {
 		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
@@ -100,6 +100,5 @@ public class OcoCmd extends AbstractCmd {
 		
 		getPlayer().setFlySpeed(level);
 		OCmsg.OCO_SET_FLY_SPEED.send(getPlayer(), cmd.getArgument(0).toString());
-	}
-
+	}*/
 }

@@ -15,6 +15,7 @@ import fr.olympa.api.lines.TimerLine;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.report.ReportReason;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.api.server.OlympaServer;
@@ -24,13 +25,19 @@ import fr.olympa.olympacreatif.command_LEGACY.OcaCommand;
 import fr.olympa.olympacreatif.command_LEGACY.OcoCommand;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.commands.CmdsLogic;
+import fr.olympa.olympacreatif.commands.MenuCommand;
+import fr.olympa.olympacreatif.commands.MicroblockCommand;
 import fr.olympa.olympacreatif.commands.OcCmd;
 import fr.olympa.olympacreatif.commands.OcaCmd;
 import fr.olympa.olympacreatif.commands.OcoCmd;
+import fr.olympa.olympacreatif.commands.SkullCommand;
+import fr.olympa.olympacreatif.commands.SpawnCommand;
+import fr.olympa.olympacreatif.commands.SpeedCommand;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.PermissionsManager;
+import fr.olympa.olympacreatif.data.ReportReasonsList;
 import fr.olympa.olympacreatif.perks.PerksManager;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
@@ -84,14 +91,19 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		OlympaCore.getInstance().setOlympaServer(OlympaServer.CREATIF);
 		
 		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
-		OlympaPermission.registerPermissions(PermissionsList.class);
 		
-		//new OcCommand(this, "oc", OcCommand.subArgsList.toArray(new String[OcCommand.subArgsList.size()])).register();
-		//new OcoCommand(this, "oco", OcoCommand.subArgsList.toArray(new String[OcoCommand.subArgsList.size()])).register();
-		//new OcaCommand(this, "oca", OcaCommand.subArgsList.toArray(new String[OcaCommand.subArgsList.size()])).register();
+		OlympaPermission.registerPermissions(PermissionsList.class);
+		ReportReason.registerReason(new ReportReasonsList().getClass());
+		
 		new OcCmd(this).register();
 		new OcoCmd(this).register();
 		new OcaCmd(this).register();
+		
+		new MenuCommand(this).register();
+		new MicroblockCommand(this).register();
+		new SkullCommand(this).register();
+		new SpeedCommand(this).register();
+		new SpawnCommand(this).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA), plugin);
 		
@@ -173,7 +185,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 					return getLine(p.getOlympaPlayer(), OlympaPlayerCreatif.scoreboardLinesSize + 1);
 				}, plugin, 20),
 				
-				new FixedLine<Scoreboard<OlympaPlayerCreatif>>("§6play.olympa.fr"));
+				new FixedLine<Scoreboard<OlympaPlayerCreatif>>("§9play.olympa.fr"));
 	}
 
 	public String getLine(OlympaPlayerCreatif p, int i) {

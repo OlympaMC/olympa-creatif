@@ -36,8 +36,8 @@ public class OcCmd extends AbstractCmd {
 	}
 
 
-	@Cmd (player = true, syntax = "Acquérir une parcelle")
-	public void claim(CommandContext cmd) {
+	@Cmd (player = true, syntax = "Trouver et claim une parcelle")
+	public void find(CommandContext cmd) {
 		plugin.getCmdLogic().claimNewPlot(getOlympaPlayer());
 	}
 	
@@ -152,15 +152,16 @@ public class OcCmd extends AbstractCmd {
 	}
 
 	
+	/*
 	@Cmd(player = true, syntax = "Retourner au spawn du Créatif")
 	public void spawn(CommandContext cmd) {
 		OCparam.SPAWN_LOC.get().teleport(getPlayer());
 		OCmsg.TELEPORTED_TO_WORLD_SPAWN.send(getPlayer());
-	}
+	}*/
 
 	
 	@Cmd(player = true, syntax = "Retourner au spawn de la parcelle")
-	public void pspawn(CommandContext cmd) {
+	public void spawn(CommandContext cmd) {
 		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
 		
 		if (plot == null)
@@ -171,7 +172,7 @@ public class OcCmd extends AbstractCmd {
 		}
 	}
 
-	
+	/*
 	@Cmd(player = true, syntax = "Obtenir la tête d'un joueur", args = "PLAYERS", min = 1)
 	public void skull(CommandContext cmd) {
 		if (!PermissionsList.USE_SKULL_COMMAND.hasPermissionWithMsg(getOlympaPlayer()))
@@ -180,8 +181,9 @@ public class OcCmd extends AbstractCmd {
 		Consumer<ItemStack> consumer = sk -> getPlayer().getInventory().addItem(sk);
 		ItemUtils.skull(consumer, "§6Tête de " + cmd.getArgument(0), cmd.getArgument(0));
 		OCmsg.OCO_HEAD_GIVED.send(getPlayer(), cmd.getArgument(0));
-	}
+	}*/
 
+	/*
 	@Cmd(player = true, syntax = "Ouvrir le menu des microblocs ou en obtenir une définie")
 	public void mb(CommandContext cmd) {
 		if (!PermissionsList.USE_MICRO_BLOCKS.hasPermissionWithMsg(getOlympaPlayer()) || !PlotPerm.BUILD.has((OlympaPlayerCreatif) getOlympaPlayer()))
@@ -193,7 +195,7 @@ public class OcCmd extends AbstractCmd {
 			getPlayer().getInventory().addItem(plugin.getPerksManager().getMicroBlocks().getMb(cmd.getArgument(0).toString()));
 		else
 			OCmsg.OCO_UNKNOWN_MB.send(getPlayer(), cmd.getArgument(0));
-	}
+	}*/
 
 	@Cmd(player = true, syntax = "Afficher le magasin du Créatif")
 	public void shop(CommandContext cmd) {

@@ -123,6 +123,9 @@ public class PlotParameters {
 					}else if (param.getDefaultValue() instanceof Boolean) {
 						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Boolean.class));
 						
+					}else if (param.getDefaultValue() instanceof Position) {
+						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Position.class));
+						
 					}else if (param.getDefaultValue() instanceof WeatherType) {
 						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), WeatherType.class));
 						
