@@ -175,7 +175,7 @@ public class KitsManager {
 		
 	}
 	
-	public enum KitType{
+	public static enum KitType{
 		REDSTONE("hasRedstoneKit", "redstone"),
 		PEACEFUL_MOBS("hasPeacefulMobsKit", "animaux"),
 		HOSTILE_MOBS("hasHostileMobsKit", "monstres"),

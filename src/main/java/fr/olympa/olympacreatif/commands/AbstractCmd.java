@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.command_reborn;
+package fr.olympa.olympacreatif.commands;
 
 import fr.olympa.api.command.complex.ComplexCommand;
 import fr.olympa.api.permission.OlympaSpigotPermission;

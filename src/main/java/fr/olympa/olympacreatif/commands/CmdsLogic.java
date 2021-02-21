@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.command_reborn;
+package fr.olympa.olympacreatif.commands;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -230,7 +230,7 @@ public class CmdsLogic {
 			if (plot == null)
 				pc.getPlayer().teleport(id.getLocation());
 			else
-				pc.getPlayer().teleport(plot.getParameters().getSpawnLoc());
+				plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
 			OCmsg.TELEPORT_IN_PROGRESS.send(pc);
 		}
 	}
@@ -241,7 +241,7 @@ public class CmdsLogic {
 		id -= 1;
 		
 		if (id >= 0 && id < plots.size()) {
-			pc.getPlayer().teleport(plots.get(id).getParameters().getSpawnLoc());
+			plots.get(id).getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
 			OCmsg.TELEPORT_IN_PROGRESS.send(pc, plots.get(id));
 		}else
 			OCmsg.INVALID_PLOT_ID.send(pc);

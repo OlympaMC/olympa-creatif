@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.command_reborn;
+package fr.olympa.olympacreatif.commands;
 
 import java.util.Collections;
 import java.util.Comparator;

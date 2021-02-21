@@ -52,14 +52,14 @@ import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 @Deprecated
-public class WorldEditManager extends EventHandler implements Listener {
+public class WorldEditManagerLEGACY extends EventHandler implements Listener {
 
 	private OlympaCreatifMain plugin;
 	private boolean isWePresent = false;
 	private boolean isWeEnabled = false;
 	private IAsyncWorldEdit awe ;
 	
-	public WorldEditManager(OlympaCreatifMain plugin) {
+	public WorldEditManagerLEGACY(OlympaCreatifMain plugin) {
 		super(Priority.NORMAL);
 		
 		this.plugin = plugin;

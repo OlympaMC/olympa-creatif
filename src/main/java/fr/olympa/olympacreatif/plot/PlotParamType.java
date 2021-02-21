@@ -14,6 +14,7 @@ import org.bukkit.WeatherType;
 import org.bukkit.block.Biome;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Position;
 
 public class PlotParamType<T extends Object> implements Cloneable {
 	public static PlotParamType<Boolean> FORCE_SPAWN_LOC = new PlotParamType<Boolean>("FORCE_SPAWN_LOC", false);
@@ -29,9 +30,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	public static PlotParamType<Boolean> KEEP_MAX_FOOD_LEVEL = new PlotParamType<Boolean>("KEEP_MAX_FOOD_LEVEL", true);
 	public static PlotParamType<Boolean> KEEP_INVENTORY_ON_DEATH = new PlotParamType<Boolean>("KEEP_INVENTORY_ON_DEATH", true);
 	
-	public static PlotParamType<Integer> SPAWN_LOC_X = new PlotParamType<Integer>("SPAWN_LOC_X", 0);
-	public static PlotParamType<Integer> SPAWN_LOC_Y = new PlotParamType<Integer>("SPAWN_LOC_Y", 0);
-	public static PlotParamType<Integer> SPAWN_LOC_Z = new PlotParamType<Integer>("SPAWN_LOC_Z", 0);
+	public static PlotParamType<Position> SPAWN_LOC = new PlotParamType<Position>("SPAWN_LOC", new Position());
 	
 	public static PlotParamType<Integer> PLOT_TIME = new PlotParamType<Integer>("PLOT_TIME", 6000);
 

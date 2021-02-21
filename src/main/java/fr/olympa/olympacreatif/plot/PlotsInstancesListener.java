@@ -16,6 +16,8 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -36,6 +38,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -141,6 +144,17 @@ public class PlotsInstancesListener implements Listener{
 			}
 		}.runTaskTimer(plugin, 10, 1);
 	}
+	
+	/*@EventHandler(priority = EventPriority.HIGHEST)
+	public void onEvent(HangingEvent e) {
+		if (e instanceof Cancellable)
+			if (((Cancellable)e).isCancelled())
+				Bukkit.broadcastMessage("§cCancelled event : "+ e);
+			else
+				Bukkit.broadcastMessage("§aNot cancelled event : "+ e);
+		else
+			Bukkit.broadcastMessage("§7Uncancellable event : "+ e);
+	}*/
 
 	////////////////////////////////////////////////////////////
 	//                      BLOCKS EVENTS                     //
@@ -364,16 +378,6 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (clickedBlock == null)
 			return;
-		/*
-		if (clickedBlock == null) {
-			if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
-				e.setCancelled(true);
-				
-				if (e.getAction() != Action.LEFT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_AIR)
-					e.getPlayer().sendMessage(Message.PLOT_CANT_INTERRACT_NULL_PLOT.getValue());
-			}
-			return;
-		}*/
 
 		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 
@@ -386,7 +390,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		//test si permission d'interagir avec le bloc donné
-		if (!PlotPerm.BUILD.has(plot, pc) && e.getClickedBlock() != null &&
+		if (!PlotPerm.BUILD.has(plot, pc) && 
 				PlotParamType.getAllPossibleIntaractibleBlocks().contains(e.getClickedBlock().getType()) &&
 				!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(e.getClickedBlock().getType()) ) {
 			e.setCancelled(true);
@@ -518,7 +522,7 @@ public class PlotsInstancesListener implements Listener{
 				//e.setTo(plotTo.getOutLoc());
 				e.setCancelled(true);
 			else if (plotTo.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC))
-				e.setTo(plotTo.getParameters().getSpawnLoc());
+				e.setTo(plotTo.getParameters().getParameter(PlotParamType.SPAWN_LOC).toLoc());
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST) //actions à effectuer lors de la sortie/entrée d'un joueur
@@ -541,7 +545,7 @@ public class PlotsInstancesListener implements Listener{
 				//plotTo.teleportOut(e.getPlayer());
 				e.setCancelled(true);
 			else if (plotTo.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC))
-				e.setTo(plotTo.getParameters().getSpawnLoc());
+				e.setTo(plotTo.getParameters().getParameter(PlotParamType.SPAWN_LOC).toLoc());
 			
 		//actions de sortie de plot
 		if (plotFrom != null) 
@@ -559,12 +563,13 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		
-		//Bukkit.broadcastMessage("death " + e.getEntity() + " - plot : " + plot + " - damages : " + e.getFinalDamage() + " - health : "  + ((Player)e.getEntity()).getHealth());
-		
 		if (plot == null) {
 			e.setCancelled(true);
 			return;	
 		}
+		
+		if (e.getDamager().getType() == EntityType.PLAYER && PlotPerm.BUILD.has(plot, (OlympaPlayerCreatif)AccountProvider.get(e.getDamager().getUniqueId())))
+			return;
 		
 		if (!plot.getParameters().getParameter(PlotParamType.ALLOW_PVP) && e.getEntityType() == EntityType.PLAYER && e.getDamager().getType() == EntityType.PLAYER) {
 			e.setCancelled(true);
@@ -609,6 +614,11 @@ public class PlotsInstancesListener implements Listener{
 
 	@EventHandler //cancel remove paintings et itemsframes
 	public void onItemFrameDestroy(HangingBreakByEntityEvent e) {
+		//Bukkit.broadcastMessage("Hanging break : " + e.getEntity().getLocation());
+		
+		if (e.getRemover().getType() == null)
+			return;
+		
 		if (e.getRemover().getType() != EntityType.PLAYER) {
 			e.setCancelled(true);
 			return;

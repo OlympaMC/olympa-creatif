@@ -343,7 +343,7 @@ public class Plot {
 		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {
 			//tp au spawn de la zone
 			if (tpToPlotSpawn && parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-				p.teleport(parameters.getSpawnLoc());
+				parameters.getParameter(PlotParamType.SPAWN_LOC).teleport(p);
 				OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc);
 			}
 			

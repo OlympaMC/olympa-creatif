@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.command;
+package fr.olympa.olympacreatif.command_LEGACY;
 
 import java.util.ArrayList;
 import java.util.Arrays;

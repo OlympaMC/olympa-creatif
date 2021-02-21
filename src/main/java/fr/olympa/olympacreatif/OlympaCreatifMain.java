@@ -19,14 +19,14 @@ import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.api.server.OlympaServer;
 import fr.olympa.core.spigot.OlympaCore;
-import fr.olympa.olympacreatif.command.OcCommand;
-import fr.olympa.olympacreatif.command.OcaCommand;
-import fr.olympa.olympacreatif.command.OcoCommand;
-import fr.olympa.olympacreatif.command_reborn.OcCmd;
-import fr.olympa.olympacreatif.command_reborn.OcaCmd;
-import fr.olympa.olympacreatif.command_reborn.OcoCmd;
-import fr.olympa.olympacreatif.command_reborn.CmdsLogic;
+import fr.olympa.olympacreatif.command_LEGACY.OcCommand;
+import fr.olympa.olympacreatif.command_LEGACY.OcaCommand;
+import fr.olympa.olympacreatif.command_LEGACY.OcoCommand;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
+import fr.olympa.olympacreatif.commands.CmdsLogic;
+import fr.olympa.olympacreatif.commands.OcCmd;
+import fr.olympa.olympacreatif.commands.OcaCmd;
+import fr.olympa.olympacreatif.commands.OcoCmd;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
@@ -39,7 +39,7 @@ import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.IWorldEditManager;
 import fr.olympa.olympacreatif.worldedit.OcFastAsyncWorldEdit;
 import fr.olympa.olympacreatif.worldedit.OcWorldEdit;
-import fr.olympa.olympacreatif.worldedit.WorldEditManager;
+import fr.olympa.olympacreatif.worldedit.WorldEditManagerLEGACY;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
 

@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.command_reborn;
+package fr.olympa.olympacreatif.commands;
 
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;

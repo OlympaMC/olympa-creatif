@@ -40,14 +40,14 @@ public class FakePlayerDeathEvent extends Event{
 		this.p = p;
 		this.plot = deathPlot;
 		
-		Location respawnLoc = OCparam.SPAWN_LOC.get().toLoc();
+		Position respawnLoc = OCparam.SPAWN_LOC.get();
 		
 		for (PotionEffect pot : p.getActivePotionEffects())
 			p.removePotionEffect(pot.getType());
 		
 				
 		if (plot != null) {
-			respawnLoc = plot.getParameters().getSpawnLoc();
+			respawnLoc = plot.getParameters().getParameter(PlotParamType.SPAWN_LOC);
 			
 			if (!plot.getParameters().getParameter(PlotParamType.KEEP_INVENTORY_ON_DEATH)) {
 				p.getInventory().forEach(item -> {if (item != null) plugin.getWorldManager().getWorld().dropItemNaturally(p.getLocation(), item);});
@@ -56,7 +56,7 @@ public class FakePlayerDeathEvent extends Event{
 			}
 		}
 		
-		p.teleport(respawnLoc);
+		respawnLoc.teleport(p);
 		p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 		p.setFoodLevel(20);
 	}

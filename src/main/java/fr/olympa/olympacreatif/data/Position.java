@@ -24,6 +24,14 @@ public class Position {
 		this.pitch = pitch;
 	}
 	
+	public Position(Location loc) {
+		this.x = loc.getX();
+		this.y = loc.getY();
+		this.z = loc.getZ();
+		this.yaw = loc.getYaw();
+		this.pitch = loc.getPitch();
+	}
+	
 	public Location toLoc() {
 		return new Location(OlympaCreatifMain.getInstance().getWorldManager().getWorld(), x, y, z, yaw, pitch);
 	}

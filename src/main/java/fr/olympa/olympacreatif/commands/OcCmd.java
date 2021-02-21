@@ -1,4 +1,4 @@
-package fr.olympa.olympacreatif.command_reborn;
+package fr.olympa.olympacreatif.commands;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +17,7 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.Position;
 import fr.olympa.olympacreatif.gui.IGui;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.MembersGui;
@@ -24,6 +25,7 @@ import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
 import fr.olympa.olympacreatif.gui.ShopGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
+import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
@@ -133,8 +135,8 @@ public class OcCmd extends AbstractCmd {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.SET_PLOT_SPAWN);
 				
 		else {
-			if (plot.getParameters().setSpawnLoc(getPlayer().getLocation()))
-				OCmsg.PLOT_SPAWN_LOC_SET.send(getPlayer());
+			PlotParamType.SPAWN_LOC.setValue(plot, new Position(getPlayer().getLocation()));
+			OCmsg.PLOT_SPAWN_LOC_SET.send(getPlayer());
 		}
 	}
 
@@ -164,7 +166,7 @@ public class OcCmd extends AbstractCmd {
 		if (plot == null)
 			OCmsg.INVALID_PLOT_ID.send(getPlayer());
 		else {
-			getPlayer().teleport(plot.getParameters().getSpawnLoc());
+			plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(getPlayer());
 			OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(getPlayer(), plot);	
 		}
 	}

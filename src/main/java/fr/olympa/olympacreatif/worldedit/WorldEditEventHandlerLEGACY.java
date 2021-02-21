@@ -22,11 +22,11 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
 @Deprecated
-public class WorldEditEventHandler {
+public class WorldEditEventHandlerLEGACY {
 
 	private OlympaCreatifMain plugin;
 	
-	protected WorldEditEventHandler(OlympaCreatifMain plugin) {
+	protected WorldEditEventHandlerLEGACY(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		plugin.getLogger().info("§aEditSessionEvent handler enregistré");
 	}

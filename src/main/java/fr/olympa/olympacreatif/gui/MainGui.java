@@ -19,6 +19,7 @@ import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
+import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 
 public class MainGui extends IGui {
@@ -76,7 +77,7 @@ public class MainGui extends IGui {
 			setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle"), 
 					(it, c, s) -> {
 						p.getPlayer().closeInventory();
-						p.getPlayer().teleport(plot.getParameters().getSpawnLoc());
+						plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(p.getPlayer());
 						OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(p);
 					});	
 		}
@@ -88,7 +89,7 @@ public class MainGui extends IGui {
 				(it, c, s) -> {
 					if (plugin.getPlotsManager().getPlots().size() > 0) {
 						Plot plotR = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
-						p.getPlayer().teleport(plotR.getParameters().getSpawnLoc());
+						plotR.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(p.getPlayer());
 						OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(p);
 					}
 				});

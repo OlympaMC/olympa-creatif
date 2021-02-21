@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.Position;
 
 public class PlotParameters {
 
@@ -48,7 +49,7 @@ public class PlotParameters {
 				}
 		
 		if (id != null)
-			setSpawnLoc(id.getLocation().clone().add(0.5, 3, 0.5));
+			setParameter(PlotParamType.SPAWN_LOC, new Position(id.getLocation().clone().add(0.5, 3, 0.5)));
 	}
 
 	/**
@@ -69,6 +70,7 @@ public class PlotParameters {
 		return Collections.unmodifiableSet(parameters.keySet());
 	}
 	
+	/*
 	public synchronized Location getSpawnLoc() {
 		return new Location(plugin.getWorldManager().getWorld(), 
 				getParameter(PlotParamType.SPAWN_LOC_X), 
@@ -85,7 +87,7 @@ public class PlotParameters {
 			return true;
 		} else
 			return false;
-	}
+	}*/
 	
 	
 	@SuppressWarnings("unchecked")
@@ -95,8 +97,8 @@ public class PlotParameters {
 		for (PlotParamType<?> param : getParameters())
 			json.put(param.getId(), parameters.get(param).toString());
 
-		if (!id.isInPlot(getSpawnLoc()))
-			System.out.println("§cERREUR SAVE SPAWN PLOT " + id + " : " + getSpawnLoc() + " IS OUT OF PLOT AREA");
+		/*if (!id.isInPlot(getSpawnLoc()))
+			System.out.println("§cERREUR SAVE SPAWN PLOT " + id + " : " + getSpawnLoc() + " IS OUT OF PLOT AREA");*/
 		
 		return json.toString();
 	}
@@ -135,8 +137,8 @@ public class PlotParameters {
 						
 					}
 			
-			if (!plotId.isInPlot(params.getSpawnLoc()))
-				System.out.println("§4ERREUR LOAD SPAWN PLOT " + plotId + " : " + params.getSpawnLoc() + " IS OUT OF PLOT AREA");
+			/*if (!plotId.isInPlot(params.getSpawnLoc()))
+				System.out.println("§4ERREUR LOAD SPAWN PLOT " + plotId + " : " + params.getSpawnLoc() + " IS OUT OF PLOT AREA");*/
 			
 			return params;
 		} catch (ParseException e) {
