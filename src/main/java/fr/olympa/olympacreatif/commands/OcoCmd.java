@@ -62,9 +62,9 @@ public class OcoCmd extends AbstractCmd {
 		
 		String debug = "\n   §6>>> Débug entités parcelle " + plot.getPlotId() + " :";
 		for (Entity e : entList)
-			debug += "\n   §e> " + e.getType().toString().toLowerCase() + "§7(" + (e.getCustomName() == null ? "" : e.getCustomName()) + "§7), " + 
+			debug += "\n   §e> " + e.getType().toString().toLowerCase() + (e.getCustomName() == null ? "" : " " + e.getCustomName()) + "§7, " + 
 					e.getLocation().getBlockX() + " " + e.getLocation().getBlockY() + " " + e.getLocation().getBlockZ() + " : " + 
-					(!e.isDead() ? "§avivante" : "§cmorte §4(contactez un staff)");
+					(!e.isDead() ? "§avivante" : "§4CONTACTEZ UN STAFF");
 		
 		getPlayer().sendMessage(debug);
 	}
