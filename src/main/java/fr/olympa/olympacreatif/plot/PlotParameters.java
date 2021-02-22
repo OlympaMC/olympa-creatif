@@ -93,9 +93,10 @@ public class PlotParameters {
 	@SuppressWarnings("unchecked")
 	public synchronized String toJson() {
 		JSONObject json = new JSONObject();
+		Gson gson = new Gson();
 		
 		for (PlotParamType<?> param : getParameters())
-			json.put(param.getId(), parameters.get(param).toString());
+			json.put(param.getId(), gson.toJson(parameters.get(param)));
 
 		/*if (!id.isInPlot(getSpawnLoc()))
 			System.out.println("§cERREUR SAVE SPAWN PLOT " + id + " : " + getSpawnLoc() + " IS OUT OF PLOT AREA");*/
@@ -113,7 +114,9 @@ public class PlotParameters {
 			
 			for (PlotParamType<?> param : params.getParameters())
 				if (json.containsKey(param.getId()))
-
+					params.setParameter(param, gson.fromJson((String) json.get(param.getId()), param.getDefaultValue().getClass()));
+					
+			/*
 					if (param.getDefaultValue() instanceof Integer) {
 						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Integer.class));
 						
@@ -138,7 +141,7 @@ public class PlotParameters {
 						else if (param.equals(PlotParamType.LIST_ALLOWED_INTERRACTION))
 							params.setParameter(param, gson.fromJson((String) json.get(param.getId()), new TypeToken<ArrayList<Material>>(){}.getType()));
 						
-					}
+					}*/
 			
 			/*if (!plotId.isInPlot(params.getSpawnLoc()))
 				System.out.println("§4ERREUR LOAD SPAWN PLOT " + plotId + " : " + params.getSpawnLoc() + " IS OUT OF PLOT AREA");*/
