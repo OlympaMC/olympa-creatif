@@ -209,7 +209,7 @@ public class MusicManager implements Listener {
 		}
 
 		@Override
-		public void click(ItemStack existing, Player p) {
+		public void click(ItemStack existing, Player p, ClickType click) {
 		}
 
 		@Override

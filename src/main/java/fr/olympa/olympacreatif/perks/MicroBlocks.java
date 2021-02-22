@@ -19,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -97,7 +98,7 @@ public class MicroBlocks {
 		}
 
 		@Override
-		public void click(ItemStack existing, Player p) {
+		public void click(ItemStack existing, Player p, ClickType click) {
 			ItemStack it = ItemUtils.name(existing.clone(), existing.getItemMeta().getDisplayName());
 			p.getInventory().addItem(it);
 		}
