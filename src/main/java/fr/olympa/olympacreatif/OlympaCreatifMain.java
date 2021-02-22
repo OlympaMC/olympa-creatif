@@ -1,13 +1,6 @@
 package fr.olympa.olympacreatif;
 
 import java.util.Random;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
-
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 import fr.olympa.api.command.essentials.tp.TpaHandler;
 import fr.olympa.api.lines.FixedLine;
@@ -20,9 +13,6 @@ import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.api.server.OlympaServer;
 import fr.olympa.core.spigot.OlympaCore;
-import fr.olympa.olympacreatif.command_LEGACY.OcCommand;
-import fr.olympa.olympacreatif.command_LEGACY.OcaCommand;
-import fr.olympa.olympacreatif.command_LEGACY.OcoCommand;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.commands.CmdsLogic;
 import fr.olympa.olympacreatif.commands.MenuCommand;
@@ -46,7 +36,6 @@ import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.IWorldEditManager;
 import fr.olympa.olympacreatif.worldedit.OcFastAsyncWorldEdit;
 import fr.olympa.olympacreatif.worldedit.OcWorldEdit;
-import fr.olympa.olympacreatif.worldedit.WorldEditManagerLEGACY;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
 
@@ -55,17 +44,17 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private PlotsManager plotsManager;
 	private PerksManager perksManager;
 	private CommandBlocksManager cbManager;
-	
+
 	private CmdsLogic cmdLogic;
 
 	private PermissionsManager permsManager;
 	private IWorldEditManager weManager = null;
-	
+
 	//private LuckPerms luckperms;
-	
+
 	/*private WorldEditPlugin we = null;
 	private IAsyncWorldEdit awe = null;*/
-	
+
 	private static OlympaCreatifMain plugin;
 
 	private ScoreboardManager<OlympaPlayerCreatif> scm;
@@ -73,32 +62,31 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	public Random random = new Random();
 
 	/*
-	@Override //defines the custom world generator 
+	@Override //defines the custom world generator
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
 		return new CustomChunkGenerator(this);
 	}*/
-	
+
 	public static OlympaCreatifMain getInstance() {
 		return plugin;
 	}
 
-	
-	@Override 
+	@Override
 	public void onEnable() {
 		super.onEnable();
-		
+
 		plugin = this;
 		OlympaCore.getInstance().setOlympaServer(OlympaServer.CREATIF);
-		
+
 		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
-		
+
 		OlympaPermission.registerPermissions(PermissionsList.class);
-		ReportReason.registerReason(new ReportReasonsList().getClass());
-		
+		ReportReason.registerReason(ReportReasonsList.class);
+
 		new OcCmd(this).register();
 		new OcoCmd(this).register();
 		new OcaCmd(this).register();
-		
+
 		new MenuCommand(this).register();
 		new MicroblockCommand(this).register();
 		new SkullCommand(this).register();
@@ -106,45 +94,44 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new SpawnCommand(this).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA), plugin);
-		
+
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);
 		perksManager = new PerksManager(this);
 		plotsManager = new PlotsManager(this);
 		cbManager = new CommandBlocksManager(this);
 		permsManager = new PermissionsManager(this);
-		
+
 		cmdLogic = new CmdsLogic(this);
-		
+
 		if (getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") != null)
 			weManager = new OcFastAsyncWorldEdit(this);
 		else if (getServer().getPluginManager().getPlugin("WorldEdit") != null && getServer().getPluginManager().getPlugin("AsyncWorldEdit") != null)
 			weManager = new OcWorldEdit(this);
-		
+
 		//OlympaCorePermissions.GROUP_COMMAND.allowGroup(OlympaGroup.DEV);
-		
+
 		//get luckperms api provider
 		/*
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-		if (provider != null) 
+		if (provider != null)
 			luckperms = provider.getProvider();*/
-		
-		
+
 		//hook into worldedit & asyncworldedit
-		
+
 		/*
 		we = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
-	    awe = (IAsyncWorldEdit) getServer().getPluginManager().getPlugin("AsyncWorldEdit");
-	    
+		awe = (IAsyncWorldEdit) getServer().getPluginManager().getPlugin("AsyncWorldEdit");
+		
 		if (we != null) {
 			we.getWorldEdit().getEventBus().register(new WorldEditListener(this));
-			
+
 			if (awe == null) {
 				Bukkit.getPluginManager().disablePlugin(we);
 				Bukkit.getLogger().log(Level.WARNING, getPrefixConsole() + "WorldEdit disabled because AsyncWorldEdit wasn't found.");
 			}
 		}
-		
+
 		if (awe != null) {
 			awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
 			Bukkit.getLogger().log(Level.FINE, getPrefixConsole() + "Successfully loaded WorldEdit and AWE custom progressbar.");
@@ -157,18 +144,19 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		super.onDisable();
 
 		//save plots
-		for (Plot plot : getPlotsManager().getPlots()) {
-			plot.unload();
-			getDataManager().addPlotToSaveQueue(plot, true);	
-		}
-		
-		scm.unload();
+		if (getPlotsManager() != null)
+			for (Plot plot : getPlotsManager().getPlots()) {
+				plot.unload();
+				getDataManager().addPlotToSaveQueue(plot, true);
+			}
+		if (scm != null)
+			scm.unload();
 	}
 
 	//crée le scoreboard du joueur avec des lignes dynamiques, pour afficher le scoreboard custom du plot si besoin
 	@SuppressWarnings("unchecked")
 	public void createScoreboard(int serverIndex) {
-		scm = new ScoreboardManager<OlympaPlayerCreatif>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
+		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
 
 		//initialisation lignes scoreboard
 		for (int i = 0; i < OlympaPlayerCreatif.scoreboardLinesSize; i++) {
@@ -184,7 +172,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 				new TimerLine<Scoreboard<OlympaPlayerCreatif>>(p -> {
 					return getLine(p.getOlympaPlayer(), OlympaPlayerCreatif.scoreboardLinesSize + 1);
 				}, plugin, 20),
-				
+
 				new FixedLine<Scoreboard<OlympaPlayerCreatif>>("§9play.olympa.fr"));
 	}
 
@@ -238,7 +226,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		}
 		return "";
 	}
-	
+
 	private String getAsRomanNumber(int i) {
 		switch (i) {
 		case 1:
@@ -277,7 +265,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	public CommandBlocksManager getCommandBlocksManager() {
 		return cbManager;
 	}
-	
+
 	public CmdsLogic getCmdLogic() {
 		return cmdLogic;
 	}
