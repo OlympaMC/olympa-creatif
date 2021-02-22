@@ -147,7 +147,7 @@ public class PlotParameters {
 				System.out.println("§4ERREUR LOAD SPAWN PLOT " + plotId + " : " + params.getSpawnLoc() + " IS OUT OF PLOT AREA");*/
 			
 			return params;
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return params;
 		}

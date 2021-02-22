@@ -201,7 +201,7 @@ public class CmdsLogic {
 		Plot plot = pc.getCurrentPlot();
 		
 		List<Long> list = plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS);
-		ComponentBuilder component = new ComponentBuilder(Prefix.DEFAULT.toString() + "§e>> Joueurs bannis de la parcelle " + plot + " : ");
+		ComponentBuilder component = new ComponentBuilder(Prefix.DEFAULT.toString() + "§eJoueurs bannis de la parcelle " + plot + " : ");
 		
 		for (int i = 0 ; i < list.size() ; i++) {
 			String target = AccountProvider.getPlayerInformations(list.get(i)).getName();
