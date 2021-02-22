@@ -16,6 +16,8 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 
+
+
 public abstract class IGui extends OlympaGUI{
 
 	protected OlympaCreatifMain plugin;

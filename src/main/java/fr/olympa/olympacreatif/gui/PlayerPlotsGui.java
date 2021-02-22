@@ -18,6 +18,8 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 
+
+
 public class PlayerPlotsGui extends IGui {
 	
 	private List<Plot> playerPlots = new ArrayList<Plot>();

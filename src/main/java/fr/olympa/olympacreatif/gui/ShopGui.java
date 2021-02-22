@@ -23,6 +23,8 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
+
+
 public class ShopGui extends IGui{
 
 	private ItemStack ranksRowHead;

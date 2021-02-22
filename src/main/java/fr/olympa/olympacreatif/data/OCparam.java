@@ -19,6 +19,8 @@ import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
+
+
 public class OCparam<T> {
 	public static final OCparam<Integer> CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK = new OCparam<Integer>(4);
 	public static final OCparam<Integer> CB_MAX_CMDS_LEFT = new OCparam<Integer>(0);

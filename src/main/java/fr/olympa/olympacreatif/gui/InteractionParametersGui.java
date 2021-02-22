@@ -20,6 +20,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
+
 public class InteractionParametersGui extends IGui {
 
 	private String[] stateAllowed = new String[] {" ", "§eEtat : §aautorisé", "§7Cliquez pour changer l'état. Si autorisé, les visiteurs", "§7pourront interragir avec ce bloc, sinon non."};

@@ -60,6 +60,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import fr.olympa.olympacreatif.world.WorldManager;
 
+
 public class StaffGui extends IGui {
 	
 	private static final Set<PlotId> resetingPlots = new HashSet<PlotId>();

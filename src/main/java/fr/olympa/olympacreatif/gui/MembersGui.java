@@ -16,6 +16,7 @@ import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
+
 public class MembersGui extends IGui {
 	
 	public MembersGui(IGui gui) {

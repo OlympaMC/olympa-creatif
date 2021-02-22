@@ -29,6 +29,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
+
 public class PlotParametersGui extends IGui {
 	
 	private String[] clickToChange = null;

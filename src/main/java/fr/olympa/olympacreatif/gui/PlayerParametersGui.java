@@ -14,6 +14,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
 
+
+
 public class PlayerParametersGui extends IGui{
 	
 	public PlayerParametersGui(IGui gui) {

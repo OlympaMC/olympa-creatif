@@ -22,6 +22,14 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 
+
+
+
+
+
+
+
+
 public class MainGui extends IGui {
 	
 	private MainGui(OlympaCreatifMain plugin, OlympaPlayerCreatif player, Plot plot, String inventoryName) {

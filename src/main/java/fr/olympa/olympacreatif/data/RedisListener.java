@@ -5,11 +5,9 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.world.WorldManager;
 import redis.clients.jedis.JedisPubSub;
 
 public class RedisListener extends JedisPubSub {
