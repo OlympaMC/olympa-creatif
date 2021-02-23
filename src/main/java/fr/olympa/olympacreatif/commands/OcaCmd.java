@@ -66,7 +66,7 @@ public class OcaCmd extends AbstractCmd {
 			return;
 		}
 
-		OCmsg.STAFF_DEACTIVATE_COMPONENT.send(getPlayer(), cmd.getArgument(0));
+		OCmsg.STAFF_DEACTIVATE_COMPONENT.send(getPlayer(), (String) cmd.getArgument(0));
 	}
 	
 	
