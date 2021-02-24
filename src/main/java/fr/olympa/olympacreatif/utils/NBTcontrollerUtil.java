@@ -38,7 +38,7 @@ public abstract class NBTcontrollerUtil {
 			return new NBTTagCompound();
 		}
 	}
-	
+	 
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
 		return getValidTags(tag, 0);
 	}
