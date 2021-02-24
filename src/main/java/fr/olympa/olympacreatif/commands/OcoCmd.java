@@ -22,8 +22,6 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class OcoCmd extends AbstractCmd {
-
-	private Map<PlotId, String> plotsResetVerifCode = new HashMap<PlotId, String>();
 	
 	public OcoCmd(OlympaCreatifMain plugin) {
 		super(plugin, "oco", null, "Commandes spécialisées du Créatif");
@@ -88,43 +86,6 @@ public class OcoCmd extends AbstractCmd {
 		}
 
 		plugin.getPerksManager().getSchematicCreator().export(plot, getOlympaPlayer());
-	}
-	
-	@Cmd(player = true, syntax = "Réinitialiser une parcelle", description = "/oca resetplot <plot> [confirmationCode]")
-	public void resetplot(CommandContext cmd) {
-		if (!PermissionsList.STAFF_RESET_PLOT.hasPermissionWithMsg(getOlympaPlayer()))
-			return;
-		
-		Plot plot = cmd.getArgumentsLength() == 0 ? ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromString(plugin, cmd.getArgument(0)));
-		
-		if (plot == null) {
-			OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
-			return;
-		}
-		
-		if (!plotsResetVerifCode.containsKey(plot.getPlotId())) {
-			String check = "";
-			for (int i = 0 ; i < 5 ; i++) check += (char) plugin.random.nextInt(26) + 'a';
-			
-			plotsResetVerifCode.put(plot.getPlotId(), check);
-			
-			Prefix.DEFAULT.sendMessage(getPlayer(), "§dVeuillez saisir la commande /oca resetplot %s %s pour réinitialiser la parcelle %s (%s). \n§cAttention cette action est irréversible !!", plot.getPlotId(), check, plot.getPlotId(), plot.getMembers().getOwner().getName());
-			
-			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getPlotId()), 400);
-			
-		} else if (cmd.getArgumentsLength() != 2) {
-			Prefix.DEFAULT.sendMessage(getPlayer(), "§dVeuillez saisir la commande /oca resetplot %s %s pour réinitialiser la parcelle %s (%s). \n§cAttention cette action est irréversible !!", plot.getPlotId(), plotsResetVerifCode.get(plot.getPlotId()), plot.getPlotId(), plot.getMembers().getOwner().getName());
-			
-		}else {			
-			if (!plotsResetVerifCode.containsKey(plot.getPlotId()) || !plotsResetVerifCode.get(plot.getPlotId()).equals(cmd.getArgument(1))) {
-				Prefix.DEFAULT.sendMessage(getPlayer(), "§dLe code renseigné n'est pas valide.");
-				return;
-			}
-			
-			plugin.getWEManager().resetPlot(getPlayer(), plot);
-			plotsResetVerifCode.remove(plot.getPlotId());
-			//Prefix.DEFAULT.sendMessage(getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());
-		}
 	}
 
 	/*

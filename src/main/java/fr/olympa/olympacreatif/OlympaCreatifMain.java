@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif;
 import java.util.Random;
 
 import fr.olympa.api.command.essentials.tp.TpaHandler;
+import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
 import fr.olympa.api.permission.OlympaPermission;
@@ -167,13 +168,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 						return getLine(p.getOlympaPlayer(), line);
 					}, plugin, 20));
 		}
-		scm.addFooters(
-
-				new TimerLine<Scoreboard<OlympaPlayerCreatif>>(p -> {
-					return getLine(p.getOlympaPlayer(), OlympaPlayerCreatif.scoreboardLinesSize + 1);
-				}, plugin, 20),
-
-				new FixedLine<Scoreboard<OlympaPlayerCreatif>>("§9play.olympa.fr"));
+		scm.addFooters(CyclingLine.olympaAnimation());
 	}
 
 	public String getLine(OlympaPlayerCreatif p, int i) {
