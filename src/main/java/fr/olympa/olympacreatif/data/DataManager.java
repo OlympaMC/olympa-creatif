@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,36 +53,36 @@ public class DataManager implements Listener {
 	private int serverIndex = -1;
 
 	//statements de création des tables
-	private final OlympaStatement osTableCreateMessages = new OlympaStatement(
+	private final String osTableCreateMessages =
 			"CREATE TABLE IF NOT EXISTS `creatif_messages` (" +
 					"`message_id` TINYTEXT NOT NULL DEFAULT ''," +
 					"`message_string` VARCHAR(512) NOT NULL DEFAULT ''," +
-					"PRIMARY KEY (`message_id`));");
+					"PRIMARY KEY (`message_id`));";
 
-	private final OlympaStatement osTableCreateServerParams = new OlympaStatement(
+	private final String osTableCreateServerParams =
 			"CREATE TABLE IF NOT EXISTS `creatif_server_params` (" +
 					"`server_id` INT NOT NULL," +
 					"`server_params` VARCHAR(8192) NOT NULL DEFAULT ''," +
-					"PRIMARY KEY (`server_id`));");
+					"PRIMARY KEY (`server_id`));";
 
-	private final OlympaStatement osTableCreatePlotSchems = new OlympaStatement(
+	private final String osTableCreatePlotSchems =
 			"CREATE TABLE IF NOT EXISTS `creatif_plotschems` (" +
 					"`server_id` INT NOT NULL," +
 					"`plot_id` INT NOT NULL," +
 					"`player_id` BIGINT(20) NOT NULL," +
 					"`schem_name` VARCHAR(128) NOT NULL DEFAULT ''," +
 					"`schem_data` MEDIUMBLOB NOT NULL," +
-					"PRIMARY KEY (`server_id`, `plot_id`));");
+					"PRIMARY KEY (`server_id`, `plot_id`));";
 
-	private final OlympaStatement osTableCreatePlotParameters = new OlympaStatement(
+	private final String osTableCreatePlotParameters =
 			"CREATE TABLE IF NOT EXISTS `creatif_plotsdatas` (" +
 					"`server_id` INT NOT NULL," +
 					"`plot_id` INT NOT NULL," +
 					"`plot_creation_date` DATETIME NOT NULL DEFAULT NOW()," +
 					"`plot_parameters` VARCHAR(8192) NOT NULL DEFAULT '', " +
-					"PRIMARY KEY (`server_id`, `plot_Id`));");
+					"PRIMARY KEY (`server_id`, `plot_Id`));";
 
-	private final OlympaStatement osTableCreatePlotMembers = new OlympaStatement(
+	private final String osTableCreatePlotMembers =
 			"CREATE TABLE IF NOT EXISTS `creatif_plotsmembers` (" +
 					"`server_id` INT NOT NULL," +
 					"`plot_id` INT NOT NULL," +
@@ -89,11 +90,11 @@ public class DataManager implements Listener {
 					"`player_name` VARCHAR(64) NOT NULL," +
 					"`player_uuid` VARCHAR(256) NOT NULL," +
 					"`player_plot_level` TINYINT NOT NULL DEFAULT 0," +
-					"PRIMARY KEY (`server_id`, `plot_id`, `player_id`));");
+					"PRIMARY KEY (`server_id`, `plot_id`, `player_id`));";
 
 	//statements select
-	private final OlympaStatement osSelectMessages = new OlympaStatement(
-			"SELECT * FROM creatif_messages;");
+	private final String osSelectMessages =
+			"SELECT * FROM creatif_messages;";
 
 	private final OlympaStatement osSelectPlotOwner = new OlympaStatement(
 			"SELECT * FROM creatif_plotsmembers WHERE `server_id` = ? AND `plot_id` = ? AND `player_plot_level` = ?;");
@@ -164,13 +165,14 @@ public class DataManager implements Listener {
 
 		//création tables
 		try {
-			osTableCreateMessages.getStatement().execute();
-			osTableCreateServerParams.getStatement().execute();
-			osTableCreatePlotSchems.getStatement().execute();
-			osTableCreatePlotParameters.getStatement().execute();
-			osTableCreatePlotMembers.getStatement().execute();
-
-			ResultSet messages = osSelectMessages.getStatement().executeQuery();
+			Statement statement = OlympaCore.getInstance().getDatabase().createStatement();
+			statement.execute(osTableCreateMessages);
+			statement.execute(osTableCreateServerParams);
+			statement.execute(osTableCreatePlotSchems);
+			statement.execute(osTableCreatePlotParameters);
+			statement.execute(osTableCreatePlotMembers);
+			
+			ResultSet messages = statement.executeQuery(osSelectMessages);
 
 			Map<String, OCmsg> ocMsgs = OCmsg.values();
 			Set<String> inexistantMessagesInBdd = new HashSet<>();
@@ -185,6 +187,8 @@ public class DataManager implements Listener {
 					plugin.getLogger().info("Message " + messages.getString("message_id") + " existant EN BDD mais pas dans le plugin, veuillez supprimer l'entrée.");
 
 			inexistantMessagesInBdd.forEach(msg -> plugin.getLogger().warning("§eMessage " + msg + " existant DANS LE PLUGIN mais pas en bdd, veuiller ajouter l'entrée !"));
+			messages.close();
+			statement.close();
 			//System.out.println(ocMsgs);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -235,36 +239,35 @@ public class DataManager implements Listener {
 			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de charger un nouveau joueur !");
 			return;
 		}
-
-		try {
-			//get player plots
-			PreparedStatement getPlayerPlots = osSelectPlayerPlots.getStatement();
+		
+		//get player plots
+		try (PreparedStatement getPlayerPlots = osSelectPlayerPlots.createStatement()) {
 			getPlayerPlots.setLong(1, serverIndex);
 			getPlayerPlots.setLong(2, e.getOlympaPlayer().getId());
-			ResultSet getPlayerPlotsResult = getPlayerPlots.executeQuery();
-
+			ResultSet getPlayerPlotsResult = osSelectPlayerPlots.executeQuery(getPlayerPlots);
+			
 			while (getPlayerPlotsResult.next()) {
 				PlotId id = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
-
+				
 				//update player name in members table
 				if (!e.getPlayer().getName().equals(getPlayerPlotsResult.getString("player_name")) && !getPlayerPlotsResult.getString("player_name").equals("Spawn")) {
-					PreparedStatement updPlayerMember = osUpdatePlayerPlotRank.getStatement();
-					updPlayerMember.setInt(1, serverIndex);
-					updPlayerMember.setInt(2, id.getId());
-					updPlayerMember.setLong(3, e.getOlympaPlayer().getId());
-					updPlayerMember.setString(4, e.getPlayer().getName());
-					updPlayerMember.setString(5, e.getOlympaPlayer().getUniqueId().toString());
-					updPlayerMember.setInt(6, getPlayerPlotsResult.getInt("player_plot_level"));
-
-					updPlayerMember.executeUpdate();
+					try (PreparedStatement updPlayerMember = osUpdatePlayerPlotRank.createStatement()) {
+						updPlayerMember.setInt(1, serverIndex);
+						updPlayerMember.setInt(2, id.getId());
+						updPlayerMember.setLong(3, e.getOlympaPlayer().getId());
+						updPlayerMember.setString(4, e.getPlayer().getName());
+						updPlayerMember.setString(5, e.getOlympaPlayer().getUniqueId().toString());
+						updPlayerMember.setInt(6, getPlayerPlotsResult.getInt("player_plot_level"));
+						
+						osUpdatePlayerPlotRank.executeUpdate(updPlayerMember);
+					}
 				}
-
+				
 				//add plot to load task
 				addPlotToLoadQueue(id, false);
 			}
-
-		} catch (SQLException | IllegalArgumentException e1) {
-			e1.printStackTrace();
+		}catch (SQLException ex) {
+			ex.printStackTrace();
 		}
 	}
 
@@ -281,39 +284,42 @@ public class DataManager implements Listener {
 		try {
 
 			//création plotParameters
-			PreparedStatement getPlotDatas;
-			getPlotDatas = osSelectPlotDatas.getStatement();
+			PreparedStatement getPlotDatas = osSelectPlotDatas.createStatement();
 			getPlotDatas.setInt(1, serverIndex);
 			getPlotDatas.setInt(2, plotId.getId());
-			ResultSet getPlotDatasResult = getPlotDatas.executeQuery();
+			ResultSet getPlotDatasResult = osSelectPlotDatas.executeQuery(getPlotDatas);
 
-			if (!getPlotDatasResult.next())
+			if (!getPlotDatasResult.next()) {
+				getPlotDatas.close();
 				return;
+			}
 
 			PlotParameters plotParams = PlotParameters.fromJson(plugin, plotId, getPlotDatasResult.getString("plot_parameters"));
+			getPlotDatasResult.close();
+			getPlotDatas.close();
 
 			//get owner id
-			PreparedStatement getPlotOwner = osSelectPlotOwner.getStatement();
+			PreparedStatement getPlotOwner = osSelectPlotOwner.createStatement();
 			getPlotOwner.setInt(1, serverIndex);
 			getPlotOwner.setInt(2, plotId.getId());
 			getPlotOwner.setInt(3, 4);
-			ResultSet getPlotOwnerResult = getPlotOwner.executeQuery();
+			ResultSet getPlotOwnerResult = osSelectPlotOwner.executeQuery(getPlotOwner);
 			getPlotOwnerResult.next();
 
 			//get owner data
-			PreparedStatement getPlayerDatas = osSelectPlayerDatas.getStatement();
+			PreparedStatement getPlayerDatas = osSelectPlayerDatas.createStatement();
 			getPlayerDatas.setLong(1, getPlotOwnerResult.getLong("player_id"));
-			ResultSet getPlotOwnerDatasResult = getPlayerDatas.executeQuery();
+			ResultSet getPlotOwnerDatasResult = osSelectPlayerDatas.executeQuery(getPlayerDatas);
 			getPlotOwnerDatasResult.next();
 
 			//création plotMembers
 			PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(
 					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())));
 
-			PreparedStatement getPlotMembers = osSelectPlotPlayers.getStatement();
+			PreparedStatement getPlotMembers = osSelectPlotPlayers.createStatement();
 			getPlotMembers.setInt(1, serverIndex);
 			getPlotMembers.setInt(2, plotId.getId());
-			ResultSet getPlotPlayersResult = getPlotMembers.executeQuery();
+			ResultSet getPlotPlayersResult = osSelectPlotPlayers.executeQuery(getPlotMembers);
 
 			while (getPlotPlayersResult.next()) {
 				MemberInformations member = plotMembers.new MemberInformations(
@@ -334,6 +340,13 @@ public class DataManager implements Listener {
 					getPlotOwnerDatasResult.getBoolean(KitType.FLUIDS.getBddKey()));
 
 			plugin.getPlotsManager().addAsyncPlot(plot);
+			
+			getPlotOwnerResult.close();
+			getPlotOwner.close();
+			getPlotOwnerDatasResult.close();
+			getPlayerDatas.close();
+			getPlotPlayersResult.close();
+			getPlotMembers.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -359,29 +372,32 @@ public class DataManager implements Listener {
 			int id = plot.getPlotId().getId();
 
 			//update plot datas
-			PreparedStatement updPlotParams = osUpdatePlotDatas.getStatement();
+			PreparedStatement updPlotParams = osUpdatePlotDatas.createStatement();
 			updPlotParams.setInt(1, serverIndex);
 			updPlotParams.setInt(2, id);
 			updPlotParams.setString(3, plot.getParameters().toJson());
-			updPlotParams.executeUpdate();
+			osUpdatePlotDatas.executeUpdate(updPlotParams);
+			updPlotParams.close();
 
 			//update plot members
 			for (Entry<MemberInformations, PlotRank> e : plot.getMembers().getList().entrySet())
 				if (e.getValue() == PlotRank.VISITOR) {
-					PreparedStatement delPlotMember = osDeletePlayerPlotRank.getStatement();
+					PreparedStatement delPlotMember = osDeletePlayerPlotRank.createStatement();
 					delPlotMember.setInt(1, serverIndex);
 					delPlotMember.setInt(2, id);
 					delPlotMember.setLong(3, e.getKey().getId());
-					delPlotMember.executeUpdate();
+					osDeletePlayerPlotRank.executeUpdate(delPlotMember);
+					delPlotMember.close();
 				} else {
-					PreparedStatement updPlotMember = osUpdatePlayerPlotRank.getStatement();
+					PreparedStatement updPlotMember = osUpdatePlayerPlotRank.createStatement();
 					updPlotMember.setInt(1, serverIndex);
 					updPlotMember.setInt(2, id);
 					updPlotMember.setLong(3, e.getKey().getId());
 					updPlotMember.setString(4, e.getKey().getName());
 					updPlotMember.setString(5, e.getKey().getUUID().toString());
 					updPlotMember.setInt(6, e.getValue().getLevel());
-					updPlotMember.executeUpdate();
+					osUpdatePlayerPlotRank.executeUpdate(updPlotMember);
+					updPlotMember.close();
 				}
 		} catch (SQLException e) {
 			plugin.getLogger().log(Level.SEVERE, "§4Failed to save plot " + plot + " !");
@@ -396,17 +412,23 @@ public class DataManager implements Listener {
 		}
 
 		try {
-			PreparedStatement ps = osCountPlots.getStatement();
+			PreparedStatement ps = osCountPlots.createStatement();
 			ps.setInt(1, serverIndex);
-			ResultSet result = ps.executeQuery();
+			ResultSet result = osCountPlots.executeQuery(ps);
 			result.next();
 
-			PreparedStatement ps2 = osCountPlots2.getStatement();
+			PreparedStatement ps2 = osCountPlots2.createStatement();
 			ps2.setInt(1, serverIndex);
-			ResultSet result2 = ps2.executeQuery();
-			result2.next();
+			ResultSet result2 = osCountPlots2.executeQuery(ps2);
+			result2.next(); // what ?
 
-			return result.getInt(1);
+			int finalResult = result.getInt(1);
+			
+			result.close();
+			ps.close();
+			result2.close();
+			ps2.close();
+			return finalResult;
 		} catch (SQLException e) {
 			e.printStackTrace();
 
@@ -421,14 +443,15 @@ public class DataManager implements Listener {
 		}
 
 		try {
-			PreparedStatement ps = osUpdatePlotSchem.getStatement();
+			PreparedStatement ps = osUpdatePlotSchem.createStatement();
 
 			ps.setInt(1, serverIndex);
 			ps.setInt(2, plot.getPlotId().getId());
 			ps.setLong(3, p.getId());
 			ps.setString(4, schem.getName());
 			ps.setBlob(5, new FileInputStream(schem));
-			ps.executeUpdate();
+			osUpdatePlotSchem.executeUpdate(ps);
+			ps.close();
 
 		} catch (SQLException | FileNotFoundException e) {
 			e.printStackTrace();
@@ -438,10 +461,10 @@ public class DataManager implements Listener {
 	public void updateWithServerIndex(int i) {
 		serverIndex = i;
 		try {
-			PreparedStatement ps = osSelectServerParams.getStatement();
+			PreparedStatement ps = osSelectServerParams.createStatement();
 			ps.setInt(1, serverIndex);
 
-			ResultSet result = ps.executeQuery();
+			ResultSet result = osSelectServerParams.executeQuery(ps);
 
 			if (result.next())
 				OCparam.fromJson(result.getString("server_params"));
@@ -454,11 +477,14 @@ public class DataManager implements Listener {
 					}
 				}.runTaskLater(plugin, 1);
 			}
+			result.close();
+			ps.close();
 
-			PreparedStatement ps2 = osUpdateServerParams.getStatement();
+			PreparedStatement ps2 = osUpdateServerParams.createStatement();
 			ps2.setInt(1, serverIndex);
 			ps2.setString(2, OCparam.toJson());
-			ps2.executeUpdate();
+			osUpdateServerParams.executeUpdate(ps2);
+			ps2.close();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
