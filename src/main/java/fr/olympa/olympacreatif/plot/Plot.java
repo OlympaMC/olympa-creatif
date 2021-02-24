@@ -398,4 +398,9 @@ public class Plot {
 		if (plugin.getWEManager() != null)
 			plugin.getWEManager().clearClipboard(this, p);
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Plot && ((Plot)o).getPlotId().equals(plotId);
+	}
 }

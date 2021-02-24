@@ -30,6 +30,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
@@ -82,7 +83,8 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 			int zMax = zMin + OCparam.PLOT_SIZE.get() - 1;
 
 			try (EditSession session = new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld())))) {
-				requester.sendMessage("§dLa réinitialisation de la parcelle " + plot + " a commencé.");
+				Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s a commencé.", plot);
+				
 				for (int x = xMin ; x <= xMax ; x++)
 					for (int z = zMin ; z <= zMax ; z++)
 						session.setBlock(x, 0, z, BlockTypes.BEDROCK);
@@ -101,8 +103,8 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 						for (int y = WorldManager.worldLevel + 1 ; y < 256 ; y++)
 							session.setBlock(x, y, z, BlockTypes.AIR);							
 			}
-			
-			requester.sendMessage("§dLa réinitialisation de la parcelle " + plot + " est terminée !");
+
+			Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s est terminée !", plot);
 			
 			resetingPlots.remove(plot.getPlotId());
 		});

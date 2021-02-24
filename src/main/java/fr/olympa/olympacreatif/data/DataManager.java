@@ -227,6 +227,7 @@ public class DataManager implements Listener {
 			savePlotToBddSync(plot);
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onJoinAsync(AsyncPlayerPreLoginEvent e) {
 		if (serverIndex == -1)
