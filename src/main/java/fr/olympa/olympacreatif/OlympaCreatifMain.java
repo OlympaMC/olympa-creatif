@@ -269,4 +269,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	public CmdsLogic getCmdLogic() {
 		return cmdLogic;
 	}
+	
+	public PermissionsManager getPermissionsManager() {
+		return permsManager;
+	}
 }

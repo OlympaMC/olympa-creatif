@@ -98,15 +98,14 @@ public class StaffGui extends IGui {
 		//désactivation worldedit et tags custom
 
 		final OlympaPermission p1 = PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS;
-		setItem(5, ItemUtils.item(Material.PAPER, "§6Désactivation de tous les tags custom", "§2Fonction de sécurité.", "§2Clic molette pour modifier.", " ", "§7Permet de désactiver tous", "§7les tags NBT custom sur le serveur en cas", "§7de problème.", " ", "§cAttention : au redémarage, les tags custom seront de nouveau activés !"), 
+		setItem(5, ItemUtils.item(Material.PAPER, "§6Désactivation commandblocks et commandes vanilla", "§2Fonction de sécurité.", "§2Clic molette pour modifier.", " ", "§7Permet de désactiver les commandblocks", "§7ainsi que toutes les commandes ", "§7vanilla (/tellraw, /kill, ...)", "§7en cas de de problème.", " ", "§cAttention : au redémarage, les commandblocks et ", "§ccommandes vanilla seront de nouveau activés !"), 
 				(it, c, s) -> {
 					if (!p1.hasPermission(p) || c != ClickType.MIDDLE)
 						return;
-					
-					NBTcontrollerUtil.setDenyAllCustomFlags(!NBTcontrollerUtil.getDenyAllCustomFlags());
-					setItem(5 + 9, getStateIndicator(NBTcontrollerUtil.getDenyAllCustomFlags(), p1), null);
+					plugin.getCommandBlocksManager().setCbActivationState(!plugin.getCommandBlocksManager().isCbEnabled());
+					setItem(5 + 9, getStateIndicator(plugin.getCommandBlocksManager().isCbEnabled(), p1), null);
 				});	
-		setItem(5 + 9, getStateIndicator(NBTcontrollerUtil.getDenyAllCustomFlags(), p1), null);
+		setItem(5 + 9, getStateIndicator(plugin.getCommandBlocksManager().isCbEnabled(), p1), null);
 
 		
 		if (plugin.getWEManager() != null) {

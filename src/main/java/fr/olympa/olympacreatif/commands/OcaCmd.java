@@ -31,15 +31,15 @@ public class OcaCmd extends AbstractCmd {
 			plugin.getCmdLogic().sendPlotsList(getOlympaPlayer(), cmd.getArgument(0));
 	}
 
-	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|nbttags"}, min = 1)
+	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|commandblocks"}, min = 1)
 	public void activate(CommandContext cmd) {
 		switch(cmd.getArgument(0).toString()) {
 		case "worldedit":
 			plugin.getWEManager().setWeActivationState(true);
 			break;
 		
-		case "nbttags":
-			NBTcontrollerUtil.setDenyAllCustomFlags(false);
+		case "commandblocks":
+			plugin.getCommandBlocksManager().setCbActivationState(true);
 			break;
 			
 		default:
@@ -47,18 +47,18 @@ public class OcaCmd extends AbstractCmd {
 			return;
 		}
 
-		OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), cmd.getArgument(0));
+		OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), (String) cmd.getArgument(0));
 	}
 
-	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|nbttags"}, min = 1)
+	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|commandblocks"}, min = 1)
 	public void deactivate(CommandContext cmd) {
 		switch(cmd.getArgument(0).toString()) {
 		case "worldedit":
 			plugin.getWEManager().setWeActivationState(false);
 			break;
 		
-		case "nbttags":
-			NBTcontrollerUtil.setDenyAllCustomFlags(true);
+		case "commandblocks":
+			plugin.getCommandBlocksManager().setCbActivationState(false);
 			break;
 			
 		default:

@@ -73,6 +73,10 @@ public class CbCommandListener implements Listener {
 			return;
 		
 		e.setCancelled(true);
+		
+		if (!plugin.getCommandBlocksManager().isCbEnabled())
+			return;
+		
 		//Bukkit.broadcastMessage("CB : " + e.getSender() + " - " + blockedExecutionLocs.get(((CraftBlockCommandSender) e.getSender()).getBlock().getLocation()));
 		
 		CommandBlock cb = ((CommandBlock)((CraftBlockCommandSender)e.getSender()).getBlock().getState());
@@ -105,7 +109,8 @@ public class CbCommandListener implements Listener {
 		CommandType cmdType = CbCommand.getCommandType(e.getMessage());
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		
-		if (p.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS) && (cmdType == CommandType.teleport || cmdType == CommandType.tp || cmdType == CommandType.clear))
+		if (!plugin.getCommandBlocksManager().isCbEnabled() || 
+				p.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS) && (cmdType == CommandType.teleport || cmdType == CommandType.tp || cmdType == CommandType.clear))
 			return;
 		
 		if (cmdType != null)

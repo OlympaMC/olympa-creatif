@@ -17,7 +17,7 @@ import net.minecraft.server.v1_16_R3.PacketPlayOutEntityStatus;
 public class CommandBlocksManager {
 
 	private OlympaCreatifMain plugin;
-	
+	private boolean cbActivation = true;
 	//scoreboards inutilisés qui seront réaffectés au besoin à d'autres plots chargés ultérieurement	 
 	//private List<Scoreboard> unusedScoreboards = new ArrayList<Scoreboard>();
 	
@@ -47,17 +47,13 @@ public class CommandBlocksManager {
 		//Bukkit.getServer().getPluginManager().getPermission("minecraft.command.gamemode").setDefault(PermissionDefault.TRUE);
 	}
 	
-	/*
-	public Scoreboard getScoreboardForPlotCbData() {
-		if (unusedScoreboards.size() == 0)
-			return Bukkit.getScoreboardManager().getNewScoreboard();
-		else
-			return unusedScoreboards.remove(0);
+	public boolean isCbEnabled() {
+		return cbActivation;
 	}
-
-	public void addUnusedScoreboard(Scoreboard scb) {
-		unusedScoreboards.add(scb);
-	}*/
+	
+	public void setCbActivationState(boolean b) {
+		plugin.getPermissionsManager().setCbPerms(cbActivation = b);
+	}
 	
 	//Actions à exécuter en entrée et sortie de plot
 	public void executeJoinActions(Plot toPlot, Player p) {

@@ -65,7 +65,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 
 	@Override
 	public void setWeActivationState(boolean b) {
-		isEnabled = b;
+		plugin.getPermissionsManager().setWePerms(isEnabled = b);
 	}
 
 	@Override
@@ -142,7 +142,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 	    	final OlympaPlayerCreatif p = AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId());
 	    	final Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
-	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p)) {
+	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p) || !isWeEnabled()) {
 	    		OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.send(p);
 	    		return null;
 	    	}
@@ -156,7 +156,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
             	
                 @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
-                	return isWeEnabled() ? PlotPerm.USE_WE.has(plot, p) : false;
+                	return PlotPerm.USE_WE.has(plot, p);
                 }
             };
 	    }

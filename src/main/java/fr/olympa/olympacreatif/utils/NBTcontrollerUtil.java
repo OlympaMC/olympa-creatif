@@ -29,16 +29,6 @@ public abstract class NBTcontrollerUtil {
 	private final static int maxListSize = 10;
 	
 	private final static TagsValues allowedTags = new TagsValues();
-
-	private static boolean denyAllCustomTags = false;
-	
-	public static void setDenyAllCustomFlags(boolean bool) {
-		denyAllCustomTags = bool;
-	}
-	
-	public static boolean getDenyAllCustomFlags() {
-		return denyAllCustomTags;
-	}
 	
 	public static NBTTagCompound getValidTags(String string) {
 		try {
@@ -50,11 +40,6 @@ public abstract class NBTcontrollerUtil {
 	}
 	
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
-		//Bukkit.broadcastMessage("Tag initial : " + tag);
-		//Bukkit.broadcastMessage("Tag vérifié : " + getValidTags(tag, 0));
-		if (denyAllCustomTags)
-			return new NBTTagCompound();
-		
 		return getValidTags(tag, 0);
 	}
 	
