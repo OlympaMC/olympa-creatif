@@ -113,17 +113,15 @@ public class OcaCmd extends AbstractCmd {
 
 			sendMessage(Prefix.INFO, "§6>>> Informations générales Créatif " + plugin.getDataManager().getServerIndex());
 
-			sendMessage(Prefix.INFO, "§7Etat des composants");
-			sendHoverAndCommand(Prefix.INFO, "§eWorldedit activé : " + (ComponentCreatif.WORLDEDIT.isActivated() ? "§aOUI" : "§cNON"),
-					"§7Cliquez ici pour changer la valeur", 
-					"/oca " + (ComponentCreatif.WORLDEDIT.isActivated() ? "deactivate" : "activate") + " worldedit");
-			sendHoverAndCommand(Prefix.INFO, "§eCommandblocks activés : " + (ComponentCreatif.COMMANDBLOCKS.isActivated() ? "§aOUI" : "§cNON"),
-					"§7Cliquez ici pour changer la valeur", 
-					"/oca " + (ComponentCreatif.COMMANDBLOCKS.isActivated() ? "deactivate" : "activate") + " commandblocks");
-			
+			sendMessage(Prefix.INFO, "§6Etat des composants");
+			for (ComponentCreatif component : ComponentCreatif.values())
+				sendHoverAndCommand(Prefix.INFO, "§e" + component.getName() + " activé : " + (component.isActivated() ? "§aOUI" : "§cNON"),
+						"§7Cliquez ici pour changer la valeur", 
+						"/oca " + (component.isActivated() ? "deactivate" : "activate") + " " + component.getName());
+				
 			OlympaPlayerCreatif pc = getOlympaPlayer();
 			
-			sendMessage(Prefix.INFO, "§7Etat de vos permissions");
+			sendMessage(Prefix.INFO, "§6Etat de vos permissions");
 			for (StaffPerm perm : StaffPerm.values())
 				sendHoverAndCommand(Prefix.INFO, "§ePermission " + perm.toString().toLowerCase() + " : " + 
 						(pc.hasStaffPerm(perm) ? "§aOUI" : "§cNON"),
@@ -133,14 +131,14 @@ public class OcaCmd extends AbstractCmd {
 		}else if (cmd.getArgument(0).equals("performances")) {
 
 			sendMessage(Prefix.INFO, "§6>>> Informations de performances Créatif " + plugin.getDataManager().getServerIndex());
-			sendMessage(Prefix.INFO, "§7Informations générales");
+			sendMessage(Prefix.INFO, "§6Informations générales");
 			sendMessage(Prefix.INFO, "§eNombre de parcelles chargées : %s", plugin.getPlotsManager().getPlots().size());
 			sendMessage(Prefix.INFO, "§eEntités chargées : %s", plugin.getWorldManager().getWorld().getEntities().size());
 
 			List<Plot> mostEntities = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingInt(plot -> -plot.getEntities().size())).collect(Collectors.toList());
 			List<Plot> mostStoplagDetect = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingInt(plot -> -plot.getStoplagChecker().getCurrentCount())).collect(Collectors.toList());
 
-			sendMessage(Prefix.INFO, "§7Informations parcelles les moins performantes");
+			sendMessage(Prefix.INFO, "§6Informations parcelles les moins performantes");
 			
 			for (int i = 0 ; i < Math.min(3, mostEntities.size()) ; i++)
 				sendHoverAndCommand(Prefix.INFO, "§eLe plus d'entités §4n°" + (i+1) + " §e: " +

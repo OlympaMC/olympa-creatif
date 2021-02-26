@@ -162,6 +162,10 @@ public class PermissionsManager implements Listener{
 			return isActivated;
 		}
 		
+		public String getName() {
+			return name;
+		}
+		
 		public static ComponentCreatif fromString(String s) {
 			for (ComponentCreatif c : ComponentCreatif.values())
 				if (c.toString().equals(s.toUpperCase()))
