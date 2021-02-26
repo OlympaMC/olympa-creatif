@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.bukkit.regions.BukkitMaskManager;
 import com.boydti.fawe.regions.FaweMask;
@@ -35,6 +36,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
@@ -42,7 +44,6 @@ import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcFastAsyncWorldEdit implements IWorldEditManager {
 
-	private boolean isEnabled = true;
 	private OlympaCreatifMain plugin;
 	private Set<PlotId> resetingPlots = new HashSet<PlotId>();
 	
@@ -57,16 +58,6 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 				config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());
 		
 		plugin.getLogger().info("§dLoaded FastAsyncWorldEdit.");
-	}
-
-	@Override
-	public boolean isWeEnabled() {
-		return isEnabled;
-	}
-
-	@Override
-	public void setWeActivationState(boolean b) {
-		plugin.getPermissionsManager().setWePerms(isEnabled = b);
 	}
 
 	@Override
@@ -144,7 +135,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 	    	final OlympaPlayerCreatif p = AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId());
 	    	final Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
-	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p) || !isWeEnabled()) {
+	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p) || !ComponentCreatif.WORLDEDIT.isActivated()) {
 	    		OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.send(p);
 	    		return null;
 	    	}

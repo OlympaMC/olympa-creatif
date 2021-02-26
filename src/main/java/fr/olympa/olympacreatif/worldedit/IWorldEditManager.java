@@ -13,10 +13,6 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public interface IWorldEditManager {
 	
-	public boolean isWeEnabled();
-	
-	public void setWeActivationState(boolean b);
-	
 	public void clearClipboard(Plot plot, Player p);
 	
 	public void resetPlot(Player requester, Plot plot);
@@ -29,7 +25,7 @@ public interface IWorldEditManager {
 			if (e.getMessage().contains("/schem")) {
 				OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 				
-				if (!PermissionsList.STAFF_BYPASS_WORLDEDIT.hasPermissionWithMsg(pc) || !pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT))
+				if (!PermissionsList.STAFF_BYPASS_WORLDEDIT.hasPermissionWithMsg(pc) || !pc.hasStaffPerm(StaffPerm.WORLDEDIT_EVERYWHERE))
 					e.setCancelled(true);
 			}	
 		}

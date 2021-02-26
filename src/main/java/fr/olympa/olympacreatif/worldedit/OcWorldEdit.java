@@ -39,6 +39,7 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
@@ -46,7 +47,6 @@ import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 
-	private boolean weEnabled = true;
 	private  OlympaCreatifMain plugin;
 	private WorldEdit we;
 	private IAsyncWorldEdit awe;
@@ -86,14 +86,6 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 			plugin.getServer().getPluginManager().disablePlugin(plugin.getServer().getPluginManager().getPlugin("goBrush"));
 		
 		plugin.getLogger().info("§dLoaded WorldEdit + AsyncWorldEdit.");
-	}
-	
-	public boolean isWeEnabled() {
-		return weEnabled;
-	}
-	
-	public void setWeActivationState(boolean b) {
-		weEnabled = b;
 	}
 	
 	public void clearClipboard(Plot plot, Player p) {
@@ -214,7 +206,7 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 		Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 
 		
-		if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) && (plot == null || !PlotPerm.USE_WE.has(plot, p))) {
+		if (!p.hasStaffPerm(StaffPerm.WORLDEDIT_EVERYWHERE) && (plot == null || !PlotPerm.USE_WE.has(plot, p))) {
 			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
 		        @Override
 		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
@@ -228,13 +220,10 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 		        @Override
 		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
 		    		//plugin.getPerksManager().getKitsManager().getKitOf(BukkitAdapter.adapt(block.getBlockType()));
-		        	return isWeEnabled() && plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
+		        	return ComponentCreatif.WORLDEDIT.isActivated() && 
+		        			plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
 		        }
 		    });		
-	}
-
-	private BlockVector3 getBV3(Location loc) {
-		return BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	}
 	
 	private World getWeWorld() {

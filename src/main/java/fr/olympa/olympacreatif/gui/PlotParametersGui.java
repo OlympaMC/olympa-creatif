@@ -143,7 +143,7 @@ public class PlotParametersGui extends IGui {
 			ItemStack item2 = item.clone();
 			
 			int mod = 2;
-			if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
+			if (p.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE))
 				mod = 3;
 			
 			int currentState = plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS);

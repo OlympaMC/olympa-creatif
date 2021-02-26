@@ -48,6 +48,7 @@ import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
+import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -181,9 +182,9 @@ public class WorldEventsListener implements Listener{
 			e.setCancelled(true);
 	}
 	
-	@EventHandler //cancel spawn if outside of the creative world
+	@EventHandler(priority = EventPriority.LOW) //cancel spawn if outside of the creative world
 	public void onEntitySpawn(EntitySpawnEvent e) {
-		if (!e.getLocation().getWorld().equals(plugin.getWorldManager().getWorld()))
+		if (!ComponentCreatif.ENTITIES.isActivated() || !e.getLocation().getWorld().equals(plugin.getWorldManager().getWorld()))
 			e.setCancelled(true);
 	}
 

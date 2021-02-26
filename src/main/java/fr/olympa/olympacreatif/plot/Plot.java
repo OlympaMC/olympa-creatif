@@ -310,7 +310,7 @@ public class Plot {
 		//si le joueur est banni, téléportation en dehors du plot
 		if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
 			
-			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN)) {
+			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_BAN)) {
 				OCmsg.PLOT_CANT_ENTER_BANNED.send(pc, this);
 				return false;	
 			}
@@ -319,7 +319,7 @@ public class Plot {
 		pc.setCurrentPlot(this);
 		
 		//ajoute le joueur aux joueurs du plot s'il n'a pas la perm de bypass les commandes vanilla
-		if (!pc.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS))
+		if (!pc.hasStaffPerm(StaffPerm.GHOST_MODE))
 			addPlayerInPlot(p);
 		
 		//exécution instruction commandblock d'entrée

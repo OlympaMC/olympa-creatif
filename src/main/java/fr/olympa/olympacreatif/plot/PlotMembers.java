@@ -90,7 +90,7 @@ public class PlotMembers{
 		if (p == null)
 			return PlotRank.VISITOR;
 		
-		if (p.hasStaffPerm(StaffPerm.FAKE_OWNER_EVERYWHERE))
+		if (p.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE))
 			return PlotRank.OWNER;
 		
 		return getPlayerRank(p.getInformation());

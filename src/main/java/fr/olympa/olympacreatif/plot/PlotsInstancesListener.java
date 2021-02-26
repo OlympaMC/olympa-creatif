@@ -381,7 +381,7 @@ public class PlotsInstancesListener implements Listener{
 		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 
 		if (plot == null) {
-			if (!pc.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT)) {
+			if (!pc.hasStaffPerm(StaffPerm.WORLDEDIT_EVERYWHERE)) {
 				e.setCancelled(true);
 				OCmsg.PLOT_CANT_INTERRACT_NULL_PLOT.send(pc);
 			}

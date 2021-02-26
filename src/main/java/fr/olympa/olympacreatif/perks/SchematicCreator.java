@@ -20,6 +20,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.world.WorldManager;
 
@@ -32,7 +33,7 @@ public class SchematicCreator {
 	}
 	    
 	public void export(Plot plot, OlympaPlayerCreatif p) {
-	    if (!plugin.getWEManager().isWeEnabled()) {
+	    if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 	    	OCmsg.WE_DISABLED.send(p);
 	    	return;
 	    }

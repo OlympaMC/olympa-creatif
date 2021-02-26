@@ -32,6 +32,7 @@ public class PlotStoplagChecker {
 	
 	private Map<StopLagDetect, Integer> detections = new HashMap<PlotStoplagChecker.StopLagDetect, Integer>();
 	private int stoplagCount = 0;
+	private int detectionsCount = 0;
 	private int stoplagResetTick = MinecraftServer.currentTick + forcedStoplagPeriodDuration;
 	
 	public PlotStoplagChecker(OlympaCreatifMain plugin, Plot plot) {
@@ -40,20 +41,18 @@ public class PlotStoplagChecker {
 		
 		for (StopLagDetect sld : StopLagDetect.values())
 			detections.put(sld, 0);
-		
-		/*if (currentPeriod == 0) {
-			currentPeriod++;
-			updatePeriod.runTaskTimer(plugin, periodDuration, periodDuration);
-		}*/
 	}
 	
 	private void resetHistory() {
 		for (StopLagDetect sld : StopLagDetect.values())
 			detections.put(sld, 0);
+		
+		detectionsCount = 0;
 	}
 
 	public void addEvent(StopLagDetect type) {		
 		detections.put(type, detections.get(type) + 1);
+		detectionsCount++;
 		
 		if (detections.get(type) >= type.getMaxPerPeriod())
 			fireStopLag(type);
@@ -86,6 +85,10 @@ public class PlotStoplagChecker {
 				OCmsg.PLOT_FORCED_STOPLAG_FIRED.send(p, type);
 				});
 		}
+	}
+	
+	public int getCurrentCount() {
+		return detectionsCount;
 	}
 
 	public enum StopLagDetect{

@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.PermissionAttachment;
@@ -20,8 +22,10 @@ import fr.olympa.api.LinkSpigotBungee;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaCorePermissions;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.utils.Prefix;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import scala.collection.convert.JavaCollectionWrappers.SetWrapper;
 
 
 
@@ -100,6 +104,70 @@ public class PermissionsManager implements Listener{
 			p.recalculatePermissions();
 			((CraftServer) Bukkit.getServer()).getHandle().getServer().getCommandDispatcher().a(((CraftPlayer) p).getHandle());
 		});
+	}
+	
+	public enum ComponentCreatif {
+		WORLDEDIT("worldedit", () -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(true), 
+				() -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(false)),
+		
+		COMMANDBLOCKS("commandblocks et commandes vanilla", () -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(true), 
+				() -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(false)),
+		
+		ENTITIES("entités", null, () -> OlympaCreatifMain.getInstance().getWorldManager().getWorld().getEntities().stream().filter(e -> 
+		(e.getType() != EntityType.PLAYER && e.getType() != EntityType.ARMOR_STAND && e.getType() != EntityType.ITEM_FRAME)).forEach(e -> e.remove()));
+		
+		private String name;
+		private boolean isActivated = true;
+		private Runnable onActivate;
+		private Runnable onDeactivate;
+		
+		ComponentCreatif(String name, Runnable onActivate, Runnable onDeactivate){
+			this.name = name;
+			this.onActivate = onActivate;
+			this.onDeactivate = onDeactivate;
+		}
+		
+		public void activate() {
+			if (isActivated)
+				return;
+			
+			isActivated = true;
+			
+			if (onActivate != null)
+				OlympaCreatifMain.getInstance().getTask().runTask(onActivate);
+			
+			Bukkit.getOnlinePlayers().forEach(p -> Prefix.DEFAULT.sendMessage(p, "§aLe composant §2%s §aa été réactivé.", name));
+		}
+		
+		public void deactivate() {
+			if (!isActivated)
+				return;
+			
+			isActivated = false;
+			
+			if (onDeactivate != null)
+				OlympaCreatifMain.getInstance().getTask().runTask(onDeactivate);
+
+			Bukkit.getOnlinePlayers().forEach(p -> Prefix.DEFAULT.sendMessage(p, "§cLe composant §4%s §ca été désactivé pour des raisons de sécurité.", name));
+		}
+		
+		public void toggle() {
+			if (isActivated())
+				deactivate();
+			else
+				activate();
+		}
+		
+		public boolean isActivated() {
+			return isActivated;
+		}
+		
+		public static ComponentCreatif fromString(String s) {
+			for (ComponentCreatif c : ComponentCreatif.values())
+				if (c.toString().equals(s.toUpperCase()))
+					return c;
+			return null;
+		}
 	}
 }
 

@@ -17,7 +17,6 @@ import net.minecraft.server.v1_16_R3.PacketPlayOutEntityStatus;
 public class CommandBlocksManager {
 
 	private OlympaCreatifMain plugin;
-	private boolean cbActivation = true;
 	//scoreboards inutilisés qui seront réaffectés au besoin à d'autres plots chargés ultérieurement	 
 	//private List<Scoreboard> unusedScoreboards = new ArrayList<Scoreboard>();
 	
@@ -31,13 +30,6 @@ public class CommandBlocksManager {
 	
 	public CommandBlocksManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-		
-		/*maxTeamsPerPlot = OCparam.CB_MAX_TEAMS_PER_PLOT.getValue();
-		maxObjectivesPerPlot = Integer.valueOf(OCmsg.PARAM_CB_MAX_OBJECTIVES_PER_PLOT.getValue());
-		maxCommandsTicketst = Integer.valueOf(OCmsg.PARAM_CB_MAX_CMDS_LEFT.getValue());
-		
-		minTickBetweenEachCbExecution = Integer.valueOf(OCmsg.PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.getValue());
-		cmdTicketByCmdSetblock = Integer.valueOf(OCmsg.PARAM_CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK.getValue());*/
 
 		plugin.getServer().getPluginManager().registerEvents(new CbObjectivesListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new CbTeamsListener(plugin), plugin);
@@ -45,14 +37,6 @@ public class CommandBlocksManager {
 		Bukkit.getPluginManager().registerEvents(new CbCommandListener(plugin), plugin);
 		
 		//Bukkit.getServer().getPluginManager().getPermission("minecraft.command.gamemode").setDefault(PermissionDefault.TRUE);
-	}
-	
-	public boolean isCbEnabled() {
-		return cbActivation;
-	}
-	
-	public void setCbActivationState(boolean b) {
-		plugin.getPermissionsManager().setCbPerms(cbActivation = b);
 	}
 	
 	//Actions à exécuter en entrée et sortie de plot

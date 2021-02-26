@@ -1,7 +1,10 @@
 package fr.olympa.olympacreatif.commands;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
@@ -10,6 +13,8 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.StaffGui;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -26,10 +31,11 @@ public class OcaCmd extends AbstractCmd {
 	}
 
 	
+	/*
 	@Cmd(player = true, syntax = "Ouvrir le menu staff du Créatif")
 	public void menu(CommandContext cmd) {
 		new StaffGui(MainGui.getMainGui(getOlympaPlayer())).create(getPlayer());
-	}
+	}*/
 
 	
 	@Cmd(syntax = "Afficher la liste des parcelles actuellement chargées", args = "PLAYERS")
@@ -40,42 +46,115 @@ public class OcaCmd extends AbstractCmd {
 			plugin.getCmdLogic().sendPlotsList(getOlympaPlayer(), cmd.getArgument(0));
 	}
 
-	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|commandblocks"}, min = 1)
+	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|commandblocks|entities"}, min = 1)
 	public void activate(CommandContext cmd) {
-		switch(cmd.getArgument(0).toString()) {
-		case "worldedit":
-			plugin.getWEManager().setWeActivationState(true);
-			break;
-		
-		case "commandblocks":
-			plugin.getCommandBlocksManager().setCbActivationState(true);
-			break;
-			
-		default:
-			OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), "aucun");
+		if (!PermissionsList.STAFF_MANAGE_COMPONENT.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
-		}
+		
+		ComponentCreatif component = ComponentCreatif.fromString(cmd.getArgument(0));
+		
+		if (component != null)
+			component.activate();
 
-		OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), (String) cmd.getArgument(0));
+		OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
 	}
 
-	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|commandblocks"}, min = 1)
+	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|commandblocks|entities"}, min = 1)
 	public void deactivate(CommandContext cmd) {
-		switch(cmd.getArgument(0).toString()) {
-		case "worldedit":
-			plugin.getWEManager().setWeActivationState(false);
-			break;
+		if (!PermissionsList.STAFF_MANAGE_COMPONENT.hasPermissionWithMsg(getOlympaPlayer()))
+			return;
 		
-		case "commandblocks":
-			plugin.getCommandBlocksManager().setCbActivationState(false);
+		ComponentCreatif component = ComponentCreatif.fromString(cmd.getArgument(0));
+		
+		if (component != null)
+			component.deactivate();
+
+		OCmsg.STAFF_DEACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
+	}
+
+	@Cmd(player = true, syntax = "Gérer ses permissions staff", description = "/oca perm <perm>", min = 1, 
+			args = "ghost_mode|owner_everywhere|worldedit_everywhere|bypass_kick_ban")
+	public void perm(CommandContext cmd) {
+		StaffPerm perm = null;
+		
+		switch ((String) cmd.getArgument(0)) {
+		case "ghost_mode":
+			perm = StaffPerm.GHOST_MODE;
 			break;
-			
+
+		case "owner_everywhere":
+			perm = StaffPerm.OWNER_EVERYWHERE;
+			break;
+
+		case "worldedit_everywhere":
+			perm = StaffPerm.WORLDEDIT_EVERYWHERE;
+			break;
+
+		case "bypass_kick_ban":
+			perm = StaffPerm.BYPASS_KICK_BAN;
+			break;
 		default:
-			OCmsg.STAFF_DEACTIVATE_COMPONENT.send(getPlayer(), "aucun");
+			sendIncorrectSyntax();
 			return;
 		}
+		
+		if (!perm.getOlympaPerm().hasPermissionWithMsg(getOlympaPlayer()))
+			return;
+		
+		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)getOlympaPlayer());
+		pc.toggleStaffPerm(perm);
+		sendMessage(Prefix.DEFAULT_GOOD, "§eVotre permission %s est désormais %s§a.", perm.toString().toLowerCase(), pc.hasStaffPerm(perm) ? "§aactivée" : "§cdésactivée");
+	}
 
-		OCmsg.STAFF_DEACTIVATE_COMPONENT.send(getPlayer(), (String) cmd.getArgument(0));
+	@Cmd(syntax = "Afficher les informations relatives au créatif", min = 1, args = "general|performances")
+	public void info(CommandContext cmd) {
+		
+		if (cmd.getArgument(0).equals("general")) {
+
+			sendMessage(Prefix.INFO, "§6>>> Informations générales Créatif " + plugin.getDataManager().getServerIndex());
+
+			sendMessage(Prefix.INFO, "§7Etat des composants");
+			sendHoverAndCommand(Prefix.INFO, "§eWorldedit activé : " + (ComponentCreatif.WORLDEDIT.isActivated() ? "§aOUI" : "§cNON"),
+					"§7Cliquez ici pour changer la valeur", 
+					"/oca " + (ComponentCreatif.WORLDEDIT.isActivated() ? "deactivate" : "activate") + " worldedit");
+			sendHoverAndCommand(Prefix.INFO, "§eCommandblocks activés : " + (ComponentCreatif.COMMANDBLOCKS.isActivated() ? "§aOUI" : "§cNON"),
+					"§7Cliquez ici pour changer la valeur", 
+					"/oca " + (ComponentCreatif.COMMANDBLOCKS.isActivated() ? "deactivate" : "activate") + " commandblocks");
+			
+			OlympaPlayerCreatif pc = getOlympaPlayer();
+			
+			sendMessage(Prefix.INFO, "§7Etat de vos permissions");
+			for (StaffPerm perm : StaffPerm.values())
+				sendHoverAndCommand(Prefix.INFO, "§ePermission " + perm.toString().toLowerCase() + " : " + 
+						(pc.hasStaffPerm(perm) ? "§aOUI" : "§cNON"),
+						"§7Cliquez ici pour changer la valeur", 
+						"/oca perm "+ perm.toString().toLowerCase());
+			
+		}else if (cmd.getArgument(0).equals("performances")) {
+
+			sendMessage(Prefix.INFO, "§6>>> Informations de performances Créatif " + plugin.getDataManager().getServerIndex());
+			sendMessage(Prefix.INFO, "§7Informations générales");
+			sendMessage(Prefix.INFO, "§eNombre de parcelles chargées : %s", plugin.getPlotsManager().getPlots().size());
+			sendMessage(Prefix.INFO, "§eEntités chargées : %s", plugin.getWorldManager().getWorld().getEntities().size());
+
+			List<Plot> mostEntities = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingInt(plot -> -plot.getEntities().size())).collect(Collectors.toList());
+			List<Plot> mostStoplagDetect = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingInt(plot -> -plot.getStoplagChecker().getCurrentCount())).collect(Collectors.toList());
+
+			sendMessage(Prefix.INFO, "§7Informations parcelles les moins performantes");
+			
+			for (int i = 0 ; i < Math.min(3, mostEntities.size()) ; i++)
+				sendHoverAndCommand(Prefix.INFO, "§eLe plus d'entités §4n°" + (i+1) + " §e: " +
+						mostEntities.get(i) + " §7(" + mostEntities.get(i).getEntities().size() + ")", 
+						"§7Se téléporter à la parcelle " + mostEntities.get(i), "/oc visit " + mostEntities.get(i));
+			
+			for (int i = 0 ; i < Math.min(3, mostStoplagDetect.size()) ; i++)
+				sendHoverAndCommand(Prefix.INFO, "§eLe plus haut score stoplag §4n°" + (i+1) + " §e: " +
+						mostStoplagDetect.get(i) + " §7(" + mostStoplagDetect.get(i).getStoplagChecker().getCurrentCount() + ")",  
+						"§7Se téléporter à la parcelle " + mostStoplagDetect.get(i), "/oc visit " + mostStoplagDetect.get(i));
+			
+		}else
+			sendIncorrectSyntax();
+		
 	}
 	
 	@Cmd(player = true, syntax = "Réinitialiser une parcelle", description = "/oca resetplot <plot> [confirmationCode]")

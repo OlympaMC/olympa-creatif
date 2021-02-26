@@ -47,7 +47,7 @@ public class WorldEditEventHandlerLEGACY {
 		/*Material mat = BukkitAdapter.adapt(e.getExtent().getBlock(BlockVector3.at(x, y, z)).getBlockType());
 		KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);*/
 		
-		if (!p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) && (plot == null || !PlotPerm.USE_WE.has(plot, p)))
+		if (!p.hasStaffPerm(StaffPerm.WORLDEDIT_EVERYWHERE) && (plot == null || !PlotPerm.USE_WE.has(plot, p)))
 			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
 		        @Override
 		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {

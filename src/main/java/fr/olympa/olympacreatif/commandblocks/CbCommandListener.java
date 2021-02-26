@@ -25,6 +25,7 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -74,7 +75,7 @@ public class CbCommandListener implements Listener {
 		
 		e.setCancelled(true);
 		
-		if (!plugin.getCommandBlocksManager().isCbEnabled())
+		if (!ComponentCreatif.COMMANDBLOCKS.isActivated())
 			return;
 		
 		//Bukkit.broadcastMessage("CB : " + e.getSender() + " - " + blockedExecutionLocs.get(((CraftBlockCommandSender) e.getSender()).getBlock().getLocation()));
@@ -109,9 +110,13 @@ public class CbCommandListener implements Listener {
 		CommandType cmdType = CbCommand.getCommandType(e.getMessage());
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		
-		if (!plugin.getCommandBlocksManager().isCbEnabled() || 
-				p.hasStaffPerm(StaffPerm.BYPASS_VANILLA_COMMANDS) && (cmdType == CommandType.teleport || cmdType == CommandType.tp || cmdType == CommandType.clear))
+		if (!ComponentCreatif.COMMANDBLOCKS.isActivated() && cmdType != null && !p.hasStaffPerm(StaffPerm.GHOST_MODE)) {
+			e.setCancelled(true);
 			return;
+		}
+		
+		/*if (cmdType == CommandType.teleport || cmdType == CommandType.tp || cmdType == CommandType.clear)
+			return;*/
 		
 		if (cmdType != null)
 			e.setCancelled(true);

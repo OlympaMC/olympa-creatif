@@ -57,6 +57,7 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import fr.olympa.olympacreatif.world.WorldManager;
 
@@ -72,23 +73,23 @@ public class StaffGui extends IGui {
 		
 		//set items pour staff perms
 		OlympaPermission perm = PermissionsList.STAFF_BYPASS_PLOT_KICK_AND_BAN;
-		StaffPerm sPerm = StaffPerm.BYPASS_KICK_AND_BAN;
+		StaffPerm sPerm = StaffPerm.BYPASS_KICK_BAN;
 		
 		setItem(0, ItemUtils.item(Material.ACACIA_FENCE_GATE, "§6Bypass kick/ban plot", "§7Permet d'entrer sur les plots même", "§7si le propriétaire vous en a banni"), getStaffPermSwitchConsumer(perm, sPerm));	
 		setItem(0 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
 		perm = PermissionsList.STAFF_BYPASS_VANILLA_COMMANDS;
-		sPerm = StaffPerm.BYPASS_VANILLA_COMMANDS;
+		sPerm = StaffPerm.GHOST_MODE;
 		setItem(1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Bypass commandes vanilla", "§7Permet de ne pas être affecté par", "§7les commandes vanilla du type /kill, /tp, ..."), getStaffPermSwitchConsumer(perm, sPerm));	
 		setItem(1 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
 		perm = PermissionsList.STAFF_BYPASS_WORLDEDIT;
-		sPerm = StaffPerm.BYPASS_WORLDEDIT;
+		sPerm = StaffPerm.WORLDEDIT_EVERYWHERE;
 		setItem(2, ItemUtils.item(Material.WOODEN_AXE, "§6Bypass WorldEdit", "§7Permet d'utiliser les fonctionnalités WorldEdit", "§7sur tous les plots et la route"), getStaffPermSwitchConsumer(perm, sPerm));	
 		setItem(2 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
 		perm = PermissionsList.STAFF_PLOT_FAKE_OWNER;
-		sPerm = StaffPerm.FAKE_OWNER_EVERYWHERE;
+		sPerm = StaffPerm.OWNER_EVERYWHERE;
 		setItem(3, ItemUtils.item(Material.REDSTONE_TORCH, "§6Fake owner", "§7Permet d'éditer les paramètres du plot comme si", "§7vous en étiez le propriétaire"), getStaffPermSwitchConsumer(perm, sPerm));	
 		setItem(3 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
@@ -97,29 +98,31 @@ public class StaffGui extends IGui {
 		
 		//désactivation worldedit et tags custom
 
-		final OlympaPermission p1 = PermissionsList.STAFF_DEACTIVATE_CUSTOM_TAGS;
+		final OlympaPermission p1 = PermissionsList.STAFF_MANAGE_COMPONENT;
 		setItem(5, ItemUtils.item(Material.PAPER, "§6Désactivation commandblocks et commandes vanilla", "§2Fonction de sécurité.", "§2Clic molette pour modifier.", " ", "§7Permet de désactiver les commandblocks", "§7ainsi que toutes les commandes ", "§7vanilla (/tellraw, /kill, ...)", "§7en cas de de problème.", " ", "§cAttention : au redémarage, les commandblocks et ", "§ccommandes vanilla seront de nouveau activés !"), 
 				(it, c, s) -> {
 					if (!p1.hasPermission(p) || c != ClickType.MIDDLE)
 						return;
-					plugin.getCommandBlocksManager().setCbActivationState(!plugin.getCommandBlocksManager().isCbEnabled());
-					setItem(5 + 9, getStateIndicator(plugin.getCommandBlocksManager().isCbEnabled(), p1), null);
+					
+					ComponentCreatif.COMMANDBLOCKS.toggle();
+					
+					setItem(5 + 9, getStateIndicator(ComponentCreatif.COMMANDBLOCKS.isActivated(), p1), null);
 				});	
-		setItem(5 + 9, getStateIndicator(plugin.getCommandBlocksManager().isCbEnabled(), p1), null);
+		setItem(5 + 9, getStateIndicator(ComponentCreatif.COMMANDBLOCKS.isActivated(), p1), null);
 
 		
 		if (plugin.getWEManager() != null) {
-			final OlympaPermission p2 = PermissionsList.STAFF_DEACTIVATE_WORLD_EDIT;
+			final OlympaPermission p2 = PermissionsList.STAFF_BYPASS_WORLDEDIT;
 			setItem(6, ItemUtils.item(Material.DIAMOND_AXE, "§6Désactivation totale de WorldEdit", "§2Fonction de sécurité.", "§2Clic molette pour modifier.", " ", "§7Permet d'interromptre instantanément", "§7toutes les tâches WorldEdit sur le serveur", "§7et de désactiver le plugin.", " ", "§cAttention : au redémarage, WorldEdit sera de nouveau activé !"),
 					(it, c, s) -> {
 						if (!p2.hasPermission(p) || c != ClickType.MIDDLE)
 							return;
+
+						ComponentCreatif.WORLDEDIT.toggle();
 						
-						plugin.getWEManager().setWeActivationState(!plugin.getWEManager().isWeEnabled());
-						
-						setItem(6 + 9, getStateIndicator(!plugin.getWEManager().isWeEnabled(), p2), null);
+						setItem(6 + 9, getStateIndicator(!ComponentCreatif.WORLDEDIT.isActivated(), p2), null);
 					});
-			setItem(6 + 9, getStateIndicator(!plugin.getWEManager().isWeEnabled(), p2), null);
+			setItem(6 + 9, getStateIndicator(!ComponentCreatif.WORLDEDIT.isActivated(), p2), null);
 		}
 		
 		

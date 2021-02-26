@@ -133,7 +133,7 @@ public class CmdsLogic {
 		else if (plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR || !plot.getPlayers().contains(target))
 			OCmsg.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.send(pc, target.getName());
 		
-		else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN))
+		else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
 			OCmsg.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.send(pc, target.getName());
 		
 		else {
@@ -161,7 +161,7 @@ public class CmdsLogic {
 		else if (!plot.getPlayers().contains(target) || plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR)
 			OCmsg.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.send(pc, target.getName());
 		
-		else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_AND_BAN))
+		else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
 			OCmsg.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.send(pc, target.getName());
 		
 		else {

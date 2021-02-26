@@ -24,8 +24,8 @@ public class PermissionsList {
 	public static final OlympaSpigotPermission STAFF_RESET_PLOT = new OlympaSpigotPermission(OlympaGroup.DEV);
 	public static final OlympaSpigotPermission STAFF_OCA_CMD = new OlympaSpigotPermission(OlympaGroup.DEV);
 
-	public static final OlympaSpigotPermission STAFF_DEACTIVATE_CUSTOM_TAGS = new OlympaSpigotPermission(OlympaGroup.DEV);
-	public static final OlympaSpigotPermission STAFF_DEACTIVATE_WORLD_EDIT = new OlympaSpigotPermission(OlympaGroup.DEV);
+	public static final OlympaSpigotPermission STAFF_MANAGE_COMPONENT = new OlympaSpigotPermission(OlympaGroup.DEV);
+	//public static final OlympaSpigotPermission STAFF_DEACTIVATE_WORLD_EDIT = new OlympaSpigotPermission(OlympaGroup.DEV);
 	
 	public static final OlympaSpigotPermission CREA_TPA = new OlympaSpigotPermission(OlympaGroup.PLAYER);
 	
