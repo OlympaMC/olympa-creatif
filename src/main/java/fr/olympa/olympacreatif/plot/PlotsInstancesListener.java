@@ -61,6 +61,7 @@ import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
+import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
@@ -221,8 +222,8 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler//cancel redstone si stoplag, sinon enregistre l'évent dans le stoplag checker
 	public void onRedstoneChange(BlockRedstoneEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-		
-		if (plot == null)
+
+		if (plot == null || plot.hasStoplag() || !ComponentCreatif.REDSTONE.isActivated())
 			e.setNewCurrent(0);
 		else
 			if (plot.hasStoplag())

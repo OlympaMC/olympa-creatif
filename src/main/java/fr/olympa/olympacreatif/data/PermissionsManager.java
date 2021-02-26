@@ -117,7 +117,9 @@ public class PermissionsManager implements Listener{
 				() -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(false)),
 		
 		ENTITIES("entités", null, () -> OlympaCreatifMain.getInstance().getWorldManager().getWorld().getEntities().stream().filter(e -> 
-		(e.getType() != EntityType.PLAYER && e.getType() != EntityType.ARMOR_STAND && e.getType() != EntityType.ITEM_FRAME)).forEach(e -> e.remove()));
+		(e.getType() != EntityType.PLAYER && e.getType() != EntityType.ARMOR_STAND && e.getType() != EntityType.ITEM_FRAME)).forEach(e -> e.remove())),
+		
+		REDSTONE("redstone", null, null);
 		
 		private String name;
 		private boolean isActivated = true;
