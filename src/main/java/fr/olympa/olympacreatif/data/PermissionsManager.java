@@ -17,6 +17,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
 
 import fr.olympa.api.LinkSpigotBungee;
 import fr.olympa.api.groups.OlympaGroup;
@@ -134,7 +137,7 @@ public class PermissionsManager implements Listener{
 			isActivated = true;
 			
 			if (onActivate != null)
-				OlympaCreatifMain.getInstance().getTask().runTask(onActivate);
+				Bukkit.getScheduler().runTask(OlympaCreatifMain.getInstance(), onActivate);
 			
 			Bukkit.getOnlinePlayers().forEach(p -> Prefix.DEFAULT.sendMessage(p, "§aLe composant §2%s §aa été réactivé.", name));
 		}
@@ -146,7 +149,7 @@ public class PermissionsManager implements Listener{
 			isActivated = false;
 			
 			if (onDeactivate != null)
-				OlympaCreatifMain.getInstance().getTask().runTask(onDeactivate);
+				Bukkit.getScheduler().runTask(OlympaCreatifMain.getInstance(), onDeactivate);
 
 			Bukkit.getOnlinePlayers().forEach(p -> Prefix.DEFAULT.sendMessage(p, "§cLe composant §4%s §ca été désactivé pour des raisons de sécurité.", name));
 		}
