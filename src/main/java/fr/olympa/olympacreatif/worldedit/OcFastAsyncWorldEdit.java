@@ -42,10 +42,10 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 
-public class OcFastAsyncWorldEdit implements IWorldEditManager {
+public class OcFastAsyncWorldEdit extends IWorldEditManager {
 
 	private OlympaCreatifMain plugin;
-	private Set<PlotId> resetingPlots = new HashSet<PlotId>();
+	//private Set<PlotId> resetingPlots = new HashSet<PlotId>();
 	
 	public OcFastAsyncWorldEdit(OlympaCreatifMain pl) {
 		this.plugin = pl;
@@ -59,7 +59,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 		
 		plugin.getLogger().info("§dLoaded FastAsyncWorldEdit.");
 	}
-
+	/*
 	@Override
 	public void resetPlot(Player requester, Plot plot) {
 		if (resetingPlots.contains(plot.getPlotId()))
@@ -99,7 +99,7 @@ public class OcFastAsyncWorldEdit implements IWorldEditManager {
 			
 			resetingPlots.remove(plot.getPlotId());
 		});
-	}
+	}*/
 
 	@Override
 	public void clearClipboard(Plot plot, Player p) {

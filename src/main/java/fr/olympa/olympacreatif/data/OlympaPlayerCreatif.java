@@ -1,6 +1,5 @@
 package fr.olympa.olympacreatif.data;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -17,7 +16,6 @@ import java.util.UUID;
 
 import com.google.common.collect.ImmutableMap;
 
-import fr.olympa.api.economy.OlympaMoney;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;

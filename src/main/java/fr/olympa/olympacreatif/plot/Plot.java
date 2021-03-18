@@ -239,6 +239,17 @@ public class Plot {
 		return new ArrayList<Entity>(entitiesInPlot);
 	}
 	
+	public synchronized long getLoadedTileEntitiesCount() {
+		long tiles = 0;
+		
+		for (int x = plotId.getLocation().getBlockX() ; x < plotId.getLocation().getBlockX() + OCparam.PLOT_SIZE.get() ; x+=16)
+			for (int z = plotId.getLocation().getBlockX() ; z < plotId.getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() ; z+=16)
+				if (plugin.getWorldManager().getNmsWorld().isChunkLoaded(x / 16, z / 16))
+					tiles += plugin.getWorldManager().getNmsWorld().getChunkAt(x / 16, z / 16).getTileEntities().size();
+	
+		return tiles;
+	}
+	
 	
 	public boolean hasLiquidFlow() {
 		return allowLiquidFlow;

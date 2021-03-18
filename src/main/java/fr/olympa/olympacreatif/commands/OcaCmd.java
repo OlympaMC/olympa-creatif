@@ -11,6 +11,7 @@ import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
@@ -20,6 +21,7 @@ import fr.olympa.olympacreatif.gui.StaffGui;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
+import net.minecraft.server.v1_16_R3.Chunk;
 
 public class OcaCmd extends AbstractCmd {
 
@@ -136,14 +138,20 @@ public class OcaCmd extends AbstractCmd {
 			sendMessage(Prefix.INFO, "§eEntités chargées : %s", plugin.getWorldManager().getWorld().getEntities().size());
 
 			List<Plot> mostEntities = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingInt(plot -> -plot.getEntities().size())).collect(Collectors.toList());
+			List<Plot> mostTileEntities = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingLong(plot -> -plot.getLoadedTileEntitiesCount())).collect(Collectors.toList());
 			List<Plot> mostStoplagDetect = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingInt(plot -> -plot.getStoplagChecker().getCurrentCount())).collect(Collectors.toList());
 
 			sendMessage(Prefix.INFO, "§6Informations parcelles les moins performantes");
-			
+
 			for (int i = 0 ; i < Math.min(3, mostEntities.size()) ; i++)
 				sendHoverAndCommand(Prefix.INFO, "§eLe plus d'entités §4n°" + (i+1) + " §e: " +
 						mostEntities.get(i) + " §7(" + mostEntities.get(i).getEntities().size() + ")", 
 						"§7Se téléporter à la parcelle " + mostEntities.get(i), "/oc visit " + mostEntities.get(i));
+			
+			for (int i = 0 ; i < Math.min(3, mostTileEntities.size()) ; i++)
+				sendHoverAndCommand(Prefix.INFO, "§eLe plus de tiles entities §4n°" + (i+1) + " §e: " +
+						mostTileEntities.get(i) + " §7(" + mostTileEntities.get(i).getLoadedTileEntitiesCount() + ")", 
+						"§7Se téléporter à la parcelle " + mostTileEntities.get(i), "/oc visit " + mostTileEntities.get(i));
 			
 			for (int i = 0 ; i < Math.min(3, mostStoplagDetect.size()) ; i++)
 				sendHoverAndCommand(Prefix.INFO, "§eLe plus haut score stoplag §4n°" + (i+1) + " §e: " +
@@ -188,7 +196,7 @@ public class OcaCmd extends AbstractCmd {
 			
 			plugin.getWEManager().resetPlot(getPlayer(), plot);
 			plotsResetVerifCode.remove(plot.getPlotId());
-			//Prefix.DEFAULT.sendMessage(getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());
+			Prefix.DEFAULT.sendMessage(getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());
 		}
 	}
 	

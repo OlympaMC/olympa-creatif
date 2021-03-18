@@ -27,6 +27,7 @@ import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.util.eventbus.EventHandler;
+import com.sk89q.worldedit.util.eventbus.EventHandler.Priority;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -45,18 +46,17 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 
-public class OcWorldEdit extends EventHandler implements IWorldEditManager {
+public class OcWorldEdit extends IWorldEditManager {
 
 	private  OlympaCreatifMain plugin;
 	private WorldEdit we;
 	private IAsyncWorldEdit awe;
 	
 	public OcWorldEdit(OlympaCreatifMain plugin) {
-		super(Priority.NORMAL);
 		this.plugin = plugin;
 
 		we = ((WorldEditPlugin) plugin.getServer().getPluginManager().getPlugin("WorldEdit")).getWorldEdit();
-		we.getEventBus().register(this);
+		registerEventHandler();
 		
 		awe = ((IAsyncWorldEdit) plugin.getServer().getPluginManager().getPlugin("AsyncWorldEdit"));
 		awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
@@ -65,21 +65,6 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 		for (Material mat : Material.values())
 			if (plugin.getPerksManager().getKitsManager().getKitOf(mat) != null)
 				config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());
-		
-		OcWorldEdit instance = this;
-		
-		/*new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				we.getEventBus().register(instance);
-				
-				LocalConfiguration config = we.getConfiguration();
-				for (Material mat : Material.values())
-					if (plugin.getPerksManager().getKitsManager().getKitOf(mat) != null)
-						config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());
-			}
-		}.runTask(plugin);*/
 		
 		//désactive goBrush qui ne fonctionne pas avec AWE
 		if (plugin.getServer().getPluginManager().getPlugin("goBrush") != null)
@@ -104,10 +89,11 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 		}
 	}
 
+	/*
 	@Override
 	public void resetPlot(Player requester, Plot plot) {
 		throw new UnsupportedOperationException("Impossible de régénérer une parcelle avec AsyncWorldEdit.");
-	}
+	}*/
 
 	/*
 	@Override
@@ -168,6 +154,7 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 			}
 	}*/
 	
+	/*
 	@SuppressWarnings("deprecation")
 	private void setLayer(final CuboidRegion reg, final BlockType block) {		
 		try {
@@ -196,39 +183,9 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 		}
 	}
 	
-	@Subscribe //cancel actions we's actions if performed out of plot
-	public void onEditSession(EditSessionEvent e) {	
-		if (e.getActor() == null || e.getActor().getUniqueId() == null)
-			return;
-		
-		OlympaPlayerCreatif p = AccountProvider.get(e.getActor().getUniqueId());
-		
-		Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
-
-		
-		if (!p.hasStaffPerm(StaffPerm.WORLDEDIT_EVERYWHERE) && (plot == null || !PlotPerm.USE_WE.has(plot, p))) {
-			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
-		        @Override
-		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
-		        	return false;
-		        }
-		    });
-			OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.send(p);
-		}
-		else
-			e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
-		        @Override
-		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
-		    		//plugin.getPerksManager().getKitsManager().getKitOf(BukkitAdapter.adapt(block.getBlockType()));
-		        	return ComponentCreatif.WORLDEDIT.isActivated() && 
-		        			plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
-		        }
-		    });		
-	}
-	
 	private World getWeWorld() {
 		return BukkitAdapter.adapt(plugin.getWorldManager().getWorld());
-	}
+	}*/
 	
 	private class AWEProgressBar implements IProgressDisplay {
 
@@ -254,18 +211,54 @@ public class OcWorldEdit extends EventHandler implements IWorldEditManager {
 
 	
 	
-	@Override
-	public void dispatch(Object event) throws Exception {
-	}
+	private void registerEventHandler() {
+		we.getEventBus().register(new EventHandler(Priority.NORMAL) {
+			
+			@Subscribe //cancel actions we's actions if performed out of plot
+			public void onEditSession(EditSessionEvent e) {	
+				if (e.getActor() == null || e.getActor().getUniqueId() == null)
+					return;
+				
+				OlympaPlayerCreatif p = AccountProvider.get(e.getActor().getUniqueId());
+				
+				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 
-	@Override
-	public int hashCode() {
-		return 1;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return this == obj;
+				
+				if (!p.hasStaffPerm(StaffPerm.WORLDEDIT_EVERYWHERE) && (plot == null || !PlotPerm.USE_WE.has(plot, p))) {
+					e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
+				        @Override
+				        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+				        	return false;
+				        }
+				    });
+					OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.send(p);
+				}
+				else
+					e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
+				        @Override
+				        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+				    		//plugin.getPerksManager().getKitsManager().getKitOf(BukkitAdapter.adapt(block.getBlockType()));
+				        	return ComponentCreatif.WORLDEDIT.isActivated() && 
+				        			plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
+				        }
+				    });		
+			}
+			
+			
+			@Override
+			public int hashCode() {
+				return 1;
+			}
+			
+			@Override
+			public boolean equals(Object arg0) {
+				return this == arg0;
+			}
+			
+			@Override
+			public void dispatch(Object arg0) throws Exception {
+			}
+		});
 	}
 }
 

@@ -172,7 +172,7 @@ public class WorldManager {
 		return nmsWorld;
 	}
 	
-	public void regenerateChunk(Chunk ch) {
+	/*public void regenerateChunk(Chunk ch) {
 		world.unloadChunk(ch);
 
 	    //newChunkProvider.unloadQueue.remove(x, z);
@@ -188,8 +188,8 @@ public class WorldManager {
 		PlayerChunk playerChunk = this.world.getPlayerChunkMap().getChunk(x, z); 
 		if (playerChunk != null) playerChunk.chunk = chunk;  
 		if (chunk != null) refreshChunk(x, z);  
-		return (chunk != null);*/
-	}
+		return (chunk != null);
+	}*/
 	
 	/**
 	 * Updates worldborder size if necessary
