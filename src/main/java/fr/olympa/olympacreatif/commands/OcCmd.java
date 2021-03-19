@@ -205,15 +205,20 @@ public class OcCmd extends AbstractCmd {
 	@Cmd(player = true, syntax = "Redevenir simple visiteur sur la parcelle actuelle")
 	public void leave(CommandContext cmd) {
 		OlympaPlayerCreatif pc = getOlympaPlayer();
+		if (pc.getCurrentPlot() == null) {
+			OCmsg.NULL_CURRENT_PLOT.send(pc);
+			return;
+		}
+		
 		PlotRank rank = pc.getCurrentPlot().getMembers().getPlayerRank(pc);
 		
-		if (pc.getCurrentPlot() == null || rank == PlotRank.VISITOR || rank == PlotRank.OWNER) {
+		if (rank == PlotRank.VISITOR || rank == PlotRank.OWNER) {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.BUILD);
 			return;
 		}
 		
-		OCmsg.PLOT_LEAVED.send(pc);
-			
+		pc.getCurrentPlot().getMembers().set(pc, PlotRank.VISITOR);
+		OCmsg.PLOT_LEAVED.send(pc);	
 	}
 }
 

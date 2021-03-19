@@ -25,8 +25,6 @@ import net.minecraft.server.v1_16_R3.Chunk;
 
 public class OcaCmd extends AbstractCmd {
 
-	private Map<PlotId, String> plotsResetVerifCode = new HashMap<PlotId, String>();
-
 	public OcaCmd(OlympaCreatifMain plugin) {
 		super(plugin, "oca", PermissionsList.STAFF_OCA_CMD, "Panel de gestion du staff.");
 		// TODO Auto-genocaerated constructor stub
@@ -163,41 +161,9 @@ public class OcaCmd extends AbstractCmd {
 		
 	}
 	
-	@Cmd(player = true, syntax = "Réinitialiser une parcelle", description = "/oca resetplot <plot> [confirmationCode]", otherArg = true)
-	public void resetplot(CommandContext cmd) {		
-		if (!PermissionsList.STAFF_RESET_PLOT.hasPermissionWithMsg(getOlympaPlayer()))
-			return;
-		
-		Plot plot = cmd.getArgumentsLength() == 0 ? ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromString(plugin, cmd.getArgument(0)));
-		
-		if (plot == null) {
-			OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
-			return;
-		}
-		
-		if (!plotsResetVerifCode.containsKey(plot.getPlotId())) {
-			String check = "";
-			for (int i = 0 ; i < 6 ; i++) check += (char) (plugin.random.nextInt(26) + 'a');
-			
-			plotsResetVerifCode.put(plot.getPlotId(), check);
-			
-			Prefix.DEFAULT.sendMessage(getPlayer(), "§dVeuillez saisir la commande /oca resetplot %s %s pour réinitialiser la parcelle %s (%s). \n§cAttention cette action est irréversible !!", plot.getPlotId(), check, plot.getPlotId(), plot.getMembers().getOwner().getName());
-			
-			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getPlotId()), 400);
-			
-		} else if (cmd.getArgumentsLength() != 2) {
-			Prefix.DEFAULT.sendMessage(getPlayer(), "§dVeuillez saisir la commande /oca resetplot %s %s pour réinitialiser la parcelle %s (%s). \n§cAttention cette action est irréversible !!", plot.getPlotId(), plotsResetVerifCode.get(plot.getPlotId()), plot.getPlotId(), plot.getMembers().getOwner().getName());
-			
-		}else {			
-			if (!plotsResetVerifCode.containsKey(plot.getPlotId()) || !plotsResetVerifCode.get(plot.getPlotId()).equals(cmd.getArgument(1))) {
-				Prefix.DEFAULT.sendMessage(getPlayer(), "§dLe code renseigné n'est pas valide.");
-				return;
-			}
-			
-			plugin.getWEManager().resetPlot(getPlayer(), plot);
-			plotsResetVerifCode.remove(plot.getPlotId());
-			Prefix.DEFAULT.sendMessage(getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());
-		}
+	@Cmd(player = true, syntax = "Réinitialiser une parcelle", description = "/oca resetplot [plot] [confirmationCode]", otherArg = true)
+	public void resetplot(CommandContext cmd) {
+		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), cmd);
 	}
 	
 	

@@ -76,9 +76,9 @@ public class ShopGui extends IGui{
 				" ",
 				"§aPréfixe " + OlympaGroup.CREA_ARCHITECT.getPrefix(p.getGender()) + p.getPlayer().getName(), 
 				"§a+2 parcelles (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 2) + ")",
-				"§aAccès aux commandes WorldEdit",
+				"§aAccès aux commandes WorldEdit et goBrush",
 				"§aExport de vos parcelles en .schematic",
-				"§aAccès au /hat",
+				//"§aAccès au /hat",
 				" ",
 				"§7Le niveau précédent est requis pour acheter ce grade.")));
 		
@@ -96,6 +96,7 @@ public class ShopGui extends IGui{
 					"§aPréfixe " + OlympaGroup.CREA_CREATOR.getPrefix(p.getGender()) + p.getPlayer().getName(), 
 					"§aAccès à toutes les couleurs dans le chat",
 					"§aMessage quand vous rejoignez le serveur",
+					"§aReset de vos parcelles à volonté",
 					" ",
 					"§6Mais avant tout, nous vous remercions",
 					"§6chaleureusementdu soutien que vous nous apportez !",

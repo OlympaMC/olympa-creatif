@@ -14,6 +14,7 @@ public class PermissionsList {
 	
 	public static final OlympaSpigotPermission USE_WORLD_EDIT = new OlympaSpigotPermission(OlympaGroup.CREA_ARCHITECT);
 	public static final OlympaSpigotPermission USE_PLOT_MUSIC = new OlympaSpigotPermission(OlympaGroup.CREA_ARCHITECT);
+	public static final OlympaSpigotPermission USE_PLOT_RESET = new OlympaSpigotPermission(OlympaGroup.CREA_CREATOR);
 	
 	public static final OlympaSpigotPermission USE_COLORED_TEXT = new OlympaSpigotPermission(OlympaGroup.CREA_CREATOR);
 	

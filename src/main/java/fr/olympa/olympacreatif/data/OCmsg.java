@@ -178,6 +178,9 @@ public class OCmsg {
     public static final OCmsg PLOT_LEAVED = new OCmsg(null);
     
 	public static final OCmsg NULL_CURRENT_PLOT = new OCmsg(null);
+
+	public static final OCmsg PLOT_PRE_RESETING = new OCmsg(null);
+	public static final OCmsg PLOT_RESETING = new OCmsg(null);
     
 	private static final Map<String, Function<OlympaPlayerCreatif, String>> playerPlaceHolders = ImmutableMap.<String, Function<OlympaPlayerCreatif,String>>builder()
 			.put("%playerName", pc -> {return pc.getName();})

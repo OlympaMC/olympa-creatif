@@ -15,12 +15,14 @@ import org.bukkit.event.inventory.ClickType;
 
 import fr.olympa.api.chat.TxtComponentBuilder;
 import fr.olympa.api.command.IOlympaCommand;
+import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -274,6 +276,50 @@ public class CmdsLogic {
 			pc.getPlayer().sendMessage("§aListe des parcelles possédées par " + target.getName() + " : " + lp);
 		else
 			pc.getPlayer().sendMessage("§aListe des parcelles possédées par " + target.getName() + " : §cjoueur hors ligne ou ne possédant aucune parcelle");
+	}
+	
+	private Map<PlotId, String> plotsResetVerifCode = new HashMap<PlotId, String>();
+	
+	public void resetPlot(OlympaPlayerCreatif pc, CommandContext cmd) {
+		if (!PermissionsList.STAFF_RESET_PLOT.hasPermissionWithMsg(pc))
+			return;
+		
+		Plot plot = cmd.getArgumentsLength() == 0 ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromString(plugin, cmd.getArgument(0)));
+		
+		 if (plot == null) {
+			OCmsg.NULL_CURRENT_PLOT.send(pc);
+			return;
+		}
+		
+		if (!PlotPerm.RESET_PLOT.has(plot, pc) && !PermissionsList.STAFF_RESET_PLOT.hasPermission(pc)) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.RESET_PLOT);
+			return;
+		}
+		 
+		if (!plotsResetVerifCode.containsKey(plot.getPlotId())) {
+			String check = "";
+			for (int i = 0 ; i < 6 ; i++) check += (char) (plugin.random.nextInt(26) + 'a');
+			
+			plotsResetVerifCode.put(plot.getPlotId(), check);
+			OCmsg.PLOT_PRE_RESETING.send(pc, plot, "/oco resetplot " + plot + " " + check);
+			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dVeuillez saisir la commande /oca resetplot %s %s pour réinitialiser la parcelle %s (%s). \n§cAttention cette action est irréversible !!", plot.getPlotId(), check, plot.getPlotId(), plot.getMembers().getOwner().getName());
+			
+			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getPlotId()), 400);
+			
+		} else if (cmd.getArgumentsLength() != 2) {
+			OCmsg.PLOT_PRE_RESETING.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getPlotId()));
+			
+		}else {		
+			if (!plotsResetVerifCode.containsKey(plot.getPlotId()) || !plotsResetVerifCode.get(plot.getPlotId()).equals(cmd.getArgument(1))) {
+				OCmsg.PLOT_PRE_RESETING.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getPlotId()));
+				return;
+			}
+
+			plotsResetVerifCode.remove(plot.getPlotId());
+			OCmsg.PLOT_RESETING.send(pc, plot);
+			plugin.getWEManager().resetPlot(pc.getPlayer(), plot);
+			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());
+		}
 	}
 }
 

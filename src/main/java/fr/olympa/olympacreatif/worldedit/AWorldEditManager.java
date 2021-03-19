@@ -31,6 +31,12 @@ import net.minecraft.server.v1_16_R3.SectionPosition;
 
 public abstract class AWorldEditManager {
 	
+	protected OlympaCreatifMain plugin;
+	
+	public AWorldEditManager(OlympaCreatifMain plugin) {
+		this.plugin = plugin;
+	}
+	
 	public abstract void clearClipboard(Plot plot, Player p);
 	
 	private static Set<PlotId> resetingPlots = new HashSet<PlotId>();
@@ -44,7 +50,7 @@ public abstract class AWorldEditManager {
 			return false;
 		
 		resetingPlots.add(plot.getPlotId());
-		OlympaCreatifMain.getInstance().getTask().runTaskLater(() -> resetingPlots.remove(plot.getPlotId()), 200);
+		plugin.getTask().runTaskLater(() -> resetingPlots.remove(plot.getPlotId()), 200);
 		
 		plot.getEntities().forEach(e -> e.remove());
 		
@@ -52,8 +58,8 @@ public abstract class AWorldEditManager {
 		
 		for (int x = originChunk.getX() ; x < originChunk.getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
 			for (int z = originChunk.getZ() ; z < originChunk.getZ() + OCparam.PLOT_SIZE.get() / 16 ; z++)
-				OlympaCreatifMain.getInstance().getWorldManager().getWorld()
-				.getChunkAtAsync(new Location(OlympaCreatifMain.getInstance().getWorldManager().getWorld(), x * 16, 0, z * 16),
+				plugin.getWorldManager().getWorld()
+				.getChunkAtAsync(new Location(plugin.getWorldManager().getWorld(), x * 16, 0, z * 16),
 						new Consumer<org.bukkit.Chunk>() {
 							
 							@Override
@@ -96,9 +102,18 @@ public abstract class AWorldEditManager {
 							ch.getWorld().setTypeAndData(pos, block, 1042);
 						else
 							cs.setType(x, y, z, block);
-					}					
+					}
 			}
 		}
+		
+		LightEngineLayerEventListener listener = ch.getWorld().getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK);
+		if (listener instanceof LightEngineBlock)
+			for (int x = ch.getPos().x * 16 ; x < ch.getPos().x * 16 + 16 ; x++)
+				for (int z = ch.getPos().z * 16 ; z < ch.getPos().z * 16 + 16 ; z++) {
+					BlockPosition pos = new BlockPosition(x, WorldManager.worldLevel, z);
+					if (listener.a(SectionPosition.a(pos)) != null)
+						((LightEngineBlock)listener).a(pos, 15);
+				}
 		
 		ch.markDirty();
 		ch.mustNotSave = false;
@@ -136,7 +151,7 @@ public abstract class AWorldEditManager {
 						lightEngine.a(pos, 15);
 				}
 		
-		OlympaCreatifMain.getInstance().getTask().runTaskLater(() -> updateLighting(ch, y + 1, lightEngine), 3);
+		plugin.getTask().runTaskLater(() -> updateLighting(ch, y + 1, lightEngine), 3);
 		}else {
 			PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(ch, 65535);
 			Bukkit.getOnlinePlayers().forEach(p -> ((CraftPlayer)p).getHandle().playerConnection.sendPacket(packet));

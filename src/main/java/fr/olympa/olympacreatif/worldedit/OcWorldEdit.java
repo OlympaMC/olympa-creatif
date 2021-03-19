@@ -48,12 +48,11 @@ import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcWorldEdit extends AWorldEditManager {
 
-	private  OlympaCreatifMain plugin;
 	private WorldEdit we;
 	private IAsyncWorldEdit awe;
 	
 	public OcWorldEdit(OlympaCreatifMain plugin) {
-		this.plugin = plugin;
+		super(plugin);
 
 		we = ((WorldEditPlugin) plugin.getServer().getPluginManager().getPlugin("WorldEdit")).getWorldEdit();
 		registerEventHandler();

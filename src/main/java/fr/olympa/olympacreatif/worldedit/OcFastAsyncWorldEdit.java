@@ -43,12 +43,9 @@ import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcFastAsyncWorldEdit extends AWorldEditManager {
-
-	private OlympaCreatifMain plugin;
-	//private Set<PlotId> resetingPlots = new HashSet<PlotId>();
 	
 	public OcFastAsyncWorldEdit(OlympaCreatifMain pl) {
-		this.plugin = pl;
+		super(pl);
 		
 		FaweAPI.addMaskManager(new OlympaCreatifMask());
 		
