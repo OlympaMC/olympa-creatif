@@ -59,6 +59,7 @@ public class OcFastAsyncWorldEdit extends IWorldEditManager {
 		
 		plugin.getLogger().info("§dLoaded FastAsyncWorldEdit.");
 	}
+	
 	/*
 	@Override
 	public void resetPlot(Player requester, Plot plot) {
@@ -92,7 +93,9 @@ public class OcFastAsyncWorldEdit extends IWorldEditManager {
 				for (int x = xMin ; x <= xMax ; x++)
 					for (int z = zMin ; z <= zMax ; z++)
 						for (int y = WorldManager.worldLevel + 1 ; y < 256 ; y++)
-							session.setBlock(x, y, z, BlockTypes.AIR);							
+							session.setBlock(x, y, z, BlockTypes.AIR);		
+				
+				session.close();
 			}
 
 			Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s est terminée !", plot);
@@ -135,24 +138,29 @@ public class OcFastAsyncWorldEdit extends IWorldEditManager {
 	    	final OlympaPlayerCreatif p = AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId());
 	    	final Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
-	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p) || !ComponentCreatif.WORLDEDIT.isActivated()) {
+	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p) || !ComponentCreatif.WORLDEDIT.isActivated() || isReseting(plot)) {
 	    		OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.send(p);
 	    		return null;
 	    	}
-
-	    	BlockVector3 v1 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX(), 0, 
-	    			plot.getPlotId().getLocation().getBlockZ());
-	    	BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 256, 
-	    			plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
 	    	
-            return new FaweMask(new CuboidRegion(v1, v2)) {
+            return new FaweMask(getPlotRegion(plot)) {
             	
                 @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
-                	return PlotPerm.USE_WE.has(plot, p);
+                	return PlotPerm.USE_WE.has(plot, AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId())) && !isReseting(plot);
                 }
             };
 	    }
+	}
+	
+	private CuboidRegion getPlotRegion(Plot plot) {
+
+    	BlockVector3 v1 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX(), 0, 
+    			plot.getPlotId().getLocation().getBlockZ());
+    	BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 256, 
+    			plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
+    	
+    	return new CuboidRegion(v1, v2);
 	}
 	
 	public class OlympaCreatifRegionFilter extends CuboidRegionFilter {

@@ -239,7 +239,7 @@ public class Plot {
 		return new ArrayList<Entity>(entitiesInPlot);
 	}
 	
-	public synchronized long getLoadedTileEntitiesCount() {
+	public long getLoadedTileEntitiesCount() {
 		long tiles = 0;
 		
 		for (int x = plotId.getLocation().getBlockX() ; x < plotId.getLocation().getBlockX() + OCparam.PLOT_SIZE.get() ; x+=16)
