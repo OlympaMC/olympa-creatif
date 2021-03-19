@@ -163,13 +163,8 @@ public class OcaCmd extends AbstractCmd {
 		
 	}
 	
-	@Cmd(player = true, syntax = "Réinitialiser une parcelle", description = "/oca resetplot <plot> [confirmationCode]")
-	public void resetplot(CommandContext cmd) {
-		plugin.getWEManager().resetPlot(getPlayer(), plugin.getPlotsManager().getPlot(getPlayer().getLocation()));
-		if(true)
-			return;
-		
-		
+	@Cmd(player = true, syntax = "Réinitialiser une parcelle", description = "/oca resetplot <plot> [confirmationCode]", otherArg = true)
+	public void resetplot(CommandContext cmd) {		
 		if (!PermissionsList.STAFF_RESET_PLOT.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		

@@ -46,7 +46,7 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 
-public class OcWorldEdit extends IWorldEditManager {
+public class OcWorldEdit extends AWorldEditManager {
 
 	private  OlympaCreatifMain plugin;
 	private WorldEdit we;

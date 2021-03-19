@@ -29,7 +29,7 @@ import net.minecraft.server.v1_16_R3.LightEngineLayerEventListener;
 import net.minecraft.server.v1_16_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R3.SectionPosition;
 
-public abstract class IWorldEditManager {
+public abstract class AWorldEditManager {
 	
 	public abstract void clearClipboard(Plot plot, Player p);
 	
@@ -39,15 +39,12 @@ public abstract class IWorldEditManager {
 		return resetingPlots.contains(plot.getPlotId());
 	}
 	
-	@SuppressWarnings("deprecation")
 	public boolean resetPlot(Player requester, Plot plot) {
 		if (isReseting(plot))
 			return false;
 		
 		resetingPlots.add(plot.getPlotId());
 		OlympaCreatifMain.getInstance().getTask().runTaskLater(() -> resetingPlots.remove(plot.getPlotId()), 200);
-		
-		Bukkit.broadcastMessage("PLOT RESETING : " + plot);
 		
 		plot.getEntities().forEach(e -> e.remove());
 		
@@ -62,7 +59,6 @@ public abstract class IWorldEditManager {
 							@Override
 							public void accept(org.bukkit.Chunk c) {
 								resetChunk(((CraftChunk)c).getHandle());
-								//Bukkit.broadcastMessage("CHUNK RESETING : " + c.getX() + " " + c.getZ());
 							}
 						});		
 		

@@ -34,7 +34,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldManager;
-import fr.olympa.olympacreatif.worldedit.IWorldEditManager;
+import fr.olympa.olympacreatif.worldedit.AWorldEditManager;
 import fr.olympa.olympacreatif.worldedit.OcFastAsyncWorldEdit;
 import fr.olympa.olympacreatif.worldedit.OcWorldEdit;
 
@@ -49,7 +49,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private CmdsLogic cmdLogic;
 
 	private PermissionsManager permsManager;
-	private IWorldEditManager weManager = null;
+	private AWorldEditManager weManager = null;
 
 	//private LuckPerms luckperms;
 
@@ -241,7 +241,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		return worldManager;
 	}
 
-	public IWorldEditManager getWEManager() {
+	public AWorldEditManager getWEManager() {
 		return weManager;
 	}
 
