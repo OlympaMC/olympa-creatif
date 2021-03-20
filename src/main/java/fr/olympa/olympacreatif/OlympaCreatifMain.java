@@ -160,7 +160,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
 
 		//initialisation lignes scoreboard
-		for (int i = 0; i < OlympaPlayerCreatif.scoreboardLinesSize; i++) {
+		for (int i = 0; i < OlympaPlayerCreatif.customScoreboardLinesSize; i++) {
 			final int line = i;
 
 			scm.addLines(
@@ -175,8 +175,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		//Bukkit.broadcastMessage(message)
 
-		if (p.getCustomScoreboardLines().size() > i)
-			return p.getCustomScoreboardLines().get(i);
+		if (p.getCustomScoreboardLines() != null)
+			return p.getCustomScoreboardLines()[i];
 
 		Plot plot = p.getCurrentPlot();
 		switch (i) {
@@ -214,10 +214,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			return "§7" + p.getGameMoneyName() + " : §6" + p.getGameMoney() + p.getGameMoneySymbol();
 
 		case 8:
-			if (p.getCustomScoreboardLines().size() > 0 && plot != null)
+			return "§4";
+			/*if (p.getCustomScoreboardLines().size() > 0 && plot != null)
 				return "§8Sidebar plot " + plot;
-			else
-				return "§4";
+			else*/
 		}
 		return "";
 	}

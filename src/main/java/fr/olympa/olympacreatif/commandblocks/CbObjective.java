@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -173,7 +175,7 @@ public class CbObjective {
 			
 			if (displaySlot == DisplaySlot.SIDEBAR)
 				for (Player p : plot.getPlayers())
-					((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCustomScoreboardTitle(newObjName);
+					((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(newObjName, (LinkedHashMap<String, Integer>)getValues(true));
 		}
 		
 			
@@ -185,8 +187,17 @@ public class CbObjective {
 	}
 	
 	public Map<String, Integer> getValues(boolean sortValues){
-		Map<String, Integer> values = new HashMap<String, Integer>();
+		final Map<String, Integer> values = new LinkedHashMap<String, Integer>();
+
+		stringHolders.forEach((name, score) -> values.put(ChatColor.translateAlternateColorCodes('&', name.replace("_", " ")), score));
+		entityHolders.forEach((ent, score) -> values.put(ent.getType() == EntityType.PLAYER ? ((Player)ent).getName() : 
+			ent.getCustomName() == null ? ent.getName() : ent.getCustomName(), score));
 		
+		if (sortValues)
+			return values.entrySet().stream().sorted(Comparator.comparingInt(e -> e.getValue())).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+		else
+			return values;
+		/*
 		//copie valeurs strings
 		for (Entry<String, Integer> e : stringHolders.entrySet())
 			values.put(ChatColor.translateAlternateColorCodes('&', e.getKey().replace("_", " ")), e.getValue());
@@ -217,12 +228,12 @@ public class CbObjective {
 			}
 	   });
 	
-		Map<String, Integer> result = new LinkedHashMap<String, Integer>();
+	   LinkedHashMap<String, Integer> result = new LinkedHashMap<String, Integer>();
 	   for (Entry<String, Integer> e : list) {
 		   result.put(e.getKey(), e.getValue());
 	   }
 	   
-	   return result;
+	   return result;*/
 	}
 	
 	//ADD ET SET POUR OBJECT
@@ -261,10 +272,10 @@ public class CbObjective {
 		
 		//affichage scoreboard sidebar
 		if (displaySlot == DisplaySlot.SIDEBAR) {
-			Map<String, Integer> values = getValues(true);
+			LinkedHashMap<String, Integer> values = (LinkedHashMap<String, Integer>) getValues(true);
 			
 			for (Player p : plot.getPlayers()) 
-				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(values);
+				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);
 			
 			//Bukkit.broadcastMessage("SCORES " + objId + " : " + values);	
 		}
@@ -296,10 +307,10 @@ public class CbObjective {
 		
 		//affichage scoreboard sidebar
 		if (displaySlot == DisplaySlot.SIDEBAR) {
-			Map<String, Integer> values = getValues(true);
+			LinkedHashMap<String, Integer> values = (LinkedHashMap<String, Integer>) getValues(true);
 			
 			for (Player p : plot.getPlayers()) 
-				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(values);	
+				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);	
 		}
 	}
 	
@@ -341,13 +352,13 @@ public class CbObjective {
 			plot.getCbData().getObjectiveBelowName().setDisplayName(objName);
 				
 		if (displaySlot == DisplaySlot.SIDEBAR) {
-			Map<String, Integer> scores = getValues(true);
+			LinkedHashMap<String, Integer> scores = (LinkedHashMap<String, Integer>) getValues(true);
 			
 			for (Player p : plot.getPlayers()) {
 				OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 				
-				pc.setCustomScoreboardTitle(getName());
-				pc.setCustomScoreboardLines(scores);
+				//pc.setCustomScoreboardTitle(getName());
+				pc.setCustomScoreboardLines(getName(), scores);
 			}	
 		}
 		return 1;

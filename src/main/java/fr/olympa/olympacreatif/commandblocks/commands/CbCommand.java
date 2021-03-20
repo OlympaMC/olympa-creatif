@@ -127,7 +127,9 @@ public abstract class CbCommand extends CbCommandI {
 	
 	public static CommandType getCommandType(String cmd) {
 		String s = cmd.split(" ")[0].replaceFirst("/", "");
-		return CommandType.get(s.split(":")[s.split(":").length - 1]);
+		String[] splited = s.split(":");
+		return CommandType.get(splited.length == 0 ? null : splited[splited.length - 1]);
+		//return CommandType.get(s.split(":")[s.split(":").length - 1]);
 	}
 	
 	public static CbCommand getCommand(OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {

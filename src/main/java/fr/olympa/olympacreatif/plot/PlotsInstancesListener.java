@@ -701,7 +701,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot.addEntityInPlot(e.getEntity());
 		plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
-		Bukkit.broadcastMessage("[DEBUG] ADD ENTITY TO " + plot + " : " + e.getEntity().getType());
+		//Bukkit.broadcastMessage("[DEBUG] ADD ENTITY TO " + plot + " : " + e.getEntity().getType());
 	}
 	
 	@EventHandler //remove entities from plot entities list

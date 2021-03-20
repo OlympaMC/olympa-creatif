@@ -113,10 +113,10 @@ public class PermissionsManager implements Listener{
 		WORLDEDIT("worldedit", () -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(true), 
 				() -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(false)),
 		
-		COMMANDBLOCKS("commandblocks et commandes vanilla", () -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(true), 
+		COMMANDBLOCKS("commandblocks_and_vanilla_commands", () -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(true), 
 				() -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(false)),
 		
-		ENTITIES("entités", null, () -> OlympaCreatifMain.getInstance().getWorldManager().getWorld().getEntities().stream().filter(e -> 
+		ENTITIES("entities", null, () -> OlympaCreatifMain.getInstance().getWorldManager().getWorld().getEntities().stream().filter(e -> 
 		(e.getType() != EntityType.PLAYER && e.getType() != EntityType.ARMOR_STAND && e.getType() != EntityType.ITEM_FRAME)).forEach(e -> e.remove())),
 		
 		REDSTONE("redstone", null, null);
@@ -173,7 +173,7 @@ public class PermissionsManager implements Listener{
 		
 		public static ComponentCreatif fromString(String s) {
 			for (ComponentCreatif c : ComponentCreatif.values())
-				if (c.toString().equals(s.toUpperCase()))
+				if (c.getName().equals(s.toLowerCase()))
 					return c;
 			return null;
 		}

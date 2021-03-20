@@ -9,10 +9,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import org.bukkit.ChatColor;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -77,9 +80,10 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	private Set<KitType> kits = new HashSet<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();
 	private Set<PlayerParamType> playerParams = new HashSet<PlayerParamType>();
-	
-	private List<String> scoreboardLines = new ArrayList<String>();
-	public static final int scoreboardLinesSize = 8;
+
+	public static final int customScoreboardLinesSize = 8;
+	private String[] customScoreboardLines = new String[customScoreboardLinesSize];
+	private boolean isCustomSidebarEnabled = false;
 	
 	private List<StaffPerm> staffPerm = new ArrayList<StaffPerm>();
 	
@@ -248,48 +252,54 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		return count;
 	}
 	
-	public void setCustomScoreboardTitle(String title) {
-		initCustomScoreboard();
+	public void setCustomScoreboardLines(String title, LinkedHashMap<String, Integer> scores) {
+		isCustomSidebarEnabled = true;
+		customScoreboardLines[0] = ChatColor.BOLD + title;
+		customScoreboardLines[customScoreboardLinesSize - 1] = "§7Custom sb plot " + currentPlot;
 		
-		scoreboardLines.set(0, title);
-	}
-	
-	public void setCustomScoreboardLines(Map<String, Integer> scores) {
+		for (int i = scores.size() + 1 ; i < customScoreboardLinesSize - 1 ; i++)
+			scores.put("§" + i, Integer.MIN_VALUE);
 		
-		initCustomScoreboard();
+		List<String> keys = new ArrayList<String>(scores.keySet());
+		for (int i = 1 ; i < customScoreboardLinesSize - 1 ; i++)
+			if (keys.get(i - 1).length() == 2 && scores.get(keys.get(i - 1)) == Integer.MIN_VALUE)
+				customScoreboardLines[i] = keys.get(i - 1);
+			else
+				customScoreboardLines[i] = keys.get(i - 1) + "§7 : " + scores.get(keys.get(i - 1));
 		
+		/*
 		List<String> keys = new ArrayList<String>(scores.keySet());
 		List<Integer> values = new ArrayList<Integer>(scores.values());
 		
+		for (int i = scores.size() ; i < customScoreboardLinesSize ; i++)
+		
 		//Bukkit.broadcastMessage("Set CS : " + scores);
 		
-		for (int i = 1 ; i < scoreboardLinesSize ; i++)
+		for (int i = 1 ; i < customScoreboardLinesSize ; i++)
 			if (keys.size() >= i)
 				//si le string commence et finit par %, on n'affiche pas le score
 				if (keys.get(i - 1).startsWith("%") && keys.get(i - 1).endsWith("%"))
-					scoreboardLines.set(i, keys.get(i - 1));
+					customScoreboardLines.set(i, keys.get(i - 1));
 				else
-					scoreboardLines.set(i, keys.get(i - 1) + "§r§7 : " + values.get(i - 1));
+					customScoreboardLines.set(i, keys.get(i - 1) + "§r§7 : " + values.get(i - 1));
 			else
-				scoreboardLines.set(i, "§" + i);
-		
+				customScoreboardLines.set(i, "§" + i);
+		*/
 		//Bukkit.broadcastMessage("Set CS : " + scoreboardLines);
 	}
 	
 	
-	public List<String> getCustomScoreboardLines(){
-		return Collections.unmodifiableList(scoreboardLines);
-	}
-	
-	private void initCustomScoreboard() {
-		if (scoreboardLines.size() == 0)
-			for (int i = 0 ; i < scoreboardLinesSize ; i++)
-				scoreboardLines.add("§" + i);
+	public String[] getCustomScoreboardLines() {
+		return isCustomSidebarEnabled ? customScoreboardLines : null;
 	}
 	
 	public void clearCustomSidebar() {
-		for (int i = 0 ; i < scoreboardLines.size() ; i++)
-			scoreboardLines.clear();
+		if (!isCustomSidebarEnabled)
+			return;
+		
+		isCustomSidebarEnabled = false;
+		for (int i = 0 ; i < customScoreboardLines.length ; i++)
+			customScoreboardLines[i] = "§" + i;
 	}
 	
 	

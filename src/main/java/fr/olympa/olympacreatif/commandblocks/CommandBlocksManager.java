@@ -1,5 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks;
 
+import java.util.LinkedHashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -58,8 +60,8 @@ public class CommandBlocksManager {
 			
 			if (obj.getDisplaySlot() == DisplaySlot.SIDEBAR) {
 				
-				pc.setCustomScoreboardTitle(obj.getName());
-				pc.setCustomScoreboardLines(obj.getValues(true));
+				//pc.setCustomScoreboardTitle(obj.getName());
+				pc.setCustomScoreboardLines(obj.getName(), (LinkedHashMap<String, Integer>) obj.getValues(true));
 			}	
 		}
 	}
