@@ -168,7 +168,7 @@ public class PlotsInstancesListener implements Listener{
 		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
-		if (plot == null) {
+		if (plot == null || plugin.getWEManager().isReseting(plot)) {
 			OCmsg.PLOT_CANT_BUILD.send(pc);
 			e.setCancelled(true);
 			return;	
@@ -207,7 +207,7 @@ public class PlotsInstancesListener implements Listener{
 		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-		if (plot == null) {
+		if (plot == null || plugin.getWEManager().isReseting(plot)) {
 			e.setCancelled(true);
 			OCmsg.PLOT_CANT_BUILD.send(pc);
 			return;	

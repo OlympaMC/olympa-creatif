@@ -133,7 +133,7 @@ public class StaffGui extends IGui {
 						if (plot == null || !p3.hasPermission(p) || c != ClickType.CONTROL_DROP || resetingPlots.contains(plot.getPlotId()))
 							return;	
 						
-						plugin.getWEManager().resetPlot(p.getPlayer(), plot);
+						plugin.getWEManager().resetPlot(p, plot);
 						//resetingPlots.remove(plot.getPlotId());
 						//resetingPlots.add(plot.getPlotId());
 						

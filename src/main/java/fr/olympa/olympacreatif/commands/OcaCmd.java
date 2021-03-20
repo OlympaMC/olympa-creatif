@@ -47,7 +47,7 @@ public class OcaCmd extends AbstractCmd {
 			plugin.getCmdLogic().sendPlotsList(getOlympaPlayer(), cmd.getArgument(0));
 	}
 
-	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|commandblocks|entities|commandblocks_and_vanilla_commands"}, min = 0)
+	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|commandblocks|entities|commandblocks_and_vanilla_commands"})
 	public void activate(CommandContext cmd) {
 		if (cmd.getArgumentsLength() == 0) {
 			sendComponentsStatus();
@@ -65,7 +65,7 @@ public class OcaCmd extends AbstractCmd {
 		OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
 	}
 
-	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|commandblocks|entities|commandblocks_and_vanilla_commands"}, min = 0)
+	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|commandblocks|entities|commandblocks_and_vanilla_commands"})
 	public void deactivate(CommandContext cmd) {
 		if (cmd.getArgumentsLength() == 0) {
 			sendComponentsStatus();
@@ -91,7 +91,7 @@ public class OcaCmd extends AbstractCmd {
 					"/oca " + (component.isActivated() ? "deactivate" : "activate") + " " + component.getName());
 	}
 
-	@Cmd(player = true, syntax = "Gérer ses permissions staff", description = "/oca perm <perm>", min = 0, 
+	@Cmd(player = true, syntax = "Gérer ses permissions staff", description = "/oca perms <perm>", min = 0, 
 			args = "ghost_mode|owner_everywhere|worldedit_everywhere|bypass_kick_ban")
 	public void perms(CommandContext cmd) {
 		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)getOlympaPlayer());
@@ -102,7 +102,9 @@ public class OcaCmd extends AbstractCmd {
 				sendHoverAndCommand(Prefix.INFO, "§ePermission " + perm.toString().toLowerCase() + " : " + 
 						(pc.hasStaffPerm(perm) ? "§aOUI" : "§cNON"),
 						"§7Cliquez ici pour changer la valeur", 
-						"/oca perm "+ perm.toString().toLowerCase());
+						"/oca perms "+ perm.toString().toLowerCase());
+			
+			return;
 		}
 		
 		StaffPerm perm = null;
@@ -146,8 +148,8 @@ public class OcaCmd extends AbstractCmd {
 			sendMessage(Prefix.INFO, "§6Informations générales");
 			sendMessage(Prefix.INFO, "§eNombre de parcelles chargées : %s", plugin.getPlotsManager().getPlots().size());
 			sendMessage(Prefix.INFO, "§eEntités chargées : %s", plugin.getWorldManager().getWorld().getEntities().size());
-			sendMessage(Prefix.INFO, "§eTile entities chargées : %s", plugin.getWorldManager().getNmsWorld().tileEntityList.size());
-			sendMessage(Prefix.INFO, "§eTicking tile entities chargées : %s", plugin.getWorldManager().getNmsWorld().tileEntityListTick.size());
+			//sendMessage(Prefix.INFO, "§eTile entities chargées : %s", plugin.getWorldManager().getNmsWorld().tileEntityList.size());
+			//sendMessage(Prefix.INFO, "§eTicking tile entities chargées : %s", plugin.getWorldManager().getNmsWorld().tileEntityListTick.size());
 			break;
 			
 		case "entities":
@@ -218,7 +220,7 @@ public class OcaCmd extends AbstractCmd {
 		return s;
 	}
 	
-	@Cmd(player = true, syntax = "Réinitialiser une parcelle", description = "/oca resetplot [plot] [confirmationCode]", otherArg = true)
+	@Cmd(player = true, syntax = "Réinitialiser une parcelle"/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
 	public void resetplot(CommandContext cmd) {
 		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), cmd);
 	}

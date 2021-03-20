@@ -1,7 +1,9 @@
 package fr.olympa.olympacreatif.worldedit;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -14,7 +16,9 @@ import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -33,23 +37,25 @@ public abstract class AWorldEditManager {
 	
 	protected OlympaCreatifMain plugin;
 	
+	private static Map<PlotId, Integer> resetingPlots = new HashMap<PlotId, Integer>();
+	
 	public AWorldEditManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 	}
 	
 	public abstract void clearClipboard(Plot plot, Player p);
 	
-	private static Set<PlotId> resetingPlots = new HashSet<PlotId>();
+	//private static Set<PlotId> resetingPlots = new HashSet<PlotId>();
 	
 	public boolean isReseting(Plot plot) {
-		return resetingPlots.contains(plot.getPlotId());
+		return resetingPlots.containsKey(plot.getPlotId());
 	}
 	
-	public boolean resetPlot(Player requester, Plot plot) {
+	public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {
 		if (isReseting(plot))
 			return false;
 		
-		resetingPlots.add(plot.getPlotId());
+		resetingPlots.put(plot.getPlotId(), 0);
 		plugin.getTask().runTaskLater(() -> resetingPlots.remove(plot.getPlotId()), 200);
 		
 		plot.getEntities().forEach(e -> e.remove());
@@ -57,24 +63,103 @@ public abstract class AWorldEditManager {
 		org.bukkit.Chunk originChunk = plot.getPlotId().getLocation().getChunk();
 		
 		for (int x = originChunk.getX() ; x < originChunk.getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
-			for (int z = originChunk.getZ() ; z < originChunk.getZ() + OCparam.PLOT_SIZE.get() / 16 ; z++)
+			for (int z = originChunk.getZ() ; z < originChunk.getZ() + OCparam.PLOT_SIZE.get() / 16 ; z++) {
+				resetingPlots.put(plot.getPlotId(), resetingPlots.get(plot.getPlotId()) + 1);
+				
 				plugin.getWorldManager().getWorld()
 				.getChunkAtAsync(new Location(plugin.getWorldManager().getWorld(), x * 16, 0, z * 16),
 						new Consumer<org.bukkit.Chunk>() {
 							
 							@Override
 							public void accept(org.bukkit.Chunk c) {
-								resetChunk(((CraftChunk)c).getHandle());
+								resetChunk(requester, plot, ((CraftChunk)c).getHandle());
 							}
-						});		
+						});	
+			}		
 		
 		return true;
 	}
 	
-	public void resetChunk(org.bukkit.Chunk ch) {
-		resetChunk(((CraftChunk)ch).getHandle());
+	private void resetChunk(OlympaPlayerCreatif requester, Plot plot, Chunk ch) {
+		resetTiles(requester, plot, ch, new ArrayList<BlockPosition>(ch.getTileEntities().keySet()));
 	}
 	
+	private void resetTiles(OlympaPlayerCreatif requester, Plot plot, Chunk ch, List<BlockPosition> tiles) {
+		try {
+			for (int i = 0 ; i < (tiles.size() > 4 ? 4 : tiles.size()) ; i++)
+				ch.getWorld().removeTileEntity(tiles.remove(i));
+			
+			if (tiles.size() > 0)
+				plugin.getTask().runTaskLater(() -> resetTiles(requester, plot, ch, tiles), 1);
+			else
+				resetBlocks(requester, plot, ch);	
+		}catch(Exception ex) {
+			resetingPlots.remove(plot.getPlotId());
+			plugin.getLogger().warning("Error while trying to reset plot " + plot + " on chunk " + ch.getPos().x + "," + ch.getPos().z);
+			OCmsg.PLOT_RESET_ERROR.send(requester, plot);
+		}
+	}
+	
+	private void resetBlocks(OlympaPlayerCreatif requester, Plot plot, Chunk ch) {
+		ChunkSection[] sections = new ChunkSection[16];
+
+		plugin.getTask().runTaskAsynchronously(() -> {
+			int yTotal = -1;
+		
+			for (int iChunkSection = 0 ; iChunkSection < 16 ; iChunkSection ++) {
+		        
+				for (int y = 0 ; y < 16 ; y++) {
+					yTotal++;
+					
+			        ChunkSection cs = sections[yTotal >> 4];
+			        if (cs == null) {
+			            cs = new ChunkSection(yTotal >> 4 << 4);
+			            sections[yTotal >> 4] = cs;
+			        }
+			        
+					IBlockData block = yTotal == 0 ? Blocks.BEDROCK.getBlockData() : 
+						yTotal < WorldManager.worldLevel ? Blocks.DIRT.getBlockData() : 
+							yTotal == WorldManager.worldLevel ? Blocks.GRASS_BLOCK.getBlockData() : Blocks.AIR.getBlockData();
+							
+					for (int x = 0 ; x < 16 ; x++)
+						for (int z = 0 ; z < 16 ; z++) 
+							//BlockPosition pos = new BlockPosition(ch.getPos().x + x, yTotal, ch.getPos().z + z);
+							cs.setType(x, y, z, block);					
+				}
+			}
+			
+			plugin.getTask().runTask(() -> {
+				for (int i = 0 ; i < 16 ; i++)
+					ch.getSections()[i] = sections[i];
+				
+				LightEngineLayerEventListener listener = ch.getWorld().getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK);
+				if (listener instanceof LightEngineBlock)
+					for (int x = ch.getPos().x * 16 ; x < ch.getPos().x * 16 + 16 ; x++)
+						for (int z = ch.getPos().z * 16 ; z < ch.getPos().z * 16 + 16 ; z++) {
+							BlockPosition pos = new BlockPosition(x, WorldManager.worldLevel, z);
+							if (listener.a(SectionPosition.a(pos)) != null)
+								((LightEngineBlock)listener).a(pos, 15);
+						}
+				
+				ch.markDirty();
+				ch.mustNotSave = false;
+				
+				resetingPlots.put(plot.getPlotId(), resetingPlots.get(plot.getPlotId()) - 1);
+				if (resetingPlots.get(plot.getPlotId()) <= 0) {
+					resetingPlots.remove(plot.getPlotId());
+					OCmsg.PLOT_RESET_END.send(requester, plot.getPlotId());
+				}
+				
+				plugin.getTask().runTaskAsynchronously(() -> {
+					PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(ch, 65535);
+					Bukkit.getOnlinePlayers().forEach(p -> ((CraftPlayer)p).getHandle().playerConnection.sendPacket(packet));
+				});
+			});
+		});
+		
+	}
+	
+	/*
 	public void resetChunk(Chunk ch) {
 
 		int yTotal = -1;
@@ -118,8 +203,11 @@ public abstract class AWorldEditManager {
 		ch.markDirty();
 		ch.mustNotSave = false;
 		
-		PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(ch, 65535);
-		Bukkit.getOnlinePlayers().forEach(p -> ((CraftPlayer)p).getHandle().playerConnection.sendPacket(packet));
+		plugin.getTask().runTaskAsynchronously(() -> {
+			PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(ch, 65535);
+			Bukkit.getOnlinePlayers().forEach(p -> ((CraftPlayer)p).getHandle().playerConnection.sendPacket(packet));
+		});
+	}
 /*
 			LightEngineLayerEventListener listener = ch.getWorld().getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK);
 			if (listener instanceof LightEngineBlock)
@@ -139,7 +227,7 @@ public abstract class AWorldEditManager {
 			ch.getTileEntities().keySet().forEach(pos -> ch.getWorld().setTypeAndData(
 					pos, ((CraftBlockData)Material.AIR.createBlockData()).getState(), 1042));*/		
 		
-	}
+	
 	
 	/*
 	private void updateLighting(Chunk ch, int y, LightEngineBlock lightEngine) {

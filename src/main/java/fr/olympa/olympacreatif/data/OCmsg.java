@@ -179,17 +179,19 @@ public class OCmsg {
     
 	public static final OCmsg NULL_CURRENT_PLOT = new OCmsg(null);
 
-	public static final OCmsg PLOT_PRE_RESETING = new OCmsg(null);
-	public static final OCmsg PLOT_RESETING = new OCmsg(null);
+	public static final OCmsg PLOT_PRE_RESET = new OCmsg(null);
+	public static final OCmsg PLOT_RESET_START = new OCmsg(null);
+	public static final OCmsg PLOT_RESET_END = new OCmsg(null);
+	public static final OCmsg PLOT_RESET_ERROR = new OCmsg(null);
     
 	private static final Map<String, Function<OlympaPlayerCreatif, String>> playerPlaceHolders = ImmutableMap.<String, Function<OlympaPlayerCreatif,String>>builder()
 			.put("%playerName", pc -> {return pc.getName();})
 			//.put("%plotOwnerName", pc -> {return pc.getCurrentPlot() == null ? "aucun" : pc.getCurrentPlot().getMembers().getOwner().getName();})
 			
 			.put("%playerGroup", pc -> {return pc.getGroupName();})
-			
-			.put("%playerMoney", pc -> {return pc.getGameMoney() + "";})
+
 			.put("%playerMoneyAndSymbol", pc -> {return pc.getGameMoney() + " " + pc.getGameMoneySymbol();})
+			.put("%playerMoney", pc -> {return pc.getGameMoney() + "";})
 			
 			.put("%playerPlotsCount", pc -> {return pc.getPlots(false).size() + "";})
 			.put("%playerPlotsMaxCount", pc -> {return pc.getPlotsSlots(false) + "";})
@@ -229,29 +231,28 @@ public class OCmsg {
 			//.put("%playerPlot", (pc, plot) -> {return plot.getPlotId().getId() + "";})
 			//.put("%plotId", (pc, plot) -> {return plot.getPlotId().getId() + "";})
 			.put("%playerPlotRank", (pc, plot) -> {return plot.getMembers().getPlayerRank(pc).getRankName();})
-			.put("%plot", (pc, plot) -> {return plot.toString();})
-			
-			.put("%plotOwnerName", (pc, plot) -> {return plot.getMembers().getOwner().getName();})
-			.put("%plotMembersSize", (pc, plot) -> {return plot.getMembers().getMembers().size() + "";})
-			.put("%plotMembersMaxSize", (pc, plot) -> {return plot.getMembers().getMaxMembers() + "";})
+			.put("%plotOwnerName", (pc, plot) -> plot.getMembers().getOwner().getName())
+			.put("%plotMembersSize", (pc, plot) -> plot.getMembers().getMembers().size() + "")
+			.put("%plotMembersMaxSize", (pc, plot) -> plot.getMembers().getMaxMembers() + "")
+			.put("%plot", (pc, plot) -> plot.toString())
 			
 			.build();
 
 	
 	private static final Map<String, Function<StopLagDetect, String>> stoplagPlaceHolders = ImmutableMap.<String, Function<StopLagDetect,String>>builder()
-			.put("%stopLagType", sl -> {return sl.toString();})
+			.put("%stopLagType", s -> s.toString())
 			.build();
 
 	
 	private static final Map<String, Function<String, String>> stringPlaceHolders = ImmutableMap.<String, Function<String,String>>builder()
-			.put("%s", s -> {return s;})
+			.put("%s", s -> s)
 			.build();
 	
 	
 	private static final Map<String, Supplier<String>> fixedPlaceHolders = ImmutableMap.<String, Supplier<String>>builder()
-			.put("%incomeAsAfk", () -> {return OCparam.INCOME_AFK.get() + "";})
-			.put("%incomeAsNotAfk", () -> {return OCparam.INCOME_NOT_AFK.get() + "";})
-			.put("%serverIndex", () -> {return (OlympaCreatifMain.getInstance() == null || OlympaCreatifMain.getInstance().getDataManager() == null) ? "???" : OlympaCreatifMain.getInstance().getDataManager().getServerIndex() + "";})
+			.put("%incomeAsAfk", () -> OCparam.INCOME_AFK.get() + "")
+			.put("%incomeAsNotAfk", () -> OCparam.INCOME_NOT_AFK.get() + "")
+			.put("%serverIndex", () -> (OlympaCreatifMain.getInstance() == null || OlympaCreatifMain.getInstance().getDataManager() == null) ? "???" : OlympaCreatifMain.getInstance().getDataManager().getServerIndex() + "")
 			.build();
 	
 	

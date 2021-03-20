@@ -32,7 +32,7 @@ public class CmdSetblock extends CbCommand {
 			return 0;
 		
 		//return si le proprio n'a pas débloqué les spawners
-		if (item.getType() == Material.SPAWNER && !plotCbData.hasUnlockedSpawnerSetblock())
+		if (item.getType() == Material.SPAWNER && !plotCbData.hasUnlockedSpawnerSetblock() || plugin.getWEManager().isReseting(getPlot()))
 			return 0;
 		
 		plugin.getWorldManager().getWorld().getBlockAt(placingLoc).setType(item.getType());
