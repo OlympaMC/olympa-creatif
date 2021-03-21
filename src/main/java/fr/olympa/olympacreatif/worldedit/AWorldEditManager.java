@@ -147,7 +147,7 @@ public abstract class AWorldEditManager {
 				resetingPlots.put(plot.getPlotId(), resetingPlots.get(plot.getPlotId()) - 1);
 				if (resetingPlots.get(plot.getPlotId()) <= 0) {
 					resetingPlots.remove(plot.getPlotId());
-					OCmsg.PLOT_RESET_END.send(requester, plot.getPlotId());
+					OCmsg.PLOT_RESET_END.send(requester, plot);
 				}
 				
 				plugin.getTask().runTaskAsynchronously(() -> {

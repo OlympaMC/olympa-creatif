@@ -233,7 +233,8 @@ public class CmdsLogic {
 				pc.getPlayer().teleport(id.getLocation());
 			else
 				plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
-			OCmsg.TELEPORT_IN_PROGRESS.send(pc, plot.getPlotId() + "");
+			
+			OCmsg.TELEPORT_IN_PROGRESS.send(pc, id.toString());
 		}
 	}
 
@@ -280,12 +281,12 @@ public class CmdsLogic {
 	
 	private Map<PlotId, String> plotsResetVerifCode = new HashMap<PlotId, String>();
 	
-	public void resetPlot(OlympaPlayerCreatif pc, CommandContext cmd) {		
+	public void resetPlot(OlympaPlayerCreatif pc, Integer plotId, String code) {		
 		/*if (!PermissionsList.STAFF_RESET_PLOT.hasPermissionWithMsg(pc))
 			return;*/
 		
-		Plot plot = cmd.getArgumentsLength() == 0 ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromString(plugin, cmd.getArgument(0)));
-		plugin.getWEManager().resetPlot(pc, plot);
+		Plot plot = plotId == null ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, plotId));
+		//plugin.getWEManager().resetPlot(pc, plot);
 		
 		 if (plot == null) {
 			OCmsg.NULL_CURRENT_PLOT.send(pc);
@@ -305,13 +306,13 @@ public class CmdsLogic {
 			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + check);
 			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dVeuillez saisir la commande /oca resetplot %s %s pour réinitialiser la parcelle %s (%s). \n§cAttention cette action est irréversible !!", plot.getPlotId(), check, plot.getPlotId(), plot.getMembers().getOwner().getName());
 			
-			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getPlotId()), 400);
+			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getPlotId()), 600);
 			
-		} else if (cmd.getArgumentsLength() != 2) {
+		} else if (code == null) {
 			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getPlotId()));
 			
 		}else {		
-			if (!plotsResetVerifCode.containsKey(plot.getPlotId()) || !plotsResetVerifCode.get(plot.getPlotId()).equals(cmd.getArgument(1))) {
+			if (!plotsResetVerifCode.containsKey(plot.getPlotId()) || !plotsResetVerifCode.get(plot.getPlotId()).equals(code)) {
 				OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getPlotId()));
 				return;
 			}

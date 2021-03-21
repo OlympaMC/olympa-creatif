@@ -88,10 +88,11 @@ public class OcoCmd extends AbstractCmd {
 
 		plugin.getPerksManager().getSchematicCreator().export(plot, getOlympaPlayer());
 	}
-
-	@Cmd(player = true, syntax = "Réinitialiser sa parcelle. §4ACTION IRREVERSIBLE !!", description = "/oco resetplot [plot] [confirmationCode]", otherArg = true)
+	
+	
+	@Cmd(player = true, syntax = "Réinitialiser une parcelle. §cATTENTION : §4ACTION IRREVERSIBLE !!", args = {"INTEGER", "code"}/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
 	public void resetplot(CommandContext cmd) {
-		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), cmd);
+		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null), (cmd.getArgumentsLength() > 1 ? (String) cmd.getArgument(1) : null));
 	}
 
 	/*
