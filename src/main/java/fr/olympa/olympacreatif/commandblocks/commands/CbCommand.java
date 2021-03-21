@@ -42,7 +42,7 @@ import fr.olympa.olympacreatif.utils.NbtParserUtil;
 import net.minecraft.server.v1_16_R3.MojangsonParser;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 
-public abstract class CbCommand extends CbCommandI {
+public abstract class CbCommand extends CbCommandSelectorParser {
 	
 	//la commande comprend un commandsender, une localisation (imposée par le execute at), le plugin, le plot à la commande est exécutée et les arguments de la commande
 	public CbCommand(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
