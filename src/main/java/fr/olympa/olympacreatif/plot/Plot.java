@@ -312,20 +312,21 @@ public class Plot {
 	 * Execute entry actions for this player for the plot
 	 * @param p concerned player
 	 * @param teleportPlayer 
-	 * @return
+	 * @return true si le joueur est autorisé à entrer, false sinon
 	 */
 	public boolean executeEntryActions(Player p, boolean tpToPlotSpawn) {
 		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		
-		//si le joueur est banni, téléportation en dehors du plot
-		if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
-			
-			if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_BAN)) {
+		if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
+			if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
 				OCmsg.PLOT_CANT_ENTER_BANNED.send(pc, this);
-				return false;	
+				return false;
 			}
-		}
+			else if (!parameters.getParameter(PlotParamType.ALLOW_VISITORS) && members.getPlayerRank(p) == PlotRank.VISITOR) {
+				OCmsg.PLOT_CANT_ENTER_CLOSED.send(pc, this);
+				return false;
+			}
 
 		pc.setCurrentPlot(this);
 		

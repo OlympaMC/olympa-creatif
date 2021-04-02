@@ -519,7 +519,6 @@ public class PlotsInstancesListener implements Listener{
 
 		if (plotTo != null) 
 			if (!plotTo.executeEntryActions(e.getPlayer(), false))
-				//e.setTo(plotTo.getOutLoc());
 				e.setCancelled(true);
 			else if (plotTo.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC))
 				e.setTo(plotTo.getParameters().getParameter(PlotParamType.SPAWN_LOC).toLoc());

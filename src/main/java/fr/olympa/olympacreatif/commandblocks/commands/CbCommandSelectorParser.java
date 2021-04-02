@@ -245,6 +245,8 @@ public abstract class CbCommandSelectorParser {
 			entitiesStream = entitiesStream.filter(e -> e.getType() == EntityType.PLAYER);
 			break;
 		}
+		if (selectorParams.size() > 10)
+			return new ArrayList<Entity>();
 		
 		for (Entry<String, SelectorFunction> mainParamEntry : selectorParametersFunctions.entrySet())
 			for (String selectorParam : selectorParams.get(mainParamEntry.getKey()))

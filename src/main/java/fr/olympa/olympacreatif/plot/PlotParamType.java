@@ -29,6 +29,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	public static PlotParamType<Boolean> ALLOW_LAUNCH_PROJECTILES = new PlotParamType<Boolean>("ALLOW_LAUNCH_PROJECTILES", true);
 	public static PlotParamType<Boolean> KEEP_MAX_FOOD_LEVEL = new PlotParamType<Boolean>("KEEP_MAX_FOOD_LEVEL", true);
 	public static PlotParamType<Boolean> KEEP_INVENTORY_ON_DEATH = new PlotParamType<Boolean>("KEEP_INVENTORY_ON_DEATH", true);
+	public static PlotParamType<Boolean> ALLOW_VISITORS = new PlotParamType<Boolean>("ALLOW_VISITORS", true);
 	
 	public static PlotParamType<Position> SPAWN_LOC = new PlotParamType<Position>("SPAWN_LOC", new Position());
 	

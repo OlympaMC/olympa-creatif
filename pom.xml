@@ -16,7 +16,7 @@
 	<repositories><!-- FAWE -->
 		<repository>
 		  <id>IntellectualSites</id>
-		  <url>https://mvn.intellectualsites.com/content/repositories/releases/</url>
+		  <url>http://mvn.intellectualsites.com/content/repositories/releases/</url>
 		</repository>
 	
 	  <repository>
