@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.block.Biome;
+
+import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Position;
@@ -43,19 +46,27 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	public static PlotParamType<WeatherType> PLOT_WEATHER = new PlotParamType<WeatherType>("PLOT_WEATHER", WeatherType.CLEAR);
 	public static PlotParamType<GameMode> GAMEMODE_INCOMING_PLAYERS = new PlotParamType<GameMode>("GAMEMODE_INCOMING_PLAYERS", GameMode.CREATIVE);
 	
-	public static PlotParamType<List<Material>> LIST_ALLOWED_INTERRACTION = new PlotParamType<List<Material>>("LIST_ALLOWED_INTERRACTION", new ArrayList<Material>());
-	public static PlotParamType<List<Long>> BANNED_PLAYERS = new PlotParamType<List<Long>>("BANNED_PLAYERS", new ArrayList<Long>());
+	public static PlotParamType<List<Material>> LIST_ALLOWED_INTERRACTION = new PlotParamType<List<Material>>("LIST_ALLOWED_INTERRACTION", new ArrayList<Material>(), new TypeToken<ArrayList<Material>>(){}.getType());
+	public static PlotParamType<List<Long>> BANNED_PLAYERS = new PlotParamType<List<Long>>("BANNED_PLAYERS", new ArrayList<Long>(), new TypeToken<ArrayList<Long>>(){}.getType());
 	
 	public static PlotParamType<Boolean> RESET_VISITOR_FLY_SPEED = new PlotParamType<Boolean>("RESET_VISITOR_FLY_SPEED", false);
+	
+	
 	
 	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();
 	
 	private String id;
 	private T defaultValue;
-	
+	private Type type;
+
 	private PlotParamType(String id, T defaultValue) {
+		this(id, defaultValue, defaultValue.getClass());
+	}
+	
+	private PlotParamType(String id, T defaultValue, Type type) {
 		this.id = id;
 		this.defaultValue = defaultValue;
+		this.type = type;
 	}
 	
 	public String getId() {
@@ -64,6 +75,10 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	
 	public T getDefaultValue() {
 		return defaultValue;
+	}
+	
+	public Type getType() {
+		return type;
 	}
 	
 	public synchronized void setValue(Plot plot, T val) {
