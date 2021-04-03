@@ -82,8 +82,11 @@ public class CommandBlocksManager {
 			bar.getBar().removePlayer(p);
 	}
 
-	public void setFakeOp(Player player) {
+	public void setFakeOp(Player player, boolean setFakeOp) {
 		EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
-		nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
+		if (setFakeOp)
+			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 28));
+		else
+			nmsPlayer.playerConnection.sendPacket(new PacketPlayOutEntityStatus(nmsPlayer, (byte) 24));
 	}
 }

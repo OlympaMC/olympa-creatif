@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
@@ -59,107 +60,12 @@ public class WorldEventsListener implements Listener{
 	Map<String, Long> sneakHistory = new HashMap<String, Long>();
 
 	Map<Plot, Integer> spawnEntities = new HashMap<Plot, Integer>();
-	
-	//List<EntityType> protectedEntities = Collections.unmodifiableList(new ArrayList<EntityType>(Arrays.asList(EntityType.PAINTING, EntityType.ARMOR_STAND, EntityType.ITEM_FRAME)));
 
 	List<Entity> entities = new ArrayList<Entity>(); 
 	List<Entity> entitiesToRemove = new ArrayList<Entity>();
 	
 	public WorldEventsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-		
-		//gestion des entités (remove si id null ou si nb par plot > 100) et update de la liste des entités dans chaque plot (amélioration res performances du sélecteur @ dans les commandes)
-		/*new BukkitRunnable() {
-			
-			Thread asyncEntityCheckup = null;
-			
-			int getTotalEntities(Map<EntityType, Integer> map) {
-				int i = 0;
-				for (Entry<EntityType, Integer> e : map.entrySet())
-					i += e.getValue();
-					
-				return i;
-			}
-			
-			@Override
-			public void run() {
-				if (asyncEntityCheckup != null)
-					asyncEntityCheckup.interrupt();
-				
-				//supression des entitées marquées
-				for (Entity e : entitiesToRemove)
-					e.remove();
-				
-				//ajout des nouvelles entités
-				entitiesToRemove.clear();
-				entities = new ArrayList<Entity>(plugin.getWorldManager().getWorld().getEntities());
-				
-				//lancement du thread de test
-				asyncEntityCheckup = new Thread(new Runnable() {
-
-					Map<String, Map<EntityType, Integer>> entitiesPerPlot = new HashMap<String, Map<EntityType,Integer>>(); 
-					
-					@Override
-					public void run() {
-						ListIterator<Entity> iterator = entities.listIterator(entities.size());
-						Entity entity = null;
-						
-						for (Plot plot : plugin.getPlotsManager().getPlots())
-							plot.clearEntitiesInPlot();
-						
-						//parcours de la liste en sens inverse pour supprimer les plus anciennes entités
-						while (iterator.hasPrevious()) {
-							entity = iterator.previous();
-							
-							if (entity.getType() == EntityType.PLAYER)
-								continue;
-							
-							PlotId id = PlotId.fromLoc(plugin, entity.getLocation());
-							
-							//supprime l'entité si en dehors d'un plot ou si le nombre d'entités dans le plot dépasse la valeur en paramètre
-							if (id == null) {
-								entitiesToRemove.add(entity);
-							}else {
-								//création de la liste pour le plot si elle n'existe pas encore
-								if (!entitiesPerPlot.containsKey(id.toString()))
-									entitiesPerPlot.put(id.toString(), new HashMap<EntityType, Integer>());
-								
-								Map<EntityType, Integer> plotEntities = entitiesPerPlot.get(id.toString());
-								
-								//création de l'entrée pour le type d'entitité d'entity si n'existe pas encore
-								if (!plotEntities.containsKey(entity.getType()))
-									plotEntities.put(entity.getType(), 0);
-
-								//supression de l'entité OU ajout à la liste des entités du plot
-								if (plotEntities.get(entity.getType()) >= WorldManager.maxEntitiesPerTypePerPlot || getTotalEntities(plotEntities) >= WorldManager.maxTotalEntitiesPerPlot) {
-									entitiesToRemove.add(entity);
-								}else {
-									plotEntities.put(entity.getType(), plotEntities.get(entity.getType()) + 1);
-									
-									Plot plot = plugin.getPlotsManager().getPlot(id);
-									if (plot != null)
-										plot.addEntityInPlot(entity);
-								}
-							}
-						}
-						//Bukkit.broadcastMessage("entitiesPerPlot : " + entitiesPerPlot);
-						//Bukkit.broadcastMessage("toRemove : " + entitiesToRemove);
-					}
-				});
-				asyncEntityCheckup.start();
-			}
-		}.runTaskTimer(plugin, 0, 30);
-		
-		
-		//vide l'historique des entités spawnées
-		new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				spawnEntities.clear();
-			}
-		}.runTaskTimer(plugin, 0, 20);
-		*/
 	}
 	
 	@EventHandler //n'autorise que certaines sources de spawn de créatures 
@@ -172,24 +78,25 @@ public class WorldEventsListener implements Listener{
 			return;
 		}
 		
-		/*
-		if (e.getEntityType() == EntityType.ARMOR_STAND)
-			return;*/
-		
 		if (e.getSpawnReason() != SpawnReason.ENDER_PEARL && 
-				e.getSpawnReason() != SpawnReason.CUSTOM && e.getSpawnReason() != SpawnReason.ENDER_PEARL && 
+				e.getSpawnReason() != SpawnReason.CUSTOM && e.getSpawnReason() != SpawnReason.BREEDING && 
 				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG)
 			e.setCancelled(true);
 	}
 	
 	@EventHandler(priority = EventPriority.LOW) //cancel spawn if outside of the creative world
 	public void onEntitySpawn(EntitySpawnEvent e) {
-		if (!ComponentCreatif.ENTITIES.isActivated() || !e.getLocation().getWorld().equals(plugin.getWorldManager().getWorld()))
+		if (!ComponentCreatif.ENTITIES.isActivated() || !e.getLocation().getWorld().getUID().equals(plugin.getWorldManager().getWorld().getUID()))
 			e.setCancelled(true);
 	}
 
 	@EventHandler
-	public void onFireSpread(BlockSpreadEvent e) {
+	public void onBlockSpread(BlockSpreadEvent e) {
+		e.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onBlockSpread(BlockFormEvent e) {
 		e.setCancelled(true);
 	}
 	
@@ -217,11 +124,11 @@ public class WorldEventsListener implements Listener{
 			e.setCurrentItem(ItemUtils.name(e.getCurrentItem(), ChatColor.translateAlternateColorCodes('&',	e.getCurrentItem().getItemMeta().getDisplayName())));
 	}
 	
-	@EventHandler //cancel potions jetables si effet >5
+	@EventHandler //cancel potions jetables si effet > 10
 	public void onSplashPotionEvent(PotionSplashEvent e) {
 		for (PotionEffect effect : e.getPotion().getEffects())
-			if (effect.getAmplifier() >= 5)
-				e.setCancelled(true);
+			if (effect.getAmplifier() >= 10)
+				effect.withAmplifier(9);
 	}
 	
 	@EventHandler //cancel potion avec effet >5
@@ -229,10 +136,9 @@ public class WorldEventsListener implements Listener{
 		if (e.getItem().getType() != Material.POTION)
 			return;
 			
-		PotionMeta im = (PotionMeta) e.getItem().getItemMeta();
-		for (PotionEffect effect : im.getCustomEffects())
-			if (effect.getAmplifier() >= 5)
-				e.setCancelled(true);
+		for (PotionEffect effect : ((PotionMeta) e.getItem().getItemMeta()).getCustomEffects())
+			if (effect.getAmplifier() >= 10)
+				effect.withAmplifier(9);
 	}
 	
 	@EventHandler //ouvre le menu si joueur a sneak deux fois rapidement (délai : 0.2s)
@@ -243,16 +149,7 @@ public class WorldEventsListener implements Listener{
 					if (((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK))
 						MainGui.getMainGui(AccountProvider.get(e.getPlayer().getUniqueId())).create(e.getPlayer());	
 				}
-		/*
-					else
-						e.getPlayer().spigot().sendMessage(new ComponentBuilder()
-								.append("Ouverture du menu via double sneak désactivé. Modifiez vos paramètres ou ")
-								.color(net.md_5.bungee.api.ChatColor.GOLD)
-								.append("cliquez ici pour ouvrir le menu", FormatRetention.FORMATTING)
-								.color(net.md_5.bungee.api.ChatColor.BOLD)
-								.event(new ClickEvent(Action.RUN_COMMAND, "/oc menu"))
-								.create());
-								*/
+
 				else
 					sneakHistory.put(e.getPlayer().getName(), System.currentTimeMillis());
 			else
@@ -262,30 +159,14 @@ public class WorldEventsListener implements Listener{
 	@EventHandler //cancel téléportation par portail de l'end ou du nether ou si le monde de destination n'est pas le monde creative
 	public void onChangeWorld(PlayerTeleportEvent e) {
 		if (e.getCause() == TeleportCause.END_PORTAL || e.getCause() == TeleportCause.NETHER_PORTAL || 
+				e.getCause() == TeleportCause.END_GATEWAY || e.getCause() == TeleportCause.SPECTATE || 
 				!e.getTo().getWorld().equals(plugin.getWorldManager().getWorld()) ||
 				!plugin.getWorldManager().getWorld().getWorldBorder().isInside(e.getTo()))
 			e.setCancelled(true);
 	}
 	
-	/*@EventHandler //remplir le dispenser au fur et à mesure qu'il se vide (pour toujours garder les mêmes objets à l'intérieur)
-	public void onDispense(BlockDispenseEvent e) {
-		if (e.getItem() == null) 
-			return;
-		
-		if (e.getBlock().getState() instanceof Dispenser) {
-			((Dispenser) e.getBlock().getState()).getInventory().addItem(e.getItem().clone());
-		}
-		if (e.getBlock().getState() instanceof Dropper) {
-			((Dropper) e.getBlock().getState()).getInventory().addItem(e.getItem().clone());
-		}
-		
-	}*/
-	
-	@EventHandler(priority = EventPriority.HIGHEST) //chat de plot
-	public void onChat(AsyncPlayerChatEvent e) {
-		if (e.isCancelled())
-			return;
-		
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true) //chat de plot
+	public void onChat(AsyncPlayerChatEvent e) {		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		
@@ -336,7 +217,7 @@ public class WorldEventsListener implements Listener{
 	public void onJoin(PlayerJoinEvent e) {
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
-		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer());
+		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer(), true);
 		
 		Plot plot = plugin.getPlotsManager().getPlot(OCparam.SPAWN_LOC.get().toLoc());
 		if (plot != null)
@@ -365,6 +246,7 @@ public class WorldEventsListener implements Listener{
 		if (!plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getBlock().getType())) {
 			e.setCancelled(true);
 			e.getPlayer().getInventory().setItem(e.getHand(), plugin.getPerksManager().getKitsManager().getNoKitPermItem(e.getBlock().getType()));
+			e.getPlayer().updateInventory();
 			return;
 		}
 	}

@@ -3,7 +3,12 @@ package fr.olympa.olympacreatif.data;
 import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -14,7 +19,10 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,16 +36,20 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import scala.collection.convert.JavaCollectionWrappers.SetWrapper;
 
 
 
-public class PermissionsManager implements Listener{
+public class PermissionsManager implements Listener {
 	
 	private OlympaCreatifMain plugin;
     YamlConfiguration config = new YamlConfiguration();
-    List<String> cbPerms;
     List<String> wePerms;
+    List<String> cbPerms;
+
+    Map<UUID, PermissionAttachment> weAttachements = new HashMap<UUID, PermissionAttachment>();
+    Map<UUID, PermissionAttachment> cbAttachements = new HashMap<UUID, PermissionAttachment>();
 	
 	public PermissionsManager(OlympaCreatifMain plugin) {
 		
@@ -67,20 +79,19 @@ public class PermissionsManager implements Listener{
 		
 		//cbPerms.forEach(OlympaGroup.PLAYER::setRuntimePermission);
 		//wePerms.forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::setRuntimePermission);
-		setCbPerms(true);
-		setWePerms(true);
 
         //plugin.getLogger().log(Level.INFO, "§aVanilla & WorldEdit permissions have been successfully added to " + OlympaGroup.PLAYER + " and " + PermissionsList.USE_WORLD_EDIT.getMinGroup() + " groups.");
 	}
 	
-	public void setWePerms(boolean givePerm) {
+	/*
+	public void setWePermss(boolean givePerm) {
 		if (givePerm)
 			wePerms.forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::setRuntimePermission);
 		else
 			wePerms.forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::unsetRuntimePermission);
 		
 		recalculatePermissions();
-		plugin.getLogger().log(Level.INFO, "§aWorldEdit permissions have been " + (givePerm ? "§2added §2to " : "§cremoved §afrom ") + PermissionsList.USE_WORLD_EDIT.getMinGroup() + " §agroup.");
+		plugin.getLogger().log(Level.INFO, "§aWorldEdit permissions have been " + (givePerm ? "§2ADDED §2to " : "§cREMOVED §afrom ") + PermissionsList.USE_WORLD_EDIT.getMinGroup() + " §agroup.");
 	}
 	
 	public void setCbPerms(boolean givePerm) {
@@ -90,10 +101,58 @@ public class PermissionsManager implements Listener{
 			cbPerms.forEach(OlympaGroup.PLAYER::unsetRuntimePermission);
 		
 		recalculatePermissions();
-		plugin.getLogger().log(Level.INFO, "§aVanilla permissions have been " + (givePerm ? "§2added §2to " : "§cremoved §afrom ") + OlympaGroup.PLAYER + " §agroup.");
+		plugin.getLogger().log(Level.INFO, "§aVanilla permissions have been " + (givePerm ? "§2ADDED §2to " : "§cREMOVED §afrom ") + OlympaGroup.PLAYER + " §agroup.");
+	}*/
+	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
+
+		weAttachements.put(pc.getUniqueId(), pc.getPlayer().addAttachment(plugin));
+		cbAttachements.put(pc.getUniqueId(), pc.getPlayer().addAttachment(plugin));
+
+		//if (PermissionsList.USE_WORLD_EDIT.hasPermission(pc) && ComponentCreatif.WORLDEDIT.isActivated())
+		//else if (pc.hasKit(KitType.COMMANDBLOCK) && ComponentCreatif.COMMANDBLOCKS.isActivated())
+		plugin.getTask().runTaskLater(() -> {
+			setWePerms(pc);
+			setCbPerms(pc);
+		}, 20);
 	}
 	
-	private void recalculatePermissions() {		
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		weAttachements.remove(e.getPlayer().getUniqueId());
+		cbAttachements.remove(e.getPlayer().getUniqueId());
+	}
+	
+	private void setWePerms(OlympaPlayerCreatif p) {
+		PermissionAttachment att = weAttachements.get(p.getUniqueId());
+		
+		wePerms.forEach(perm -> {
+			if (PermissionsList.USE_WORLD_EDIT.hasPermission(p) && ComponentCreatif.WORLDEDIT.isActivated())
+				att.setPermission(perm, true); 
+			else
+				att.unsetPermission(perm);
+		});
+		
+		((CraftServer) Bukkit.getServer()).getHandle().getServer().getCommandDispatcher().a(((CraftPlayer) p.getPlayer()).getHandle()); 
+	}
+	
+	private void setCbPerms(OlympaPlayerCreatif p) {
+		PermissionAttachment att = cbAttachements.get(p.getUniqueId());
+		
+		cbPerms.forEach(perm -> {
+			if (p.hasKit(KitType.COMMANDBLOCK) && ComponentCreatif.COMMANDBLOCKS.isActivated()) 
+				att.setPermission(perm, true); 
+			else
+				att.unsetPermission(perm);
+		});
+
+		((CraftServer) Bukkit.getServer()).getHandle().getServer().getCommandDispatcher().a(((CraftPlayer) p.getPlayer()).getHandle());
+	}
+	
+	/*
+	private void recalculatePermissions() {
 		Bukkit.getOnlinePlayers().forEach(p -> {
 			for (PermissionAttachmentInfo attachmentInfo : p.getEffectivePermissions())
 				if (attachmentInfo.getAttachment() != null && attachmentInfo.getAttachment().getPlugin() == OlympaCore.getInstance())
@@ -107,14 +166,19 @@ public class PermissionsManager implements Listener{
 			p.recalculatePermissions();
 			((CraftServer) Bukkit.getServer()).getHandle().getServer().getCommandDispatcher().a(((CraftPlayer) p).getHandle());
 		});
-	}
+	}*/
+	
+	
+	
 	
 	public enum ComponentCreatif {
-		WORLDEDIT("worldedit", () -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(true), 
-				() -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(false)),
+		WORLDEDIT("worldedit", () -> Bukkit.getOnlinePlayers().forEach(p -> 
+		OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(AccountProvider.get(p.getUniqueId()))), 
+				() -> Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(AccountProvider.get(p.getUniqueId())))),
 		
-		COMMANDBLOCKS("commandblocks_and_vanilla_commands", () -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(true), 
-				() -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(false)),
+		COMMANDBLOCKS("commandblocks_and_vanilla_commands", () -> Bukkit.getOnlinePlayers().forEach(p -> 
+		OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(AccountProvider.get(p.getUniqueId()))), 
+				() -> Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(AccountProvider.get(p.getUniqueId())))),
 		
 		ENTITIES("entities", null, () -> OlympaCreatifMain.getInstance().getWorldManager().getWorld().getEntities().stream().filter(e -> 
 		(e.getType() != EntityType.PLAYER && e.getType() != EntityType.ARMOR_STAND && e.getType() != EntityType.ITEM_FRAME)).forEach(e -> e.remove())),

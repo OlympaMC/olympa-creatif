@@ -3,12 +3,15 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.compress.archivers.EntryStreamOffsets;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -190,7 +193,12 @@ public abstract class CbCommandSelectorParser {
 		if (s.length() < 2)
 			return new ArrayList<Entity>();
 		
-		Stream<Entity> entitiesStream = onlyPlayers ? plot.getEntities().stream().filter(e -> e.getType() == EntityType.PLAYER) : plot.getEntities().stream();
+		Set<Entity> ents = new HashSet<Entity>(plot.getPlayers());
+		if (!onlyPlayers)
+			ents.addAll(plot.getEntities());
+
+		Stream<Entity> entitiesStream = ents.stream();
+		
 		HashMultimap<String, String> selectorParams = HashMultimap.create();
 		
 		String key = "";
@@ -245,12 +253,12 @@ public abstract class CbCommandSelectorParser {
 			entitiesStream = entitiesStream.filter(e -> e.getType() == EntityType.PLAYER);
 			break;
 		}
-		if (selectorParams.size() > 10)
-			return new ArrayList<Entity>();
 		
-		for (Entry<String, SelectorFunction> mainParamEntry : selectorParametersFunctions.entrySet())
-			for (String selectorParam : selectorParams.get(mainParamEntry.getKey()))
-				entitiesStream = mainParamEntry.getValue().apply(plot, sendingLoc, entitiesStream, selectorParam);
+		ArrayList<Entry<String, SelectorFunction>> paramsList = new ArrayList<Entry<String, SelectorFunction>>(selectorParametersFunctions.entrySet());
+		
+		for (int i = 0 ; i < (paramsList.size() > 10 ? 10 : paramsList.size()) ; i++)
+			for (String selectorParam : selectorParams.get(paramsList.get(i).getKey()))
+				entitiesStream = paramsList.get(i).getValue().apply(plot, sendingLoc, entitiesStream, selectorParam);
 		
 		return entitiesStream.collect(Collectors.toList());
 	}

@@ -54,7 +54,6 @@ public class PlotParameters {
 
 	/**
 	 * For internal use only, NEVER use this method!
-	 * To set the spawn location, use the dedicated method setSpawnLoc
 	 */
 	public synchronized void setParameter(PlotParamType<?> param, Object value) {
 		//if (!param.equals(PlotParamType.SPAWN_LOC_X) && !param.equals(PlotParamType.SPAWN_LOC_Y) && !param.equals(PlotParamType.SPAWN_LOC_Z))
@@ -115,36 +114,6 @@ public class PlotParameters {
 			for (PlotParamType<?> param : params.getParameters())
 				if (json.containsKey(param.getId()))
 					params.setParameter(param, gson.fromJson((String) json.get(param.getId()), param.getType()));
-					
-			/*
-					if (param.getDefaultValue() instanceof Integer) {
-						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Integer.class));
-						
-					}else if (param.getDefaultValue() instanceof String) {
-						params.setParameter(param, (String) json.get(param.getId()));
-						
-					}else if (param.getDefaultValue() instanceof Boolean) {
-						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Boolean.class));
-						
-					}else if (param.getDefaultValue() instanceof Position) {
-						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), Position.class));
-						
-					}else if (param.getDefaultValue() instanceof WeatherType) {
-						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), WeatherType.class));
-						
-					}else if (param.getDefaultValue() instanceof GameMode) {
-						params.setParameter(param, gson.fromJson((String) json.get(param.getId()), GameMode.class));
-						
-					}else if (param.getDefaultValue() instanceof List) {
-						if (param.equals(PlotParamType.BANNED_PLAYERS))
-							params.setParameter(param, gson.fromJson((String) json.get(param.getId()), new TypeToken<ArrayList<Long>>(){}.getType()));
-						else if (param.equals(PlotParamType.LIST_ALLOWED_INTERRACTION))
-							params.setParameter(param, gson.fromJson((String) json.get(param.getId()), new TypeToken<ArrayList<Material>>(){}.getType()));
-						
-					}*/
-			
-			/*if (!plotId.isInPlot(params.getSpawnLoc()))
-				System.out.println("§4ERREUR LOAD SPAWN PLOT " + plotId + " : " + params.getSpawnLoc() + " IS OUT OF PLOT AREA");*/
 			
 			return params;
 		} catch (Exception e) {

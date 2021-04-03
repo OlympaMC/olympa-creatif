@@ -47,7 +47,7 @@ public class OcaCmd extends AbstractCmd {
 			plugin.getCmdLogic().sendPlotsList(getOlympaPlayer(), cmd.getArgument(0));
 	}
 
-	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|commandblocks|entities|commandblocks_and_vanilla_commands"})
+	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|redstone|entities|commandblocks_and_vanilla_commands"})
 	public void activate(CommandContext cmd) {
 		if (cmd.getArgumentsLength() == 0) {
 			sendComponentsStatus();
@@ -65,7 +65,7 @@ public class OcaCmd extends AbstractCmd {
 		OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
 	}
 
-	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|commandblocks|entities|commandblocks_and_vanilla_commands"})
+	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|redstone|entities|commandblocks_and_vanilla_commands"})
 	public void deactivate(CommandContext cmd) {
 		if (cmd.getArgumentsLength() == 0) {
 			sendComponentsStatus();
