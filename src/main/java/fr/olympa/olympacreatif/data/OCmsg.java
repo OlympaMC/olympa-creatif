@@ -186,6 +186,8 @@ public class OCmsg {
 	
 
 	public static final OCmsg PLOT_CANT_ENTER_CLOSED = new OCmsg(null);
+	
+	public static final OCmsg GIVE_VIP_REWARD = new OCmsg(null);
     
 	private static final Map<String, Function<OlympaPlayerCreatif, String>> playerPlaceHolders = ImmutableMap.<String, Function<OlympaPlayerCreatif,String>>builder()
 			.put("%playerName", pc -> {return pc.getName();})

@@ -7,8 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.min;
+
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
@@ -30,7 +34,7 @@ public class OcaCmd extends AbstractCmd {
 		super(plugin, "oca", PermissionsList.STAFF_OCA_CMD, "Panel de gestion du staff.");
 		// TODO Auto-genocaerated constructor stub
 	}
-
+	
 	
 	/*
 	@Cmd(player = true, syntax = "Ouvrir le menu staff du Créatif")
@@ -216,13 +220,58 @@ public class OcaCmd extends AbstractCmd {
 	private String getPlotIdOnFixedLength(Plot plot) {
 		String s = plot.getPlotId().toString();
 		while (s.length() < 7)
-			s = "_" + s;
+			s = " " + s;
 		return s;
 	}
 	
 	@Cmd(player = true, syntax = "Réinitialiser une parcelle", args = {"INTEGER", "code"}/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
 	public void resetplot(CommandContext cmd) {
 		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null), (cmd.getArgumentsLength() > 1 ? (String) cmd.getArgument(1) : null));
+	}
+	
+	@Cmd(player = true, syntax = "Gérer l'argent d'un joueur", args = {"PLAYERS", "info|give|remove", "INTEGER", }, min = 2)
+	public void money(CommandContext cmd) {
+		if (!PermissionsList.STAFF_MANAGE_MONEY.hasPermissionWithMsg(getOlympaPlayer()))
+			return;
+		
+		OlympaPlayerCreatif target = AccountProvider.get(((Player)cmd.getArgument(0)).getUniqueId());
+		
+		int money = cmd.getArgumentsLength() == 3 ? cmd.getArgument(2) : 0;
+		
+		switch((String) cmd.getArgument(1)) {
+		case "info":
+			Prefix.DEFAULT.sendMessage(getPlayer(), "Le joueur %s a actuellement %s coins.", target.getName(), target.getGameMoney() + "");
+			break;
+			
+		case "give":
+			if (money == 0) {
+				Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Veuillez entrer un montant valide !");
+				return;
+			}
+			
+			Prefix.DEFAULT.sendMessage(getPlayer(), "Le joueur %s a reçu %s coins et en a maintenant %s.", 
+					target.getName(), money + "", (target.getGameMoney() + money) + "");
+			
+			target.addGameMoney(money, () -> target.getPlayer().sendMessage("§aVotre compte vient d'être crédité de " + money + " coins par " + getPlayer().getName() + "."));
+			break;
+			
+		case "remove":
+			if (money == 0) {
+				Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Veuillez entrer un montant valide !");
+				return;
+			}
+			
+			if (!target.hasGameMoney(money)) {
+				Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Le joueur %s n'a que %s coins, impossible de lui en retirer %s.", target.getName(), target.getGameMoney() + "",  money + "");
+				return;
+			}
+				
+			Prefix.DEFAULT.sendMessage(getPlayer(), "Le joueur %s a perdu %s coins et en a maintenant %s.", 
+					target.getName(), money + "", (target.getGameMoney() - money) + "");
+			
+			target.withdrawGameMoney(money, () -> target.getPlayer().sendMessage("§cVotre compte vient d'être débité de " + cmd.getArgument(2) + " coins par " + getPlayer().getName() + "."));
+			break;
+		}
 	}
 	
 	

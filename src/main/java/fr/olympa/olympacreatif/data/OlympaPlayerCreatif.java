@@ -36,7 +36,7 @@ import fr.olympa.olympacreatif.plot.PlotsManager;
 
 public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
-	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_MONEY = new SQLColumn<OlympaPlayerCreatif>("gameMoney", "INT NOT NULL DEFAULT 0", Types.INTEGER).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_MONEY = new SQLColumn<OlympaPlayerCreatif>("gameMoney", "INT NOT NULL DEFAULT 100", Types.INTEGER).setUpdatable();
 	
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_REDSTONE_KIT = new SQLColumn<OlympaPlayerCreatif>("hasRedstoneKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PEACEFUL_KIT = new SQLColumn<OlympaPlayerCreatif>("hasPeacefulMobsKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
@@ -52,8 +52,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_DEFAULT_PLOT_CHAT = new SQLColumn<OlympaPlayerCreatif>("playerParamDefaultPlotChat", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_MENU_ON_SNEAK = new SQLColumn<OlympaPlayerCreatif>("playerParamOpenMenuOnSneak", "TINYINT(1) NOT NULL DEFAULT 1", Types.TINYINT).setUpdatable();
 	
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_HAS_CLAIMED_VIP = new SQLColumn<OlympaPlayerCreatif>("hasClaimedVipReward", "BOOLEAN NOT NULL DEFAULT FALSE", Types.BOOLEAN).setUpdatable();
+	
 	public static final List<SQLColumn<OlympaPlayerCreatif>> COLUMNS =
-			Arrays.asList(COLUMN_MONEY, COLUMN_REDSTONE_KIT, COLUMN_PEACEFUL_KIT, COLUMN_HOSTILE_KIT, COLUMN_FLUID_KIT, COLUMN_COMMANDBLOCK_KIT, COLUMN_ADMIN_KIT, COLUMN_UPGRADE_COMMANDBLOCK, COLUMN_UPGRADE_BONUSPLOTS, COLUMN_UPGRADE_BONUSMEMBERS, COLUMN_PARAM_DEFAULT_PLOT_CHAT, COLUMN_PARAM_MENU_ON_SNEAK);
+			Arrays.asList(COLUMN_MONEY, COLUMN_REDSTONE_KIT, COLUMN_PEACEFUL_KIT, 
+					COLUMN_HOSTILE_KIT, COLUMN_FLUID_KIT, COLUMN_COMMANDBLOCK_KIT, 
+					COLUMN_ADMIN_KIT, COLUMN_UPGRADE_COMMANDBLOCK, COLUMN_UPGRADE_BONUSPLOTS, 
+					COLUMN_UPGRADE_BONUSMEMBERS, COLUMN_PARAM_DEFAULT_PLOT_CHAT, COLUMN_PARAM_MENU_ON_SNEAK, 
+					COLUMN_HAS_CLAIMED_VIP);
 	
 	private static final Map<KitType, SQLColumn<OlympaPlayerCreatif>> kitsColumns = ImmutableMap.<KitType, SQLColumn<OlympaPlayerCreatif>>builder()
 			.put(KitType.ADMIN, COLUMN_ADMIN_KIT)
@@ -72,10 +78,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			
 	private OlympaCreatifMain plugin;
 	
-	//A CHANGER AVANT BETA OUVERTE
-	//private int gameMoney = 0;
-	//private OlympaMoney gameMoney = new OlympaMoney(0);
-	private int gameMoney = 0;
+	private int gameMoney;
 
 	private Set<KitType> kits = new HashSet<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();
@@ -96,11 +99,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		for (UpgradeType upg : UpgradeType.values())
 			upgrades.put(upg, 0);
 
-		//playerParams.add(PlayerParamType.DEFAULT_PLOT_CHAT);
 		playerParams.add(PlayerParamType.OPEN_GUI_ON_SNEAK);
 		
 		currentPlot = plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, 1));
-		//gameMoney.observe("datas", () -> COLUMN_MONEY.updateAsync(this, gameMoney.get(), null, null));
 	}
 	
 	@Override
@@ -119,6 +120,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 				playerParams.add(param);
 			else
 				playerParams.remove(param);
+		
+		//give possible VIP rewards
+		if (!resultSet.getBoolean("hasClaimedVipReward") && getGroups().containsKey(OlympaGroup.VIP))
+			COLUMN_HAS_CLAIMED_VIP.updateAsync(this, true, () ->
+					addGameMoney(100, () -> OCmsg.GIVE_VIP_REWARD.send(this)), 
+					null);
+		
+		currentPlot = plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, 1));
 	}
 	
 	/*@Override
@@ -174,7 +183,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	public void setGameMoney(int money, Runnable successRunnable) {
 		gameMoney = money;
-		COLUMN_MONEY.updateAsync(this, gameMoney, successRunnable, exception -> Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Une erreur est survenue lors de la mise à jour de vos informations. Erreur à signaler au staff : §4" + exception.getCause().getMessage()));
+		COLUMN_MONEY.updateAsync(this, gameMoney, successRunnable, exception -> Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Une erreur est survenue lors de la mise à jour de vos informations. \nErreur à signaler au staff : §4" + exception.getCause().getMessage()));
 	}
 	
 	public boolean hasKit(KitType kit) {
@@ -266,26 +275,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 				customScoreboardLines[i] = keys.get(i - 1);
 			else
 				customScoreboardLines[i] = keys.get(i - 1) + "§7 : " + scores.get(keys.get(i - 1));
-		
-		/*
-		List<String> keys = new ArrayList<String>(scores.keySet());
-		List<Integer> values = new ArrayList<Integer>(scores.values());
-		
-		for (int i = scores.size() ; i < customScoreboardLinesSize ; i++)
-		
-		//Bukkit.broadcastMessage("Set CS : " + scores);
-		
-		for (int i = 1 ; i < customScoreboardLinesSize ; i++)
-			if (keys.size() >= i)
-				//si le string commence et finit par %, on n'affiche pas le score
-				if (keys.get(i - 1).startsWith("%") && keys.get(i - 1).endsWith("%"))
-					customScoreboardLines.set(i, keys.get(i - 1));
-				else
-					customScoreboardLines.set(i, keys.get(i - 1) + "§r§7 : " + values.get(i - 1));
-			else
-				customScoreboardLines.set(i, "§" + i);
-		*/
-		//Bukkit.broadcastMessage("Set CS : " + scoreboardLines);
 	}
 	
 	

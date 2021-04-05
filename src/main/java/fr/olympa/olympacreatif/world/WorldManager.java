@@ -67,31 +67,29 @@ public class WorldManager {
 		
 		//task pour donner l'argent aux joueurs périodiquement
 		new BukkitRunnable() {
+
+			int currentPeriod = 0;
 			
-			final int cMax = 60;
-			int c = 0;
+			int noAfkIncome = OCparam.INCOME_NOT_AFK.get();
+			int afkIncome = OCparam.INCOME_AFK.get();
 			
 			@Override
 			public void run() {
-
-				int noAfkIncome = OCparam.INCOME_NOT_AFK.get();
-				int afkIncome = OCparam.INCOME_AFK.get();
+				currentPeriod++;
+				currentPeriod = currentPeriod % 10;
 				
 				Bukkit.getOnlinePlayers().forEach(p -> {
 					OlympaPlayerCreatif pp = AccountProvider.get(p.getUniqueId());
 
 					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? afkIncome : noAfkIncome;
-					pp.addGameMoney(income, null);
 					
-					c++;
-					
-					if (c == cMax) {
-						c = 0;
-						OCmsg.PERIODIC_INCOME_RECEIVED.send(p, "" + income);	
-					}
+					if (currentPeriod == 0)
+						pp.addGameMoney(income, () -> OCmsg.PERIODIC_INCOME_RECEIVED.send(p, "" + income));
+					else
+						pp.addGameMoney(income, null);
 				});
 			}
-		}.runTaskTimer(plugin, 20*60, 20*60);
+		}.runTaskTimer(plugin, 20*60*6, 20*60*6);
 	}
 	
 	public void defineWorldParams() {
