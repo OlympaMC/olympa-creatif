@@ -36,6 +36,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import scala.collection.convert.JavaCollectionWrappers.SetWrapper;
 
@@ -46,9 +47,11 @@ public class PermissionsManager implements Listener {
 	private OlympaCreatifMain plugin;
     YamlConfiguration config = new YamlConfiguration();
     List<String> wePerms;
+    List<String> wePermsAdmin;
     List<String> cbPerms;
 
     Map<UUID, PermissionAttachment> weAttachements = new HashMap<UUID, PermissionAttachment>();
+    Map<UUID, PermissionAttachment> weAdminAttachements = new HashMap<UUID, PermissionAttachment>();
     Map<UUID, PermissionAttachment> cbAttachements = new HashMap<UUID, PermissionAttachment>();
 	
 	public PermissionsManager(OlympaCreatifMain plugin) {
@@ -76,6 +79,7 @@ public class PermissionsManager implements Listener {
         //System.out.println("we perms : " + config.getList("we_perms"));
 		cbPerms = config.getStringList("cb_perms");
 		wePerms = config.getStringList("we_perms");
+		wePermsAdmin = config.getStringList("we_perms_admin");
 		
 		//cbPerms.forEach(OlympaGroup.PLAYER::setRuntimePermission);
 		//wePerms.forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::setRuntimePermission);
@@ -130,6 +134,19 @@ public class PermissionsManager implements Listener {
 		
 		wePerms.forEach(perm -> {
 			if (PermissionsList.USE_WORLD_EDIT.hasPermission(p) && ComponentCreatif.WORLDEDIT.isActivated())
+				att.setPermission(perm, true); 
+			else
+				att.unsetPermission(perm);
+		});
+		
+		((CraftServer) Bukkit.getServer()).getHandle().getServer().getCommandDispatcher().a(((CraftPlayer) p.getPlayer()).getHandle()); 
+	}
+	
+	public void setWePermsAdmin(OlympaPlayerCreatif p) {
+		PermissionAttachment att = weAttachements.get(p.getUniqueId());
+		
+		wePermsAdmin.forEach(perm -> {
+			if (p.hasStaffPerm(StaffPerm.WORLDEDIT))
 				att.setPermission(perm, true); 
 			else
 				att.unsetPermission(perm);

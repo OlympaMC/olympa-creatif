@@ -203,6 +203,7 @@ public class CbCommandListener implements Listener {
 		*/
 	}
 	
+	/*
 	private void maintainCbTags(CommandSender sender) {
 		
 		BlockState cb = (BlockState) ((CraftBlockCommandSender) sender).getBlock().getState();
@@ -216,7 +217,7 @@ public class CbCommandListener implements Listener {
 		
 		if (tag.hasKey("SuccessCount"))
 			setCbTags(tile, tag.getInt("SuccessCount"));
-	}
+	}*/
 	
 	private void setCbTags(CommandSender sender, int cmdResult) {
 		

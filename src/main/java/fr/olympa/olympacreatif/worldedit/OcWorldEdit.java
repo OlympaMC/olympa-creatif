@@ -223,7 +223,7 @@ public class OcWorldEdit extends AWorldEditManager {
 				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 
 				
-				if (!p.hasStaffPerm(StaffPerm.WORLDEDIT_EVERYWHERE) && (plot == null || !PlotPerm.USE_WE.has(plot, p))) {
+				if (!p.hasStaffPerm(StaffPerm.WORLDEDIT) && (plot == null || !PlotPerm.USE_WE.has(plot, p))) {
 					e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
 				        @Override
 				        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {

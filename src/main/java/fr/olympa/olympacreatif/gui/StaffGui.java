@@ -84,7 +84,7 @@ public class StaffGui extends IGui {
 		setItem(1 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 
 		perm = PermissionsList.STAFF_BYPASS_WORLDEDIT;
-		sPerm = StaffPerm.WORLDEDIT_EVERYWHERE;
+		sPerm = StaffPerm.WORLDEDIT;
 		setItem(2, ItemUtils.item(Material.WOODEN_AXE, "§6Bypass WorldEdit", "§7Permet d'utiliser les fonctionnalités WorldEdit", "§7sur tous les plots et la route"), getStaffPermSwitchConsumer(perm, sPerm));	
 		setItem(2 + 9, getStateIndicator(p.hasStaffPerm(sPerm), perm), null);
 

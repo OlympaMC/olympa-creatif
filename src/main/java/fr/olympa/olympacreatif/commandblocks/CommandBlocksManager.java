@@ -80,6 +80,9 @@ public class CommandBlocksManager {
 		
 		for (CbBossBar bar : fromPlot.getCbData().getBossBars().values())
 			bar.getBar().removePlayer(p);
+		
+		for (CbObjective obj : fromPlot.getCbData().getObjectives())
+			obj.set(p, null);
 	}
 
 	public void setFakeOp(Player player, boolean setFakeOp) {

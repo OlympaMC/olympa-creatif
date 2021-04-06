@@ -175,10 +175,9 @@ public class CbObjective {
 			
 			if (displaySlot == DisplaySlot.SIDEBAR)
 				for (Player p : plot.getPlayers())
-					((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(newObjName, (LinkedHashMap<String, Integer>)getValues(true));
+					((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(newObjName, getValues(true));
 		}
 		
-			
 		objName = newObjName;
 	}
 	
@@ -186,54 +185,17 @@ public class CbObjective {
 		return typeParam;
 	}
 	
-	public Map<String, Integer> getValues(boolean sortValues){
-		final Map<String, Integer> values = new LinkedHashMap<String, Integer>();
+	public LinkedHashMap<String, Integer> getValues(boolean sortValues){
+		LinkedHashMap<String, Integer> values = new LinkedHashMap<String, Integer>();
 
 		stringHolders.forEach((name, score) -> values.put(ChatColor.translateAlternateColorCodes('&', name.replace("_", " ")), score));
 		entityHolders.forEach((ent, score) -> values.put(ent.getType() == EntityType.PLAYER ? ((Player)ent).getName() : 
 			ent.getCustomName() == null ? ent.getName() : ent.getCustomName(), score));
 		
 		if (sortValues)
-			return values.entrySet().stream().sorted(Comparator.comparingInt(e -> e.getValue())).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+			return values.entrySet().stream().sorted(Comparator.comparingInt(e -> e.getValue())).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldKey, newKey) -> newKey, () -> new LinkedHashMap<String, Integer>()));//(e -> e.getKey(), e -> e.getValue()));
 		else
 			return values;
-		/*
-		//copie valeurs strings
-		for (Entry<String, Integer> e : stringHolders.entrySet())
-			values.put(ChatColor.translateAlternateColorCodes('&', e.getKey().replace("_", " ")), e.getValue());
-			//values.put(e.getKey(), e.getValue());
-		
-		//copie valeurs entités
-		for (Entry<Entity, Integer> e : entityHolders.entrySet())
-			//si joueur, copie nom avec grade
-			if (e.getKey().getType() == EntityType.PLAYER)
-				values.put((AccountProvider.get(e.getKey().getUniqueId())).getGroupNameColored() + " " + e.getKey().getName(), e.getValue());
-			else
-				//si entité, copie custom name ou type entité par défaut
-				if (e.getKey().getCustomName() != null)
-					values.put(e.getKey().getCustomName(), e.getValue());
-				else
-					values.put(e.getKey().getName(), e.getValue());
-		
-		if (!sortValues)
-			return values;
-	   
-		List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(values.entrySet());
-	   
-		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-
-			@Override
-			public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-				return - o1.getValue().compareTo(o2.getValue());
-			}
-	   });
-	
-	   LinkedHashMap<String, Integer> result = new LinkedHashMap<String, Integer>();
-	   for (Entry<String, Integer> e : list) {
-		   result.put(e.getKey(), e.getValue());
-	   }
-	   
-	   return result;*/
 	}
 	
 	//ADD ET SET POUR OBJECT
@@ -272,7 +234,7 @@ public class CbObjective {
 		
 		//affichage scoreboard sidebar
 		if (displaySlot == DisplaySlot.SIDEBAR) {
-			LinkedHashMap<String, Integer> values = (LinkedHashMap<String, Integer>) getValues(true);
+			LinkedHashMap<String, Integer> values = getValues(true);
 			
 			for (Player p : plot.getPlayers()) 
 				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);
@@ -307,7 +269,7 @@ public class CbObjective {
 		
 		//affichage scoreboard sidebar
 		if (displaySlot == DisplaySlot.SIDEBAR) {
-			LinkedHashMap<String, Integer> values = (LinkedHashMap<String, Integer>) getValues(true);
+			LinkedHashMap<String, Integer> values = getValues(true);
 			
 			for (Player p : plot.getPlayers()) 
 				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);	
@@ -352,7 +314,7 @@ public class CbObjective {
 			plot.getCbData().getObjectiveBelowName().setDisplayName(objName);
 				
 		if (displaySlot == DisplaySlot.SIDEBAR) {
-			LinkedHashMap<String, Integer> scores = (LinkedHashMap<String, Integer>) getValues(true);
+			LinkedHashMap<String, Integer> scores = getValues(true);
 			
 			for (Player p : plot.getPlayers()) {
 				OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());

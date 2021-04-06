@@ -1,3 +1,12 @@
+we_perms_admin:  
+  - worldedit.schematic.list
+  - worldedit.schematic.load
+  - worldedit.clipboard.load
+  - worldedit.schematic.save
+  - worldedit.clipboard.save
+  - worldedit.schematic.list
+  - worldedit.schematic.formats
+  
 cb_perms:  
   - minecraft.command.clear
   - minecraft.command.effect
@@ -13,65 +22,121 @@ cb_perms:
   - minecraft.command.team
   - minecraft.command.tellraw
   - minecraft.command.trigger
+  - minecraft.command.teleport
   - minecraft.command.setblock
   - minecraft.command.selector
 
   
-we_perms:
-  - worldedit.wand
-  - worldedit.analysis.count
-  - worldedit.analysis.distr
-  - worldedit.brush.apply
-  - worldedit.brush.options.mask
-  - worldedit.brush.options.material
-  - worldedit.brush.options.range
-  - worldedit.brush.options.size
-  - worldedit.brush.clipboard
-  - worldedit.brush.cylinder
-  - worldedit.brush.deform
-  - worldedit.brush.ex
-  - worldedit.brush.forest
-  - worldedit.brush.lower
-  - worldedit.brush.paint
-  - worldedit.brush.item
-  - worldedit.brush.raise
-  - worldedit.brush.set
-  - worldedit.brush.smooth
-  - worldedit.brush.sphere
-  - worldedit.clipboard.copy
+we_perms: 
+  - gobrush.use
+  - fawe.olympacreatif
+  - fawe.worldeditregion
+  - fawe.cancel
+  - worldedit.analysis.sel
+  - worldedit.biome.info
+  - worldedit.biome.set
+  - worldedit.biome.list
+  - worldedit.light.fix
+  #- worldedit.chunkinfo
+  #- worldedit.listchunks
   - worldedit.clipboard.cut
-  - worldedit.clipboard.flip
   - worldedit.clipboard.paste
+  - worldedit.clipboard.clear
+  - worldedit.clipboard.copy
+  - worldedit.clipboard.lazycopy
+  - worldedit.clipboard.place
+  - worldedit.clipboard.flip
   - worldedit.clipboard.rotate
-  - worldedit.drain
+  - worldedit.help
   - worldedit.generation.cylinder
+  - worldedit.generation.sphere
   - worldedit.generation.forest
   - worldedit.generation.pumpkins
   - worldedit.generation.pyramid
   - worldedit.generation.shape
-  - worldedit.generation.sphere
-  - worldedit.green
-  - worldedit.help
-  - worldedit.history.redo
   - worldedit.history.undo
-  - worldedit.region.curve
-  - worldedit.region.faces
-  - worldedit.region.forest
+  - worldedit.history.redo
+  #- worldedit.history.rollback
+  - worldedit.navigation.unstuck
+  - worldedit.region.hollow
   - worldedit.region.line
-  - worldedit.region.naturalize
+  - worldedit.region.curve
   - worldedit.region.overlay
-  - worldedit.region.replace
-  - worldedit.region.set
-  - worldedit.region.smooth
-  - worldedit.region.stack
+  - worldedit.region.center
+  - worldedit.region.naturalize
   - worldedit.region.walls
-  - worldedit.replacenear
-  - worldedit.selection.expand
-  - worldedit.selection.hpos
+  - worldedit.region.faces
+  - worldedit.region.smooth
+  - worldedit.region.move
+  - worldedit.region.forest
+  - worldedit.region.replace
+  - worldedit.region.stack
+  - worldedit.region.set
   - worldedit.selection.pos
+  #- worldedit.selection.chunk
+  #- worldedit.selection.hpos
+  - worldedit.wand
+  - worldedit.wand.toggle
+  - worldedit.selection.contract
+  - worldedit.selection.outset
+  - worldedit.selection.inset
+  - worldedit.analysis.distr
+  - worldedit.analysis.count
+  - worldedit.selection.size
+  - worldedit.selection.expand
   - worldedit.selection.shift
-  - worldedit.snow
+  #- worldedit.snapshots.list
+  - worldedit.superpickaxe
   - worldedit.superpickaxe.area
-  - worldedit.thaw
+  #- worldedit.brush.blendball
+  - worldedit.brush.erode
+  - worldedit.brush.pull
+  #- worldedit.brush.circle
+  - worldedit.brush.line
+  - worldedit.brush.spline
+  #- worldedit.brush.surfacespline
+  #- worldedit.brush.shatter
+  #- worldedit.brush.stencil
+  #- worldedit.brush.height
+  - worldedit.brush.layer
+  - worldedit.brush.scatter
+  - worldedit.brush.splatter
+  - worldedit.brush.scattercommand
+  - worldedit.brush.copy
+  #- worldedit.brush.command
+  - worldedit.brush.apply
+  - worldedit.brush.sphere
+  - worldedit.brush.cylinder
+  - worldedit.brush.clipboard
+  - worldedit.brush.smooth
+  - worldedit.brush.ex
+  - worldedit.brush.gravity
+  - worldedit.brush.options.range
+  - worldedit.brush.options.material
+  - worldedit.brush.options.size
+  - worldedit.brush.options.mask
+  - worldedit.brush.options.smask
+  - worldedit.brush.options.transform
+  - worldedit.brush.options.scroll
+  - worldedit.tool.deltree
+  - worldedit.tool.farwand
+  - worldedit.tool.lrbuild
+  - worldedit.tool.info
   - worldedit.tool.tree
-
+  - worldedit.tool.replacer
+  #- worldedit.tool.data-cycler
+  - worldedit.tool.flood-fill
+  - worldedit.tool.inspect
+  - worldedit.drain
+  - worldedit.fixlava
+  - worldedit.fixwater
+  - worldedit.removeabove
+  - worldedit.removebelow
+  - worldedit.removenear
+  - worldedit.replacenear
+  - worldedit.snow
+  - worldedit.thaw
+  - worldedit.green
+  - worldedit.extinguish
+  - worldedit.calc
+  - worldedit.fill

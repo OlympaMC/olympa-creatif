@@ -129,12 +129,12 @@ public class PlotsInstancesListener implements Listener{
 						Dispenser disp = (Dispenser) plugin.getWorldManager().getWorld().getBlockAt(loc).getBlockData();
 						BlockFace face = disp.getFacing();
 						
-						Block target = plugin.getWorldManager().getWorld().getBlockAt(loc); 
-						target.setType(mat);
+						Block targetBlock = plugin.getWorldManager().getWorld().getBlockAt(loc); 
+						targetBlock.setType(mat);
 						
-						CommandBlock data = (CommandBlock) target.getBlockData();
-						data.setFacing(face);
-						target.setBlockData(data);
+						CommandBlock targetBlockData = (CommandBlock) targetBlock.getBlockData();
+						targetBlockData.setFacing(face);
+						targetBlock.setBlockData(targetBlockData);
 					}
 				}
 				
@@ -382,7 +382,7 @@ public class PlotsInstancesListener implements Listener{
 		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 
 		if (plot == null) {
-			if (!pc.hasStaffPerm(StaffPerm.WORLDEDIT_EVERYWHERE)) {
+			if (!pc.hasStaffPerm(StaffPerm.WORLDEDIT)) {
 				e.setCancelled(true);
 				OCmsg.PLOT_CANT_INTERRACT_NULL_PLOT.send(pc);
 			}

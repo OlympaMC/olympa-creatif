@@ -330,7 +330,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	public enum StaffPerm{
 		BYPASS_KICK_BAN(PermissionsList.STAFF_BYPASS_PLOT_KICK_AND_BAN),
 		GHOST_MODE(PermissionsList.STAFF_BYPASS_VANILLA_COMMANDS),
-		WORLDEDIT_EVERYWHERE(PermissionsList.STAFF_BYPASS_WORLDEDIT),
+		WORLDEDIT(PermissionsList.STAFF_BYPASS_WORLDEDIT),
 		OWNER_EVERYWHERE(PermissionsList.STAFF_PLOT_FAKE_OWNER);
 		
 		OlympaPermission corePerm;

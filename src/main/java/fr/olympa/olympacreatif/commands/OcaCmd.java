@@ -2,45 +2,27 @@ package fr.olympa.olympacreatif.commands;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.min;
-
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
-import fr.olympa.olympacreatif.gui.MainGui;
-import fr.olympa.olympacreatif.gui.StaffGui;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotId;
-import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
-import net.minecraft.server.v1_16_R3.Chunk;
 
 public class OcaCmd extends AbstractCmd {
 
 	public OcaCmd(OlympaCreatifMain plugin) {
-		super(plugin, "oca", PermissionsList.STAFF_OCA_CMD, "Panel de gestion du staff.");
-		// TODO Auto-genocaerated constructor stub
+		super(plugin, "oca", PermissionsList.STAFF_OCA_CMD, "Panel de gestion pour le staff.");
 	}
-	
-	
-	/*
-	@Cmd(player = true, syntax = "Ouvrir le menu staff du Créatif")
-	public void menu(CommandContext cmd) {
-		new StaffGui(MainGui.getMainGui(getOlympaPlayer())).create(getPlayer());
-	}*/
 
 	
 	@Cmd(syntax = "Afficher la liste des parcelles actuellement chargées", args = "PLAYERS")
@@ -96,7 +78,7 @@ public class OcaCmd extends AbstractCmd {
 	}
 
 	@Cmd(player = true, syntax = "Gérer ses permissions staff", description = "/oca perms <perm>", min = 0, 
-			args = "ghost_mode|owner_everywhere|worldedit_everywhere|bypass_kick_ban")
+			args = "ghost_mode|owner_everywhere|worldedit|bypass_kick_ban")
 	public void perms(CommandContext cmd) {
 		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)getOlympaPlayer());
 		
@@ -122,8 +104,8 @@ public class OcaCmd extends AbstractCmd {
 			perm = StaffPerm.OWNER_EVERYWHERE;
 			break;
 
-		case "worldedit_everywhere":
-			perm = StaffPerm.WORLDEDIT_EVERYWHERE;
+		case "worldedit":
+			perm = StaffPerm.WORLDEDIT;
 			break;
 
 		case "bypass_kick_ban":
@@ -138,6 +120,9 @@ public class OcaCmd extends AbstractCmd {
 			return;
 		
 		pc.toggleStaffPerm(perm);
+		if (perm == StaffPerm.WORLDEDIT)
+			plugin.getPermissionsManager().setWePermsAdmin(pc);
+		
 		sendMessage(Prefix.DEFAULT_GOOD, "§eVotre permission %s est désormais %s§a.", perm.toString().toLowerCase(), pc.hasStaffPerm(perm) ? "§aactivée" : "§cdésactivée");
 	}
 
@@ -229,9 +214,9 @@ public class OcaCmd extends AbstractCmd {
 		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null), (cmd.getArgumentsLength() > 1 ? (String) cmd.getArgument(1) : null));
 	}
 	
-	@Cmd(player = true, syntax = "Gérer l'argent d'un joueur", args = {"PLAYERS", "info|give|remove", "INTEGER", }, min = 2)
+	@Cmd(syntax = "Gérer l'argent d'un joueur", args = {"PLAYERS", "info|give|remove", "INTEGER", }, min = 2)
 	public void money(CommandContext cmd) {
-		if (!PermissionsList.STAFF_MANAGE_MONEY.hasPermissionWithMsg(getOlympaPlayer()))
+		if (getOlympaPlayer() != null && !PermissionsList.STAFF_MANAGE_MONEY.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
 		OlympaPlayerCreatif target = AccountProvider.get(((Player)cmd.getArgument(0)).getUniqueId());
@@ -240,16 +225,16 @@ public class OcaCmd extends AbstractCmd {
 		
 		switch((String) cmd.getArgument(1)) {
 		case "info":
-			Prefix.DEFAULT.sendMessage(getPlayer(), "Le joueur %s a actuellement %s coins.", target.getName(), target.getGameMoney() + "");
+			Prefix.DEFAULT.sendMessage(getSender(), "Le joueur %s a actuellement %s coins.", target.getName(), target.getGameMoney() + "");
 			break;
 			
 		case "give":
 			if (money == 0) {
-				Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Veuillez entrer un montant valide !");
+				Prefix.DEFAULT_BAD.sendMessage(getSender(), "Veuillez entrer un montant valide !");
 				return;
 			}
 			
-			Prefix.DEFAULT.sendMessage(getPlayer(), "Le joueur %s a reçu %s coins et en a maintenant %s.", 
+			Prefix.DEFAULT.sendMessage(getSender(), "Le joueur %s a reçu %s coins et en a maintenant %s.", 
 					target.getName(), money + "", (target.getGameMoney() + money) + "");
 			
 			target.addGameMoney(money, () -> target.getPlayer().sendMessage("§aVotre compte vient d'être crédité de " + money + " coins par " + getPlayer().getName() + "."));
@@ -257,16 +242,16 @@ public class OcaCmd extends AbstractCmd {
 			
 		case "remove":
 			if (money == 0) {
-				Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Veuillez entrer un montant valide !");
+				Prefix.DEFAULT_BAD.sendMessage(getSender(), "Veuillez entrer un montant valide !");
 				return;
 			}
 			
 			if (!target.hasGameMoney(money)) {
-				Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Le joueur %s n'a que %s coins, impossible de lui en retirer %s.", target.getName(), target.getGameMoney() + "",  money + "");
+				Prefix.DEFAULT_BAD.sendMessage(getSender(), "Le joueur %s n'a que %s coins, impossible de lui en retirer %s.", target.getName(), target.getGameMoney() + "",  money + "");
 				return;
 			}
 				
-			Prefix.DEFAULT.sendMessage(getPlayer(), "Le joueur %s a perdu %s coins et en a maintenant %s.", 
+			Prefix.DEFAULT.sendMessage(getSender(), "Le joueur %s a perdu %s coins et en a maintenant %s.", 
 					target.getName(), money + "", (target.getGameMoney() - money) + "");
 			
 			target.withdrawGameMoney(money, () -> target.getPlayer().sendMessage("§cVotre compte vient d'être débité de " + cmd.getArgument(2) + " coins par " + getPlayer().getName() + "."));
