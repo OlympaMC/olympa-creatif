@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.plot;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -18,13 +19,9 @@ public class PlotStoplagChecker {
 	public static final int forcedStoplagStoplagCount = 3;
 	
 	static {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				OlympaCreatifMain.getInstance().getPlotsManager().getPlots().forEach(plot -> plot.getStoplagChecker().resetHistory());
-			}
-		}.runTaskTimer(OlympaCreatifMain.getInstance(), periodDuration, periodDuration);
-		
+		OlympaCreatifMain.getInstance().getTask().scheduleSyncRepeatingTask(
+				() -> OlympaCreatifMain.getInstance().getPlotsManager().getPlots().forEach(plot -> plot.getStoplagChecker().resetHistory()), 
+				5, 5, TimeUnit.SECONDS);
 	}
 	
 	private OlympaCreatifMain plugin;
@@ -33,7 +30,7 @@ public class PlotStoplagChecker {
 	private Map<StopLagDetect, Integer> detections = new HashMap<PlotStoplagChecker.StopLagDetect, Integer>();
 	private int stoplagCount = 0;
 	private int detectionsCount = 0;
-	private int stoplagResetTick = MinecraftServer.currentTick + forcedStoplagPeriodDuration;
+	private int forcedStoplagResetTick = MinecraftServer.currentTick + forcedStoplagPeriodDuration;
 	
 	public PlotStoplagChecker(OlympaCreatifMain plugin, Plot plot) {
 		this.plugin = plugin;
@@ -61,12 +58,12 @@ public class PlotStoplagChecker {
 	private void fireStopLag(StopLagDetect type) {
 		detections.put(type, 0);
 		
-		if (stoplagResetTick < MinecraftServer.currentTick)
+		if (forcedStoplagResetTick < MinecraftServer.currentTick)
 			stoplagCount = 1;
 		else
 			stoplagCount++;
 		
-		stoplagResetTick = MinecraftServer.currentTick + forcedStoplagPeriodDuration;
+		forcedStoplagResetTick = MinecraftServer.currentTick + forcedStoplagPeriodDuration;
 		
 		//si le nombre d'avertissement a été dépassé, mise en stoplag forcée
 		if (stoplagCount < forcedStoplagStoplagCount) {
@@ -93,9 +90,9 @@ public class PlotStoplagChecker {
 
 	public enum StopLagDetect{
 		PISTON(200, "pistons"),
-		LAMP(200, "lampes de redstone"),
-		LIQUID(1000, "liquides fluides"),
-		ENTITY(150, "spawn entités"),
+		LAMP(150, "lampes de redstone"),
+		LIQUID(750, "liquides fluides"),
+		ENTITY(200, "spawn entités"),
 		WIRE(50000, "systèmes de redstone"),
 		;
 		

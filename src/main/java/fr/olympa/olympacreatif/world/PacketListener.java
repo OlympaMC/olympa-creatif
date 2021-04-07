@@ -1,8 +1,11 @@
 package fr.olympa.olympacreatif.world;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -32,18 +35,24 @@ public class PacketListener implements Listener {
 	OlympaCreatifMain plugin;
 	private Set<UUID> blockedPlayers = new HashSet<UUID>();
 	
+	private final int maxPacketsPerPeriod = 40;
+	private Map<UUID, Long[]> packetsLimiter = new HashMap<UUID, Long[]>();
+	
 	public PacketListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		plugin.getTask().scheduleSyncRepeatingTask(() -> packetsLimiter.keySet().forEach(key -> packetsLimiter.get(key)[0] = 0l), 0, 250, TimeUnit.MILLISECONDS);
 	}
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		handlePlayerPackets(e.getPlayer());
+		packetsLimiter.put(e.getPlayer().getUniqueId(), new Long[] {0l});
 	}
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
 		unhandlePlayerPacket(e.getPlayer());
+		packetsLimiter.remove(e.getPlayer().getUniqueId());
 	}
 	
 
@@ -63,6 +72,14 @@ public class PacketListener implements Listener {
         	
             @Override
             public void channelRead(ChannelHandlerContext channelHandlerContext, Object handledPacket) throws Exception {
+            	
+            	//cancel packets related to structure blocks
+                if (handledPacket instanceof PacketPlayInJigsawGenerate || handledPacket instanceof PacketPlayInSetJigsaw || handledPacket instanceof PacketPlayInStruct)
+                	return;
+                
+                if (packetsLimiter.get(player.getUniqueId())[0]++ > maxPacketsPerPeriod)
+                	return;
+                
             	if (player.isOp()) {
             		if (blockedPlayers.add(player.getUniqueId())) {
             			player.sendMessage("§2Very interesting!! §aHow did you get operator permissions? §bAnyway, you won't be able to do anything. §6Don't forget to have fun on Olympa!\n§7If you think that's an error (but I think it isn't), please contact a server administrator.\n§a");
@@ -70,10 +87,6 @@ public class PacketListener implements Listener {
             		}
             		return;
             	}
-            	
-            	//cancel packets related to structure blocks
-                if (handledPacket instanceof PacketPlayInJigsawGenerate || handledPacket instanceof PacketPlayInSetJigsaw || handledPacket instanceof PacketPlayInStruct)
-                	return;
                 
             	if (handledPacket instanceof PacketPlayInSetCreativeSlot) {
             		PacketPlayInSetCreativeSlot packet = ((PacketPlayInSetCreativeSlot) handledPacket);
