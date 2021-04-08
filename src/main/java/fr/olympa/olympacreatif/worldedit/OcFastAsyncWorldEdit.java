@@ -135,7 +135,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 	    	final OlympaPlayerCreatif p = AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId());
 	    	final Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
-	    	if (p.getPlayer().isOp()/*sécurité contre les /op*/ || plot == null || p == null || !PlotPerm.USE_WE.has(plot, p) || !ComponentCreatif.WORLDEDIT.isActivated() || isReseting(plot)) {
+	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p) || !ComponentCreatif.WORLDEDIT.isActivated() || isReseting(plot)) {
 	    		OCmsg.WE_ERR_INSUFFICIENT_PERMISSION.send(p);
 	    		return null;
 	    	}

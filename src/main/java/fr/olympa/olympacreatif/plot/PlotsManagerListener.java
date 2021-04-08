@@ -20,7 +20,7 @@ public class PlotsManagerListener implements Listener {
 	@EventHandler //charge les plots non encore chargés sur lesquels les joueurs se rendent
 	public void onMoveEvent(PlayerMoveEvent e) {
 		//si pas de mouvment de block suivant X ou Z, return
-		if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ())
+		if (e.getFrom().getChunk() == e.getTo().getChunk())
 			return;
 		
 		tryToRegisterPlot(e.getFrom(), e.getTo());

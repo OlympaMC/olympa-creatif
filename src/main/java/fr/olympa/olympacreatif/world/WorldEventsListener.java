@@ -42,7 +42,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
-import fr.olympa.api.customevents.PlayerAfkEvent;
+import fr.olympa.api.customevents.AsyncPlayerAfkEvent;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -71,9 +71,9 @@ public class WorldEventsListener implements Listener{
 	}
 	
 	@EventHandler
-	public void onAfk(PlayerAfkEvent e) {
+	public void onAfk(AsyncPlayerAfkEvent e) {
 		if (e.isAfk())
-			OCparam.SPAWN_LOC.get().teleport(e.getPlayer());
+			plugin.getTask().runTask(() -> OCparam.SPAWN_LOC.get().teleport(e.getPlayer()));
 	}
 	
 	@EventHandler //n'autorise que certaines sources de spawn de créatures 

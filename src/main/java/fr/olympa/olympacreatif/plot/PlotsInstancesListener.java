@@ -526,15 +526,20 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler(priority = EventPriority.LOWEST) //actions à effectuer lors de la sortie/entrée d'un joueur
 	public void onPlayerMove(PlayerMoveEvent e) {
-		if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ())
+		if (e.getFrom().getChunk() == e.getTo().getChunk())
 			return;
+		
 		
 		Plot plotTo = plugin.getPlotsManager().getPlot(e.getTo());
 		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
+
+		//Bukkit.broadcastMessage("DETECTED chunk SWITCH FOR " + e.getPlayer().getName() + " : " + plotFrom + " TO " + plotTo);
 		
 		//sortie de l'évent si pas de changement de plot
 		if (plotTo == plotFrom)
 			return;
+
+		//Bukkit.broadcastMessage("DETECTED plot SWITCH FOR" + e.getPlayer().getName() + " : " + plotFrom + " TO " + plotTo);
 
 		//OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		

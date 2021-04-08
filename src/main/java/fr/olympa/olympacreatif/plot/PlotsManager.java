@@ -38,7 +38,7 @@ public class PlotsManager {
 	
 	private OlympaCreatifMain plugin;
 	
-	private Map<PlotId, Plot> loadedPlots = new HashMap<PlotId, Plot>();
+	private Map<Integer, Plot> loadedPlots = new HashMap<Integer, Plot>();
 	
 	private Vector<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
 	
@@ -88,7 +88,7 @@ public class PlotsManager {
 							if (!hasMemberOnline && !plot.getPlotId().equals(PlotId.fromId(plugin, 1))) {
 								plot.unload();
 								plugin.getDataManager().addPlotToSaveQueue(plot, false);
-								loadedPlots.remove(plot.getPlotId());
+								loadedPlots.remove(plot.getPlotId().getId());
 							}
 						}	
 					}
@@ -184,7 +184,8 @@ public class PlotsManager {
 	}
 	
 	public boolean isPlotLoaded(PlotId id) {
-		return loadedPlots.containsKey(id);
+		//Bukkit.broadcastMessage("Plots list : " + loadedPlots.keySet() + ", trying to load " + id);
+		return loadedPlots.containsKey(id.getId());
 	}
 	
 	
@@ -192,7 +193,7 @@ public class PlotsManager {
 		Plot plot = new Plot(plugin, pc);
 		
 		plugin.getDataManager().addPlotToSaveQueue(plot, true);
-		loadedPlots.put(plot.getPlotId(), plot);
+		loadedPlots.put(plot.getPlotId().getId(), plot);
 		return plot;
 	}
 	
@@ -204,7 +205,8 @@ public class PlotsManager {
 		if (loc == null)
 			return null;
 
-		return loadedPlots.get(PlotId.fromLoc(plugin, loc));
+		PlotId id = PlotId.fromLoc(plugin, loc);
+		return id == null ? null : loadedPlots.get(id.getId());
 	}
 
 	/*
@@ -225,7 +227,7 @@ public class PlotsManager {
 	}*/
 	
 	public Plot getPlot(PlotId id) {
-		return loadedPlots.get(id);
+		return loadedPlots.get(id.getId());
 	}
 	
 	
@@ -250,6 +252,6 @@ public class PlotsManager {
 	
 	private void loadPlot(AsyncPlot ap) {
 		if (!isPlotLoaded(ap.getId())) 
-			loadedPlots.put(ap.getId(), new Plot(ap));
+			loadedPlots.put(ap.getId().getId(), new Plot(ap));
 	}
 }
