@@ -10,11 +10,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import redis.clients.jedis.JedisPubSub;
 
-public class RedisListener extends JedisPubSub {
+public class OCRedisListener extends JedisPubSub {
 
 	private OlympaCreatifMain plugin;
 	
-	public RedisListener(OlympaCreatifMain plugin) {
+	public OCRedisListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		plugin.getLogger().log(Level.INFO, "Redis listener chargé.");
 	}
@@ -43,6 +43,8 @@ public class RedisListener extends JedisPubSub {
 		}
 			
 		plugin.getPlotsManager().setTotalPlotCount(plotsCount);
+		
+		
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -59,42 +61,4 @@ public class RedisListener extends JedisPubSub {
 		//plugin.getLogger().log(Level.INFO, "Taille parcelles définie à " + OCparam.PLOT_SIZE.get() + "*" + OCparam.PLOT_SIZE.get());
 		//plugin.getServer().getPluginManager().callEvent(new PlotSizeRecievedEvent(OCparam.PLOT_SIZE.get(), WorldManager.roadSize, WorldManager.worldLevel));
 	}
-	
-	@Deprecated
-	public static class PlotSizeRecievedEvent extends Event {
-	    private static final HandlerList HANDLERS_LIST = new HandlerList();
-
-	    private int plotSize;
-	    private int roadSize;
-	    private int worldLevel;
-	    
-	    private PlotSizeRecievedEvent(int plotSize, int roadSize, int worldLevel) {
-	    	super(true);
-	    	this.plotSize = plotSize;
-	    	this.roadSize = roadSize;
-	    	this.worldLevel = worldLevel;
-	    }
-	    
-	    public int getPlotSize() {
-	    	return plotSize;
-	    }
-	    
-	    public int getRoadSize() {
-	    	return roadSize;
-	    }
-	    
-	    public int getWorldLevel() {
-	    	return worldLevel;
-	    }
-	    
-	    @Override
-	    public HandlerList getHandlers() {
-	        return HANDLERS_LIST;
-	    }
-
-	    public static HandlerList getHandlerList() {
-	        return HANDLERS_LIST;
-	    }
-	}
-	
 }

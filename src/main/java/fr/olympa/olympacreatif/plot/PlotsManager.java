@@ -38,7 +38,7 @@ public class PlotsManager {
 	
 	private OlympaCreatifMain plugin;
 	
-	private Set<Plot> loadedPlots = new HashSet<Plot>();
+	private Map<PlotId, Plot> loadedPlots = new HashMap<PlotId, Plot>();
 	
 	private Vector<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
 	
@@ -74,7 +74,7 @@ public class PlotsManager {
 					 
 					//Bukkit.broadcastMessage("Loaded plots: " + loadedPlots);
 					
-					for (Plot plot : new ArrayList<Plot>(loadedPlots)) {
+					for (Plot plot : new HashSet<Plot>(loadedPlots.values())) {
 						boolean hasMemberOnline = false;
 						
 						//s'il n'y a aucun joueur sur la parcelle
@@ -88,7 +88,7 @@ public class PlotsManager {
 							if (!hasMemberOnline && !plot.getPlotId().equals(PlotId.fromId(plugin, 1))) {
 								plot.unload();
 								plugin.getDataManager().addPlotToSaveQueue(plot, false);
-								loadedPlots.remove(plot);
+								loadedPlots.remove(plot.getPlotId());
 							}
 						}	
 					}
@@ -184,40 +184,27 @@ public class PlotsManager {
 	}
 	
 	public boolean isPlotLoaded(PlotId id) {
-		for (Plot plot : loadedPlots)
-			if (plot.getPlotId().equals(id))
-				return true;
-		
-		return false;
+		return loadedPlots.containsKey(id);
 	}
 	
 	
 	public Plot createNewPlot(OlympaPlayerCreatif pc) {
 		Plot plot = new Plot(plugin, pc);
 		
-		plugin.getDataManager().addPlotToSaveQueue(plot, false);
-		loadedPlots.add(plot);
+		plugin.getDataManager().addPlotToSaveQueue(plot, true);
+		loadedPlots.put(plot.getPlotId(), plot);
 		return plot;
 	}
 	
 	public synchronized Set<Plot> getPlots(){
-		return new HashSet<Plot>(loadedPlots);
+		return new HashSet<Plot>(loadedPlots.values());
 	}
 
 	public Plot getPlot(Location loc) {
 		if (loc == null)
 			return null;
-		
-		PlotId id = PlotId.fromLoc(plugin, loc);
-		
-		if (id == null)
-			return null;
-		
-		for (Plot plot : loadedPlots)
-			if (plot.getPlotId().equals(id))
-				return plot;
-		
-		return null;
+
+		return loadedPlots.get(PlotId.fromLoc(plugin, loc));
 	}
 
 	/*
@@ -238,13 +225,7 @@ public class PlotsManager {
 	}*/
 	
 	public Plot getPlot(PlotId id) {
-		if (id == null)
-			return null;
-		
-		for (Plot plot : loadedPlots)
-			if (plot.getPlotId().equals(id))
-				return plot;
-		return null;
+		return loadedPlots.get(id);
 	}
 	
 	
@@ -269,6 +250,6 @@ public class PlotsManager {
 	
 	private void loadPlot(AsyncPlot ap) {
 		if (!isPlotLoaded(ap.getId())) 
-			loadedPlots.add(new Plot(ap));
+			loadedPlots.put(ap.getId(), new Plot(ap));
 	}
 }

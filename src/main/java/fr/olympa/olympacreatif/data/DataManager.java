@@ -161,7 +161,7 @@ public class DataManager implements Listener {
 
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		//register redis
-		OlympaCore.getInstance().registerRedisSub(RedisAccess.INSTANCE.connect(), new RedisListener(plugin), RedisChannel.BUNGEE_ASK_SEND_SERVERNAME.name());
+		OlympaCore.getInstance().registerRedisSub(RedisAccess.INSTANCE.connect(), new OCRedisListener(plugin), RedisChannel.BUNGEE_ASK_SEND_SERVERNAME.name());
 
 		//création tables
 		try {
@@ -213,15 +213,15 @@ public class DataManager implements Listener {
 		}.runTaskTimer(plugin, 20, 1);
 	}
 
-	public synchronized void addPlotToLoadQueue(PlotId id, boolean forceInstantLoad) {
-		if (!forceInstantLoad)
+	public synchronized void addPlotToLoadQueue(PlotId id, boolean syncLoad) {
+		if (!syncLoad)
 			plugin.getTask().runTaskAsynchronously(() -> plotsToLoad.add(id));
 		else
 			loadPlot(id);
 	}
 
-	public synchronized void addPlotToSaveQueue(Plot plot, boolean forceInstantSave) {
-		if (!forceInstantSave)
+	public synchronized void addPlotToSaveQueue(Plot plot, boolean syncSave) {
+		if (!syncSave)
 			plugin.getTask().runTaskAsynchronously(() -> plotsToSave.add(plot));
 		else
 			savePlotToBddSync(plot);

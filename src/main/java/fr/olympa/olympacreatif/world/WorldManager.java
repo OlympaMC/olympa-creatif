@@ -53,18 +53,6 @@ public class WorldManager {
 		
 		Bukkit.setDefaultGameMode(GameMode.CREATIVE);
 		
-		/*
-		WorldCreator worldCreator = new WorldCreator(Message.PARAM_WORLD_NAME.getValue());
-		worldCreator.generateStructures(false);
-		worldCreator.generator(new CustomChunkGenerator(plugin));
-
-		
-		plugin.getLogger().log(Level.INFO, "Creative world " + Message.PARAM_WORLD_NAME.getValue() + " loading...");
-		
-		world = worldCreator.createWorld();
-		
-		System.out.println("world : " + world);*/
-		
 		//task pour donner l'argent aux joueurs périodiquement
 		new BukkitRunnable() {
 
@@ -131,13 +119,14 @@ public class WorldManager {
             	if (s.contains("spawn-npcs") || s.contains("spawn-animals") || s.contains("spawn-monsters") || 
             			s.contains("spawn-protection") || s.contains("allow-nether") || s.contains("enable-command-block") || 
             			s.contains("difficulty") || s.contains("broadcast-rcon-to-ops") || s.contains("op-permission-level") ||
-            			s.contains("broadcast-console-to-ops"))
+            			s.contains("broadcast-console-to-ops") || s.contains("view-distance"))
             		lines.remove(s);
             }
-            
-            lines.add("spawn-npcs=true");
-            lines.add("spawn-animals=true");
-            lines.add("spawn-monsters=true");
+
+            lines.add("view-distance=7");
+            lines.add("spawn-npcs=false");
+            lines.add("spawn-animals=false");
+            lines.add("spawn-monsters=false");
             lines.add("spawn-protection=0");
             lines.add("allow-nether=false");
             lines.add("enable-command-block=true");
@@ -145,6 +134,7 @@ public class WorldManager {
             lines.add("op-permission-level=1");
             lines.add("broadcast-rcon-to-ops=false");
             lines.add("broadcast-console-to-ops=false");
+            
             
             Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
