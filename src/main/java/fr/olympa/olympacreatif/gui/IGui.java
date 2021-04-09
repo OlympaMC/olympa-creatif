@@ -2,22 +2,14 @@ package fr.olympa.olympacreatif.gui;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-
 import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent.Reason;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Consumer;
-
 import com.google.common.collect.HashMultimap;
 
 import fr.olympa.api.gui.OlympaGUI;
@@ -116,7 +108,7 @@ public abstract class IGui extends OlympaGUI{
 		
 		if (inv.first(from) == -1)
 			return;
-		
+		 
 		inv.setItem(inv.first(from.clone()), to.clone());
 		actionItems.put(to, actionItems.remove(from));		
 	}
