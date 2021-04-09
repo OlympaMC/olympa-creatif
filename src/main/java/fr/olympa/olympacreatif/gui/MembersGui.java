@@ -103,25 +103,32 @@ public class MembersGui extends IGui {
 	}
 	
 	private boolean canDemote(MemberInformations member) {
-		if (isOpenByStaff)
-			return staffPlayer.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE);
-		
-		int playerLevel = plot.getMembers().getPlayerRank(p).getLevel();
+		int playerLevel = isOpenByStaff ? 
+				staffPlayer.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE) ? 
+						PlotRank.OWNER.getLevel() : 
+						PlotRank.VISITOR.getLevel() : 
+				plot.getMembers().getPlayerRank(p).getLevel();
+						
 		int memberLevel = plot.getMembers().getPlayerRank(member).getLevel();
 
 		if ((PlotPerm.PROMOTE_DEMOTE.has(plot, p) || (isOpenByStaff && staffPlayer.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE))) 
-				&& memberLevel > 0 && memberLevel < playerLevel && memberLevel != PlotRank.OWNER.getLevel())
+				&& memberLevel > 0 && memberLevel < playerLevel)
 			return true;
 		else
 			return false;
 	}
 
 	private boolean canPromote(MemberInformations member) {
-		int playerLevel = plot.getMembers().getPlayerRank(p).getLevel();
+		int playerLevel = isOpenByStaff ? 
+								staffPlayer.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE) ? 
+										PlotRank.OWNER.getLevel() : 
+										PlotRank.VISITOR.getLevel() : 
+								plot.getMembers().getPlayerRank(p).getLevel();
+						
 		int memberLevel = plot.getMembers().getPlayerRank(member).getLevel();
 		
 		if ((PlotPerm.PROMOTE_DEMOTE.has(plot, p) || (isOpenByStaff && staffPlayer.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE))) 
-				&& playerLevel > memberLevel + 1 && memberLevel < PlotRank.OWNER.getLevel())
+				&& playerLevel > memberLevel + 1/* && memberLevel < PlotRank.OWNER.getLevel()*/)
 			return true;
 		else
 			return false;
