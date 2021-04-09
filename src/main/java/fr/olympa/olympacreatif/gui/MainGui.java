@@ -32,8 +32,8 @@ import fr.olympa.olympacreatif.plot.PlotsManager;
 
 public class MainGui extends IGui {
 	
-	private MainGui(OlympaCreatifMain plugin, OlympaPlayerCreatif player, Plot plot, String inventoryName) {
-		super(plugin, player, plot, inventoryName, 6); 
+	private MainGui(OlympaCreatifMain plugin, OlympaPlayerCreatif player, Plot plot, String inventoryName, OlympaPlayerCreatif staffPlayer) {
+		super(plugin, player, plot, inventoryName, 6, staffPlayer); 
 		
 		String clickToOpenMenu = "§9Cliquez pour ouvrir le menu";
 		
@@ -57,7 +57,7 @@ public class MainGui extends IGui {
 			sk = ItemUtils.name(sk, "§6Paramètres de " + p.getName());
 			sk = ItemUtils.lore(sk, clickToOpenMenu);
 			
-			setItem(12, sk, (it, c, s) -> new PlayerParametersGui(this).create(p.getPlayer()));
+			setItem(12, sk, (it, c, s) -> new PlayerParametersGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
 		};
 
 		headConsumer.accept(new ItemStack(Material.PLAYER_HEAD));
@@ -67,20 +67,20 @@ public class MainGui extends IGui {
 				"§eParcelles possédées : " + p.getPlots(true).size() + "/" + p.getPlotsSlots(true),
 				"§eParcelles totales : " + p.getPlots(false).size() + "/" + p.getPlotsSlots(false), 
 				clickToOpenMenu), 
-				(it, c, s) -> new PlayerPlotsGui(this).create(p.getPlayer()));
+				(it, c, s) -> new PlayerPlotsGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
 		
 		setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", clickToOpenMenu), 
-				(it, c, s) -> new ShopGui(this).create(p.getPlayer()));
+				(it, c, s) -> new ShopGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
 		
 		if (plot != null) {
 			setItem(21, ItemUtils.item(Material.PAINTING, "§6Membres parcelle", "§eNombre de membres : " + plot.getMembers().getCount(), clickToOpenMenu), 
-					(it, c, s) -> new MembersGui(this).create(p.getPlayer()));
+					(it, c, s) -> new MembersGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
 			
 			setItem(22, ItemUtils.item(Material.COMPARATOR, "§6Paramètres généraux parcelle", clickToOpenMenu), 
-					(it, c, s) -> new PlotParametersGui(this).create(p.getPlayer()));
+					(it, c, s) -> new PlotParametersGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
 			
 			setItem(23, ItemUtils.item(Material.REPEATER, "§6Paramètres d'interraction parcelle", clickToOpenMenu), 
-					(it, c, s) -> new InteractionParametersGui(this).create(p.getPlayer()));
+					(it, c, s) -> new InteractionParametersGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
 
 			setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle"), 
 					(it, c, s) -> {
@@ -102,8 +102,12 @@ public class MainGui extends IGui {
 					}
 				});
 
-		setItem(40, ItemUtils.item(Material.COMPASS, "§6Trouver une nouvelle parcelle"),
-				(it, c, s) -> plugin.getCmdLogic().claimNewPlot(getPlayer()));
+		if (!isOpenByStaff)
+			setItem(40, ItemUtils.item(Material.COMPASS, "§6Trouver une nouvelle parcelle"),
+					(it, c, s) -> plugin.getCmdLogic().claimNewPlot(getPlayer()));
+		else
+			setItem(40, ItemUtils.item(Material.COMPASS, "§cImpossible de claim en mode staff"),
+					null);
 		
 		setItem(49, ItemUtils.item(Material.PAPER, "§6Ouvrir l'aide"), 
 				(it, c, s) -> getPlayer().getPlayer().sendMessage("§7L'aide n'a pas encore été définie. En attendant, vous pouvez utiliser /oc ou /oco help !"));
@@ -156,8 +160,15 @@ public class MainGui extends IGui {
 	
 	public static MainGui getMainGui(OlympaPlayerCreatif p, Plot plot) {
 		if (plot == null)
-			return new MainGui(OlympaCreatifMain.getInstance(), p, null, "Menu");
+			return new MainGui(OlympaCreatifMain.getInstance(), p, null, "Menu", null);
 		else
-			return new MainGui(OlympaCreatifMain.getInstance(), p, plot, "Menu >> " + plot.getPlotId());
+			return new MainGui(OlympaCreatifMain.getInstance(), p, plot, "Menu >> " + plot.getPlotId(), null);
 	}
+	
+	public static MainGui getMainGuiForStaff(OlympaPlayerCreatif p, OlympaPlayerCreatif staffPlayer) {
+		return new MainGui(OlympaCreatifMain.getInstance(), p, staffPlayer.getCurrentPlot(), 
+				p.getCurrentPlot() == null ? "Menu" : "Menu >> " + p.getCurrentPlot(), staffPlayer);
+	}
+	
+	
 }

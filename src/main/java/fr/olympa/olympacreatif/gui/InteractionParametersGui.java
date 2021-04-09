@@ -27,7 +27,7 @@ public class InteractionParametersGui extends IGui {
 	private String[] stateDenied = new String[] {" ", "§eEtat : §cinterdit", "§7Cliquez pour changer l'état. Si autorisé, les visiteurs", "§7pourront interragir avec ce bloc, sinon non."}; 
 	
 	public InteractionParametersGui(IGui gui) {
-		super(gui, "Interactions parcelle " + gui.getPlot().getPlotId(), 6);
+		super(gui, "Interactions parcelle " + gui.getPlot().getPlotId(), 6, gui.staffPlayer);
 		
 		//pour tous les items interdits possibles, ajout de l'item au gui selon son état (interdit/autorisé)
 		for (Material mat : PlotParamType.getAllPossibleIntaractibleBlocks()) {

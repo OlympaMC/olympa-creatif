@@ -45,8 +45,8 @@ public class ShopGui extends IGui{
 	int buyProcessStateSlot;
 	
 	public ShopGui(IGui gui) {
-		super(gui, "Magasin (monnaie : " + gui.getPlayer().getGameMoney() + " " + gui.getPlayer().getGameMoneyName() + ")", 4);
-
+		super(gui, "Magasin (monnaie : " + gui.getPlayer().getGameMoney() + " " + gui.getPlayer().getGameMoneyName() + ")", 4, gui.staffPlayer);
+		
 		//init têtes
 		ranksRowHead = ItemUtils.skullCustom("§6Grades", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI1NzViNTU3N2NjYjMyZTQyZDU0MzA0YTFlZjVmMjNhZDZiYWQ1YTM0NTYzNDBhNDkxMmE2MmIzNzk3YmI1In19fQ==");
 		kitsRowHead = ItemUtils.skullCustom("§6Kits", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg4MjRkY2Y0YmEzMTc1MzNiZjI5ZGNhMThjZTdjNGZkMzI4YjQyNjgwZTZjMzIyZjVmNGZmMWEzOTRhODg3In19fQ==");
@@ -243,6 +243,7 @@ public class ShopGui extends IGui{
 	 * Set the buy process indicator to deny for 2 seconds
 	 */
 	private void startBuyDenyTimer(MarketItemData data) {
+		
 		setItem(buyProcessItemSlot, ItemUtils.item(data.getHolder().getType(), "§6Achat : " + data.getHolder().getItemMeta().getDisplayName()), null);
 		setItem(buyProcessStateSlot, buyProcessDeny, null);
 		
@@ -256,6 +257,9 @@ public class ShopGui extends IGui{
 	
 	
 	private void startBuyAcceptTimer(MarketItemData data) {
+		if (isOpenByStaff) //cancel buying if gui is open by a staff
+			return;
+		
 		useBuyAcceptTimer(data, 2, 2, 15, 
 				ItemUtils.item(data.getHolder().getType(), "§6Achat : " + data.getHolder().getItemMeta().getDisplayName()));
 	}

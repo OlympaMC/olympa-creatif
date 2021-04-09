@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotPerm;
@@ -21,7 +22,7 @@ public class MembersGui extends IGui {
 	
 	public MembersGui(IGui gui) {
 		super(gui, "Membres parcelle " + gui.getPlot().getPlotId() + " (" + gui.getPlot().getMembers().getCount() + "/" + 
-				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(gui.getPlayer().getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3);
+				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(gui.getPlayer().getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3, gui.staffPlayer);
 		
 		//affichage des perms par rang
 		int i = inv.getSize() - 1 - PlotRank.values().length;
@@ -102,10 +103,14 @@ public class MembersGui extends IGui {
 	}
 	
 	private boolean canDemote(MemberInformations member) {
+		if (isOpenByStaff)
+			return staffPlayer.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE);
+		
 		int playerLevel = plot.getMembers().getPlayerRank(p).getLevel();
 		int memberLevel = plot.getMembers().getPlayerRank(member).getLevel();
-		
-		if (PlotPerm.PROMOTE_DEMOTE.has(plot, p) && memberLevel > 0 && memberLevel < playerLevel)
+
+		if ((PlotPerm.PROMOTE_DEMOTE.has(plot, p) || (isOpenByStaff && staffPlayer.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE))) 
+				&& memberLevel > 0 && memberLevel < playerLevel && memberLevel != PlotRank.OWNER.getLevel())
 			return true;
 		else
 			return false;
@@ -115,7 +120,8 @@ public class MembersGui extends IGui {
 		int playerLevel = plot.getMembers().getPlayerRank(p).getLevel();
 		int memberLevel = plot.getMembers().getPlayerRank(member).getLevel();
 		
-		if (PlotPerm.PROMOTE_DEMOTE.has(plot, p) && playerLevel > memberLevel + 1)
+		if ((PlotPerm.PROMOTE_DEMOTE.has(plot, p) || (isOpenByStaff && staffPlayer.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE))) 
+				&& playerLevel > memberLevel + 1 && memberLevel < PlotRank.OWNER.getLevel())
 			return true;
 		else
 			return false;

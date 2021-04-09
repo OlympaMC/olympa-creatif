@@ -25,7 +25,7 @@ public class PlayerPlotsGui extends IGui {
 	private List<Plot> playerPlots = new ArrayList<Plot>();
 	
 	public PlayerPlotsGui(IGui gui) {
-		super(gui, "Parcelles de " + gui.getPlayer().getName(), gui.getPlayer().getPlots(false).size()/9 + 2);
+		super(gui, "Parcelles de " + gui.getPlayer().getName(), gui.getPlayer().getPlots(false).size()/9 + 2, gui.staffPlayer);
 		
 		playerPlots = p.getPlots(false);
 		
@@ -39,7 +39,10 @@ public class PlayerPlotsGui extends IGui {
 				i++;
 				setItem(i, ItemUtils.item(mat, "§6 Parcelle " + plot.getPlotId().getId(), 
 						"§eRang : " + plot.getMembers().getPlayerRank(p).getRankName(), 
-						"§7Clic gauche : téléportation vers le plot", "§7Clic droit : ouverture du menu pour celle parcelle"), 
+						"§7Clic gauche : téléportation vers le plot", 
+						isOpenByStaff ? 
+								"§7§8[STAFF] Clic droit : ouverture des paramètres de cette parcelle" : 
+								"§7Clic droit : ouverture du menu pour celle parcelle"), 
 						
 						(it, c, s) -> {
 							if (s < playerPlots.size()) 
@@ -48,7 +51,10 @@ public class PlayerPlotsGui extends IGui {
 									p.getPlayer().teleport(playerPlots.get(s).getPlotId().getLocation());
 									OCmsg.TELEPORT_IN_PROGRESS.send(p);	
 								}else if (c == ClickType.RIGHT) {
-									MainGui.getMainGui(p, playerPlots.get(s)).create(p.getPlayer());
+									if (isOpenByStaff)
+										new PlotParametersGui(MainGui.getMainGui(getPlayer())).create(staffPlayer.getPlayer());
+									else
+										MainGui.getMainGui(getPlayer(), playerPlots.get(s)).create(getPlayer().getPlayer());
 								}
 						});
 			}	

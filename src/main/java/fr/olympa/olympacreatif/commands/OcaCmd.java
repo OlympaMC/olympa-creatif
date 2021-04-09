@@ -15,6 +15,7 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
+import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 
@@ -25,7 +26,7 @@ public class OcaCmd extends AbstractCmd {
 	}
 
 	
-	@Cmd(syntax = "Afficher la liste des parcelles actuellement chargées", args = "PLAYERS")
+	@Cmd(player = true, syntax = "Afficher la liste des parcelles actuellement chargées", args = "PLAYERS")
 	public void plotslist(CommandContext cmd) {
 		if (cmd.getArgumentsLength() == 0)
 			plugin.getCmdLogic().sendPlotsList(getOlympaPlayer(), null);
@@ -40,15 +41,18 @@ public class OcaCmd extends AbstractCmd {
 			return;
 		}
 		
-		if (!PermissionsList.STAFF_MANAGE_COMPONENT.hasPermissionWithMsg(getOlympaPlayer()))
+		if (getSender() instanceof Player && !PermissionsList.STAFF_MANAGE_COMPONENT.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
 		ComponentCreatif component = ComponentCreatif.fromString(cmd.getArgument(0));
 		
 		if (component != null)
 			component.activate();
-
-		OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
+		
+		if (!isConsole())
+			OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
+		else
+			sendMessage(Prefix.INFO, "§aLe composant " + (component == null ? "§caucun§a" : (String) cmd.getArgument(0)) + " a été activé.");
 	}
 
 	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|redstone|entities|commandblocks_and_vanilla_commands"})
@@ -58,7 +62,7 @@ public class OcaCmd extends AbstractCmd {
 			return;
 		}
 		
-		if (!PermissionsList.STAFF_MANAGE_COMPONENT.hasPermissionWithMsg(getOlympaPlayer()))
+		if (!isConsole() && !PermissionsList.STAFF_MANAGE_COMPONENT.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
 		ComponentCreatif component = ComponentCreatif.fromString(cmd.getArgument(0));
@@ -66,15 +70,22 @@ public class OcaCmd extends AbstractCmd {
 		if (component != null)
 			component.deactivate();
 
-		OCmsg.STAFF_DEACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
+		if (getSender() instanceof Player)
+			OCmsg.STAFF_DEACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
+		else
+			sendMessage(Prefix.INFO, "§cLe composant " + (component == null ? "§caucun§c" : (String) cmd.getArgument(0)) + " a été activé.");
 	}
 	
 	private void sendComponentsStatus() {
 		sendMessage(Prefix.INFO, "§6Etat des composants créatif");
-		for (ComponentCreatif component : ComponentCreatif.values())
-			sendHoverAndCommand(Prefix.INFO, "§e" + component.getName() + " activé : " + (component.isActivated() ? "§aOUI" : "§cNON"),
-					"§7Cliquez ici pour changer la valeur", 
-					"/oca " + (component.isActivated() ? "deactivate" : "activate") + " " + component.getName());
+		if (!isConsole())
+			for (ComponentCreatif component : ComponentCreatif.values())
+				sendHoverAndCommand(Prefix.INFO, "§e" + component.getName() + " activé : " + (component.isActivated() ? "§aOUI" : "§cNON"),
+						"§7Cliquez ici pour changer la valeur", 
+						"/oca " + (component.isActivated() ? "deactivate" : "activate") + " " + component.getName());
+		else
+			for (ComponentCreatif component : ComponentCreatif.values())
+				sendMessage(Prefix.INFO, "§e" + component.getName() + " activé : " + (component.isActivated() ? "§aOUI" : "§cNON"));
 	}
 
 	@Cmd(player = true, syntax = "Gérer ses permissions staff", description = "/oca perms <perm>", min = 0, 
@@ -257,6 +268,11 @@ public class OcaCmd extends AbstractCmd {
 			target.withdrawGameMoney(money, () -> target.getPlayer().sendMessage("§cVotre compte vient d'être débité de " + cmd.getArgument(2) + " coins par " + getPlayer().getName() + "."));
 			break;
 		}
+	}
+	
+	@Cmd(player = true, syntax = "Ouvrir l'interface des parcelles d'un joueur", args = {"PLAYERS"}, min = 1)
+	public void openmenuas(CommandContext cmd) {
+		MainGui.getMainGuiForStaff(AccountProvider.get(((Player)cmd.getArgument(0)).getUniqueId()), getOlympaPlayer()).create(getPlayer());
 	}
 	
 	

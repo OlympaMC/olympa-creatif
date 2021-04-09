@@ -43,9 +43,10 @@ public class PlotParametersGui extends IGui {
 	private boolean canChangeSettings = false; 
 	
 	public PlotParametersGui(IGui gui) {
-		super(gui, "Paramètres du plot " + gui.getPlot().getPlotId(), 3);
+		super(gui, "Paramètres du plot " + gui.getPlot(), 3, gui.staffPlayer);
 		
-		canChangeSettings = PlotPerm.CHANGE_PARAM_SETTINGS.has(plot, p);
+		canChangeSettings = isOpenByStaff ? staffPlayer.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE) : 
+				PlotPerm.CHANGE_PARAM_SETTINGS.has(plot, p);
 		
 		if (canChangeSettings)
 			 clickToChange = new String[] {" ", "§7Cliquez pour changer la valeur"};
@@ -63,7 +64,7 @@ public class PlotParametersGui extends IGui {
 			if (!canChangeSettings)
 				return;
 			
-			GameMode gm = GameMode.valueOf(ItemUtils.getLore(item)[0].split(" : ")[1]);
+			GameMode gm = plot.getParameters().getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS);
 			switch (gm) {
 			case ADVENTURE:
 				gm = GameMode.SURVIVAL;

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.apache.logging.log4j.util.TriConsumer;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -20,25 +21,35 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public abstract class IGui extends OlympaGUI{
 
+	protected boolean isOpenByStaff;
+	protected OlympaPlayerCreatif staffPlayer;
+	
 	protected OlympaCreatifMain plugin;
 	protected Plot plot; 
 	protected OlympaPlayerCreatif p;
 	
 	private Map<ItemStack, TriConsumer<ItemStack, ClickType, Integer>> actionItems = new HashMap<ItemStack, TriConsumer<ItemStack, ClickType, Integer>>(); 
 	
-	public IGui(OlympaCreatifMain plugin, OlympaPlayerCreatif player, Plot plot, String inventoryName, int rows) {
-		super(inventoryName, rows);
+	public IGui(OlympaCreatifMain plugin, OlympaPlayerCreatif player, Plot plot, String inventoryName, int rows, OlympaPlayerCreatif staffPlayer) {
+		super((staffPlayer == null ? "§8" : "§c[STAFF] §8") + inventoryName, rows);
 
 		this.plugin = plugin;
 		this.plot = plot;
 		
 		this.p = player;
+		this.staffPlayer = staffPlayer;
+		this.isOpenByStaff = staffPlayer != null;
 
-		setItem(inv.getSize() - 1, getBackItem(), (it, c, s) -> MainGui.getMainGui(this.p, this).create(p.getPlayer()));
+		setItem(inv.getSize() - 1, getBackItem(), (it, c, s) -> {
+			if (isOpenByStaff)
+				MainGui.getMainGuiForStaff(p, staffPlayer).create(staffPlayer.getPlayer());
+			else
+				MainGui.getMainGui(this.p, this).create(p.getPlayer());
+		});
 	}
 	
-	public IGui(IGui gui, String inventoryName, int rows) {
-		this(gui.getPlugin(), gui.getPlayer(), gui.getPlot(), inventoryName, rows);
+	public IGui(IGui gui, String inventoryName, int rows, OlympaPlayerCreatif staffPlayer) {
+		this(gui.getPlugin(), gui.getPlayer(), gui.getPlot(), inventoryName, rows, staffPlayer);
 	}
 	
 	public OlympaCreatifMain getPlugin() {

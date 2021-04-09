@@ -61,13 +61,13 @@ import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import fr.olympa.olympacreatif.world.WorldManager;
 
-
+@Deprecated(forRemoval = true)
 public class StaffGui extends IGui {
 	
 	private static final Set<PlotId> resetingPlots = new HashSet<PlotId>();
 	
 	public StaffGui(IGui gui) {
-		super(gui, "Interface staff", 2);
+		super(gui, "Interface staff", 2, gui.staffPlayer);
 		
 		inv.setItem(inv.getSize() - 1, new ItemStack(Material.AIR));
 		
