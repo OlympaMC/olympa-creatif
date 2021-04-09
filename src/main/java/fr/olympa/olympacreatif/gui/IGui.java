@@ -5,11 +5,20 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.apache.logging.log4j.util.TriConsumer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent.Reason;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Consumer;
+
+import com.google.common.collect.HashMultimap;
 
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
@@ -20,12 +29,25 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 
 public abstract class IGui extends OlympaGUI{
+	
+	// 1 : menu ouvert comme le joueur // 2 : menu ouvert par ce staff 
+	private static HashMultimap<Player, Player> staffOpennedInventories = HashMultimap.create();
+	
+	//ferme les inventaires en mode staff si le joueur cible se déconnecte
+	static {
+		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {
+			@EventHandler
+			public void onQuit(PlayerQuitEvent e) {
+				staffOpennedInventories.removeAll(e.getPlayer()).forEach(p -> p.closeInventory());
+			}
+		}, OlympaCreatifMain.getInstance());
+	}
 
 	protected boolean isOpenByStaff;
 	protected OlympaPlayerCreatif staffPlayer;
 	
 	protected OlympaCreatifMain plugin;
-	protected Plot plot; 
+	protected Plot plot;
 	protected OlympaPlayerCreatif p;
 	
 	private Map<ItemStack, TriConsumer<ItemStack, ClickType, Integer>> actionItems = new HashMap<ItemStack, TriConsumer<ItemStack, ClickType, Integer>>(); 
@@ -103,6 +125,14 @@ public abstract class IGui extends OlympaGUI{
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		if (actionItems.get(current) != null)
 			actionItems.get(current).accept(current, click, slot);
+		
+		return true;
+	}
+	
+	@Override
+	public boolean onClose(Player player) {
+		if (isOpenByStaff)
+			staffOpennedInventories.remove(p.getPlayer(), staffPlayer.getPlayer());
 		
 		return true;
 	}
