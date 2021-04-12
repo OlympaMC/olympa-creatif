@@ -2,12 +2,14 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +25,8 @@ import org.bukkit.entity.Player;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbTeam;
@@ -66,9 +70,7 @@ public abstract class CbCommandSelectorParser {
 	}
 
 	@SuppressWarnings("deprecation")
-	private static final Map<String, SelectorFunction> selectorParametersFunctions = ImmutableMap.<String, SelectorFunction>builder()
-			.put("limit", (plot, loc, stream, param) -> getInt(param) == null ? stream.limit(0) : stream.limit(getInt(param)))
-			
+	private static final ImmutableSet<Entry<String, SelectorFunction>> selectorParametersFunctions = ImmutableMap.<String, SelectorFunction>builder()
 			.put("gamemode", (plot, loc, stream, param) -> 
 				EnumUtils.isValidEnum(GameMode.class, param.toUpperCase()) ? 
 				stream.filter(e -> e.getType() == EntityType.PLAYER).filter(e -> ((Player)e).getGameMode() == GameMode.valueOf(param)) : 
@@ -81,7 +83,7 @@ public abstract class CbCommandSelectorParser {
 				stream.sorted(Comparator.comparingDouble(e -> e.getLocation().distance(loc))) : 
 				param == "furthest" ? 
 				stream.sorted(Comparator.comparingDouble(e -> -e.getLocation().distance(loc))) : 
-				stream.unordered())
+				stream.sorted(Comparator.comparingInt(i -> ThreadLocalRandom.current().nextInt())))
 
 			.put("x", (plot, loc, stream, param) -> {if (getInt(param) != null) loc.setX(getInt(param)); return stream;})
 			.put("y", (plot, loc, stream, param) -> {if (getInt(param) != null) loc.setY(getInt(param)); return stream;})
@@ -175,8 +177,10 @@ public abstract class CbCommandSelectorParser {
 				return stream.filter(e -> getNonString(param) == null ? team.isMember(e) : !team.isMember(e));
 			})
 			
+			.put("limit", (plot, loc, stream, param) -> getInt(param) == null ? stream.limit(0) : stream.limit(getInt(param)))
+			
 			//.put("", (plot, loc, stream, param) -> null)
-			.build();
+			.build().entrySet();
 	
 	@FunctionalInterface
 	private interface SelectorFunction {
@@ -187,17 +191,15 @@ public abstract class CbCommandSelectorParser {
 		if (s == null)
 			return new ArrayList<Entity>();
 		
-		if (!s.startsWith("@") && Bukkit.getPlayer(s) != null)
+		if (!s.startsWith("@") && plot.getPlayers().contains(Bukkit.getPlayer(s)))
 			return new ArrayList<Entity>(Arrays.asList(Bukkit.getPlayer(s)));
 		
 		if (s.length() < 2)
 			return new ArrayList<Entity>();
 		
-		Set<Entity> ents = new HashSet<Entity>(plot.getPlayers());
+		Set<Entity> ents = s.startsWith("@p") || s.startsWith("@r") || s.startsWith("@a") ? new HashSet<Entity>() : new HashSet<Entity>(plot.getPlayers());
 		if (!onlyPlayers)
 			ents.addAll(plot.getEntities());
-
-		Stream<Entity> entitiesStream = ents.stream();
 		
 		HashMultimap<String, String> selectorParams = HashMultimap.create();
 		
@@ -233,14 +235,12 @@ public abstract class CbCommandSelectorParser {
 			selectorParams.put(key, value);
 		
 		switch(s.substring(0, 2)) {
-		case "@a":
-			entitiesStream = entitiesStream.filter(e -> e.getType() == EntityType.PLAYER);
-			break;
-			
 		case "@r":
 			if (!selectorParams.containsKey("limit"))
 				selectorParams.put("limit", "1");
-			entitiesStream = entitiesStream.filter(e -> e.getType() == EntityType.PLAYER);
+
+			if (!selectorParams.containsKey("sort"))
+				selectorParams.put("sort", "random");
 			break;
 			
 		case "@p":
@@ -249,17 +249,29 @@ public abstract class CbCommandSelectorParser {
 
 			if (!selectorParams.containsKey("sort"))
 				selectorParams.put("sort", "nearest");
-			
-			entitiesStream = entitiesStream.filter(e -> e.getType() == EntityType.PLAYER);
 			break;
 		}
+
+		Stream<Entity> entitiesStream = ents.stream();
 		
-		ArrayList<Entry<String, SelectorFunction>> paramsList = new ArrayList<Entry<String, SelectorFunction>>(selectorParametersFunctions.entrySet());
-		
-		for (int i = 0 ; i < (paramsList.size() > 10 ? 10 : paramsList.size()) ; i++)
-			for (String selectorParam : selectorParams.get(paramsList.get(i).getKey()))
-				entitiesStream = paramsList.get(i).getValue().apply(plot, sendingLoc, entitiesStream, selectorParam);
-		
+		int iterations = 0;
+		for (Entry<String, SelectorFunction> e : selectorParametersFunctions)
+			for (String paramValue : selectorParams.removeAll(e.getKey())) {
+				entitiesStream = e.getValue().apply(plot, sendingLoc, entitiesStream, paramValue);
+
+				if (iterations++ > 10)
+					return entitiesStream.collect(Collectors.toList());
+			}
+					
+					/*
+			selectorParams.removeAll(e.getKey()).forEach(paramValue -> {
+				entitiesStream = e.getValue().apply(plot, sendingLoc, entitiesStream, paramValue);
+				iterations++;
+				
+				if (iterations > 10)
+					break;
+			});*/
+				
 		return entitiesStream.collect(Collectors.toList());
 	}
 	

@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -80,7 +81,7 @@ public class PacketListener implements Listener {
                 if (packetsLimiter.get(player.getUniqueId())[0]++ > maxPacketsPerPeriod)
                 	return;
                 
-            	if (player.isOp()) {
+            	if (player.isOp() && !PermissionsList.STAFF_BYPASS_OP_CHECK.hasPermission(p)) {
             		if (blockedPlayers.add(player.getUniqueId())) {
             			player.sendMessage("§2Very interesting!! §aHow did you get operator permissions? §bAnyway, you won't be able to do anything. §6Don't forget to have fun on Olympa!\n§7If you think that's an error (but I think it isn't), please contact a server administrator.\n§a");
             			plugin.getTask().runTaskLater(() -> blockedPlayers.remove(player.getUniqueId()), 20*30);

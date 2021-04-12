@@ -54,7 +54,7 @@ public class OcCmd extends AbstractCmd {
 	}
 
 	
-	@Cmd(player = true, syntax = "Accepter une invitation à une parcelle", args = "PLAYERS", min = 1)
+	@Cmd(player = true, syntax = "Accepter une invitation à une parcelle", args = "INTEGER", min = 1)
 	public void accept(CommandContext cmd) {
 		plugin.getCmdLogic().acceptInvitation(getOlympaPlayer(), cmd.getArgument(0));
 	}

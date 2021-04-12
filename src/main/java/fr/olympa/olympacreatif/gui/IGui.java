@@ -54,6 +54,9 @@ public abstract class IGui extends OlympaGUI{
 		this.staffPlayer = staffPlayer;
 		this.isOpenByStaff = staffPlayer != null;
 
+		if (isOpenByStaff)
+			staffOpennedInventories.put(p.getPlayer(), staffPlayer.getPlayer());
+		
 		setItem(inv.getSize() - 1, getBackItem(), (it, c, s) -> {
 			if (isOpenByStaff)
 				MainGui.getMainGuiForStaff(p, staffPlayer).create(staffPlayer.getPlayer());

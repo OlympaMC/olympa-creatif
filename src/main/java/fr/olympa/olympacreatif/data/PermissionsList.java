@@ -32,6 +32,8 @@ public class PermissionsList {
 	
 	public static final OlympaSpigotPermission STAFF_MANAGE_MONEY = new OlympaSpigotPermission(OlympaGroup.DEV);
 	
+	public static final OlympaSpigotPermission STAFF_BYPASS_OP_CHECK = new OlympaSpigotPermission(OlympaGroup.DEV);
+	
 	
 	 
 	/*nb de plots propriétaire :
