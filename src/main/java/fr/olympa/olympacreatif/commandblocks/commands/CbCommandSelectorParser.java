@@ -197,9 +197,8 @@ public abstract class CbCommandSelectorParser {
 		if (s.length() < 2)
 			return new ArrayList<Entity>();
 		
-		Set<Entity> ents = s.startsWith("@p") || s.startsWith("@r") || s.startsWith("@a") ? new HashSet<Entity>() : new HashSet<Entity>(plot.getPlayers());
-		if (!onlyPlayers)
-			ents.addAll(plot.getEntities());
+		Set<Entity> ents = (s.startsWith("@e") && !onlyPlayers) ? new HashSet<Entity>(plot.getEntities()) : new HashSet<Entity>(plot.getPlayers().size());
+		ents.addAll(plot.getPlayers());
 		
 		HashMultimap<String, String> selectorParams = HashMultimap.create();
 		
