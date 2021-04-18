@@ -186,8 +186,10 @@ public class OCmsg {
 	
 
 	public static final OCmsg PLOT_CANT_ENTER_CLOSED = new OCmsg(null);
-	
+
 	public static final OCmsg GIVE_VIP_REWARD = new OCmsg(null);
+	public static final OCmsg MONEY_RECIEVED_COMMAND = new OCmsg(null);
+	public static final OCmsg MONEY_WITHDRAWED_COMMAND = new OCmsg(null);
     
 	private static final Map<String, Function<OlympaPlayerCreatif, String>> playerPlaceHolders = ImmutableMap.<String, Function<OlympaPlayerCreatif,String>>builder()
 			.put("%playerName", pc -> {return pc.getName();})
@@ -195,8 +197,8 @@ public class OCmsg {
 			
 			.put("%playerGroup", pc -> {return pc.getGroupName();})
 
-			.put("%playerMoneyAndSymbol", pc -> {return pc.getGameMoney() + " " + pc.getGameMoneySymbol();})
-			.put("%playerMoney", pc -> {return pc.getGameMoney() + "";})
+			.put("%playerMoneyAndSymbol", pc -> {return pc.getGameMoney().getFormatted();})
+			.put("%playerMoney", pc -> {return pc.getGameMoney().get() + "";})
 			
 			.put("%playerPlotsCount", pc -> {return pc.getPlots(false).size() + "";})
 			.put("%playerPlotsMaxCount", pc -> {return pc.getPlotsSlots(false) + "";})

@@ -3,7 +3,9 @@ package fr.olympa.olympacreatif.data;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -36,8 +38,8 @@ public class OCparam<T> {
 	
 	public static final OCparam<Position> HOLO_HELP_1_LOC = new OCparam<Position>(new Position());
 	public static final OCparam<Position> HOLO_HELP_2_LOC = new OCparam<Position>(new Position());
-	public static final OCparam<String> HOLO_HELP_1_TEXT = new OCparam<String>("");
-	public static final OCparam<String> HOLO_HELP_2_TEXT = new OCparam<String>("");
+	public static final OCparam<List<String>> HOLO_HELP_1_TEXT = new OCparam<List<String>>(new ArrayList<String>(), new TypeToken<List<String>>() {}.getType());
+	public static final OCparam<List<String>> HOLO_HELP_2_TEXT = new OCparam<List<String>>(new ArrayList<String>(), new TypeToken<List<String>>() {}.getType());
 	
 	public static final OCparam<Integer> INCOME_NOT_AFK = new OCparam<Integer>(0); 
 	public static final OCparam<Integer> INCOME_AFK = new OCparam<Integer>(0); 
@@ -48,27 +50,32 @@ public class OCparam<T> {
 	public static final OCparam<String> ROAD_SCHEM_NAME_Z = new OCparam<String>("fileName");
 	
 	private T value;
-	
+	private Type type;
+
 	private OCparam(T value) {
+		this(value, value.getClass());
+	}
+	private OCparam(T value, Type type) {
 		this.value = value;
+		this.type = type;
 	}
 	
 	public T get() {
 		return value;
 	}
 	
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	public void setValueFromBdd(Object value) {
 		//if (value.getClass().equals(paramClass))
 		this.value = (T) value;
-	}
+	}*/
 	
 	public void setValue(T value) {
 		this.value = value;
 	}
 	
-	public Type getType(){
-		return new TypeToken<OCparam<T>>() {}.getType();
+	private Type getType(){
+		return type;
 	}
 
 	
@@ -102,14 +109,15 @@ public class OCparam<T> {
 			Gson gson = new GsonBuilder().serializeNulls().create();
 			
 			for (Entry<String, OCparam<?>> e : values().entrySet()) {
-				if (json.containsKey(e.getKey())) {
-					if (e.getValue().get() instanceof Integer)
+				if (json.containsKey(e.getKey())) 
+					e.getValue().setValue(gson.fromJson((String) json.get(e.getKey()), e.getValue().getType()));
+					/*if (e.getValue().get() instanceof Integer)
 						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), Integer.class));
 					else if (e.getValue().get() instanceof String)
 						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), String.class));
 					else if (e.getValue().get() instanceof Position)
-						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), Position.class));
-				}else
+						e.getValue().setValueFromBdd(gson.fromJson((String) json.get(e.getKey()), Position.class));*/
+				else
 					OlympaCreatifMain.getInstance().getLogger().warning("§eLe paramètre " + e.getKey() + " n'existe pas en bdd ! Une valeur par défaut a été définie : " + e.getValue().get());
 			}
 			
@@ -129,7 +137,7 @@ public class OCparam<T> {
 		//Gson gson = new GsonBuilder().serializeNulls().create();
 		
 		for (Entry<String, OCparam<?>> param : values().entrySet())
-			json.put(param.getKey(), new Gson().toJson(param.getValue().get()));
+			json.put(param.getKey(), new Gson().toJson(param.getValue().get(), param.getValue().getType()));
 		
 		return json.toString();
 	}

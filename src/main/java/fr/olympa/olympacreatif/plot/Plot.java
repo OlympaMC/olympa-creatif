@@ -136,21 +136,19 @@ public class Plot {
 		//spawns the tuto holo if it's the plot 1
 		if (plotId.getId() == 1) {
 			plugin.getTask().runTaskLater(() -> {
-				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get().split(" & "));
-				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get().split(" & "));
+				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
+				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
 			}, 10);
 		}
 	}
 	
-	private void setHelpHolo(Location loc, String[] text) {
+	private void setHelpHolo(Location loc, List<String> text) {
 		loc.getChunk().load();
 		loc.getChunk().setForceLoaded(true);
 		
-		@SuppressWarnings("unchecked")
 		Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, false, true);
 		
-		for (String s : text)
-			holo.addLine(new FixedLine<HologramLine>(s));
+		text.forEach(s -> holo.addLine(new FixedLine<HologramLine>(s)));
 	}
 	
 	private void loadInitialEntitiesOnChunks() {

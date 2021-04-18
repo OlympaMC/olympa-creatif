@@ -166,6 +166,8 @@ public class PlotsInstancesListener implements Listener{
 			return;
 
 		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
+		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS))
+			return;
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlockPlaced().getLocation());
 		if (plot == null || plugin.getWEManager().isReseting(plot)) {
@@ -205,6 +207,8 @@ public class PlotsInstancesListener implements Listener{
 			return;
 
 		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
+		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS))
+			return;
 		
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		if (plot == null || plugin.getWEManager().isReseting(plot)) {
@@ -367,6 +371,8 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
 		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
+		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS))
+			return;
 		
 		Block clickedBlock = e.getClickedBlock();
 		
@@ -691,6 +697,8 @@ public class PlotsInstancesListener implements Listener{
 	public void onEntitySpawn(EntityAddToWorldEvent e) {
 		if (e.getEntityType() == EntityType.PLAYER)
 			return;
+
+		//Bukkit.broadcastMessage("add entity : " + e.getEntity());
 		
 		if (!CmdSummon.allowedEntities.contains(e.getEntityType())) {
 			e.getEntity().remove();
@@ -705,7 +713,6 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot.addEntityInPlot(e.getEntity());
 		plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
-		//Bukkit.broadcastMessage("[DEBUG] ADD ENTITY TO " + plot + " : " + e.getEntity().getType());
 	}
 	
 	@EventHandler //remove entities from plot entities list
@@ -713,7 +720,10 @@ public class PlotsInstancesListener implements Listener{
 		if (e.getEntityType() == EntityType.PLAYER)
 			return;
 		
-		plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(e.getEntity()));
+		//Bukkit.broadcastMessage("remove entity : " + e.getEntity());
+		plot = plugin.getPlotsManager().getPlot(
+				plugin.getPlotsManager().getBirthPlot(
+						e.getEntity()));
 		
 		//Bukkit.broadcastMessage("Entity removed : " + e.getEntity() + " from " + plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		

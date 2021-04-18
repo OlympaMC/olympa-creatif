@@ -21,9 +21,11 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.enginehub.piston.part.NoArgCommandFlag;
 
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 
+import fr.olympa.api.economy.OlympaMoney;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -56,10 +58,7 @@ public class WorldManager {
 		//task pour donner l'argent aux joueurs périodiquement
 		new BukkitRunnable() {
 
-			int currentPeriod = 0;
-			
-			int noAfkIncome = OCparam.INCOME_NOT_AFK.get();
-			int afkIncome = OCparam.INCOME_AFK.get();
+			int currentPeriod = -1;
 			
 			@Override
 			public void run() {
@@ -67,17 +66,16 @@ public class WorldManager {
 				currentPeriod = currentPeriod % 10;
 				
 				Bukkit.getOnlinePlayers().forEach(p -> {
-					OlympaPlayerCreatif pp = AccountProvider.get(p.getUniqueId());
+					OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 
-					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? afkIncome : noAfkIncome;
+					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? OCparam.INCOME_AFK.get() : OCparam.INCOME_NOT_AFK.get();
+					pc.getGameMoney().give(income);
 					
 					if (currentPeriod == 0)
-						pp.addGameMoney(income, () -> OCmsg.PERIODIC_INCOME_RECEIVED.send(p, "" + income));
-					else
-						pp.addGameMoney(income, null);
+						OCmsg.PERIODIC_INCOME_RECEIVED.send(p, income + OlympaMoney.OMEGA);
 				});
 			}
-		}.runTaskTimer(plugin, 20*60*6, 20*60*6);
+		}.runTaskTimer(plugin, /*20*60*6*/200, 20*60*6);
 	}
 	
 	public void defineWorldParams() {

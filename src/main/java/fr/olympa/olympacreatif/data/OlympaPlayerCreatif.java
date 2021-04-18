@@ -19,6 +19,8 @@ import org.bukkit.ChatColor;
 
 import com.google.common.collect.ImmutableMap;
 
+import fr.olympa.api.economy.MoneyPlayerInterface;
+import fr.olympa.api.economy.OlympaMoney;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;
@@ -34,7 +36,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 import fr.olympa.olympacreatif.plot.PlotsManager;
 
-public class OlympaPlayerCreatif extends OlympaPlayerObject {
+public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlayerInterface {
 	
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_MONEY = new SQLColumn<OlympaPlayerCreatif>("gameMoney", "INT NOT NULL DEFAULT 100", Types.INTEGER).setUpdatable();
 	
@@ -78,7 +80,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			
 	private OlympaCreatifMain plugin;
 	
-	private int gameMoney;
+	private boolean hasClaimedVipRewards = false; //utilisé pour les récompenses uniques VIP
+	private OlympaMoney money = new OlympaMoney(0);
 
 	private Set<KitType> kits = new HashSet<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();
@@ -106,7 +109,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 	@Override
 	public void loadDatas(ResultSet resultSet) throws SQLException {
-		gameMoney = resultSet.getInt("gameMoney");
+		money.set(resultSet.getInt("gameMoney"));
 		
 		for (KitType kit : KitType.values())
 			if (resultSet.getBoolean(kit.getBddKey()))
@@ -121,13 +124,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			else
 				playerParams.remove(param);
 		
-		//give possible VIP rewards
-		if (!resultSet.getBoolean("hasClaimedVipReward") && getGroups().containsKey(OlympaGroup.VIP))
-			COLUMN_HAS_CLAIMED_VIP.updateAsync(this, true, () ->
-					addGameMoney(100, () -> OCmsg.GIVE_VIP_REWARD.send(this)), 
-					null);
+		hasClaimedVipRewards = resultSet.getBoolean("hasClaimedVipReward");
 		
-		currentPlot = plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, 1));
+		//currentPlot = plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, 1));
 	}
 	
 	/*@Override
@@ -160,9 +159,28 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 			else
 				statement.setBoolean(i, false);
 	}*/
+
+	@Override
+	public void loaded() {
+		super.loaded();
+		money.observe("datas", () -> COLUMN_MONEY.updateAsync(this, money.get(), null, ex -> getPlayer().sendMessage("§cFailed to save your new money. Please send this to the staff.")));
+		
+		if (!hasClaimedVipRewards && getGroups().containsKey(OlympaGroup.VIP)) 
+			COLUMN_HAS_CLAIMED_VIP.updateAsync(this, true, () -> {
+				OCmsg.GIVE_VIP_REWARD.send(this);
+				money.give(100);
+			}, null);
+		
+	}
+
+	@Override
+	public OlympaMoney getGameMoney() {
+		return money;
+	}
 	
-	public int getGameMoney() {
-		return gameMoney;
+	/*
+	public OlympaMoney getMoney() {
+		return money;
 	}
 	
 	public boolean hasGameMoney(int money) {
@@ -184,7 +202,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	public void setGameMoney(int money, Runnable successRunnable) {
 		gameMoney = money;
 		COLUMN_MONEY.updateAsync(this, gameMoney, successRunnable, exception -> Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Une erreur est survenue lors de la mise à jour de vos informations. \nErreur à signaler au staff : §4" + exception.getCause().getMessage()));
-	}
+	}*/
 	
 	public boolean hasKit(KitType kit) {
 		return kits.contains(kit);
@@ -295,11 +313,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 	
 
 	public String getGameMoneyName() {
-		return "Kumars";
-	}
-	
-	public String getGameMoneySymbol() {
-		return "K";
+		return "Omegas";
 	}
 	
 	public Plot getCurrentPlot() {
@@ -331,6 +345,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject {
 		BYPASS_KICK_BAN(PermissionsList.STAFF_BYPASS_PLOT_KICK_AND_BAN),
 		GHOST_MODE(PermissionsList.STAFF_BYPASS_VANILLA_COMMANDS),
 		WORLDEDIT(PermissionsList.STAFF_BYPASS_WORLDEDIT),
+		BUILD_ROADS(PermissionsList.STAFF_BUILD_ROADS),
 		OWNER_EVERYWHERE(PermissionsList.STAFF_PLOT_FAKE_OWNER);
 		
 		OlympaPermission corePerm;

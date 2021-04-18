@@ -31,8 +31,9 @@ public class PermissionsList {
 	public static final OlympaSpigotPermission CREA_TPA = new OlympaSpigotPermission(OlympaGroup.PLAYER);
 	
 	public static final OlympaSpigotPermission STAFF_MANAGE_MONEY = new OlympaSpigotPermission(OlympaGroup.DEV);
-	
+
 	public static final OlympaSpigotPermission STAFF_BYPASS_OP_CHECK = new OlympaSpigotPermission(OlympaGroup.DEV);
+	public static final OlympaSpigotPermission STAFF_BUILD_ROADS = new OlympaSpigotPermission(OlympaGroup.DEV);
 	
 	
 	 

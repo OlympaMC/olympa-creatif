@@ -213,7 +213,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			return "§3";
 
 		case 7:
-			return "§7" + p.getGameMoneyName() + " : §6" + p.getGameMoney() + p.getGameMoneySymbol();
+			return "§7" + p.getGameMoneyName() + " : §6" + p.getGameMoney().getFormatted();
 
 		case 8:
 			return "§4";

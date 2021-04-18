@@ -19,6 +19,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -47,7 +48,7 @@ public abstract class AWorldEditManager {
 	
 	//private static Set<PlotId> resetingPlots = new HashSet<PlotId>();
 	
-	public boolean isReseting(Plot plot) {
+	public final boolean isReseting(Plot plot) {
 		return resetingPlots.containsKey(plot.getPlotId());
 	}
 	

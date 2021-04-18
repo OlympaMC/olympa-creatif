@@ -152,6 +152,11 @@ public class PermissionsManager implements Listener {
 				att.unsetPermission(perm);
 		});
 		
+		if (p.hasStaffPerm(StaffPerm.BUILD_ROADS))
+			att.setPermission("fawe.bypass", true);
+		else
+			att.unsetPermission("fawe.bypass");
+		
 		((CraftServer) Bukkit.getServer()).getHandle().getServer().getCommandDispatcher().a(((CraftPlayer) p.getPlayer()).getHandle()); 
 	}
 	

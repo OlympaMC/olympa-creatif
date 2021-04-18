@@ -227,7 +227,7 @@ public class PlotsManager {
 	}*/
 	
 	public Plot getPlot(PlotId id) {
-		return loadedPlots.get(id.getId());
+		return loadedPlots.get(id == null ? null : id.getId());
 	}
 	
 	

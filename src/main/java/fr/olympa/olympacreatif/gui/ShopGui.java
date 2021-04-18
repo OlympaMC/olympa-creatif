@@ -45,7 +45,7 @@ public class ShopGui extends IGui{
 	int buyProcessStateSlot;
 	
 	public ShopGui(IGui gui) {
-		super(gui, "Magasin (monnaie : " + gui.getPlayer().getGameMoney() + " " + gui.getPlayer().getGameMoneyName() + ")", 4, gui.staffPlayer);
+		super(gui, "Magasin (monnaie : " + gui.getPlayer().getGameMoney().getFormatted() + ")", 4, gui.staffPlayer);
 		
 		//init têtes
 		ranksRowHead = ItemUtils.skullCustom("§6Grades", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI1NzViNTU3N2NjYjMyZTQyZDU0MzA0YTFlZjVmMjNhZDZiYWQ1YTM0NTYzNDBhNDkxMmE2MmIzNzk3YmI1In19fQ==");
@@ -355,7 +355,7 @@ public class ShopGui extends IGui{
 			
 			if (!isBuyable)
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§7Achat impossible");
-			else if (!p.hasGameMoney(price))
+			else if (!p.getGameMoney().has(price))
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§cPas assez de fonds");
 			else
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§aAchat possible");
@@ -386,15 +386,16 @@ public class ShopGui extends IGui{
 			return isBuyable;
 		}
 		
+		@SuppressWarnings("deprecation")
 		public void tryToBuy(ShopGui gui) {
-			if (!isBuyable || !p.hasGameMoney(price))
+			if (!isBuyable || !p.getGameMoney().has(price))
 				return;
 			
 			if (toBuy instanceof OlympaGroup) {
 				if (p.getGroups().containsKey(toBuy))
 					return;
 				
-				p.withdrawGameMoney(price, () -> {
+				if (p.getGameMoney().withdraw(price)) {
 					p.addGroup((OlympaGroup)toBuy);
 					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(p);
 					
@@ -406,7 +407,7 @@ public class ShopGui extends IGui{
 						Bukkit.broadcastMessage("§6----------------------------------------------\n§6\n"
 								+ "Le joueur §c" + p.getName() + " §6a découvert le grade secret ! \nFélicitations à " + genreType + " !"
 								+ "\n§6\n----------------------------------------------");	
-				});
+				}
 				
 				/*plugin.getTask().runTaskAsynchronously(()-> {
 					OlympaCore.getInstance().getServer().getPluginManager().callEvent(new AsyncOlympaPlayerChangeGroupEvent(p.getPlayer(), ChangeType.ADD, p, (OlympaGroup) toBuy));
@@ -419,19 +420,20 @@ public class ShopGui extends IGui{
 			}else if (toBuy instanceof KitType) {
 				if (p.hasKit((KitType)toBuy))
 					return;
-
-				p.withdrawGameMoney(price, () -> {
+				
+				if (p.getGameMoney().withdraw(price)) {
 					p.addKit((KitType)toBuy);
 					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
-				});
+				}
+				
 			}else if (toBuy instanceof UpgradeType) {
 				if (p.getUpgradeLevel((UpgradeType)toBuy) >= ((UpgradeType)toBuy).getMaxLevel())
 					return;
 
-				p.withdrawGameMoney(price, () -> {
+				if (p.getGameMoney().withdraw(price)) {
 					p.incrementUpgradeLevel((UpgradeType)toBuy);
 					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
-				});
+				}
 			}
 			
 			OCmsg.SHOP_BUY_SUCCESS.send(p, this);
