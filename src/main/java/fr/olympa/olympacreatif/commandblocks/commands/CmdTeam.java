@@ -22,8 +22,8 @@ import fr.olympa.olympacreatif.utils.NbtParserUtil;
 
 public class CmdTeam extends CbCommand {
 	
-	public CmdTeam(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdTeam(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.team, sender, loc, plugin, plot, args);
 	}
 	
 	@Override 

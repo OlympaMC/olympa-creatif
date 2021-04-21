@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.command.CommandSender;
@@ -93,9 +94,9 @@ public class CbCommandListener implements Listener {
 				return;	
 			}else
 				//commandblock lents, max 1 cmd/s
-				if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
+				/*if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
 					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - OCparam.CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.get());
-				else
+				else*/
 					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
 			
 			
@@ -145,19 +146,16 @@ public class CbCommandListener implements Listener {
 		
 		//Bukkit.broadcastMessage(cmd.getType().toString());
 
-		int neededCmdTickets;
-		if (cmd.getType() == CommandType.setblock)
-			neededCmdTickets = OCparam.CB_COMMAND_TICKETS_CONSUMED_BY_SETBLOCK.get();
-		else
-			neededCmdTickets = 1;
+		int neededCmdTickets = cmd.getType().getRequiredCbTickets();
 		
 		if (cmd.getPlot().getCbData().getCommandsTicketsLeft() < neededCmdTickets) {
 			//si le plot n'a plus assez de commandes restantes, cancel exécution
 			OCmsg.CB_NO_COMMANDS_LEFT.send(sender);
 			return;
-		}else
-			//si le plot a assez de commandes restantes, retrait d'une d'entre elles avant de passer à l'exécution
-			cmd.getPlot().getCbData().removeCommandTickets(neededCmdTickets);
+		}
+		
+		//si le plot a assez de commandes restantes, retrait d'une d'entre elles avant de passer à l'exécution
+		cmd.getPlot().getCbData().removeCommandTickets(neededCmdTickets);
 		
 		int result = cmd.execute();
 		
@@ -167,40 +165,8 @@ public class CbCommandListener implements Listener {
 		message.send(sender, new CbCmdResult(cmd.getType(), result));
 		
 		//mise à jour NBTTags command block
-		if (!(sender instanceof CraftBlockCommandSender))
-			return;
-		
-		setCbTags(sender, result);
-		
-		/*
-		BlockState cb = (BlockState) ((CraftBlockCommandSender) sender).getBlock().getState();
-		
-		//update valeurs NBT commandblock
-		CommandBlock b;
-
-		TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(
-				new BlockPosition(cb.getLocation().getX(), cb.getLocation().getY(), cb.getLocation().getZ()));
-		
-		NBTTagCompound tag = new NBTTagCompound();
-		
-		tile.save(tag);
-		
-		//Bukkit.broadcastMessage(tag.asString());
-		
-		if (tag.hasKey("SuccessCount"))
-			tag.setInt("SuccessCount", (byte) Math.max(0, result));
-		
-		if (tag.hasKey("LastExecution"))
-			tag.setLong("LastExecution", MinecraftServer.currentTick);
-		
-		if (tag.hasKey("conditionMet"))
-			if (result == 0)
-				tag.setBoolean("conditionMet", false);
-			else
-				tag.setBoolean("conditionMet", true);
-		
-		tile.load(tag);
-		*/
+		if (sender instanceof CraftBlockCommandSender)
+			setCbTags(sender, result);
 	}
 	
 	/*
@@ -221,10 +187,11 @@ public class CbCommandListener implements Listener {
 	
 	private void setCbTags(CommandSender sender, int cmdResult) {
 		
-		BlockState cb = (BlockState) ((CraftBlockCommandSender) sender).getBlock().getState();
+		Block cb = ((CraftBlockCommandSender) sender).getBlock();//.getState();
 
 		TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(
-				new BlockPosition(cb.getLocation().getX(), cb.getLocation().getY(), cb.getLocation().getZ()));
+				//new BlockPosition(cb.getLocation().getX(), cb.getLocation().getY(), cb.getLocation().getZ()));
+				new BlockPosition(cb.getX(), cb.getY(), cb.getZ()));
 		
 		setCbTags(tile, cmdResult);
 	}
@@ -240,7 +207,7 @@ public class CbCommandListener implements Listener {
 		//Bukkit.broadcastMessage(tag.asString());
 		
 		if (tag.hasKey("SuccessCount"))
-			tag.setInt("SuccessCount", (byte) Math.max(0, cmdResult));
+			tag.setInt("SuccessCount", (byte) cmdResult > 0 ? cmdResult : 0);
 		
 		if (tag.hasKey("LastExecution"))
 			tag.setLong("LastExecution", MinecraftServer.currentTick);

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.bukkit.entity.Player;
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
+import fr.olympa.api.economy.OlympaMoney;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -242,7 +243,7 @@ public class OcaCmd extends AbstractCmd {
 		
 		switch((String) cmd.getArgument(1)) {
 		case "info":
-			Prefix.DEFAULT.sendMessage(getSender(), "Le joueur %s a actuellement %s coins.", target.getName(), target.getGameMoney() + "");
+			Prefix.DEFAULT.sendMessage(getSender(), "Le joueur %s a actuellement %s coins.", target.getName(), target.getGameMoney().getFormatted());
 			break;
 			
 		case "give":
@@ -254,9 +255,9 @@ public class OcaCmd extends AbstractCmd {
 			target.getGameMoney().give(money);
 			
 			Prefix.DEFAULT.sendMessage(getSender(), "Le joueur %s a reçu %s coins et en a maintenant %s.", 
-					target.getName(), money + "", target.getGameMoney().getFormatted() + "");
+					target.getName(), money + OlympaMoney.OMEGA, target.getGameMoney().getFormatted());
 			
-			OCmsg.MONEY_RECIEVED_COMMAND.send(target, target.getGameMoney().getFormatted());
+			OCmsg.MONEY_RECIEVED_COMMAND.send(target, money + OlympaMoney.OMEGA);
 			break;
 			
 		case "withdraw":
@@ -267,10 +268,10 @@ public class OcaCmd extends AbstractCmd {
 			
 			if (target.getGameMoney().withdraw(money)) {
 				Prefix.DEFAULT.sendMessage(getSender(), "Le joueur %s a perdu %s coins et en a maintenant %s.", 
-						target.getName(), money + "", target.getGameMoney().getFormatted() + "");
-				OCmsg.MONEY_WITHDRAWED_COMMAND.send(target, target.getGameMoney().getFormatted());
+						target.getName(), money + OlympaMoney.OMEGA, target.getGameMoney().getFormatted());
+				OCmsg.MONEY_WITHDRAWED_COMMAND.send(target, money + OlympaMoney.OMEGA);
 			} else 
-				Prefix.DEFAULT_BAD.sendMessage(getSender(), "Le joueur %s n'a que %s coins, impossible de lui en retirer %s.", target.getName(), target.getGameMoney() + "",  money + "");
+				Prefix.DEFAULT_BAD.sendMessage(getSender(), "Le joueur %s n'a que %s, impossible de lui en retirer %s.", target.getName(), target.getGameMoney().getFormatted(),  money + "");
 			
 			break;
 		}

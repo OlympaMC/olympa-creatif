@@ -10,6 +10,7 @@ import org.bukkit.entity.EntityType;
 
 import com.google.common.collect.ImmutableList;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -105,8 +106,8 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.ITEM_FRAME)
 			.build();
 	
-	public CmdSummon(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdSummon(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.summon, sender, loc, plugin, plot, args);
 	}
 
 	

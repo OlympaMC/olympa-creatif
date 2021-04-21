@@ -7,14 +7,15 @@ import org.bukkit.entity.Entity;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.CbObjective.ObjType;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class CmdTrigger extends CbCommand {
 
-	public CmdTrigger(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
+	public CmdTrigger(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
-		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
+		super(CommandType.trigger, sender, sendingLoc, plugin, plot, commandString);
 		
 		neededPlotRankToExecute = PlotRank.VISITOR;
 		needCbKitToExecute = false;

@@ -15,13 +15,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdReplaceitem extends CbCommand {
 
-	public CmdReplaceitem(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
+	public CmdReplaceitem(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
-		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
+		super(CommandType.replaceitem, sender, sendingLoc, plugin, plot, commandString);
 		// TODO Auto-generated constructor stub
 	}
 	

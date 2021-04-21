@@ -20,31 +20,31 @@ public class UpgradesManager {
 	OlympaCreatifMain plugin;
 	
 	private static Map<Integer, Integer> cbLevels = ImmutableMap.<Integer, Integer>builder()
-			.put(1, 10) //valeur de l'upgrade, prix de l'upgrade
-			.put(2, 10)
-			.put(4, 10)
-			.put(6, 10)
-			.put(8, 10)
-			.put(10, 10)
+			.put(1, 1) //valeur de l'upgrade, prix de l'upgrade
+			.put(2, 1)
+			.put(3, 1)
+			.put(4, 1)
+			.put(5, 1)
+			.put(7, 1)
 			.build();
 	
 	private static Map<Integer, Integer> plotLevels = ImmutableMap.<Integer, Integer>builder()
-			.put(1, 10)
-			.put(2, 10)
-			.put(3, 10)
-			.put(4, 10)
-			.put(5, 10)
-			.put(6, 10)
-			.put(7, 10)
+			.put(1, 1)
+			.put(2, 1)
+			.put(3, 1)
+			.put(4, 1)
+			.put(5, 1)
+			.put(6, 1)
+			.put(7, 1)
 			.build();
 	
 	private static Map<Integer, Integer> membersLevels = ImmutableMap.<Integer, Integer>builder()
-			.put(4, 10)
-			.put(5, 10)
-			.put(6, 10)
-			.put(7, 10)
-			.put(8, 10)
-			.put(9, 10)
+			.put(4, 1)
+			.put(5, 1)
+			.put(6, 1)
+			.put(7, 1)
+			.put(8, 1)
+			.put(9, 1)
 			.build();
 	
 	public UpgradesManager(OlympaCreatifMain plugin) {

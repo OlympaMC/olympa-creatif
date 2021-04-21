@@ -2,11 +2,13 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,6 +18,8 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
+import com.sk89q.worldedit.function.operation.RunContext;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
@@ -23,8 +27,8 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdExecute extends CbCommand {
 
-	public CmdExecute(CommandType cmdType, CommandSender sender, Location loc, OlympaCreatifMain plugin,	Plot plot, String[] args) {
-		super(cmdType, sender, loc, plugin, plot, args);
+	public CmdExecute(CommandSender sender, Location loc, OlympaCreatifMain plugin,	Plot plot, String[] args) {
+		super(CommandType.execute, sender, loc, plugin, plot, args);
 	}
 	
 	@Override
@@ -32,7 +36,7 @@ public class CmdExecute extends CbCommand {
 		LinkedHashMap<ExecuteType, List<String>> subCommands = new LinkedHashMap<ExecuteType, List<String>>();
 		
 		//liste utilisée exclusivement pour la génération de la map subCommands
-		List<String> subArgs = new ArrayList<String>();
+		List<String> subArgs = new ArrayList<String>(10);
 		
 		ExecuteType currentType = null;
 		
@@ -45,11 +49,10 @@ public class CmdExecute extends CbCommand {
 			
 			//si la commande n'est pas la dernière possible (à savoir run), ajout de la commande à la liste et reset de la liste d'arg pour la prochaine sub cmd
 			else {
-				if (currentType != null) {
+				if (currentType != null) 
 					subCommands.put(currentType, subArgs);
-				}
 				
-				subArgs = new ArrayList<String>();
+				subArgs.clear();
 				currentType = newType;
 			}
 		}
@@ -58,11 +61,11 @@ public class CmdExecute extends CbCommand {
 		subCommands.put(currentType, subArgs);
 		
 		//passage de la sous commande store (s'il y en a une) tout à la fin de la liste
-		if (subCommands.keySet().contains(ExecuteType.cmd_store))
+		if (subCommands.containsKey(ExecuteType.cmd_store))
 			subCommands.put(ExecuteType.cmd_store, subCommands.remove(ExecuteType.cmd_store));
 		
 		Map<CommandSender, Location> commandSenders = new HashMap<CommandSender, Location>();
-		List<Location> sendingLocations = new ArrayList<Location>();
+		Set<Location> sendingLocations = new HashSet<Location>();
 		
 		commandSenders.put(sender, null);
 		sendingLocations.add(sendingLoc);
@@ -241,11 +244,15 @@ public class CmdExecute extends CbCommand {
 						if (e.getValue() != null)
 							sendingLoc = e.getValue();
 						
+						if (plot.getCbData().getCommandsTicketsLeft() < CbCommand.getCommandType(stringCmd).getRequiredCbTickets())
+							return -1;
+						
 						CbCommand runCmd = CbCommand.getCommand(plugin, sender, sendingLoc, stringCmd);
 						
 						if (runCmd == null)
 							return 0;
 						
+						plot.getCbData().removeCommandTickets(runCmd.getType().getRequiredCbTickets());
 						cmdResults.add(runCmd.execute());
 					}
 				}

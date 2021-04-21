@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.item.ItemUtils;
@@ -19,6 +20,7 @@ public class KitsManager {
 	OlympaCreatifMain plugin;
 	Map<Material, KitType> kits = new HashMap<Material, KitType>();
 	Map<Material, ItemStack> noKitItem = new HashMap<Material, ItemStack>();
+	Map<Material, net.minecraft.server.v1_16_R3.ItemStack> noKitItemNMS = new HashMap<Material, net.minecraft.server.v1_16_R3.ItemStack>();
 	
 	public KitsManager (OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -26,6 +28,9 @@ public class KitsManager {
 		
 		for (Material mat : kits.keySet())
 			noKitItem.put(mat, ItemUtils.item(Material.STONE, "§cLe kit §6" + getKitOf(mat).toString().toLowerCase() + " §cest requis pour utiliser §6" + mat.toString().toLowerCase().replace("_", " ")));
+		
+		for (Entry<Material, ItemStack> e : noKitItem.entrySet())
+			noKitItemNMS.put(e.getKey(), CraftItemStack.asNMSCopy(e.getValue()));
 	}
 	
 	public KitType getKitOf(Material mat) {
@@ -54,6 +59,10 @@ public class KitsManager {
 	
 	public ItemStack getNoKitPermItem(Material mat) {
 		return noKitItem.get(mat);
+	}
+	
+	public net.minecraft.server.v1_16_R3.ItemStack getNoKitPermItemNMS(Material mat) {
+		return noKitItemNMS.get(mat);
 	}
 	
 	private void initKitItems() {

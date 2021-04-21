@@ -53,7 +53,7 @@ public class ShopGui extends IGui{
 		upgradesRowHead = ItemUtils.skullCustom("§6Améliorations", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODA3M2FlNTQ3ZTZkYWE5ZDJkYzhjYjkwZTc4ZGQxYzcxY2RmYWRiNzQwMWRjMTY3ZDE2ODE5YjE3MzI4M2M1MSJ9fX0=");
 		
 		//init rangs
-		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CONSTRUCTOR, 10, ItemUtils.item(Material.IRON_AXE, "§6Grade " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()), 
+		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CONSTRUCTOR, 1, ItemUtils.item(Material.IRON_AXE, "§6Grade " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()), 
 				"§2Ce grade donne accès à :", 
 				" ",
 				"§aPréfixe " + OlympaGroup.CREA_CONSTRUCTOR.getPrefix(p.getGender()) + p.getPlayer().getName(),  
@@ -61,7 +61,7 @@ public class ShopGui extends IGui{
 				"§aAccès aux microblocks et aux têtes"
 				)));
 		
-		ranks.add(new MarketItemData(p, OlympaGroup.CREA_ARCHITECT, 20, ItemUtils.item(Material.GOLDEN_AXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), 
+		ranks.add(new MarketItemData(p, OlympaGroup.CREA_ARCHITECT, 1, ItemUtils.item(Material.GOLDEN_AXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), 
 				"§2En plus des avantages du niveau précédent,",
 				"§2ce grade donne accès à :",
 				" ",
@@ -80,7 +80,7 @@ public class ShopGui extends IGui{
 				hasAllKits = false;
 		
 		if (p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) && hasAllKits)
-			ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 30, ItemUtils.item(Material.DIAMOND_AXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), 
+			ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 1, ItemUtils.item(Material.DIAMOND_AXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), 
 					"§2En plus des avantages du niveau précédent,",
 					"§2ce grade donne accès à :",
 					" ",
@@ -94,7 +94,7 @@ public class ShopGui extends IGui{
 					"§6En espérant vous voir encore longtemps parmis nous,",
 					"§cL'équipe dévouée d'Olympa")));
 
-		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 10, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks", 
+		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks", 
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'§eutiliser les",
@@ -109,7 +109,7 @@ public class ShopGui extends IGui{
 				" ",
 				"§7Pour voir votre consommation de CPS : /oco debug")));
 		
-		kits.add(new MarketItemData(p, KitType.REDSTONE, 10, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone",
+		kits.add(new MarketItemData(p, KitType.REDSTONE, 1, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone",
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'utiliser",
@@ -121,7 +121,7 @@ public class ShopGui extends IGui{
 				"§7En cas d'abus, les courant de redstone",
 				"§7se bloqueront sur la parcelle.")));
 		
-		kits.add(new MarketItemData(p, KitType.FLUIDS, 10, ItemUtils.item(Material.WATER_BUCKET, "§6Kit fluides",
+		kits.add(new MarketItemData(p, KitType.FLUIDS, 1, ItemUtils.item(Material.WATER_BUCKET, "§6Kit fluides",
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit permet à l'§eeau et à la lave", 
@@ -132,7 +132,7 @@ public class ShopGui extends IGui{
 				"§7En cas d'abus, les fluides arrêteront",
 				"§7de couler sur la parcelle.")));
 		
-		kits.add(new MarketItemData(p, KitType.PEACEFUL_MOBS, 10, ItemUtils.item(Material.PIG_SPAWN_EGG, "§6Kit animaux",
+		kits.add(new MarketItemData(p, KitType.PEACEFUL_MOBS, 1, ItemUtils.item(Material.PIG_SPAWN_EGG, "§6Kit animaux",
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'utiliser tous les ",
@@ -146,7 +146,7 @@ public class ShopGui extends IGui{
 				"§7En cas d'abus, les entités",
 				"§7n'apparaîtront plus sur la parcelle.")));
 		
-		kits.add(new MarketItemData(p, KitType.HOSTILE_MOBS, 10, ItemUtils.item(Material.CREEPER_SPAWN_EGG, "§6Kit monstres",
+		kits.add(new MarketItemData(p, KitType.HOSTILE_MOBS, 1, ItemUtils.item(Material.CREEPER_SPAWN_EGG, "§6Kit monstres",
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'utiliser tous les ",

@@ -8,14 +8,15 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdGive extends CbCommand {
 
 	private ItemStack item = null;
 	
-	public CmdGive(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdGive(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.give, sender, loc, plugin, plot, args);
 	}
 	
 	@Override

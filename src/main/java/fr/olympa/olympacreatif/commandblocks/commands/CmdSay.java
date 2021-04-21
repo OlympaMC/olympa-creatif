@@ -14,8 +14,8 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdSay extends CbCommand {
 
-	public CmdSay(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdSay(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.say, sender, loc, plugin, plot, args);
 	}
 	
 	@Override

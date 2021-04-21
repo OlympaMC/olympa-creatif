@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.enginehub.piston.CommandValue;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -54,7 +56,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		if (s == null)
 			return null;
 		
-		String matStr = s.replace("minecraft:", "");
+		String matStr = s.startsWith("minecraft:") ? s.substring(10, s.length()) : s;
 
 		Material mat = Material.getMaterial(matStr.split("\\{")[0].toUpperCase());
 		
@@ -63,11 +65,12 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		
 		ItemStack item = new ItemStack(mat);
 		
-		if (!s.contains("{"))  
+		int indexOfNbt = s.indexOf("{");
+		if (s.indexOf("{") == -1)  
 			return item;
 		
 		try {			
-			NBTTagCompound tag = NBTcontrollerUtil.getValidTags(MojangsonParser.parse(s.substring(s.indexOf("{"))));
+			NBTTagCompound tag = NBTcontrollerUtil.getValidTags(MojangsonParser.parse(s.substring(indexOfNbt)));
 			net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 			nmsItem.setTag(tag);
 			item = CraftItemStack.asBukkitCopy(nmsItem);
@@ -103,10 +106,10 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		}catch(NumberFormatException e) {
 		}
 		
-		if (s.contains("~"))
+		if (s.startsWith("~"))
 			if (s.length() >= 2)
 				try{
-					return Double.valueOf(s.replaceFirst("~", "")) + potentialVectorValueToAdd;	
+					return Double.valueOf(s.substring(1, s.length())) + potentialVectorValueToAdd;	
 				}catch(NumberFormatException e) {
 					return null;
 				}
@@ -126,34 +129,30 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	}
 	
 	public static CommandType getCommandType(String cmd) {
-		String s = cmd.split(" ")[0].replaceFirst("/", "");
-		String[] splited = s.split(":");
-		return CommandType.get(splited.length == 0 ? null : splited[splited.length - 1]);
+		String s = cmd.startsWith("/") ? cmd.substring(1, cmd.length()) : cmd;
+		s = cmd.startsWith("minecraft:") ? cmd.substring(10, cmd.length()) : s;
+		return CommandType.get(s);
 		//return CommandType.get(s.split(":")[s.split(":").length - 1]);
 	}
 	
-	public static CbCommand getCommand(OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {
-		Plot plot = null;
-
-		if (sender instanceof Entity) {
-			plot = plugin.getPlotsManager().getPlot(((Entity) sender).getLocation());	
-		}
-		if (((sender instanceof CraftBlockCommandSender) && ((CraftBlockCommandSender) sender).getBlock().getState() instanceof CommandBlock)) {
-			plot = plugin.getPlotsManager().getPlot(((CraftBlockCommandSender) sender).getBlock().getState().getLocation());	
-		}
-		
-		if (plot == null)
+	public static CbCommand getCommand(CommandType type, OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {
+		if (type == null)
 			return null;
 		
-		CommandType type = getCommandType(fullCommand);
-		
-		if (type == null)
+		Plot plot = null;
+
+		if (((sender instanceof CraftBlockCommandSender) && ((CraftBlockCommandSender) sender).getBlock().getState() instanceof CommandBlock)) {
+			plot = plugin.getPlotsManager().getPlot(((CraftBlockCommandSender) sender).getBlock().getState().getLocation());
+			
+		} else if (sender instanceof Entity) {
+			plot = plugin.getPlotsManager().getPlot(((Entity) sender).getLocation());	
+		}else
 			return null;
 
 		//extraction des arguments de la commande
 		String[] args = fullCommand.split(" ");
 		
-		List<String> list = new ArrayList<String>(Arrays.asList(args));
+		//List<String> list = new ArrayList<String>();
 		List<String> concatList = new ArrayList<String>();
 		
 		//conctat les tags en plusieurs morceaux
@@ -161,9 +160,9 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		int crochetsCount = 0;
 		String concat = "";
 		
-		for (String s : list) {
+		for (String s : args) {
 			
-			if (concat.equals(""))
+			if (concat.length() == 0)
 				concat += s;
 			else
 				concat += " " + s;
@@ -182,85 +181,60 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		concatList.remove(0);
 		args = concatList.toArray(new String[concatList.size()]);
 		
-		switch (type) {
-		case gamemode:
-			return new CmdGamemode(type, sender, loc, plugin, plot, args);
-		case gm:
-			return new CmdGamemode(type, sender, loc, plugin, plot, args);
-		case bossbar:
-			return new CmdBossBar(type, sender, loc, plugin, plot, args);
-		case setblock:
-			return new CmdSetblock(type, sender, loc, plugin, plot, args);
-		case clear:
-			return new CmdClear(type, sender, loc, plugin, plot, args);
-		case enchant:
-			return new CmdEnchant(type, sender, loc, plugin, plot, args);
-		case execute:
-			return new CmdExecute(type, sender, loc, plugin, plot, args);
-		case experience:
-			return new CmdExperience(type, sender, loc, plugin, plot, args);
-		case give:
-			return new CmdGive(type, sender, loc, plugin, plot, args);
-		case tellraw:
-			return new CmdTellraw(type, sender, loc, plugin, plot, args);
-		case scoreboard:
-			return new CmdScoreboard(type, sender, loc, plugin, plot, args);
-		case team:
-			return new CmdTeam(type, sender, loc, plugin, plot, args);
-		case teleport:
-			return new CmdTeleport(type, sender, loc, plugin, plot, args);
-		case tp:
-			return new CmdTeleport(type, sender, loc, plugin, plot, args);
-		case effect:
-			return new CmdEffect(type, sender, loc, plugin, plot, args);
-		case summon:
-			return new CmdSummon(type, sender, loc, plugin, plot, args);
-		case kill:
-			return new CmdKill(type, sender, loc, plugin, plot, args);
-		case say:
-			return new CmdSay(type, sender, loc, plugin, plot, args);
-		case me:
-			return new CmdSay(type, sender, loc, plugin, plot, args);
-		case trigger:
-			return new CmdTrigger(type, sender, loc, plugin, plot, args);
-		case replaceitem:
-			return new CmdReplaceitem(type, sender, loc, plugin, plot, args);
-		//easter egg
-		case op:
-			return new CmdOp(type, sender, loc, plugin, plot, args);
-		default:
-			return null;
-		}
+		return type == null ? null : type.getBuilder().getCmd(sender, loc, plugin, plot, args);
+	}
+	
+	public static CbCommand getCommand(OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {
+		return getCommand(getCommandType(fullCommand), plugin, sender, loc, fullCommand);
 	}
 	
 	public enum CommandType{
-		teleport,
-		tp,
-		tellraw,
-		execute,
-		team,
-		scoreboard,
-		bossbar,
-		clear,
-		give,
-		enchant,
-		experience, 
-		effect, 
-		summon, 
-		kill,
-		say, 
-		me, 
-		setblock, 
-		gamemode, 
-		gm, 
-		op,
-		trigger,
-		replaceitem,
+		teleport(CmdOp::new),
+		tp(CmdTeleport::new),
+		tellraw(CmdTellraw::new),
+		execute(CmdExecute::new, 2),
+		team(CmdTeam::new),
+		scoreboard(CmdScoreboard::new),
+		bossbar(CmdBossBar::new),
+		clear(CmdClear::new, 2),
+		give(CmdGive::new, 3),
+		enchant(CmdEnchant::new),
+		experience(CmdExperience::new), 
+		effect(CmdEffect::new), 
+		summon(CmdSummon::new, 2), 
+		kill(CmdKill::new),
+		say(CmdSay::new), 
+		me(CmdSay::new), 
+		setblock(CmdSetblock::new, 4), 
+		gamemode(CmdGamemode::new), 
+		gm(CmdGamemode::new), 
+		op(CmdOp::new),
+		trigger(CmdTrigger::new),
+		replaceitem(CmdReplaceitem::new),
 		;
+		
+		private CommandBuilder builder;
+		private int requiredCmdTickets;
+		
+		CommandType(CommandBuilder builder){
+			this(builder, 1);
+		}
+		 
+		CommandType(CommandBuilder builder, int i){
+			requiredCmdTickets = i;
+		}
+		
+		public int getRequiredCbTickets() {
+			return requiredCmdTickets;
+		}
+		
+		public CommandBuilder getBuilder() {
+			return builder;
+		}
 		
 		public static CommandType get(String s) {
 			for (CommandType cmd : CommandType.values())
-				if (cmd.toString().equals(s))
+				if (cmd.toString().startsWith(s))
 					return cmd;
 			return null;
 		}
@@ -268,6 +242,11 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	
 	public int execute() {
 		return 0;
+	}
+	
+	@FunctionalInterface
+	static interface CommandBuilder {
+		CbCommand getCmd(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args);
 	}
 	
 }

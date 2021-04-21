@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.world;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +27,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
+import net.minecraft.server.v1_16_R3.ItemStack;
 import net.minecraft.server.v1_16_R3.PacketPlayInJigsawGenerate;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCreativeSlot;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetJigsaw;
@@ -38,9 +40,22 @@ public class PacketListener implements Listener {
 	
 	private final int maxPacketsPerPeriod = 40;
 	private Map<UUID, Long[]> packetsLimiter = new HashMap<UUID, Long[]>();
+
+	private Field packetSetInSlotSlot;
+	private Field packetSetInCreativeSlotItem;
 	
 	public PacketListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		try {
+			packetSetInSlotSlot = PacketPlayInSetCreativeSlot.class.getDeclaredField("slot");
+			packetSetInSlotSlot.setAccessible(true);
+			packetSetInCreativeSlotItem = PacketPlayInSetCreativeSlot.class.getDeclaredField("b");
+			packetSetInCreativeSlotItem.setAccessible(true);
+		} catch (NoSuchFieldException | SecurityException e) {
+			plugin.getLogger().warning("Failed to reflect class PacketPlayInSetCreativeSlot!");
+			e.printStackTrace();
+		}
+		
 		plugin.getTask().scheduleSyncRepeatingTask(() -> packetsLimiter.keySet().forEach(key -> packetsLimiter.get(key)[0] = 0l), 0, 250, TimeUnit.MILLISECONDS);
 	}
 	
@@ -97,7 +112,7 @@ public class PacketListener implements Listener {
             			
                 		if (!plugin.getPerksManager().getKitsManager().
                 				hasPlayerPermissionFor(p, mat)) {
-                			p.getPlayer().getInventory().setItemInMainHand(plugin.getPerksManager().getKitsManager().getNoKitPermItem(mat));
+                			packetSetInCreativeSlotItem.set(packet, plugin.getPerksManager().getKitsManager().getNoKitPermItemNMS(mat));
                 			p.getPlayer().updateInventory();
                 			return;	
                 		}

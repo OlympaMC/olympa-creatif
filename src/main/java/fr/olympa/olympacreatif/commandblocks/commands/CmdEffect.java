@@ -14,11 +14,14 @@ import org.bukkit.potion.PotionEffectType;
 import com.google.common.collect.ImmutableMap;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdEffect extends CbCommand {
 
-	private static final Map<String, PotionEffectType> potConversion = ImmutableMap.<String, PotionEffectType>builder().put("dolphins_grace", PotionEffectType.DOLPHINS_GRACE).put("ABSORPTION", PotionEffectType.ABSORPTION)
+	private static final Map<String, PotionEffectType> potConversion = ImmutableMap.<String, PotionEffectType>builder()
+			.put("DOLPHINS_GRACE", PotionEffectType.DOLPHINS_GRACE)
+			.put("ABSORPTION", PotionEffectType.ABSORPTION)
 			.put("BAD_OMEN", PotionEffectType.BAD_OMEN)
 			.put("BLINDESS", PotionEffectType.BLINDNESS)
 			.put("CONDUIT_POWER", PotionEffectType.CONDUIT_POWER)
@@ -52,8 +55,8 @@ public class CmdEffect extends CbCommand {
 			.put("WITHER", PotionEffectType.WITHER)
 			.build();
 	
-	public CmdEffect(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdEffect(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.effect, sender, loc, plugin, plot, args);
 	}
 
 	@Override

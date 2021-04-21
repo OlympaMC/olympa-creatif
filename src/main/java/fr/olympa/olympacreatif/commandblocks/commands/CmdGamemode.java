@@ -7,14 +7,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class CmdGamemode extends CbCommand {
 
-	public CmdGamemode(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
+	public CmdGamemode(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
-		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
+		super(CommandType.gamemode, sender, sendingLoc, plugin, plot, commandString);
 		
 		neededPlotRankToExecute = PlotRank.MEMBER;
 		needCbKitToExecute = false;

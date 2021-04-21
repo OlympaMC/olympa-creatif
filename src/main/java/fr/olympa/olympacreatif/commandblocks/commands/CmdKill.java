@@ -15,8 +15,8 @@ import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
 
 public class CmdKill extends CbCommand {
 
-	public CmdKill(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdKill(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.kill, sender, loc, plugin, plot, args);
 	}
 	
 	@Override

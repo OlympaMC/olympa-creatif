@@ -7,6 +7,7 @@ import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -14,9 +15,9 @@ import net.minecraft.server.v1_16_R3.TileEntity;
 
 public class CmdSetblock extends CbCommand {
 
-	public CmdSetblock(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
+	public CmdSetblock(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
-		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
+		super(CommandType.setblock, sender, sendingLoc, plugin, plot, commandString);
 		// TODO Auto-generated constructor stub
 	}
 

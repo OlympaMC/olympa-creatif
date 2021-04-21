@@ -15,8 +15,8 @@ public class CmdTeleport extends CbCommand {
 	
 	private List<Location> tpPoints = new ArrayList<Location>();
 	
-	public CmdTeleport(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdTeleport(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.teleport, sender, loc, plugin, plot, args);
 	
 		switch(args.length) {
 		case 1:

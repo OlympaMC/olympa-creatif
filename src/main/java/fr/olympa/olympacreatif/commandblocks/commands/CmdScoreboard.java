@@ -23,8 +23,8 @@ public class CmdScoreboard extends CbCommand {
 	ObjectivesType objType;
 	PlayersType playerType;
 	
-	public CmdScoreboard(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdScoreboard(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.scoreboard, sender, loc, plugin, plot, args);
 	}
 	
 	@Override

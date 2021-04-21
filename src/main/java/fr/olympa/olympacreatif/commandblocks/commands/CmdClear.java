@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 
@@ -20,8 +21,8 @@ public class CmdClear extends CbCommand {
 	private NBTTagCompound tagToRemove = null;
 	int removedItemLimit = 1000000;
 	
-	public CmdClear(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdClear(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.clear, sender, loc, plugin, plot, args);
 		
 		if (args.length > 0)
 			targetEntities = parseSelector(args[0], true);
@@ -62,7 +63,7 @@ public class CmdClear extends CbCommand {
 				//si le tag est nul et que les material correspondent
 				(it.getType() == matToRemove && tagToRemove == null) ||
 				//si le tag n'est pas nul et que les matériaux correspondent
-				(it.getType() == matToRemove && tagToRemove.equals(CraftItemStack.asNMSCopy(it).getTag())) )) {
+				(it.getType() == matToRemove && tagToRemove.equals(CraftItemStack.asNMSCopy(it).getTag())))) {
 					
 					if (it.getAmount() < playerItemsToRemove) {
 						

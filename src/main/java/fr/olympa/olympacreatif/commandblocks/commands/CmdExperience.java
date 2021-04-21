@@ -16,8 +16,8 @@ public class CmdExperience extends CbCommand {
 	private Experience expType = Experience.LEVELS;
 	private int definedAmount = 0;
 	
-	public CmdExperience(CommandType cmdType, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(cmdType, sender, loc, plugin, plot, args);
+	public CmdExperience(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.experience, sender, loc, plugin, plot, args);
 		
 		if (args.length == 0)
 			return;

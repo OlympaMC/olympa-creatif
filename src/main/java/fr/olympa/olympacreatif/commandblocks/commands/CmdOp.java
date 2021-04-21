@@ -11,9 +11,9 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class CmdOp extends CbCommand {
 	
-	public CmdOp(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot,
+	public CmdOp(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot,
 			String[] commandString) {
-		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
+		super(CommandType.op, sender, sendingLoc, plugin, plot, commandString);
 		
 		neededPlotRankToExecute = PlotRank.VISITOR;
 		needCbKitToExecute = false;

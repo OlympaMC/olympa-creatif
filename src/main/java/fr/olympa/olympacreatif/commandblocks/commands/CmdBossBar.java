@@ -4,6 +4,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -14,13 +15,14 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
+import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.NbtParserUtil;
 
 public class CmdBossBar extends CbCommand {
 	
-	public CmdBossBar(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdBossBar(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.bossbar, sender, loc, plugin, plot, args);
 	}
 	
 	@Override
@@ -33,7 +35,9 @@ public class CmdBossBar extends CbCommand {
 			if (args.length != 3)
 				return 0;
 			
-			BossBar bukkitBar = Bukkit.createBossBar(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[2])), BarColor.WHITE, BarStyle.SOLID);
+			BossBar bukkitBar = Bukkit.createBossBar(
+					args[2].startsWith("{") ? NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[2])) : 
+						ChatColor.translateAlternateColorCodes('&', args[2]), BarColor.WHITE, BarStyle.SOLID);
 			
 			plotCbData.addBossBar(args[1], new CbBossBar(plugin, bukkitBar));
 			return 1;
@@ -108,7 +112,8 @@ public class CmdBossBar extends CbCommand {
 				}
 				
 			case "name":
-				bar.getBar().setTitle(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[3])));
+				bar.getBar().setTitle(args[3].startsWith("{") ? NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[3])) : 
+					ChatColor.translateAlternateColorCodes('&', args[3]));
 				return 1;
 				
 			case "value":
@@ -128,20 +133,21 @@ public class CmdBossBar extends CbCommand {
 			case "max":
 				int max = 100;
 
-				if (StringUtils.isNumeric(args[3])) {
+				try {
 					max = (int) (double) Double.valueOf(args[3]);
-					if (max <= 0)
+					if (max > 0)
+						bar.setMax(max);
+					else
 						return 0;
-				}
-				else
+					
+				}catch(Exception ex) {
 					return 0;
+				}
 				
-				bar.setMax(max);
 				return 1;
 				
 				
 			case "players":
-				
 				targetEntities = parseSelector(args[3], true);
 				for (Entity p : targetEntities)
 					bar.getBar().addPlayer((Player) p);
@@ -181,7 +187,7 @@ public class CmdBossBar extends CbCommand {
 					bar.getBar().setVisible(false);
 					return 1;
 				default:
-				return 0;
+					return 0;
 				}
 			default:
 				return 0;
@@ -191,5 +197,4 @@ public class CmdBossBar extends CbCommand {
 			return 0;
 		}
 	}
-
 }

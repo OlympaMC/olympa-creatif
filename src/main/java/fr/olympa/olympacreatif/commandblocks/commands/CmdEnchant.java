@@ -20,14 +20,14 @@ public class CmdEnchant extends CbCommand {
 	private Enchantment ench = null;
 	private int level = 1;
 	
-	public CmdEnchant(CommandType type, CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
-		super(type, sender, loc, plugin, plot, args);
+	public CmdEnchant(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+		super(CommandType.enchant, sender, loc, plugin, plot, args);
 	
-		if (args.length >= 2)
+		if (args.length >= 2) {
 			targetEntities = parseSelector(args[0], true);
-		
-		if (args[1].split(":").length == 2)
-			ench = Enchantment.getByKey(NamespacedKey.minecraft(args[1].split(":")[1]));
+			ench = args[1].startsWith("minecraft:") ? 
+					Enchantment.getByKey(NamespacedKey.fromString(args[1])) : Enchantment.getByKey(NamespacedKey.minecraft(args[1]));
+		}
 		
 		if (args.length == 3)
 			if (StringUtils.isNumeric(args[2]))
@@ -42,8 +42,8 @@ public class CmdEnchant extends CbCommand {
 		int i = 0;
 		
 		for (Entity e : targetEntities)
-			if (((Player) e).getInventory().getItemInMainHand() != null && ((Player) e).getInventory().getItemInMainHand().getType() != Material.AIR ) {
-				((Player) e).getInventory().setItemInMainHand(ItemUtils.addEnchant(((Player) e).getInventory().getItemInMainHand(), ench, Math.min(level, 5)));
+			if (((Player) e).getInventory().getItemInMainHand() != null && ((Player) e).getInventory().getItemInMainHand().getType() != Material.AIR) {
+				((Player) e).getInventory().setItemInMainHand(ItemUtils.addEnchant(((Player) e).getInventory().getItemInMainHand(), ench, level > 9 ? 9 : level));
 				i++;
 			}
 		

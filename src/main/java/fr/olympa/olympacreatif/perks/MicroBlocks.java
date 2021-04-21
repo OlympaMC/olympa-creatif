@@ -64,7 +64,8 @@ public class MicroBlocks {
 			mbConfig.load(mbConfigFile);
 		} catch (IOException | InvalidConfigurationException e) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			plugin.getLogger().warning("Failed to load microblocks config!");
+			e.printStackTrace();
 		}
 		
 		//initialise la liste des têtes
