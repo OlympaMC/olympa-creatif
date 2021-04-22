@@ -48,8 +48,13 @@ public class PlayerPlotsGui extends IGui {
 							if (s < playerPlots.size()) 
 								p.getPlayer().closeInventory();
 								if (c == ClickType.LEFT) {
-									p.getPlayer().teleport(playerPlots.get(s).getPlotId().getLocation());
-									OCmsg.TELEPORT_IN_PROGRESS.send(p, playerPlots.get(s).toString());	
+									if (isOpenByStaff) {
+										staffPlayer.getPlayer().teleport(playerPlots.get(s).getPlotId().getLocation());
+										OCmsg.TELEPORT_IN_PROGRESS.send(staffPlayer, playerPlots.get(s).toString());
+									}else {
+										p.getPlayer().teleport(playerPlots.get(s).getPlotId().getLocation());
+										OCmsg.TELEPORT_IN_PROGRESS.send(p, playerPlots.get(s).toString());	
+									}	
 								}else if (c == ClickType.RIGHT) {
 									if (isOpenByStaff)
 										new PlotParametersGui(MainGui.getMainGuiForStaff(getPlayer(), staffPlayer, plot)).create(staffPlayer.getPlayer());
