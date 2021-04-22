@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.plot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,10 +22,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.olympa.api.holograms.Hologram;
 import fr.olympa.api.holograms.Hologram.HologramLine;
 import fr.olympa.api.lines.FixedLine;
-import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -33,6 +33,8 @@ import net.minecraft.server.v1_16_R3.NBTTagString;
 
 public class PlotsManager {
 
+	//private final List<Integer> forceLoadedPlots = Arrays.asList(new Integer []{1, 3, 4, 5});
+	
 	private static final int delayBetweenPlotsCheckup = 20 * 30;
 	public static final int maxPlotsPerPlayer = 36;
 	
@@ -85,7 +87,7 @@ public class PlotsManager {
 									hasMemberOnline = true;
 								}
 							}
-							if (!hasMemberOnline && !plot.getPlotId().equals(PlotId.fromId(plugin, 1))) {
+							if (!hasMemberOnline/* && !forceLoadedPlots.contains(plot.getPlotId().getId())*/) {
 								plot.unload();
 								plugin.getDataManager().addPlotToSaveQueue(plot, false);
 								loadedPlots.remove(plot.getPlotId().getId());
@@ -94,7 +96,7 @@ public class PlotsManager {
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 20, delayBetweenPlotsCheckup);
+		}.runTaskTimer(plugin, delayBetweenPlotsCheckup, delayBetweenPlotsCheckup);
 		
 		
 		//kill les entités en dehors de leur plot attitré
@@ -123,6 +125,18 @@ public class PlotsManager {
 					});
 			}
 		}.runTaskTimerAsynchronously(plugin, 10, 300);
+		
+		
+		//load help holos plots
+		plugin.getTask().runTaskLater(() -> {
+			plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_1_LOC.get().toLoc()), false);
+			plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_2_LOC.get().toLoc()), false);
+			
+			plugin.getTask().runTaskLater(() -> {
+				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
+				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
+			}, 40);
+		}, 20);
 	}
 	
 	/**
@@ -254,4 +268,18 @@ public class PlotsManager {
 		if (!isPlotLoaded(ap.getId())) 
 			loadedPlots.put(ap.getId().getId(), new Plot(ap));
 	}
+	
+	
+	private void setHelpHolo(Location loc, List<String> text) {
+		loc.getChunk().load();
+		loc.getChunk().setForceLoaded(true);
+		
+		Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, false, true);
+		
+		text.forEach(s -> holo.addLine(new FixedLine<HologramLine>(s)));
+	}
 }
+
+
+
+

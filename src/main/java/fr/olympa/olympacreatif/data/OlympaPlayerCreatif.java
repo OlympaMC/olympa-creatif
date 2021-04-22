@@ -103,8 +103,6 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 			upgrades.put(upg, 0);
 
 		playerParams.add(PlayerParamType.OPEN_GUI_ON_SNEAK);
-		
-		currentPlot = plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, 1));
 	}
 	
 	@Override
@@ -171,6 +169,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 				money.give(100);
 			}, null);
 		
+		currentPlot = plugin.getPlotsManager().getPlot(getPlayer().getLocation());
 	}
 
 	@Override

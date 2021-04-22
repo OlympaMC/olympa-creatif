@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
+import fr.olympa.olympacreatif.data.Position;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class PlotId {
@@ -226,6 +227,10 @@ public class PlotId {
 	
 	public Location getLocation() {
 		return loc;
+	}
+	
+	public boolean isInPlot(Position loc) {
+		return isInPlot((int) loc.getX(), (int) loc.getZ());
 	}
 	
 	public boolean isInPlot(Location loc) {

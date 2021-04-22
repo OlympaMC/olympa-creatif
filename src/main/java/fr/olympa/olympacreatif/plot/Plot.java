@@ -45,6 +45,9 @@ import fr.olympa.olympacreatif.world.WorldManager;
 
 public class Plot {
 
+	private static boolean hasLoadedHolo1 = false;
+	private static boolean hasLoadedHolo2 = false;
+	
 	private OlympaCreatifMain plugin;
 	
 	private PlotMembers members;
@@ -132,23 +135,6 @@ public class Plot {
 						else if (e.getType() != EntityType.PLAYER)
 							e.remove();
 					});
-		
-		//spawns the tuto holo if it's the plot 1
-		if (plotId.getId() == 1) {
-			plugin.getTask().runTaskLater(() -> {
-				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
-				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
-			}, 10);
-		}
-	}
-	
-	private void setHelpHolo(Location loc, List<String> text) {
-		loc.getChunk().load();
-		loc.getChunk().setForceLoaded(true);
-		
-		Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, false, true);
-		
-		text.forEach(s -> holo.addLine(new FixedLine<HologramLine>(s)));
 	}
 	
 	private void loadInitialEntitiesOnChunks() {

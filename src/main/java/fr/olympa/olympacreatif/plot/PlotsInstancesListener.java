@@ -160,11 +160,8 @@ public class PlotsInstancesListener implements Listener{
 	//                      BLOCKS EVENTS                     //
 	////////////////////////////////////////////////////////////
 	
-	@EventHandler //test place block (autorisé uniquement pour les membres et pour la zone protégeé)
+	@EventHandler(ignoreCancelled = true) //test place block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
-		if (e.isCancelled())
-			return;
-
 		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS))
 			return;
@@ -201,11 +198,8 @@ public class PlotsInstancesListener implements Listener{
 		*/
 	}
 	
-	@EventHandler //test break block (autorisé uniquement pour les membres et pour la zone protégeé)
+	@EventHandler(ignoreCancelled = true) //test break block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onBreakBlockEvent(BlockBreakEvent e) {
-		if (e.isCancelled())
-			return;
-
 		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS))
 			return;
