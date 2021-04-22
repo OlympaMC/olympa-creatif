@@ -138,7 +138,7 @@ public class CbCommandListener implements Listener {
 			OCmsg.INSUFFICIENT_KIT_PERMISSION.send(p, KitType.COMMANDBLOCK);
 			//OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer(), cmd.getType());
 		else if (!cmd.getMinRankToExecute().has(cmd.getPlot(), p))
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer());
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer(), cmd.getMinRankToExecute());
 		else
 			executeCommandBlockCommand(cmd, e.getPlayer());
 	}	

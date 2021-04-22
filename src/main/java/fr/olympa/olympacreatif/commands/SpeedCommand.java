@@ -31,7 +31,7 @@ public class SpeedCommand extends OlympaCommand {
 		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
 		
 		if (plot != null && !PlotPerm.DEFINE_OWN_FLY_SPEED.has(plot, getOlympaPlayer())) {
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer());
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.DEFINE_OWN_FLY_SPEED);
 			return false;
 		}
 		

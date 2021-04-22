@@ -69,7 +69,7 @@ public class CmdsLogic {
 		}
 
 		if (!PlotPerm.INVITE_MEMBER.has(plot, pc)) {
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.INVITE_MEMBER.getRank().getRankName());
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.INVITE_MEMBER);
 			return;
 		}
 
@@ -130,7 +130,7 @@ public class CmdsLogic {
 			OCmsg.INVALID_PLOT_ID.send(pc);
 		
 		else if (!PlotPerm.KICK_VISITOR.has(plot, pc))
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc);
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.KICK_VISITOR);
 		
 		else if (plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR || !plot.getPlayers().contains(target))
 			OCmsg.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.send(pc, target.getName());
@@ -158,7 +158,7 @@ public class CmdsLogic {
 			OCmsg.PLAYER_TARGET_OFFLINE.send(pc);
 		
 		else if (!PlotPerm.BAN_VISITOR.has(plot, pc))
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc);
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.BAN_VISITOR);
 		
 		else if (!plot.getPlayers().contains(target) || plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR)
 			OCmsg.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.send(pc, target.getName());
@@ -190,7 +190,7 @@ public class CmdsLogic {
 			OCmsg.PLAYER_TARGET_OFFLINE.send(pc);
 		
 		else if (!PlotPerm.BAN_VISITOR.has(plot, pc))
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc);
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.BAN_VISITOR);
 		
 		else if (plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).remove(AccountProvider.get(target.getUniqueId()).getId()))
 			OCmsg.PLOT_UNBAN_PLAYER.send(pc, target.getName());
