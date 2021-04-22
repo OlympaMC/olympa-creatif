@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent;
 import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent.ChangeType;
+import fr.olympa.api.economy.OlympaMoney;
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.player.Gender;

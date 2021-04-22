@@ -45,14 +45,14 @@ import scala.collection.convert.JavaCollectionWrappers.SetWrapper;
 public class PermissionsManager implements Listener {
 	
 	private OlympaCreatifMain plugin;
-    YamlConfiguration config = new YamlConfiguration();
-    List<String> wePerms;
-    List<String> wePermsAdmin;
-    List<String> cbPerms;
+	private YamlConfiguration config = new YamlConfiguration();
+	private List<String> wePerms;
+	private List<String> wePermsAdmin;
+	private List<String> cbPerms;
 
-    Map<UUID, PermissionAttachment> weAttachements = new HashMap<UUID, PermissionAttachment>();
-    Map<UUID, PermissionAttachment> weAdminAttachements = new HashMap<UUID, PermissionAttachment>();
-    Map<UUID, PermissionAttachment> cbAttachements = new HashMap<UUID, PermissionAttachment>();
+	private Map<UUID, PermissionAttachment> weAttachements = new HashMap<UUID, PermissionAttachment>();
+	private Map<UUID, PermissionAttachment> weAdminAttachements = new HashMap<UUID, PermissionAttachment>();
+	private Map<UUID, PermissionAttachment> cbAttachements = new HashMap<UUID, PermissionAttachment>();
 	
 	public PermissionsManager(OlympaCreatifMain plugin) {
 		
@@ -129,7 +129,7 @@ public class PermissionsManager implements Listener {
 		cbAttachements.remove(e.getPlayer().getUniqueId());
 	}
 	
-	private void setWePerms(OlympaPlayerCreatif p) {
+	public void setWePerms(OlympaPlayerCreatif p) {
 		PermissionAttachment att = weAttachements.get(p.getUniqueId());
 		
 		wePerms.forEach(perm -> {
@@ -160,7 +160,7 @@ public class PermissionsManager implements Listener {
 		((CraftServer) Bukkit.getServer()).getHandle().getServer().getCommandDispatcher().a(((CraftPlayer) p.getPlayer()).getHandle()); 
 	}
 	
-	private void setCbPerms(OlympaPlayerCreatif p) {
+	public void setCbPerms(OlympaPlayerCreatif p) {
 		PermissionAttachment att = cbAttachements.get(p.getUniqueId());
 		
 		cbPerms.forEach(perm -> {

@@ -109,20 +109,21 @@ public class CbCommandListener implements Listener {
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e) {
 		//cancel commande si c'est une commande commandblock
 		CommandType cmdType = CbCommand.getCommandType(e.getMessage());
+		
+		if (cmdType == null)
+			return;
+		
+		e.setCancelled(true);
+		
+		if (!ComponentCreatif.COMMANDBLOCKS.isActivated())
+			return;
+		
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		
-		if (!ComponentCreatif.COMMANDBLOCKS.isActivated() && cmdType != null && !p.hasStaffPerm(StaffPerm.GHOST_MODE)) {
-			e.setCancelled(true);
+		/*if (p.getCurrentPlot() == null) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer());
 			return;
-		}
-		
-		/*if (cmdType == CommandType.teleport || cmdType == CommandType.tp || cmdType == CommandType.clear)
-			return;*/
-		
-		if (cmdType != null)
-			e.setCancelled(true);
-		else
-			return;
+		}*/
 		
 		CbCommand cmd = CbCommand.getCommand(plugin, e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
 		
@@ -131,12 +132,15 @@ public class CbCommandListener implements Listener {
 			OCmsg.CB_INVALID_CMD.send(e.getPlayer()); 
 			return;
 		}
-		
+
 		//si la commandes est un trigger, ou si le joueur a la perm d'exécuter cette commande (selon kit et type cmd)
-		if (cmd.getMinRankToExecute().has(cmd.getPlot(), p) && (p.hasKit(KitType.COMMANDBLOCK) || !cmd.needCbKitToExecute()))
-			executeCommandBlockCommand(cmd, e.getPlayer());
-		else
+		if (!p.hasKit(KitType.COMMANDBLOCK) && cmd.needCbKitToExecute())
+			OCmsg.INSUFFICIENT_KIT_PERMISSION.send(p, KitType.COMMANDBLOCK);
+			//OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer(), cmd.getType());
+		else if (!cmd.getMinRankToExecute().has(cmd.getPlot(), p))
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer());
+		else
+			executeCommandBlockCommand(cmd, e.getPlayer());
 	}	
 	
 	//exécute la commande et si le CommandSender est un commandblock, mise à jour des ses NBTTags

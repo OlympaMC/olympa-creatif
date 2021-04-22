@@ -213,12 +213,13 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 			kits.add(kit);
 		
 		if (kits.contains(KitType.HOSTILE_MOBS) && kits.contains(KitType.PEACEFUL_MOBS))
-			for (Plot plot : getPlots(true))
+			for (Plot plot : getPlots(true)) {
 				plot.getCbData().unlockSummon();
+				plot.getCbData().unlockSpawnerSetblock();	
+			}
 		
-		if (kits.contains(KitType.HOSTILE_MOBS))
-			for (Plot plot : getPlots(true))
-				plot.getCbData().unlockSpawnerSetblock();
+		if (kit == KitType.COMMANDBLOCK)
+			plugin.getPermissionsManager().setCbPerms(this);
 		
 		if (kit == KitType.FLUIDS)
 			for (Plot plot : getPlots(true))

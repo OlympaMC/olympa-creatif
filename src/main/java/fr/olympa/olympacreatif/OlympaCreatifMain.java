@@ -25,6 +25,7 @@ import fr.olympa.olympacreatif.commands.ShopCommand;
 import fr.olympa.olympacreatif.commands.SkullCommand;
 import fr.olympa.olympacreatif.commands.SpawnCommand;
 import fr.olympa.olympacreatif.commands.SpeedCommand;
+import fr.olympa.olympacreatif.commands.StoplagCommand;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
@@ -95,6 +96,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new SpeedCommand(this).register();
 		new SpawnCommand(this).register();
 		new ShopCommand(this).register();
+		new StoplagCommand(this).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA), plugin);
 

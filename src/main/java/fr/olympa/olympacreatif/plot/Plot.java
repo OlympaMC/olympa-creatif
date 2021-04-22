@@ -391,6 +391,8 @@ public class Plot {
 
 		plugin.getCommandBlocksManager().excecuteQuitActions(this, p);
 		removePlayerInPlot(p);
+		
+		plugin.getPerksManager().getSongManager().stopSong(p);
 
 		//rendu inventaire si stocké
 		if (inventoryStorage.containsKey(p)) {

@@ -19,15 +19,20 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.perks.KitsManager;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
+import net.minecraft.server.v1_16_R3.IMaterial;
 import net.minecraft.server.v1_16_R3.ItemStack;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PacketPlayInJigsawGenerate;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCreativeSlot;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetJigsaw;
@@ -43,6 +48,8 @@ public class PacketListener implements Listener {
 
 	private Field packetSetInSlotSlot;
 	private Field packetSetInCreativeSlotItem;
+	
+	private static final ItemStack airItem = CraftItemStack.asNMSCopy(new org.bukkit.inventory.ItemStack(Material.AIR)); 
 	
 	public PacketListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -109,12 +116,20 @@ public class PacketListener implements Listener {
             		
             		if (packet.getItemStack() != null){
             			Material mat = CraftItemStack.asBukkitCopy(packet.getItemStack()).getType();
+            			/*System.out.println("Detected item " + mat + " for " + p.getName() + ". Have perm : " + plugin.getPerksManager().getKitsManager().
+                				hasPlayerPermissionFor(p, mat));*/
             			
-                		if (!plugin.getPerksManager().getKitsManager().
-                				hasPlayerPermissionFor(p, mat)) {
+            			KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
+            			
+                		if (kit != null && !p.hasKit(kit)) {
                 			packetSetInCreativeSlotItem.set(packet, plugin.getPerksManager().getKitsManager().getNoKitPermItemNMS(mat));
                 			p.getPlayer().updateInventory();
-                			return;	
+                			
+                			NBTTagCompound tag = new NBTTagCompound();
+                			plugin.getPerksManager().getKitsManager().getNoKitPermItemNMS(mat).save(tag);
+                			
+                			//System.out.println("TAG de la stone : " + tag.asString());
+                			//OCmsg.INSUFFICIENT_KIT_PERMISSION.send(p, kit);
                 		}
                 		
                 		if (packet.getItemStack().getTag() != null)

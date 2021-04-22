@@ -36,6 +36,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -103,11 +104,15 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
 	@Override
 	public void clearClipboard(Plot plot, Player p) {
+		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+		if (pc.hasStaffPerm(StaffPerm.WORLDEDIT))
+			return;
+		
 		LocalSession weSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
 		
 		if (weSession != null) {
 			//clear clipboard si le joueur n'en est pas le proprio
-			if (PlotPerm.BYPASS_EXIT_CLIPBOARD_CLEAR.has(plot, AccountProvider.get(p.getUniqueId())))
+			if (!PlotPerm.BYPASS_EXIT_CLIPBOARD_CLEAR.has(plot, pc))
 				weSession.setClipboard(null);
 			
 			World world = weSession.getSelectionWorld();

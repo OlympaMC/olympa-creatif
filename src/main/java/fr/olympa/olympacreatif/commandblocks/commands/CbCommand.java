@@ -148,6 +148,9 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 			plot = plugin.getPlotsManager().getPlot(((Entity) sender).getLocation());	
 		}else
 			return null;
+		
+		if (plot == null)
+			return null;
 
 		//extraction des arguments de la commande
 		String[] args = fullCommand.split(" ");
@@ -216,11 +219,12 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		private CommandBuilder builder;
 		private int requiredCmdTickets;
 		
-		CommandType(CommandBuilder builder){
+		CommandType(CommandBuilder builder) {
 			this(builder, 1);
 		}
 		 
-		CommandType(CommandBuilder builder, int i){
+		CommandType(CommandBuilder builder, int i) {
+			this.builder = builder;
 			requiredCmdTickets = i;
 		}
 		
@@ -233,8 +237,9 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		}
 		
 		public static CommandType get(String s) {
+			s = s.toLowerCase().split(" ")[0];
 			for (CommandType cmd : CommandType.values())
-				if (cmd.toString().startsWith(s))
+				if (s.equals(cmd.toString()))
 					return cmd;
 			return null;
 		}

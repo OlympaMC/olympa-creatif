@@ -52,6 +52,7 @@ import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -261,7 +262,7 @@ public class WorldEventsListener implements Listener{
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits
+	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits et des zones non claim
 	public void onInterract(PlayerInteractEvent e) {
 		
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
@@ -273,7 +274,7 @@ public class WorldEventsListener implements Listener{
 			return;
 		}
 		
-		if (PlotId.fromLoc(plugin, e.getPlayer().getLocation()) == null) {
+		if (PlotId.fromLoc(plugin, e.getPlayer().getLocation()) == null && !p.hasStaffPerm(StaffPerm.BUILD_ROADS)) {
 			e.setCancelled(true);
 			return;	
 		}

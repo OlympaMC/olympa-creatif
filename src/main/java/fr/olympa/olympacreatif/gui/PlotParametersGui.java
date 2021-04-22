@@ -176,7 +176,7 @@ public class PlotParametersGui extends IGui {
 			if (!canChangeSettings)
 				return;
 
-			if (PlotPerm.DEFINE_MUSIC.has(plot, p))
+			if (PlotPerm.DEFINE_MUSIC.has(plot, p) && !isOpenByStaff)
 				plugin.getPerksManager().getSongManager().openGui(p.getPlayer(), plot);
 		});
 		

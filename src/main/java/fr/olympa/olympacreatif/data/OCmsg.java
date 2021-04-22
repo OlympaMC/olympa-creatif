@@ -29,6 +29,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbCommandListener.CbCmdResult;
 import fr.olympa.olympacreatif.gui.ShopGui.MarketItemData;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
@@ -190,6 +191,9 @@ public class OCmsg {
 	public static final OCmsg GIVE_VIP_REWARD = new OCmsg(null);
 	public static final OCmsg MONEY_RECIEVED_COMMAND = new OCmsg(null);
 	public static final OCmsg MONEY_WITHDRAWED_COMMAND = new OCmsg(null);
+	public static final OCmsg INSUFFICIENT_KIT_PERMISSION = new OCmsg(null);
+	
+	public static final OCmsg PLOT_STOPLAG_FIRED_CMD = new OCmsg(null);
     
 	private static final Map<String, Function<OlympaPlayerCreatif, String>> playerPlaceHolders = ImmutableMap.<String, Function<OlympaPlayerCreatif,String>>builder()
 			.put("%playerName", pc -> {return pc.getName();})
@@ -251,6 +255,11 @@ public class OCmsg {
 			.build();
 
 	
+	private static final Map<String, Function<KitType, String>> kitPlaceHolders = ImmutableMap.<String, Function<KitType,String>>builder()
+			.put("%kitName", kit -> kit.getName())
+			.build();
+
+	
 	private static final Map<String, Function<String, String>> stringPlaceHolders = ImmutableMap.<String, Function<String,String>>builder()
 			.put("%s", s -> s)
 			.build();
@@ -274,7 +283,7 @@ public class OCmsg {
 			return "§cMessage manquant, veuillez vérifier les logs.";
 		
 		//ajoute le plot actuel du joueur si aucun n'a été fourni
-		boolean setPlayerPlot = true;
+		/*boolean setPlayerPlot = true;
 		for (Object o : args)
 			if (o instanceof Plot)
 				setPlayerPlot = false;
@@ -286,7 +295,7 @@ public class OCmsg {
 			
 			args2[args.length] = pc.getCurrentPlot();	
 			args = args2;
-		}
+		}*/
 		
 		String msg = message;
 
@@ -297,7 +306,8 @@ public class OCmsg {
 			for (Entry<String, Function<OlympaPlayerCreatif, String>> e : playerPlaceHolders.entrySet())
 				msg = msg.replace(e.getKey(), e.getValue().apply(pc));	
 		
-
+		boolean plotAlreadyAdded = false;
+		
 		//remplacement des placeholders
 		for (Object o : args)
 			if (o instanceof PlotPerm)
@@ -316,9 +326,11 @@ public class OCmsg {
 				for (Entry<String, Function<MarketItemData, String>> e : shopPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((MarketItemData) o));
 
-			else if (o instanceof Plot)
+			else if (o instanceof Plot) {
+				plotAlreadyAdded = true;
 				for (Entry<String, BiFunction<OlympaPlayerCreatif, Plot, String>> e : plotPlaceHolders.entrySet())
-					msg = msg.replace(e.getKey(), e.getValue().apply(pc, (Plot) o));
+					msg = msg.replace(e.getKey(), e.getValue().apply(pc, (Plot) o));	
+			}
 
 			else if (o instanceof StopLagDetect)
 				for (Entry<String, Function<StopLagDetect, String>> e : stoplagPlaceHolders.entrySet())
@@ -327,6 +339,14 @@ public class OCmsg {
 			else if (o instanceof String)
 				for (Entry<String, Function<String, String>> e : stringPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((String) o));
+
+			else if (o instanceof KitType)
+				for (Entry<String, Function<KitType, String>> e : kitPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((KitType) o));
+		
+		if (!plotAlreadyAdded && pc != null && pc.getCurrentPlot() != null)
+			for (Entry<String, BiFunction<OlympaPlayerCreatif, Plot, String>> e : plotPlaceHolders.entrySet())
+				msg = msg.replace(e.getKey(), e.getValue().apply(pc, pc.getCurrentPlot()));
 		
 		return msg;
 	}

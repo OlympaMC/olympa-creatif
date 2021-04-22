@@ -1,20 +1,18 @@
 package fr.olympa.olympacreatif.perks;
 
 import java.io.File;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,7 +20,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.xxmicloxx.NoteBlockAPI.event.SongNextEvent;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
@@ -54,10 +51,10 @@ public class MusicManager implements Listener {
 	}));
 	
 	private OlympaCreatifMain plugin;
-	private Map<String, Song> songs = new HashMap<String, Song>();
+	private Map<String, Song> songsName = new HashMap<String, Song>();
+	private Map<ItemStack, Entry<String, Song>> songsItem = new LinkedHashMap<ItemStack, Map.Entry<String,Song>>();
+	
 	private Map<Player, RadioSongPlayer> radios = new HashMap<Player, RadioSongPlayer>();
-
-	private int i = 0;
 	
 	public MusicManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -78,15 +75,33 @@ public class MusicManager implements Listener {
 		list.sort((s1, s2) -> {
 			return s1.getName().compareTo(s2.getName());
 		});
+
 		
 		
 		//store songs and their representative items
 		for (int i = 0 ; i < list.size() ; i++) {
-			String str = list.get(i).getName().replace(".nbs", "");
-			songs.put(str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase(), NBSDecoder.parse(list.get(i)));
+			Song s = NBSDecoder.parse(list.get(i));
+			songsName.put(list.get(i).getName().replace(".nbs", "").toLowerCase(), s);
 		}
 		
-		Bukkit.getLogger().log(Level.INFO, "§aLoaded " + songs.size() + " songs.");
+		int i = 0;
+		
+		for (Entry<String, Song> e : songsName.entrySet()) {
+			i++;
+			ItemStack it = ItemUtils.item(discs.get(plugin.random.nextInt(discs.size())), "§7" + i + ". §d" + e.getKey());
+			
+			if (!e.getValue().getOriginalAuthor().equals(""))
+				it = ItemUtils.loreAdd(it, "§7Musique par " + e.getValue().getOriginalAuthor());
+			if (!e.getValue().getAuthor().equals(""))
+				it = ItemUtils.loreAdd(it, "§7Transcription par " + e.getValue().getAuthor());
+			
+			songsItem.put(it, new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue()));
+		}
+		
+		songsName.forEach((songName, song) -> {
+		});
+		
+		plugin.getLogger().info("§aLoaded " + songsName.size() + " songs.");
 	}
 
 	/**
@@ -96,17 +111,23 @@ public class MusicManager implements Listener {
 	 * 
 	 * @return true if music started, false if the sound wasn't found
 	 */
-	public void startSong(Player p, String music) {
+	public void startSong(Player p, String songName) {
+		
+		//Bukkit.broadcastMessage("STARTED TEXT " + songName + " for " + p);
+		
+		if (songsName.containsKey(songName))
+			startSong(p, songsName.get(songName));
+	}
+	
+	public void startSong(Player p, Song song) {
 		stopSong(p);
 		
-		Song song = songs.get(music);
-		
-		if (song == null)
-			return;
+		//Bukkit.broadcastMessage("STARTED SONG " + song + " for " + p);
 		
 		RadioSongPlayer rsp = new RadioSongPlayer(song);
-		rsp.setVolume((byte)20);
+		rsp.setVolume((byte)80);
 		rsp.setAutoDestroy(true);
+		rsp.addPlayer(p);
 		rsp.setPlaying(true);
 		
 		radios.put(p, rsp);
@@ -116,7 +137,7 @@ public class MusicManager implements Listener {
 	 * Stop music stream for defined player
 	 * @param p
 	 */
-	private void stopSong(Player p) {
+	public void stopSong(Player p) {
 		RadioSongPlayer rsp = radios.get(p);
 		if (rsp == null)
 			return;
@@ -130,26 +151,8 @@ public class MusicManager implements Listener {
 	 * @param p
 	 * @param plot
 	 */
-	public void openGui(Player p, Plot plot) {
-		if (plot != null) {
-			Map<ItemStack, Song> songsMap = new LinkedHashMap<ItemStack, Song>();
-			
-			i = 0;
-			
-			songs.forEach((songName, song) -> {
-				i++;
-				ItemStack it = ItemUtils.item(discs.get(plugin.random.nextInt(discs.size())), "§7" + i + ". §d" + songName);
-				
-				if (!song.getOriginalAuthor().equals(""))
-					it = ItemUtils.loreAdd(it, "§7Musique par " + song.getOriginalAuthor());
-				if (!song.getAuthor().equals(""))
-					it = ItemUtils.loreAdd(it, "§7Transcription par " + song.getAuthor());
-				
-				songsMap.put(it, song);
-			});
-			
-			new MusicGui(plugin, plot, p, songsMap).create(p);	
-		}
+	public void openGui(Player p, Plot plot) {			
+		new MusicGui(plugin, plot, p, plot == null ? new HashMap<ItemStack, Entry<String, Song>>() : songsItem).create(p);	
 	}
 	
 	@EventHandler
@@ -163,19 +166,17 @@ public class MusicManager implements Listener {
 	
 		private Map<ItemStack, Consumer<Player>> items = new HashMap<ItemStack, Consumer<Player>>();
 		
-		protected MusicGui(OlympaCreatifMain plugin, Plot plot, Player p0, Map<ItemStack, Song> songsMap) {
+		protected MusicGui(OlympaCreatifMain plugin, Plot plot, Player p0, Map<ItemStack, Entry<String, Song>> songsMap) {
 			super("Musiques disponibles", DyeColor.GREEN, new ArrayList<ItemStack>(songsMap.keySet()), 6);
 			//this.plot = plot;
 
 			//building music discs
 			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProvider.get(p0.getUniqueId())))
-				songsMap.forEach((it, song) -> items.put(it, p -> {
-					String songName = it.getItemMeta().getDisplayName().split("\\. §d")[1];
+				songsMap.forEach((it, song) -> items.put(it, p -> {					
+					PlotParamType.SONG.setValue(plot, song.getKey());
+					ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §a" + song.getValue().getTitle());
 					
-					PlotParamType.SONG.setValue(plot, songName);
-					ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §a" + songName);
-					
-					plot.getPlayers().forEach(player -> startSong(player, songName));
+					plot.getPlayers().forEach(player -> startSong(player, song.getValue()));
 				}));
 			
 			//set current selected music

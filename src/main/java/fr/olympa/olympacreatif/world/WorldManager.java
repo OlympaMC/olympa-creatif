@@ -46,7 +46,7 @@ public class WorldManager {
 
 	//public static int plotSize = 256;
 	public static final int roadSize = 16;
-	public static final int worldLevel = 60;
+	public static final int worldLevel = 20;
 	
 	private ChunkProviderServer newChunkProvider;
 	
