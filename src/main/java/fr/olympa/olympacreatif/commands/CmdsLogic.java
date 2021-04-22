@@ -89,7 +89,7 @@ public class CmdsLogic {
 		}
 		
 		invitations.put(plot.getPlotId(), new AbstractMap.SimpleEntry<OlympaPlayerCreatif, Player>(pc, target));
-		OCmsg.PLOT_RECIEVE_INVITATION.send(target, plot);
+		OCmsg.PLOT_RECIEVE_INVITATION.send(target, plot, pc.getName());
 		OCmsg.PLOT_SEND_INVITATION.send(pc, target.getName());
 	}
 
@@ -116,7 +116,7 @@ public class CmdsLogic {
 		
 		else {
 			OCmsg.PLOT_PLAYER_JOIN.send(invitations.get(plot.getPlotId()).getKey(), pc.getName());
-			OCmsg.PLOT_ACCEPTED_INVITATION.send(pc, plotId);
+			OCmsg.PLOT_ACCEPTED_INVITATION.send(pc, plot);
 			plot.getMembers().set(invitations.remove(plot.getPlotId()).getValue(), PlotRank.MEMBER);	
 		}
 	}

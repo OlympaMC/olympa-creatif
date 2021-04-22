@@ -166,8 +166,12 @@ public class MainGui extends IGui {
 	}
 	
 	public static MainGui getMainGuiForStaff(OlympaPlayerCreatif p, OlympaPlayerCreatif staffPlayer) {
-		return new MainGui(OlympaCreatifMain.getInstance(), p, staffPlayer.getCurrentPlot(), 
-				p.getCurrentPlot() == null ? "Menu" : "Menu >> " + p.getCurrentPlot(), staffPlayer);
+		return getMainGuiForStaff(p, staffPlayer, staffPlayer.getCurrentPlot());
+	}
+	
+	public static MainGui getMainGuiForStaff(OlympaPlayerCreatif p, OlympaPlayerCreatif staffPlayer, Plot plot) {
+		return new MainGui(OlympaCreatifMain.getInstance(), p, plot, 
+				plot == null ? "Menu" : "Menu >> " + plot, staffPlayer);
 	}
 	
 	

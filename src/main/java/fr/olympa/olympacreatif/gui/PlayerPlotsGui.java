@@ -52,7 +52,7 @@ public class PlayerPlotsGui extends IGui {
 									OCmsg.TELEPORT_IN_PROGRESS.send(p, playerPlots.get(s).toString());	
 								}else if (c == ClickType.RIGHT) {
 									if (isOpenByStaff)
-										new PlotParametersGui(MainGui.getMainGui(getPlayer())).create(staffPlayer.getPlayer());
+										new PlotParametersGui(MainGui.getMainGuiForStaff(getPlayer(), staffPlayer, plot)).create(staffPlayer.getPlayer());
 									else
 										MainGui.getMainGui(getPlayer(), playerPlots.get(s)).create(getPlayer().getPlayer());
 								}
