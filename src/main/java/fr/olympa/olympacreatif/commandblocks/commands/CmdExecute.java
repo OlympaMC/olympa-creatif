@@ -52,13 +52,14 @@ public class CmdExecute extends CbCommand {
 				if (currentType != null) 
 					subCommands.put(currentType, subArgs);
 				
-				subArgs.clear();
+				subArgs = new ArrayList<String>();
 				currentType = newType;
 			}
 		}
 		
 		//copie de la dernière sous commande du /execute
-		subCommands.put(currentType, subArgs);
+		if (currentType != null)
+			subCommands.put(currentType, subArgs);
 		
 		//passage de la sous commande store (s'il y en a une) tout à la fin de la liste
 		if (subCommands.containsKey(ExecuteType.cmd_store))
@@ -73,7 +74,7 @@ public class CmdExecute extends CbCommand {
 		//résultats commande (nombre de résultats = locations * commandSender)
 		List<Integer> cmdResults = new ArrayList<Integer>();
 		
-		//Bukkit.broadcastMessage("arguments : " + subCommands.toString());
+		Bukkit.broadcastMessage("arguments : " + subCommands.toString());
 		
 		for (Entry<ExecuteType, List<String>> subCmd : subCommands.entrySet()) 
 			switch (subCmd.getKey()) {

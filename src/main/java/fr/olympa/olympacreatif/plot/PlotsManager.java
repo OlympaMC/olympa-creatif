@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
@@ -26,6 +28,7 @@ import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.Position;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.NBTTagList;
@@ -135,7 +138,7 @@ public class PlotsManager {
 			plugin.getTask().runTaskLater(() -> {
 				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
 				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
-			}, 40);
+			}, 30);
 		}, 20);
 	}
 	
@@ -271,12 +274,18 @@ public class PlotsManager {
 	
 	
 	private void setHelpHolo(Location loc, List<String> text) {
-		loc.getChunk().load();
-		loc.getChunk().setForceLoaded(true);
-		
-		Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, false, true);
-		
-		text.forEach(s -> holo.addLine(new FixedLine<HologramLine>(s)));
+		plugin.getWorldManager().getWorld().getChunkAtAsync(loc, new Consumer<Chunk>() {
+			
+			@Override
+			public void accept(Chunk chunk) {
+				chunk.setForceLoaded(true);
+				Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, false, true);
+				text.forEach(s -> holo.addLine(new FixedLine<HologramLine>(s)));
+				holo.show();
+
+				plugin.getLogger().info("§aHelp holo " + text.get(0) + " §a placed at " + new Position(loc));
+			}
+		});
 	}
 }
 

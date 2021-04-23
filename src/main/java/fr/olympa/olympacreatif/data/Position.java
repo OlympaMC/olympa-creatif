@@ -51,4 +51,9 @@ public class Position {
 	public void teleport(Player p) {
 		p.teleport(toLoc());
 	}
+	
+	@Override
+	public String toString() {
+		return x + ", " + y + ", " + z;
+	}
 }
