@@ -36,7 +36,7 @@ import net.minecraft.server.v1_16_R3.NBTTagString;
 
 public class PlotsManager {
 
-	//private final List<Integer> forceLoadedPlots = Arrays.asList(new Integer []{1, 3, 4, 5});
+	private final Set<Plot> forceLoadedPlots = new HashSet<Plot>(); 
 	
 	private static final int delayBetweenPlotsCheckup = 20 * 30;
 	public static final int maxPlotsPerPlayer = 36;
@@ -90,7 +90,7 @@ public class PlotsManager {
 									hasMemberOnline = true;
 								}
 							}
-							if (!hasMemberOnline/* && !forceLoadedPlots.contains(plot.getPlotId().getId())*/) {
+							if (!hasMemberOnline && !forceLoadedPlots.contains(plot)) {
 								plot.unload();
 								plugin.getDataManager().addPlotToSaveQueue(plot, false);
 								loadedPlots.remove(plot.getPlotId().getId());
@@ -136,6 +136,9 @@ public class PlotsManager {
 			plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_2_LOC.get().toLoc()), false);
 			
 			plugin.getTask().runTaskLater(() -> {
+				forceLoadedPlots.add(getPlot(OCparam.HOLO_HELP_1_LOC.get().toLoc()));
+				forceLoadedPlots.add(getPlot(OCparam.HOLO_HELP_2_LOC.get().toLoc()));
+				
 				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
 				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
 			}, 30);
@@ -283,7 +286,7 @@ public class PlotsManager {
 				text.forEach(s -> holo.addLine(new FixedLine<HologramLine>(s)));
 				holo.show();
 
-				plugin.getLogger().info("§aHelp holo " + text.get(0) + " §a placed at " + new Position(loc));
+				plugin.getLogger().info("§aHelp holo " + text.get(0) + " §aplaced at " + new Position(loc));
 			}
 		});
 	}

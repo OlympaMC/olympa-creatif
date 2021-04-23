@@ -74,7 +74,7 @@ public class CmdExecute extends CbCommand {
 		//résultats commande (nombre de résultats = locations * commandSender)
 		List<Integer> cmdResults = new ArrayList<Integer>();
 		
-		Bukkit.broadcastMessage("arguments : " + subCommands.toString());
+		//Bukkit.broadcastMessage("arguments : " + subCommands.toString());
 		
 		for (Entry<ExecuteType, List<String>> subCmd : subCommands.entrySet()) 
 			switch (subCmd.getKey()) {
