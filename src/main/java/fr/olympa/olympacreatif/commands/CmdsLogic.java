@@ -115,9 +115,9 @@ public class CmdsLogic {
 			OCmsg.PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS.send(pc, plot);
 		
 		else {
-			OCmsg.PLOT_PLAYER_JOIN.send(invitations.get(plot.getPlotId()).getKey(), pc.getName());
+			OCmsg.PLOT_PLAYER_JOIN.send(invitations.remove(plot.getPlotId()).getKey(), pc.getName());
 			OCmsg.PLOT_ACCEPTED_INVITATION.send(pc, plot);
-			plot.getMembers().set(invitations.remove(plot.getPlotId()).getValue(), PlotRank.MEMBER);	
+			plot.getMembers().set(pc, PlotRank.MEMBER);	
 		}
 	}
 

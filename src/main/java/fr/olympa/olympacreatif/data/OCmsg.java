@@ -143,6 +143,10 @@ public class OCmsg {
 			.put("%plotPermMinPlotRank", (pc, perm) -> {return perm.getRank().getRankName();})
 			.build();
 
+	private static final Map<String, Function<PlotRank, String>> plotRankPlaceHolders = ImmutableMap.<String, Function<PlotRank,String>>builder()
+			.put("%plotPermMinPlotRank", rank -> {return rank.getRankName();})
+			.build();
+
 	
 	private static final Map<String, Function<CbCmdResult, String>> commandblockPlaceHolders = ImmutableMap.<String, Function<CbCmdResult,String>>builder()
 			.put("%cbCmdName", (cmd) -> {return cmd.getCmd().toString().toLowerCase();})
@@ -229,11 +233,11 @@ public class OCmsg {
 		
 		//remplacement des placeholders
 		for (Object o : args)
-			if (o instanceof PlotPerm)
+			if (o instanceof PlotPerm && pc != null)
 				for (Entry<String, BiFunction<OlympaPlayerCreatif, PlotPerm, String>> e : plotPermissionPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply(pc, (PlotPerm) o));
 		
-			else if (o instanceof OlympaPermission)
+			else if (o instanceof OlympaPermission && pc != null)
 				for (Entry<String, BiFunction<OlympaPlayerCreatif, OlympaPermission, String>> e : permissionPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply(pc, (OlympaPermission) o));
 
@@ -241,11 +245,15 @@ public class OCmsg {
 				for (Entry<String, Function<CbCmdResult, String>> e : commandblockPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((CbCmdResult) o));
 
+			else if (o instanceof PlotRank)
+				for (Entry<String, Function<PlotRank, String>> e : plotRankPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((PlotRank) o));
+
 			else if (o instanceof MarketItemData)
 				for (Entry<String, Function<MarketItemData, String>> e : shopPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((MarketItemData) o));
 
-			else if (o instanceof Plot) {
+			else if (o instanceof Plot && pc != null) {
 				plotAlreadyAdded = true;
 				for (Entry<String, BiFunction<OlympaPlayerCreatif, Plot, String>> e : plotPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply(pc, (Plot) o));	
@@ -262,6 +270,8 @@ public class OCmsg {
 			else if (o instanceof KitType)
 				for (Entry<String, Function<KitType, String>> e : kitPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((KitType) o));
+		
+		
 		
 		if (!plotAlreadyAdded && pc != null && pc.getCurrentPlot() != null)
 			for (Entry<String, BiFunction<OlympaPlayerCreatif, Plot, String>> e : plotPlaceHolders.entrySet())

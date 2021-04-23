@@ -62,6 +62,9 @@ public class PlotMembers{
 		
 		if (getOwner() != null && rank == PlotRank.OWNER)
 			return true;
+		
+		if (getPlayerRank(p) == PlotRank.OWNER)
+			return true;
 			
 		if (rank == PlotRank.VISITOR || getCount() < maxMembers) {
 			members.put(p, rank);			
@@ -193,9 +196,6 @@ public class PlotMembers{
 		
 		@Override
 		public boolean equals(Object obj) {
-			
-			//Bukkit.broadcastMessage("COMPARE " + this.toString() + " ----TO---- "  + obj.toString() + " ----RESULT---- " + (((MemberInformations)obj).getId() == this.id));
-			
 			return obj instanceof MemberInformations && ((MemberInformations)obj).getId() == this.id;
 		}
 		

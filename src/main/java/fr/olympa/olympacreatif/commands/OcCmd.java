@@ -212,13 +212,14 @@ public class OcCmd extends AbstractCmd {
 		
 		PlotRank rank = pc.getCurrentPlot().getMembers().getPlayerRank(pc);
 		
-		if (rank == PlotRank.VISITOR || rank == PlotRank.OWNER) {
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.BUILD);
-			return;
+		if (rank == PlotRank.VISITOR) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotRank.MEMBER);
+		}else if (rank == PlotRank.OWNER) {
+			OCmsg.NULL_CURRENT_PLOT.send(pc);
+		}else {
+			pc.getCurrentPlot().getMembers().set(pc, PlotRank.VISITOR);
+			OCmsg.PLOT_LEAVED.send(pc);	
 		}
-		
-		pc.getCurrentPlot().getMembers().set(pc, PlotRank.VISITOR);
-		OCmsg.PLOT_LEAVED.send(pc);	
 	}
 }
 

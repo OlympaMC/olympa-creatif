@@ -391,8 +391,8 @@ public class PlotsInstancesListener implements Listener{
 		
 		//test si permission d'interagir avec le bloc donné
 		if (!PlotPerm.BUILD.has(plot, pc) && 
-				PlotParamType.getAllPossibleIntaractibleBlocks().contains(e.getClickedBlock().getType()) &&
-				!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(e.getClickedBlock().getType()) ) {
+				PlotParamType.getAllPossibleIntaractibleBlocks().contains(clickedBlock.getType()) &&
+				!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(clickedBlock.getType()) ) {
 			e.setCancelled(true);
 			OCmsg.PLOT_CANT_INTERRACT.send(pc);
 			
@@ -413,15 +413,14 @@ public class PlotsInstancesListener implements Listener{
 		
 		//GESTION COMMAND BLOCKS
 		//si édition/placement du commandblock
-		if (PlotPerm.COMMAND_BLOCK.has(plot, pc) && e.getClickedBlock() != null && 
+		if (PlotPerm.COMMAND_BLOCK.has(plot, pc) && clickedBlock != null && 
 				plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(pc, e.getClickedBlock().getType())) {
 			
 			if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-				Block block = e.getClickedBlock();
 				ItemStack item = e.getItem();
 				
 				//si le block cliqué est un commandblock, ouverture interface
-				if (block != null && commandBlockTypes.contains(block.getType()) && !e.getPlayer().isSneaking()) {
+				if (commandBlockTypes.contains(clickedBlock.getType()) && !e.getPlayer().isSneaking()) {
 					
 					BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
 					
@@ -473,7 +472,7 @@ public class PlotsInstancesListener implements Listener{
 				}
 			}else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE)) {
 				if (commandBlockTypes.contains(e.getClickedBlock().getType()))
-					e.getClickedBlock().setType(Material.AIR);
+					clickedBlock.setType(Material.AIR);
 			}
 		}
 	}
