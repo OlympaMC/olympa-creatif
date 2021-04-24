@@ -36,7 +36,7 @@ public class ShopGui extends IGui{
 	private static final ItemStack buyProcessArrow = ItemUtils.skullCustom(" ", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19");
 	private static final ItemStack buyProcessQuestion = ItemUtils.skullCustom("§7En attente...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19");
 	private static final ItemStack buyProcessAccept = ItemUtils.skullCustom("§aCliquez §2§lICI §r§apour acheter", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQwNjNiYTViMTZiNzAzMGEyMGNlNmYwZWE5NmRjZDI0YjA2NDgzNmY1NzA0NTZjZGJmYzllODYxYTc1ODVhNSJ9fX0=");
-	private static final ItemStack buyProcessDeny = ItemUtils.skullCustom("§cAchat impossible", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzIwZWYwNmRkNjA0OTk3NjZhYzhjZTE1ZDJiZWE0MWQyODEzZmU1NTcxODg2NGI1MmRjNDFjYmFhZTFlYTkxMyJ9fX0=");
+	private static final ItemStack buyProcessDenyItem = ItemUtils.skullCustom("§cAchat impossible", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzIwZWYwNmRkNjA0OTk3NjZhYzhjZTE1ZDJiZWE0MWQyODEzZmU1NTcxODg2NGI1MmRjNDFjYmFhZTFlYTkxMyJ9fX0=");
 
 	private List<MarketItemData> ranks = new ArrayList<MarketItemData>();
 	private List<MarketItemData> kits = new ArrayList<MarketItemData>();
@@ -246,10 +246,10 @@ public class ShopGui extends IGui{
 	private void startBuyDenyTimer(MarketItemData data) {
 		
 		setItem(buyProcessItemSlot, ItemUtils.item(data.getHolder().getType(), "§6Achat : " + data.getHolder().getItemMeta().getDisplayName()), null);
-		setItem(buyProcessStateSlot, buyProcessDeny, null);
+		setItem(buyProcessStateSlot, buyProcessDenyItem, null);
 		
 		plugin.getTask().runTaskLater(() -> {
-			if (buyProcessDeny.equals(inv.getItem(buyProcessStateSlot))) {
+			if (buyProcessDenyItem.equals(inv.getItem(buyProcessStateSlot))) {
 				setItem(buyProcessItemSlot, buyProcessNullItem, null);
 				setItem(buyProcessStateSlot, buyProcessQuestion, null);	
 			}
@@ -295,7 +295,11 @@ public class ShopGui extends IGui{
 		private Object toBuy;
 		private ItemStack itemHolder;
 		private int price;
-		private boolean isBuyable = true;
+		
+		private boolean isBuyablee = true;
+		private boolean isBuyableOwned = true;
+		private boolean isBuyableMoney = true;
+		private boolean isBuyableRequirements = true;
 		
 		public MarketItemData(OlympaPlayerCreatif p, Object toBuy, int defaultPrice, ItemStack holder){
 			this.p = p;
@@ -303,23 +307,25 @@ public class ShopGui extends IGui{
 			this.itemHolder = holder;
 			this.price = defaultPrice;
 			
+			this.isBuyableMoney = p.getGameMoney().has(defaultPrice);
+			
 			//Repère les objets non achetables (déjà achetés ou prérequis non validés)
 			if (toBuy instanceof OlympaGroup) {
 				if (p.getGroups().containsKey((OlympaGroup)toBuy)) {
 					itemHolder = addInvisibleEnchant(itemHolder);
-					isBuyable = false;
+					isBuyableOwned = false;
 				}
 				
 				//détection prérequis des grades
 				if ((OlympaGroup)toBuy == OlympaGroup.CREA_ARCHITECT && !p.getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR))
-					isBuyable = false;
+					isBuyableRequirements = false;
 				else if ((OlympaGroup)toBuy == OlympaGroup.CREA_CREATOR && !p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT))
-					isBuyable = false;
+					isBuyableRequirements = false;
 					
 			}else if (toBuy instanceof KitType) {
 				if (p.hasKit((KitType) toBuy)) {
 					itemHolder = addInvisibleEnchant(itemHolder);
-					isBuyable = false;	
+					isBuyableOwned = false;	
 				}
 				
 			//détecte le prochain niveau d'upgrade dispo
@@ -329,7 +335,7 @@ public class ShopGui extends IGui{
 					this.price = ((UpgradeType)toBuy).getPriceOf(p.getUpgradeLevel((UpgradeType)toBuy));
 				else {
 					itemHolder = addInvisibleEnchant(itemHolder);
-					isBuyable = false;	
+					isBuyableOwned = false;	
 				}
 
 				int oldValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy));
@@ -349,14 +355,18 @@ public class ShopGui extends IGui{
 				itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + oldV + " ➔ " + newV);
 				
 				if (toBuy == UpgradeType.CB_LEVEL && !p.hasKit(KitType.COMMANDBLOCK))
-					isBuyable = false;
+					isBuyableRequirements = false;
 			}
 
 			itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§ePrix : " + price);
 			
-			if (!isBuyable)
-				itemHolder = ItemUtils.loreAdd(itemHolder, "§7Achat impossible");
-			else if (!p.getGameMoney().has(price))
+			isBuyablee = isBuyableMoney && isBuyableOwned && isBuyableRequirements;
+
+			if (!isBuyableOwned)
+				itemHolder = ItemUtils.loreAdd(itemHolder, "§7Objet déjà possédé");
+			else if (!isBuyableRequirements)
+				itemHolder = ItemUtils.loreAdd(itemHolder, "§ePrérequis non rempli");
+			else if (!isBuyableMoney)
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§cPas assez de fonds");
 			else
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§aAchat possible");
@@ -384,12 +394,12 @@ public class ShopGui extends IGui{
 		}
 		
 		public boolean isBuyable() {
-			return isBuyable;
+			return isBuyablee;
 		}
 		
 		@SuppressWarnings("deprecation")
 		public void tryToBuy(ShopGui gui) {
-			if (!isBuyable || !p.getGameMoney().has(price))
+			if (!isBuyablee || !p.getGameMoney().has(price))
 				return;
 			
 			if (toBuy instanceof OlympaGroup) {

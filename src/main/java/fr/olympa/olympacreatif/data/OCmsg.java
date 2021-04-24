@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import fr.olympa.api.afk.AfkHandler;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -138,7 +139,7 @@ public class OCmsg {
 
 	@SuppressWarnings("deprecation")
 	private static final Map<String, BiFunction<OlympaPlayerCreatif, PlotPerm, String>> plotPermissionPlaceHolders = ImmutableMap.<String, BiFunction<OlympaPlayerCreatif, PlotPerm,String>>builder()
-			.put("%plotPermDesc", (pc, perm) -> {return perm.getDesc();})
+			.put("%plotPermDesc", (pc, perm) -> {return perm.getDesc() == null ? "" : perm.getDesc();})
 			.put("%plotPermMinGroup", (pc, perm) -> {return perm.getPerm() == null ? "aucun" : pc == null ? perm.getPerm().getMinGroup().getName() : perm.getPerm().getMinGroup().getName(pc.getGender());})
 			.put("%plotPermMinPlotRank", (pc, perm) -> {return perm.getRank().getRankName();})
 			.build();
