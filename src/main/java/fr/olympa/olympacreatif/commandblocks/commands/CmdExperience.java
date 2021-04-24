@@ -88,6 +88,9 @@ public class CmdExperience extends CbCommand {
 		if (type == null)
 			return 0;
 		
+		//TODO gérer correctement les points d'exp
+		expType = Experience.LEVELS;
+		
 		switch (type) {
 		case ADD:
 			for (Entity p : targetEntities)
