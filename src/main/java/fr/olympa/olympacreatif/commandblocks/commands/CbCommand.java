@@ -214,6 +214,10 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		op(CmdOp::new),
 		trigger(CmdTrigger::new),
 		replaceitem(CmdReplaceitem::new),
+		weather(CmdWeather::new), 
+		time(CmdTime::new), 
+		setworldspawn(CmdSetworldspawn::new), 
+		spreadplayers(CmdSpreadplayers::new),
 		;
 		
 		private CommandBuilder builder;
