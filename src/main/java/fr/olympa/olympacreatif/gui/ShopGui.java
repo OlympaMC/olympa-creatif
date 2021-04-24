@@ -114,12 +114,12 @@ public class ShopGui extends IGui{
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'utiliser",
-				"§atous les blocsliés à la §eredstone§a,", 
+				"§atous les blocs liés à la §eredstone§a,", 
 				"§asur toutes les parcelles, y compris",
 				"§acelles où vous n'êtes pas propriétaire.",
 				" ",
 				"§7Les machines à lag sont interdites. ", 
-				"§7En cas d'abus, les courant de redstone",
+				"§7En cas d'abus, les courants de redstone",
 				"§7se bloqueront sur la parcelle.")));
 		
 		kits.add(new MarketItemData(p, KitType.FLUIDS, 1, ItemUtils.item(Material.WATER_BUCKET, "§6Kit fluides",

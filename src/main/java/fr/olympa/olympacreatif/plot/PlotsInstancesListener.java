@@ -54,6 +54,8 @@ import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.common.collect.ImmutableList;
+
+import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CmdSummon;
@@ -423,8 +425,8 @@ public class PlotsInstancesListener implements Listener{
 				if (commandBlockTypes.contains(clickedBlock.getType()) && !e.getPlayer().isSneaking()) {
 					
 					BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
-					
 					NBTTagCompound tag = new NBTTagCompound();
+					
 					plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
 					
 					PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
