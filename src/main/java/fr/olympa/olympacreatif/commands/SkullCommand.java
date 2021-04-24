@@ -13,7 +13,9 @@ import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class SkullCommand extends OlympaCommand {
 
@@ -27,6 +29,11 @@ public class SkullCommand extends OlympaCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (!PlotPerm.BUILD.has((OlympaPlayerCreatif) getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif) getOlympaPlayer(), PlotPerm.BUILD);
+			return false;	
+		}
+		
 		if (args.length != 1) {
 			sendIncorrectSyntax("/skull <player>");
 			return false;

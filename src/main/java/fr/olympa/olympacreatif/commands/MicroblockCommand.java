@@ -25,8 +25,10 @@ public class MicroblockCommand extends OlympaCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!PlotPerm.BUILD.has((OlympaPlayerCreatif) getOlympaPlayer()))
-			return false;
+		if (!PlotPerm.BUILD.has((OlympaPlayerCreatif) getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif)getOlympaPlayer(), PlotPerm.BUILD);
+			return false;	
+		}
 		
 		if (args.length == 0)
 			plugin.getPerksManager().getMicroBlocks().openGui(getPlayer());
