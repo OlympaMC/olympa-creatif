@@ -367,8 +367,6 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
 		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
-		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS))
-			return;
 		
 		Block clickedBlock = e.getClickedBlock();
 		
@@ -382,6 +380,10 @@ public class PlotsInstancesListener implements Listener{
 			return;
 
 		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
+
+		
+		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS) && plot == null)
+			return;
 
 		if (plot == null) {
 			if (!pc.hasStaffPerm(StaffPerm.WORLDEDIT)) {
@@ -416,7 +418,7 @@ public class PlotsInstancesListener implements Listener{
 		//GESTION COMMAND BLOCKS
 		//si édition/placement du commandblock
 		if (PlotPerm.COMMAND_BLOCK.has(plot, pc) && clickedBlock != null && 
-				plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(pc, e.getClickedBlock().getType())) {
+				plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(pc, clickedBlock.getType())) {
 			
 			if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				ItemStack item = e.getItem();
@@ -424,7 +426,7 @@ public class PlotsInstancesListener implements Listener{
 				//si le block cliqué est un commandblock, ouverture interface
 				if (commandBlockTypes.contains(clickedBlock.getType()) && !e.getPlayer().isSneaking()) {
 					
-					BlockPosition pos = new BlockPosition(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockY(), e.getClickedBlock().getLocation().getBlockZ());
+					BlockPosition pos = new BlockPosition(clickedBlock.getLocation().getBlockX(), clickedBlock.getLocation().getBlockY(), clickedBlock.getLocation().getBlockZ());
 					NBTTagCompound tag = new NBTTagCompound();
 					
 					plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
@@ -438,29 +440,29 @@ public class PlotsInstancesListener implements Listener{
 				}else if (item != null && commandBlockTypes.contains(item.getType())){
 					
 					//return si le Y est trop bas ou trop haut
-					if (e.getClickedBlock().getLocation().getBlockY() < 2 || e.getClickedBlock().getLocation().getBlockY() > 254)
+					if (clickedBlock.getLocation().getBlockY() < 2 || clickedBlock.getLocation().getBlockY() > 254)
 						return;
 					
 					Location loc = null;
 					
 					switch(e.getBlockFace()) {
 					case DOWN:
-						loc = e.getClickedBlock().getLocation().add(0, -1, 0);
+						loc = clickedBlock.getLocation().add(0, -1, 0);
 						break;
 					case EAST:
-						loc = e.getClickedBlock().getLocation().add(1, 0, 0);
+						loc = clickedBlock.getLocation().add(1, 0, 0);
 						break;
 					case NORTH:
-						loc = e.getClickedBlock().getLocation().add(0, 0, -1);
+						loc = clickedBlock.getLocation().add(0, 0, -1);
 						break;
 					case SOUTH:
-						loc = e.getClickedBlock().getLocation().add(0, 0, 1);
+						loc = clickedBlock.getLocation().add(0, 0, 1);
 						break;
 					case UP:
-						loc = e.getClickedBlock().getLocation().add(0, 1, 0);
+						loc = clickedBlock.getLocation().add(0, 1, 0);
 						break;
 					case WEST:
-						loc = e.getClickedBlock().getLocation().add(-1, 0, 0);
+						loc = clickedBlock.getLocation().add(-1, 0, 0);
 						break;
 					default:
 						return;
@@ -473,7 +475,7 @@ public class PlotsInstancesListener implements Listener{
 					e.getItem().setType(Material.DISPENSER);
 				}
 			}else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE)) {
-				if (commandBlockTypes.contains(e.getClickedBlock().getType()))
+				if (commandBlockTypes.contains(clickedBlock.getType()))
 					clickedBlock.setType(Material.AIR);
 			}
 		}

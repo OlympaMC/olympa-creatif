@@ -159,6 +159,9 @@ public abstract class CbCommandSelectorParser {
 						continue;
 					
 					CbObjective obj = plot.getCbData().getObjective(objParts[0]);
+					if (obj == null)
+						continue;
+					
 					stream = stream.filter(e -> obj.get(e) >= range[0] && obj.get(e) <= range[1]);
 				}
 				
@@ -281,7 +284,7 @@ public abstract class CbCommandSelectorParser {
 			return null;
 		
 		try {
-			Double[] response = new Double[2];
+			Double[] response = new Double[] {null, null};
 			
 			if (s.contains("..")) {
 				if (s.startsWith(".."))

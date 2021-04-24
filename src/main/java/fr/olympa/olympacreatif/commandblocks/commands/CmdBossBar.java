@@ -13,6 +13,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.google.gson.stream.JsonReader;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
@@ -28,6 +30,9 @@ public class CmdBossBar extends CbCommand {
 	@Override
 	public int execute() {
 		
+		if (args.length == 0)
+			return 0;
+		
 		CbBossBar bar = null;
 		
 		switch (args[0]) {
@@ -36,7 +41,7 @@ public class CmdBossBar extends CbCommand {
 				return 0;
 			
 			BossBar bukkitBar = Bukkit.createBossBar(
-					args[2].startsWith("{") ? NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[2])) : 
+					args[2].startsWith("{") ? NbtParserUtil.parseJsonFromCompoundd(NbtParserUtil.getTagFromStringg(args[2])) : 
 						ChatColor.translateAlternateColorCodes('&', args[2]), BarColor.WHITE, BarStyle.SOLID);
 			
 			plotCbData.addBossBar(args[1], new CbBossBar(plugin, bukkitBar));
@@ -112,7 +117,7 @@ public class CmdBossBar extends CbCommand {
 				}
 				
 			case "name":
-				bar.getBar().setTitle(args[3].startsWith("{") ? NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromString(args[3])) : 
+				bar.getBar().setTitle(args[3].startsWith("{") ? NbtParserUtil.parseJsonFromCompoundd(NbtParserUtil.getTagFromStringg(args[3])) : 
 					ChatColor.translateAlternateColorCodes('&', args[3]));
 				return 1;
 				

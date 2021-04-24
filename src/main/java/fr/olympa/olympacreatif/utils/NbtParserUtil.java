@@ -50,7 +50,7 @@ public class NbtParserUtil {
 		copyValue.add("CanDestroy");
 	}
 	
-	public static NBTTagCompound getEntityNbtData(NBTTagCompound oldTag, EntitySourceType sourceType) {
+	public static NBTTagCompound getEntityNbtDatae(NBTTagCompound oldTag, EntitySourceType sourceType) {
 		NBTTagCompound newTag = new NBTTagCompound();
 		
 		try {			
@@ -98,7 +98,7 @@ public class NbtParserUtil {
 				
 				int iMax = oldTag.getList("HandItems", 10).size();
 				for (int i = 0 ; i < iMax ; i++) 
-					list.add(getValidItem(oldTag.getList("HandItems", 10).getCompound(i)));
+					list.add(getValidItemm(oldTag.getList("HandItems", 10).getCompound(i)));
 				
 				newTag.set("HandItems", list);
 			}
@@ -109,7 +109,7 @@ public class NbtParserUtil {
 				
 				int iMax = oldTag.getList("ArmorItems", 10).size();
 				for (int i = 0 ; i < iMax ; i++) 
-					list.add(getValidItem(oldTag.getList("ArmorItems", 10).getCompound(i)));
+					list.add(getValidItemm(oldTag.getList("ArmorItems", 10).getCompound(i)));
 				
 				newTag.set("ArmorItems", list);
 			}
@@ -130,7 +130,7 @@ public class NbtParserUtil {
 				int iMax = oldTag.getList("Attributes", 10).size();
 				for (int i = 0 ; i < iMax ; i++) {
 					NBTTagCompound tag = new NBTTagCompound();
-					list.add(getValidAttribute(oldTag.getList("Attributes", 10).getCompound(i)));	
+					list.add(getValidAttributee(oldTag.getList("Attributes", 10).getCompound(i)));	
 				}
 				
 				newTag.set("Attributes", list);
@@ -184,7 +184,7 @@ public class NbtParserUtil {
 		}
 	}
 	
-	public static NBTTagCompound getValidAttribute(NBTTagCompound oldTag) {
+	public static NBTTagCompound getValidAttributee(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
 		
 		if (!oldTag.hasKey("Base") || !oldTag.hasKey("Name"))
@@ -211,7 +211,7 @@ public class NbtParserUtil {
 	}
 	
 	//TODO
-	public static NBTTagCompound getValidItem(NBTTagCompound oldTag) {
+	public static NBTTagCompound getValidItemm(NBTTagCompound oldTag) {
 		NBTTagCompound newTag = new NBTTagCompound();
 
 		for (String s : copyValue)
@@ -298,11 +298,11 @@ public class NbtParserUtil {
 		NBTTagCompound tag = new NBTTagCompound();
 
 		if (oldTag.hasKey("buy"))
-			tag.set("buy", getValidItem(oldTag.getCompound("buy")));
+			tag.set("buy", getValidItemm(oldTag.getCompound("buy")));
 		if (oldTag.hasKey("buyB"))
-			tag.set("buyB", getValidItem(oldTag.getCompound("buyB")));
+			tag.set("buyB", getValidItemm(oldTag.getCompound("buyB")));
 		if (oldTag.hasKey("sell"))
-			tag.set("sell", getValidItem(oldTag.getCompound("sell")));
+			tag.set("sell", getValidItemm(oldTag.getCompound("sell")));
 
 		if (oldTag.hasKey("maxUses"))
 			tag.set("maxUses", oldTag.get("maxUses"));
@@ -319,17 +319,17 @@ public class NbtParserUtil {
 	}
 	
 	//renvoie le NBTTagCompound compris dans la liste de strings
-	public static NBTTagCompound getTagFromStrings(String[] args) {
+	public static NBTTagCompound getTagFromStringss(String[] args) {
 		
 		String concat = "";
 		for (String s : args) {
 			concat += s + " ";
 		}
 		
-		return getTagFromString(concat);
+		return getTagFromStringg(concat);
 	}
 	
-	public static NBTTagCompound getTagFromString(String arg) {
+	public static NBTTagCompound getTagFromStringg(String arg) {
 		try {
 			if (!arg.contains("{") || !arg.contains("}")) 
 				return new NBTTagCompound();
@@ -343,18 +343,18 @@ public class NbtParserUtil {
 	}
 	
 	//renvoie un string comprenant les parses de tous les tags de la liste
-	public static String parseJsonFromList(NBTTagList nbtList) {
+	public static String parseJsonFromListt(NBTTagList nbtList) {
 		String text = "";
 
 		for (int i = 0 ; i < nbtList.size() ; i++) 	
-			text += parseJsonFromCompound(nbtList.getCompound(i));
+			text += parseJsonFromCompoundd(nbtList.getCompound(i));
 		
 		
 		return text;
 	}
 	
 	//renvoie un string formaté selon les paramètres json du tag
-	public static String parseJsonFromCompound(NBTTagCompound tag) {
+	public static String parseJsonFromCompoundd(NBTTagCompound tag) {
 		
 		String text = "§r";
 		
@@ -395,7 +395,7 @@ public class NbtParserUtil {
 	*/
 
 	//renvoie un NBTTagList à partir d'arguments d'un string json
-	public static NBTTagList getListCompoundFromString(String concat) {
+	public static NBTTagList getListCompoundFromStringg(String concat) {
 
 		//si le concat est formé comme un NBTTagCompound
 		if (concat.startsWith("{")) {

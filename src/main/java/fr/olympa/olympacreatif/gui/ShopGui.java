@@ -74,27 +74,22 @@ public class ShopGui extends IGui{
 				" ",
 				"§7Le niveau précédent est requis pour acheter ce grade.")));
 		
-		//ajout du grade créateur si les prérequis sont respectés
-		boolean hasAllKits = true;
-		for (KitType kit : KitType.values())
-			if (!p.hasKit(kit) && kit != KitType.ADMIN)
-				hasAllKits = false;
-		
-		if (p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) && hasAllKits)
-			ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 1, ItemUtils.item(Material.DIAMOND_AXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), 
-					"§2En plus des avantages du niveau précédent,",
-					"§2ce grade donne accès à :",
-					" ",
-					"§aPréfixe " + OlympaGroup.CREA_CREATOR.getPrefix(p.getGender()) + p.getPlayer().getName(), 
-					"§aAccès à toutes les couleurs dans le chat",
-					"§aMessage quand vous rejoignez le serveur",
-					"§aReset de vos parcelles à volonté",
-					" ",
-					"§6Mais avant tout, nous vous remercions",
-					"§6chaleureusementdu soutien que vous nous apportez !",
-					"§6En espérant vous voir encore longtemps parmis nous,",
-					"§cL'équipe dévouée d'Olympa")));
+		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 1, ItemUtils.item(Material.DIAMOND_AXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), 
+				"§2En plus des avantages du niveau précédent,",
+				"§2ce grade donne accès à :",
+				" ",
+				"§aPréfixe " + OlympaGroup.CREA_CREATOR.getPrefix(p.getGender()) + p.getPlayer().getName(), 
+				"§aAccès à toutes les couleurs dans le chat",
+				"§aMessage quand vous rejoignez le serveur",
+				"§aReset de vos parcelles à volonté",
+				" ",
+				"§6Mais avant tout, nous vous remercions",
+				"§6chaleureusementdu soutien que vous nous apportez !",
+				"§6En espérant vous voir encore longtemps parmis nous,",
+				"§cL'équipe dévouée d'Olympa")));
 
+		
+		
 		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks", 
 				"§2Caractéristiques :",
 				" ",
@@ -296,7 +291,7 @@ public class ShopGui extends IGui{
 		private ItemStack itemHolder;
 		private int price;
 		
-		private boolean isBuyablee = true;
+		private boolean isBuyable = true;
 		private boolean isBuyableOwned = true;
 		private boolean isBuyableMoney = true;
 		private boolean isBuyableRequirements = true;
@@ -360,7 +355,7 @@ public class ShopGui extends IGui{
 
 			itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§ePrix : " + price);
 			
-			isBuyablee = isBuyableMoney && isBuyableOwned && isBuyableRequirements;
+			isBuyable = isBuyableMoney && isBuyableOwned && isBuyableRequirements;
 
 			if (!isBuyableOwned)
 				itemHolder = ItemUtils.loreAdd(itemHolder, "§7Objet déjà possédé");
@@ -394,12 +389,11 @@ public class ShopGui extends IGui{
 		}
 		
 		public boolean isBuyable() {
-			return isBuyablee;
+			return isBuyable;
 		}
 		
-		@SuppressWarnings("deprecation")
 		public void tryToBuy(ShopGui gui) {
-			if (!isBuyablee || !p.getGameMoney().has(price))
+			if (!isBuyable || !p.getGameMoney().has(price))
 				return;
 			
 			if (toBuy instanceof OlympaGroup) {
@@ -410,22 +404,9 @@ public class ShopGui extends IGui{
 					p.addGroup((OlympaGroup)toBuy);
 					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(p);
 					
-					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));
-					
-					String genreType = p.getGender() == Gender.FEMALE ? "elle" : "lui";
-					
-					if (toBuy == OlympaGroup.CREA_CREATOR)
-						Bukkit.broadcastMessage("§6----------------------------------------------\n§6\n"
-								+ "Le joueur §c" + p.getName() + " §6a découvert le grade secret ! \nFélicitations à " + genreType + " !"
-								+ "\n§6\n----------------------------------------------");	
+					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));	
 				}
 				
-				/*plugin.getTask().runTaskAsynchronously(()-> {
-					OlympaCore.getInstance().getServer().getPluginManager().callEvent(new AsyncOlympaPlayerChangeGroupEvent(p.getPlayer(), ChangeType.ADD, p, (OlympaGroup) toBuy));
-					AccountProvider olympaAccount = new AccountProvider(p.getUniqueId());
-					olympaAccount.saveToRedis(p);
-					//olympaAccount.saveToDb(p);
-				});*/
 				
 
 			}else if (toBuy instanceof KitType) {

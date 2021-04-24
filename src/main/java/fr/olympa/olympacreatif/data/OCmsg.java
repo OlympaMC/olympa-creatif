@@ -40,80 +40,80 @@ import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 
 
 public class OCmsg {
-    public static final OCmsg CB_INVALID_CMD = new OCmsg(null);
-    public static final OCmsg CB_NO_COMMANDS_LEFT = new OCmsg(null);
-    public static final OCmsg CB_RESULT_FAILED = new OCmsg(null);
-    public static final OCmsg CB_RESULT_SUCCESS = new OCmsg(null);
-    public static final OCmsg INSUFFICIENT_PLOT_PERMISSION = new OCmsg(null);
-    public static final OCmsg INVALID_PLOT_ID = new OCmsg(null);
-    public static final OCmsg MAX_PLOT_COUNT_OWNER_REACHED = new OCmsg(null);
-    public static final OCmsg MAX_PLOT_COUNT_REACHED = new OCmsg(null);
-    public static final OCmsg OCO_HEAD_GIVED = new OCmsg(null);
-    public static final OCmsg OCO_SET_FLY_SPEED = new OCmsg(null);
-    public static final OCmsg OCO_UNKNOWN_MB = new OCmsg(null);
-    public static final OCmsg PERIODIC_INCOME_RECEIVED = new OCmsg(null);
-    public static final OCmsg PLAYER_TARGET_OFFLINE = new OCmsg(null);
-    public static final OCmsg PLOT_ACCEPTED_INVITATION = new OCmsg(null);
-    public static final OCmsg PLOT_BAN_PLAYER = new OCmsg(null);
-    public static final OCmsg PLOT_CANT_BUILD = new OCmsg(null);
-    public static final OCmsg PLOT_CANT_ENTER_BANNED = new OCmsg(null);
-    public static final OCmsg PLOT_CANT_INTERRACT = new OCmsg(null);
-    public static final OCmsg PLOT_CANT_INTERRACT_NULL_PLOT = new OCmsg(null);
-    public static final OCmsg PLOT_CANT_PRINT_TNT = new OCmsg(null);
-    public static final OCmsg PLOT_CANT_UNBAN_PLAYER = new OCmsg(null);
-    public static final OCmsg PLOT_DENY_ITEM_DROP = new OCmsg(null);
-    public static final OCmsg PLOT_FORCED_STOPLAG_FIRED = new OCmsg(null);
-    public static final OCmsg PLOT_HAVE_BEEN_BANNED = new OCmsg(null);
-    public static final OCmsg PLOT_HAVE_BEEN_KICKED = new OCmsg(null);
-    public static final OCmsg PLOT_IMPOSSIBLE_TO_BAN_PLAYER = new OCmsg(null);
-    public static final OCmsg PLOT_IMPOSSIBLE_TO_KICK_PLAYER = new OCmsg(null);
-    public static final OCmsg PLOT_INSUFFICIENT_MEMBERS_SIZE = new OCmsg(null);
-    public static final OCmsg PLOT_INVITATION_TARGET_ALREADY_MEMBER = new OCmsg(null);
-    public static final OCmsg PLOT_ITEM_PROHIBITED_USED = new OCmsg(null);
-    public static final OCmsg PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS = new OCmsg(null);
-    public static final OCmsg PLOT_JOIN_ERR_SENDER_OFFLINE = new OCmsg(null);
-    public static final OCmsg PLOT_KICK_PLAYER = new OCmsg(null);
-    public static final OCmsg PLOT_NEW_CLAIM = new OCmsg(null);
-    public static final OCmsg PLOT_NO_PENDING_INVITATION = new OCmsg(null);
-    public static final OCmsg PLOT_PLAYER_JOIN = new OCmsg(null);
-    public static final OCmsg PLOT_RECIEVE_INVITATION = new OCmsg(null);
-    public static final OCmsg PLOT_SEND_INVITATION = new OCmsg(null);
-    public static final OCmsg PLOT_SPAWN_LOC_SET = new OCmsg(null);
-    public static final OCmsg PLOT_STOPLAG_FIRED = new OCmsg(null);
-    public static final OCmsg PLOT_UNBAN_PLAYER = new OCmsg(null);
-    public static final OCmsg PLOT_UNLOADED = new OCmsg(null);
-    public static final OCmsg SHOP_BUY_SUCCESS = new OCmsg(null);
-    public static final OCmsg STAFF_ACTIVATE_COMPONENT = new OCmsg(null);
-    public static final OCmsg STAFF_DEACTIVATE_COMPONENT = new OCmsg(null);
-    public static final OCmsg TELEPORT_IN_PROGRESS = new OCmsg(null);
-    public static final OCmsg TELEPORT_TO_RANDOM_PLOT = new OCmsg(null);
-    public static final OCmsg TELEPORTED_TO_PLOT_SPAWN = new OCmsg(null);
-    public static final OCmsg TELEPORTED_TO_WORLD_SPAWN = new OCmsg(null);
-    public static final OCmsg WE_COMPLETE_GENERATING_PLOT_SCHEM = new OCmsg(null);
-    public static final OCmsg WE_DISABLED = new OCmsg(null);
-    public static final OCmsg WE_ERR_INSUFFICIENT_PERMISSION = new OCmsg(null);
-    public static final OCmsg WE_PLOT_EXPORT_FAILED = new OCmsg(null);
-    //public static final OCmsg WE_PLOT_RESETING = new OCmsg(null);
-    public static final OCmsg WE_START_GENERATING_PLOT_SCHEM = new OCmsg(null);
+    public static final OCmsg CB_INVALID_CMD = new OCmsg();
+    public static final OCmsg CB_NO_COMMANDS_LEFT = new OCmsg();
+    public static final OCmsg CB_RESULT_FAILED = new OCmsg();
+    public static final OCmsg CB_RESULT_SUCCESS = new OCmsg();
+    public static final OCmsg INSUFFICIENT_PLOT_PERMISSION = new OCmsg();
+    public static final OCmsg INVALID_PLOT_ID = new OCmsg();
+    public static final OCmsg MAX_PLOT_COUNT_OWNER_REACHED = new OCmsg();
+    public static final OCmsg MAX_PLOT_COUNT_REACHED = new OCmsg();
+    public static final OCmsg OCO_HEAD_GIVED = new OCmsg();
+    public static final OCmsg OCO_SET_FLY_SPEED = new OCmsg();
+    public static final OCmsg OCO_UNKNOWN_MB = new OCmsg();
+    public static final OCmsg PERIODIC_INCOME_RECEIVED = new OCmsg();
+    public static final OCmsg PLAYER_TARGET_OFFLINE = new OCmsg();
+    public static final OCmsg PLOT_ACCEPTED_INVITATION = new OCmsg();
+    public static final OCmsg PLOT_BAN_PLAYER = new OCmsg();
+    public static final OCmsg PLOT_CANT_BUILD = new OCmsg();
+    public static final OCmsg PLOT_CANT_ENTER_BANNED = new OCmsg();
+    public static final OCmsg PLOT_CANT_INTERRACT = new OCmsg();
+    public static final OCmsg PLOT_CANT_INTERRACT_NULL_PLOT = new OCmsg();
+    public static final OCmsg PLOT_CANT_PRINT_TNT = new OCmsg();
+    public static final OCmsg PLOT_CANT_UNBAN_PLAYER = new OCmsg();
+    public static final OCmsg PLOT_DENY_ITEM_DROP = new OCmsg();
+    public static final OCmsg PLOT_FORCED_STOPLAG_FIRED = new OCmsg();
+    public static final OCmsg PLOT_HAVE_BEEN_BANNED = new OCmsg();
+    public static final OCmsg PLOT_HAVE_BEEN_KICKED = new OCmsg();
+    public static final OCmsg PLOT_IMPOSSIBLE_TO_BAN_PLAYER = new OCmsg();
+    public static final OCmsg PLOT_IMPOSSIBLE_TO_KICK_PLAYER = new OCmsg();
+    public static final OCmsg PLOT_INSUFFICIENT_MEMBERS_SIZE = new OCmsg();
+    public static final OCmsg PLOT_INVITATION_TARGET_ALREADY_MEMBER = new OCmsg();
+    public static final OCmsg PLOT_ITEM_PROHIBITED_USED = new OCmsg();
+    public static final OCmsg PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS = new OCmsg();
+    public static final OCmsg PLOT_JOIN_ERR_SENDER_OFFLINE = new OCmsg();
+    public static final OCmsg PLOT_KICK_PLAYER = new OCmsg();
+    public static final OCmsg PLOT_NEW_CLAIM = new OCmsg();
+    public static final OCmsg PLOT_NO_PENDING_INVITATION = new OCmsg();
+    public static final OCmsg PLOT_PLAYER_JOIN = new OCmsg();
+    public static final OCmsg PLOT_RECIEVE_INVITATION = new OCmsg();
+    public static final OCmsg PLOT_SEND_INVITATION = new OCmsg();
+    public static final OCmsg PLOT_SPAWN_LOC_SET = new OCmsg();
+    public static final OCmsg PLOT_STOPLAG_FIRED = new OCmsg();
+    public static final OCmsg PLOT_UNBAN_PLAYER = new OCmsg();
+    public static final OCmsg PLOT_UNLOADED = new OCmsg();
+    public static final OCmsg SHOP_BUY_SUCCESS = new OCmsg();
+    public static final OCmsg STAFF_ACTIVATE_COMPONENT = new OCmsg();
+    public static final OCmsg STAFF_DEACTIVATE_COMPONENT = new OCmsg();
+    public static final OCmsg TELEPORT_IN_PROGRESS = new OCmsg();
+    public static final OCmsg TELEPORT_TO_RANDOM_PLOT = new OCmsg();
+    public static final OCmsg TELEPORTED_TO_PLOT_SPAWN = new OCmsg();
+    public static final OCmsg TELEPORTED_TO_WORLD_SPAWN = new OCmsg();
+    public static final OCmsg WE_COMPLETE_GENERATING_PLOT_SCHEM = new OCmsg();
+    public static final OCmsg WE_DISABLED = new OCmsg();
+    public static final OCmsg WE_ERR_INSUFFICIENT_PERMISSION = new OCmsg();
+    public static final OCmsg WE_PLOT_EXPORT_FAILED = new OCmsg();
+    //public static final OCmsg WE_PLOT_RESETING = new OCmsg();
+    public static final OCmsg WE_START_GENERATING_PLOT_SCHEM = new OCmsg();
     
-    public static final OCmsg PLOT_LEAVED = new OCmsg(null);
+    public static final OCmsg PLOT_LEAVED = new OCmsg();
     
-	public static final OCmsg NULL_CURRENT_PLOT = new OCmsg(null);
+	public static final OCmsg NULL_CURRENT_PLOT = new OCmsg();
 
-	public static final OCmsg PLOT_PRE_RESET = new OCmsg(null);
-	public static final OCmsg PLOT_RESET_START = new OCmsg(null);
-	public static final OCmsg PLOT_RESET_END = new OCmsg(null);
-	public static final OCmsg PLOT_RESET_ERROR = new OCmsg(null);
+	public static final OCmsg PLOT_PRE_RESET = new OCmsg();
+	public static final OCmsg PLOT_RESET_START = new OCmsg();
+	public static final OCmsg PLOT_RESET_END = new OCmsg();
+	public static final OCmsg PLOT_RESET_ERROR = new OCmsg();
 	
 
-	public static final OCmsg PLOT_CANT_ENTER_CLOSED = new OCmsg(null);
+	public static final OCmsg PLOT_CANT_ENTER_CLOSED = new OCmsg();
 
-	public static final OCmsg GIVE_VIP_REWARD = new OCmsg(null);
-	public static final OCmsg MONEY_RECIEVED_COMMAND = new OCmsg(null);
-	public static final OCmsg MONEY_WITHDRAWED_COMMAND = new OCmsg(null);
-	public static final OCmsg INSUFFICIENT_KIT_PERMISSION = new OCmsg(null);
+	public static final OCmsg GIVE_VIP_REWARD = new OCmsg();
+	public static final OCmsg MONEY_RECIEVED_COMMAND = new OCmsg();
+	public static final OCmsg MONEY_WITHDRAWED_COMMAND = new OCmsg();
+	public static final OCmsg INSUFFICIENT_KIT_PERMISSION = new OCmsg();
 	
-	public static final OCmsg PLOT_STOPLAG_FIRED_CMD = new OCmsg(null);
+	public static final OCmsg PLOT_STOPLAG_FIRED_CMD = new OCmsg();
     
 	private static final Map<String, Function<OlympaPlayerCreatif, String>> playerPlaceHolders = ImmutableMap.<String, Function<OlympaPlayerCreatif,String>>builder()
 			.put("%playerName", pc -> {return pc.getName();})
@@ -196,11 +196,7 @@ public class OCmsg {
 			.build();
 	
 	
-	private String message;
-	
-	private OCmsg(String s) {
-		message = s;
-	}
+	private String message = null;
 	
 	private String getValue(OlympaPlayerCreatif pc, Object... args) {
 		if (message == null)

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -43,6 +44,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
+import fr.olympa.api.command.essentials.AfkCommand;
 import fr.olympa.api.customevents.AsyncPlayerAfkEvent;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
@@ -75,7 +77,7 @@ public class WorldEventsListener implements Listener{
 	@EventHandler
 	public void onAfk(AsyncPlayerAfkEvent e) {
 		if (e.isAfk())
-			plugin.getTask().runTask(() -> OCparam.SPAWN_LOC.get().teleport(e.getPlayer()));
+			plugin.getTask().runTask(() -> e.getPlayer().teleport(OCparam.SPAWN_LOC.get().toLoc().add(ThreadLocalRandom.current().nextDouble(-1, 1), 0, ThreadLocalRandom.current().nextDouble(-1, 1))));
 	}
 	
 	@EventHandler //n'autorise que certaines sources de spawn de créatures 

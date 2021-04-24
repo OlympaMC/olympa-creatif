@@ -30,12 +30,15 @@ public class CmdExperience extends CbCommand {
 
 				if (StringUtils.isNumeric(args[2]))
 					definedAmount = (int)(double)Double.valueOf(args[2]);
-			}
-			if (args.length == 4)
-				expType = Experience.getExperienceType(args[3]);
-			else
-				expType = Experience.POINTS;
+				
+				if (args.length == 4)
+					expType = Experience.getExperienceType(args[3]);
+				else
+					expType = Experience.POINTS;
+			} 
 			break;
+			
+			
 		case "query":
 			if (args.length == 3) {
 				targetEntities = parseSelector(args[1], true);
@@ -43,6 +46,8 @@ public class CmdExperience extends CbCommand {
 				expType = Experience.getExperienceType(args[2]);
 			}
 			break;
+			
+			
 		case "set":
 			if (args.length >= 3) {
 				targetEntities = parseSelector(args[1], true);
@@ -50,11 +55,12 @@ public class CmdExperience extends CbCommand {
 				
 				if (StringUtils.isNumeric(args[2]))
 					definedAmount = (int)(double)Double.valueOf(args[2]);
+				
+				if (args.length == 4)
+					expType = Experience.getExperienceType(args[3]);
+				else
+					expType = Experience.POINTS;
 			}
-			if (args.length == 4)
-				expType = Experience.getExperienceType(args[3]);
-			else
-				expType = Experience.POINTS;
 			break;
 		}
 	}
@@ -73,12 +79,15 @@ public class CmdExperience extends CbCommand {
 			for (Experience t : Experience.values())
 				if (t.toString().equalsIgnoreCase(s))
 					return t;
-			return POINTS;
+			return LEVELS;
 		}
 	}
 	
 	@Override
 	public int execute() {
+		if (type == null)
+			return 0;
+		
 		switch (type) {
 		case ADD:
 			for (Entity p : targetEntities)

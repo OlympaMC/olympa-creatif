@@ -28,6 +28,10 @@ public class CmdTeam extends CbCommand {
 	
 	@Override 
 	public int execute() {
+		
+		if (args.length == 0)
+			return 0;
+		
 		switch (args[0]) {
 		case "list":
 			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getPlotId() + " <<<");
@@ -148,7 +152,7 @@ public class CmdTeam extends CbCommand {
 				switch (args[2]) {
 				case "suffix":					
 					if (args.length >= 4) 
-						t.setName(NbtParserUtil.parseJsonFromCompound(NbtParserUtil.getTagFromStrings(args)));
+						t.setName(NbtParserUtil.parseJsonFromCompoundd(NbtParserUtil.getTagFromStringss(args)));
 					
 					return 1;
 					
@@ -177,5 +181,4 @@ public class CmdTeam extends CbCommand {
 		
 		return 0;
 	}
-
 }

@@ -1,5 +1,7 @@
 package fr.olympa.olympacreatif.utils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 
 import org.bukkit.Bukkit;
@@ -7,10 +9,14 @@ import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.EntityType;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.utils.TagsValues.TagParams;
+import net.minecraft.server.v1_16_R3.ChatDeserializer;
 import net.minecraft.server.v1_16_R3.MojangsonParser;
 import net.minecraft.server.v1_16_R3.NBTBase;
 import net.minecraft.server.v1_16_R3.NBTTagByte;
@@ -29,6 +35,25 @@ public abstract class NBTcontrollerUtil {
 	private final static int maxListSize = 10;
 	
 	private final static TagsValues allowedTags = new TagsValues();
+	
+	//set default minecraft JsonReader lenient
+	/*static {
+		try {
+			Field gsonField = ChatDeserializer.class.getDeclaredField("a");
+			gsonField.setAccessible(true);
+			
+			Field fieldModifiers = Field.class.getDeclaredField("modifiers");
+			fieldModifiers.setAccessible(true);
+			fieldModifiers.setInt(gsonField, gsonField.getModifiers() & ~Modifier.FINAL);
+			
+			gsonField.set(null, new GsonBuilder().setLenient().create());
+			
+			OlympaCreatifMain.getInstance().getLogger().info("§aDefault ChatDeserializer Gson instance set lenient.");
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			OlympaCreatifMain.getInstance().getLogger().warning("§cFailed to set default ChatDeserializer Gson instance lenient!");
+			e.printStackTrace();
+		}
+	}*/
 	
 	public static NBTTagCompound getValidTags(String string) {
 		try {
@@ -111,7 +136,9 @@ public abstract class NBTcontrollerUtil {
 					
 					//si le tag n'est ni un compound ni une liste, vérification
 					if (!isValueValid(params, tag.get(key)))
-						tag.remove(key);	
+						tag.remove(key);
+					else if (tag.get(key) instanceof NBTTagString && !(tag.getString(key).startsWith("\"") && tag.getString(key).endsWith("\"")))
+						tag.setString(key, "\"" + tag.getString(key) + "\"");
 				}				
 			}
 		}

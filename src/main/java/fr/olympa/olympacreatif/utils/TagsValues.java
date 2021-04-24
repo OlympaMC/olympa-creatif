@@ -22,16 +22,6 @@ public class TagsValues {
 	
 	@SuppressWarnings("rawtypes")
 	public TagsValues() {
-		/*
-		tags.put("Name", new TagParams(NBTTagString.class, 0, 200, null));
-		tags.put("Lore", new TagParams(NBTTagString.class, 0, 200, NBT.TAG_STRING));
-
-		tags.put("CustomName", new TagParams(NBTTagString.class, 0, 200, null));
-		tags.put("CustomNameVisible", new TagParams(NBTTagInt.class, 0, 1, null));
-		tags.put("Invulnerable", new TagParams(NBTTagInt.class, 0, 1, null));
-		
-		tags.put("HideFlags", new TagParams(NBTTagInt.class, 0, 10000, null));
-		*/
 		
 		//chargement des tags depuis le fichier config
         File file = new File(OlympaCreatifMain.getInstance().getDataFolder(), "tags.yml");

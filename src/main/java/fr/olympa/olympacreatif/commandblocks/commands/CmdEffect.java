@@ -1,9 +1,11 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
+import java.util.AbstractMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -11,49 +13,45 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.google.common.collect.ImmutableMap;
-
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdEffect extends CbCommand {
 
-	private static final Map<String, PotionEffectType> potConversion = ImmutableMap.<String, PotionEffectType>builder()
-			.put("DOLPHINS_GRACE", PotionEffectType.DOLPHINS_GRACE)
-			.put("ABSORPTION", PotionEffectType.ABSORPTION)
-			.put("BAD_OMEN", PotionEffectType.BAD_OMEN)
-			.put("BLINDESS", PotionEffectType.BLINDNESS)
-			.put("CONDUIT_POWER", PotionEffectType.CONDUIT_POWER)
-			.put("NAUSEA", PotionEffectType.CONFUSION)
-			.put("RESISTANCE", PotionEffectType.DAMAGE_RESISTANCE)
-			.put("DOLPHINS_GRACE", PotionEffectType.DOLPHINS_GRACE)
-			.put("HASTE", PotionEffectType.FAST_DIGGING)
-			.put("FIRES_RESISTANCE", PotionEffectType.FIRE_RESISTANCE)
-			.put("GLOWING", PotionEffectType.GLOWING)
-			.put("INSTANT_DAMAGE", PotionEffectType.HARM)
-			.put("INSTANT_HEALTH", PotionEffectType.HEAL)
-			.put("HEALTH_BOOST", PotionEffectType.HEALTH_BOOST)
-			.put("HERO_OF_THE_VILLAGE", PotionEffectType.HERO_OF_THE_VILLAGE)
-			.put("HUNGER", PotionEffectType.HUNGER)
-			.put("STRENGTH", PotionEffectType.INCREASE_DAMAGE)
-			.put("INVISIBILITY", PotionEffectType.INVISIBILITY)
-			.put("JUMP_BOOST", PotionEffectType.JUMP)
-			.put("LEVITATION", PotionEffectType.LEVITATION)
-			.put("LUCK", PotionEffectType.LUCK)
-			.put("NIGHT_VISION", PotionEffectType.NIGHT_VISION)
-			.put("POISON", PotionEffectType.POISON)
-			.put("REGENERATION", PotionEffectType.REGENERATION)
-			.put("SATURATION", PotionEffectType.SATURATION)
-			.put("SLOWNESS", PotionEffectType.SLOW)
-			.put("MINING_FATIGUE", PotionEffectType.SLOW_DIGGING)
-			.put("SLOW_FALLING", PotionEffectType.SLOW_FALLING)
-			.put("SPEED", PotionEffectType.SPEED)
-			.put("UNUCK", PotionEffectType.UNLUCK)
-			.put("WATER_BREATHING", PotionEffectType.WATER_BREATHING)
-			.put("WEAKNESS", PotionEffectType.WEAKNESS)
-			.put("WITHER", PotionEffectType.WITHER)
-			.build();
+	private static final Map<String, PotionEffectType> potConversion = Stream.of(
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("DOLPHINS_GRACE", PotionEffectType.DOLPHINS_GRACE),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("ABSORPTION", PotionEffectType.ABSORPTION),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("BAD_OMEN", PotionEffectType.BAD_OMEN),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("BLINDESS", PotionEffectType.BLINDNESS),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("CONDUIT_POWER", PotionEffectType.CONDUIT_POWER),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("NAUSEA", PotionEffectType.CONFUSION),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("RESISTANCE", PotionEffectType.DAMAGE_RESISTANCE),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("HASTE", PotionEffectType.FAST_DIGGING),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("FIRES_RESISTANCE", PotionEffectType.FIRE_RESISTANCE),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("GLOWING", PotionEffectType.GLOWING),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("INSTANT_DAMAGE", PotionEffectType.HARM),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("INSTANT_HEALTH", PotionEffectType.HEAL),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("HEALTH_BOOST", PotionEffectType.HEALTH_BOOST),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("HERO_OF_THE_VILLAGE", PotionEffectType.HERO_OF_THE_VILLAGE),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("HUNGER", PotionEffectType.HUNGER),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("STRENGTH", PotionEffectType.INCREASE_DAMAGE),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("INVISIBILITY", PotionEffectType.INVISIBILITY),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("JUMP_BOOST", PotionEffectType.JUMP),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("LEVITATION", PotionEffectType.LEVITATION),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("LUCK", PotionEffectType.LUCK),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("NIGHT_VISION", PotionEffectType.NIGHT_VISION),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("POISON", PotionEffectType.POISON),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("REGENERATION", PotionEffectType.REGENERATION),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("SATURATION", PotionEffectType.SATURATION),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("SLOWNESS", PotionEffectType.SLOW),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("MINING_FATIGUE", PotionEffectType.SLOW_DIGGING),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("SLOW_FALLING", PotionEffectType.SLOW_FALLING),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("SPEED", PotionEffectType.SPEED),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("UNUCK", PotionEffectType.UNLUCK),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("WATER_BREATHING", PotionEffectType.WATER_BREATHING),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("WEAKNESS", PotionEffectType.WEAKNESS),
+			new AbstractMap.SimpleEntry<String, PotionEffectType>("WITHER", PotionEffectType.WITHER))
+			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	
 	public CmdEffect(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.effect, sender, loc, plugin, plot, args);
@@ -61,6 +59,9 @@ public class CmdEffect extends CbCommand {
 
 	@Override
 	public int execute() {
+		if (args.length == 0) 
+			return 0;
+		
 		PotionEffectType type = null;
 		
 		if (args.length >= 2)

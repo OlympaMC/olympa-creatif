@@ -248,7 +248,7 @@ public class CmdExecute extends CbCommand {
 						if (plot.getCbData().getCommandsTicketsLeft() < CbCommand.getCommandType(stringCmd).getRequiredCbTickets())
 							return -1;
 						
-						CbCommand runCmd = CbCommand.getCommand(plugin, sender, sendingLoc, stringCmd);
+						CbCommand runCmd = CbCommand.getCommand(plugin, e.getKey(), loc, stringCmd);
 						
 						if (runCmd == null)
 							return 0;
