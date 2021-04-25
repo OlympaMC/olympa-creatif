@@ -111,7 +111,7 @@ public class PlotsManager {
 				
 				//parcours les entités du monde. Si elles sont en dehors de leur plot, elles sont supprimées
 				if (plugin.getWorldManager().getWorld() != null)
-					new ArrayList<Entity>(plugin.getWorldManager().getWorld().getEntities()).forEach(e ->{
+					plugin.getWorldManager().getWorld().getEntities().forEach(e ->{
 						if (e.getType() == EntityType.PLAYER)
 							return;
 						
@@ -127,7 +127,7 @@ public class PlotsManager {
 						}
 					});
 			}
-		}.runTaskTimerAsynchronously(plugin, 10, 300);
+		}.runTaskTimer(plugin, 10, 300);
 		
 		
 		//load help holos plots

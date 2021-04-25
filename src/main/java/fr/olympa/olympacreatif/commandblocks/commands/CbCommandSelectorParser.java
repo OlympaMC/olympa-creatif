@@ -194,6 +194,9 @@ public abstract class CbCommandSelectorParser {
 		if (s == null)
 			return new ArrayList<Entity>();
 		
+		if (s.equals("@s"))
+			return (sender instanceof Entity) ? Arrays.asList(new Entity[]{(Entity) sender})  : new ArrayList<Entity>();
+		
 		if (!s.startsWith("@") && plot.getPlayers().contains(Bukkit.getPlayer(s)))
 			return new ArrayList<Entity>(Arrays.asList(Bukkit.getPlayer(s)));
 		

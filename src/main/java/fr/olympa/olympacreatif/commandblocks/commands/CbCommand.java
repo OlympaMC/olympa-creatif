@@ -195,7 +195,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		teleport(CmdOp::new),
 		tp(CmdTeleport::new),
 		tellraw(CmdTellraw::new),
-		execute(CmdExecute::new, 2),
+		execute(CmdExecute2::new, 2),
 		team(CmdTeam::new),
 		scoreboard(CmdScoreboard::new),
 		bossbar(CmdBossBar::new),
