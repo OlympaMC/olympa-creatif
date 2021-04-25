@@ -2,24 +2,18 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.bukkit.Bukkit;
+import java.util.stream.Collectors;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-
-import com.sk89q.worldedit.function.operation.RunContext;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
@@ -66,14 +60,12 @@ public class CmdExecute extends CbCommand {
 		if (subCommands.containsKey(ExecuteType.cmd_store))
 			subCommands.put(ExecuteType.cmd_store, subCommands.remove(ExecuteType.cmd_store));
 		
-		Map<CommandSender, Location> commandSenders = new HashMap<CommandSender, Location>();
-		Set<Location> sendingLocations = new HashSet<Location>();
+		//Map<CommandSender, Location> commandSenders = new HashMap<CommandSender, Location>();
+		//Set<Location> sendingLocations = new HashSet<Location>();
 		
-		commandSenders.put(sender, null);
-		sendingLocations.add(sendingLoc);
-		//Set<CbEntry> senders = new HashSet<CbEntry>();
+		Set<CbEntry> senders = new HashSet<CbEntry>();
 		
-		//senders.add(new CbEntry(sender, sendingLoc));
+		senders.add(new CbEntry(sender, sendingLoc));
 		
 		//résultats commande (nombre de résultats = locations * commandSender)
 		List<Integer> cmdResults = new ArrayList<Integer>();
@@ -86,65 +78,67 @@ public class CmdExecute extends CbCommand {
 			case cmd_as:
 				if (subCmd.getValue().size() != 1)
 					return 0;
+
+				Set<Location> locsSet = senders.stream().map(e -> e.getValue()).collect(Collectors.toSet());
+				senders = new HashSet<CbEntry>();
 				
-				commandSenders.clear();
+				for (Location loc : locsSet) {
+					sendingLoc = loc;
+					for (Entity e : parseSelector(subCmd.getValue().get(0), false))
+						senders.add(new CbEntry(e, loc));
+				}
 				
 				//ajout de toutes les entités respectant le sélecteur à la liste des commandsenders
 				//for (Location loc : sendingLocations) {
 					//sendingLoc = loc;
-					for (Entity e : parseSelector(subCmd.getValue().get(0), false))
-						if (!commandSenders.containsKey(e))
-							commandSenders.put(e, null);
 				//}
-				Bukkit.broadcastMessage("Parsed senders : " + commandSenders);
+				//Bukkit.broadcastMessage("Parsed senders : " + senders);
 			break;
 				
 			case cmd_at:
 				if (subCmd.getValue().size() != 1)
 					return 0;
-				
-				sendingLocations.clear();
+
+				Set<CommandSender> sendersSet = senders.stream().map(e -> e.getKey()).collect(Collectors.toSet());
+				senders = new HashSet<CbEntry>();
 				
 				//ajout de toutes les positions des entités du sélecteur à la liste des sending loc
-				for (CommandSender s : commandSenders.keySet()) {
+				for (CommandSender s : sendersSet) {
+					sender = s;
 					
-					if (s instanceof Entity)
+					/*if (s instanceof Entity)
 						sendingLoc = ((Entity) s).getLocation();
 					else if (s instanceof BlockCommandSender)
-						sendingLoc = ((BlockCommandSender) s).getBlock().getLocation();
+						sendingLoc = ((BlockCommandSender) s).getBlock().getLocation();*/
 					
 					for (Entity e : parseSelector(subCmd.getValue().get(0), false))
-						if (!sendingLocations.contains(e.getLocation()))
-							sendingLocations.add(e.getLocation());
-				}new SimpleEntry(null, null);
+						senders.add(new CbEntry(s, e.getLocation()));
+				}
 
 				break;
 				
 			case cmd_positioned:
 				if (subCmd.getValue().size() == 2 && subCmd.getValue().get(0).equals("as")) {
-					
-					for (CommandSender e : commandSenders.keySet()) {
-						sender = e;
-						
-						List<Entity> list = parseSelector(subCmd.getValue().get(1), false);	
-						
-						if (list.size() > 0)
-							commandSenders.put(e, list.get(0).getLocation());
-					}
-					
+
+					Set<CommandSender> sendersSet2 = senders.stream().map(e -> e.getKey()).collect(Collectors.toSet());
+					senders = new HashSet<CbEntry>();
+
+					for (CommandSender s : sendersSet2) {
+						sender = s;
+						for (Entity e : parseSelector(subCmd.getValue().get(1), false))
+							senders.add(new CbEntry(s, e.getLocation()));
+					}	
 					
 				}else if (subCmd.getValue().size() == 3) {
 					
-					for (CommandSender e : commandSenders.keySet()) {
-						sender = e;
-						
-						Location newLoc = parseLocation(subCmd.getValue().get(0), subCmd.getValue().get(1), subCmd.getValue().get(2));
-						
-						if (newLoc != null)
-							commandSenders.put(e, newLoc);
-					}
+					Set<CommandSender> sendersSet2 = senders.stream().map(e -> e.getKey()).collect(Collectors.toSet());
+					senders = new HashSet<CbEntry>();
 					
+					Location loc = parseLocation(subCmd.getValue().get(0), subCmd.getValue().get(1), subCmd.getValue().get(2));
 					
+					if (loc != null)
+						for (CommandSender s : sendersSet2) 
+							senders.add(new CbEntry(s, loc));
 				}
 				
 				break;
@@ -152,81 +146,40 @@ public class CmdExecute extends CbCommand {
 			case cmd_if:
 				cmdResults.clear();
 				
-				for (Location loc : new ArrayList<Location>(sendingLocations)) {
-					sendingLoc = loc;
+				Iterator<CbEntry> iterator = senders.iterator();
+				
+				while (iterator.hasNext()) {
+					CbEntry entry = iterator.next();
 					
-					Iterator<Entry<CommandSender, Location>> iter = commandSenders.entrySet().iterator();
-					int senderSize = commandSenders.size();
+					sender = entry.getKey();
+					sendingLoc = entry.getValue();
 					
-					while(iter.hasNext()) {
-						
-						Entry<CommandSender, Location> e = iter.next();
-						
-						sender = e.getKey();
-						
-						if (e.getValue() != null)
-							sendingLoc = e.getValue();
-						
-						Integer result = executeIfUnlessTest(subCmd.getValue());
-						
-						if (result == null)
-							return 0;
-						
-						if (result == 0)
-							if (senderSize == 1)
-								sendingLocations.remove(loc);
-							else if (sendingLocations.size() == 1)
-								iter.remove();
-							else {
-								sendingLocations.remove(loc);
-								iter.remove();
-							}
-						
-						cmdResults.add(result);	
-					}
-				}				
+					Integer result = executeIfUnlessTest(subCmd.getValue());
+					cmdResults.add(result == null ? 0 : result);
+					
+					if (result == null || result == 0)
+						iterator.remove();
+				}	
 				break;
 				
 				
 			case cmd_unless:
 				cmdResults.clear();
 				
-				for (Location loc : new ArrayList<Location>(sendingLocations)) {
-					sendingLoc = loc;
+				Iterator<CbEntry> iterator2 = senders.iterator();
+				
+				while (iterator2.hasNext()) {
+					CbEntry entry = iterator2.next();
 					
-					Iterator<Entry<CommandSender, Location>> iter = commandSenders.entrySet().iterator();
-					int senderSize = commandSenders.size();
+					sender = entry.getKey();
+					sendingLoc = entry.getValue();
 					
-					while(iter.hasNext()) {
-						
-						Entry<CommandSender, Location> e = iter.next();
-						
-						sender = e.getKey();
-						
-						if (e.getValue() != null)
-							sendingLoc = e.getValue();
-						
-						Integer result = executeIfUnlessTest(subCmd.getValue());
-						
-						if (result == null)
-							return 0;
-						
-						if (result > 0)
-							if (senderSize == 1)
-								sendingLocations.remove(loc);
-							else if (sendingLocations.size() == 1)
-								iter.remove();
-							else {
-								sendingLocations.remove(loc);
-								iter.remove();
-							}
-						
-						if (result == 0)
-							cmdResults.add(1);
-						else
-							cmdResults.add(0);
-					}
-				}				
+					Integer result = executeIfUnlessTest(subCmd.getValue());
+					cmdResults.add(result == null ? 0 : result);
+					
+					if (result == null || result == 1)
+						iterator2.remove();
+				}			
 				break;
 				
 				
@@ -234,7 +187,7 @@ public class CmdExecute extends CbCommand {
 				
 				cmdResults.clear();
 				
-				Bukkit.broadcastMessage("RUN senders : " + commandSenders.toString() + " - locations : " + sendingLocations.toString());
+				//Bukkit.broadcastMessage("RUN with : " + senders);
 				
 				//concat commande à partir de la liste
 				String stringCmd = "";
@@ -242,27 +195,21 @@ public class CmdExecute extends CbCommand {
 					if (!s.equals("run"))
 						stringCmd += s + " ";
 				
-				for (Location loc : sendingLocations) {
-					sendingLoc = loc;
-					for (Entry<CommandSender, Location> e : commandSenders.entrySet()) {
-						sender = e.getKey();
-						
-						if (e.getValue() != null)
-							sendingLoc = e.getValue();
-						
-						CommandType type = CbCommand.getCommandType(stringCmd);
-						
-						if (plot.getCbData().getCommandsTicketsLeft() < type.getRequiredCbTickets())
-							return -1;
-						
-						CbCommand runCmd = CbCommand.getCommand(type, plugin, sender, sendingLoc, stringCmd);
-						
-						if (runCmd == null)
-							return 0;
-						
-						plot.getCbData().removeCommandTickets(runCmd.getType().getRequiredCbTickets());
-						cmdResults.add(runCmd.execute());
-					}
+				for (CbEntry e : senders) {
+					sender = e.getKey();
+					sendingLoc = e.getValue();
+					
+					CommandType type = CbCommand.getCommandType(stringCmd);
+					if (plot.getCbData().getCommandsTicketsLeft() < type.getRequiredCbTickets())
+						return -1;
+					
+					CbCommand runCmd = CbCommand.getCommand(type, plugin, sender, sendingLoc, stringCmd);
+					
+					if (runCmd == null)
+						return 0;
+					
+					plot.getCbData().removeCommandTickets(runCmd.getType().getRequiredCbTickets());
+					cmdResults.add(runCmd.execute());
 				}
 				break;
 				
@@ -271,7 +218,7 @@ public class CmdExecute extends CbCommand {
 				//Bukkit.broadcastMessage(cmdResults.size() + " = " + listSenders.size() + " * " + listLocations.size());
 				
 				//return si le nombre de résultats n'est pas suffisant
-				if (cmdResults.size() != commandSenders.size() * sendingLocations.size())
+				if (cmdResults.size() != senders.size())
 					return 0;
 				
 				List<String> subCmdArgs = subCommands.get(ExecuteType.cmd_store);
@@ -293,19 +240,14 @@ public class CmdExecute extends CbCommand {
 					
 					int i = -1;
 					
-					for (Location loc : sendingLocations) {
-						sendingLoc = loc;
-						for (Entry<CommandSender, Location> e : commandSenders.entrySet()) {
-							sender = e.getKey();
-							
-							if (e.getValue() != null)
-								sendingLoc = e.getValue();
-							
-							i++;
-							//pour chaque entité du sélecteur, stockage du résultat précédent dans score obj
-							for (Entity ent : parseSelector(subCmdArgs.get(2), false))
-								obj.set(ent, cmdResults.get(i));
-						}
+					for (CbEntry e : senders) {
+						sender = e.getKey();
+						sendingLoc = e.getValue();
+						
+						i++;
+						//pour chaque entité du sélecteur, stockage du résultat précédent dans score obj
+						for (Entity ent : parseSelector(subCmdArgs.get(2), false))
+							obj.set(ent, cmdResults.size() > i ? cmdResults.get(i) : 0);
 					}
 					break;
 					
@@ -340,6 +282,8 @@ public class CmdExecute extends CbCommand {
 		else
 			return cmdResults.get(cmdResults.size() - 1);
 	}
+	
+	
 	
 	private Integer executeIfUnlessTest(List<String> args) {
 		if (args.size() == 0)
@@ -520,6 +464,11 @@ public class CmdExecute extends CbCommand {
 	}
 	
 	private class CbEntry extends SimpleEntry<CommandSender, Location> {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2308946095098425283L;
 
 		public CbEntry(CommandSender key, Location value) {
 			super(key, value);
