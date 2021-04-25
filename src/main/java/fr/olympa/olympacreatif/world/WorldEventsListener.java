@@ -276,10 +276,10 @@ public class WorldEventsListener implements Listener{
 			return;
 		}
 		
-		if (PlotId.fromLoc(plugin, e.getPlayer().getLocation()) == null && !p.hasStaffPerm(StaffPerm.BUILD_ROADS)) {
+		/*if (PlotId.fromLoc(plugin, e.getPlayer().getLocation()) == null && !p.hasStaffPerm(StaffPerm.BUILD_ROADS)) {
 			e.setCancelled(true);
 			return;	
-		}
+		}*/
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits
