@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.worldedit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
@@ -59,7 +61,7 @@ public abstract class AWorldEditManager {
 		resetingPlots.put(plot.getPlotId(), 0);
 		plugin.getTask().runTaskLater(() -> resetingPlots.remove(plot.getPlotId()), 200);
 		
-		plot.getEntities().forEach(e -> e.remove());
+		Arrays.asList(plot.getEntities().toArray(new Entity[plot.getEntities().size()])).forEach(e -> plot.removeEntityInPlot(e, true));
 		
 		org.bukkit.Chunk originChunk = plot.getPlotId().getLocation().getChunk();
 		

@@ -203,7 +203,7 @@ public class PermissionsManager implements Listener {
 				() -> Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(AccountProvider.get(p.getUniqueId())))),
 		
 		ENTITIES("entities", null, () -> OlympaCreatifMain.getInstance().getWorldManager().getWorld().getEntities().stream().filter(e -> 
-		(e.getType() != EntityType.PLAYER && e.getType() != EntityType.ARMOR_STAND && e.getType() != EntityType.ITEM_FRAME)).forEach(e -> e.remove())),
+		(e.getType() != EntityType.PLAYER)).forEach(e -> e.remove())),
 		
 		REDSTONE("redstone", null, null);
 		

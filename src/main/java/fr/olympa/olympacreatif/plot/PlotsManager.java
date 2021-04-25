@@ -117,7 +117,9 @@ public class PlotsManager {
 						
 						PlotId id = getBirthPlot(e);
 						
-						if (id  == null || !id.equals(PlotId.fromLoc(plugin, e.getLocation()))) {
+						if (id == null)
+							e.remove();
+						else if (!id.equals(PlotId.fromLoc(plugin, e.getLocation()))) {
 							Plot plot = plugin.getPlotsManager().getPlot(id);
 							
 							if (plot != null)

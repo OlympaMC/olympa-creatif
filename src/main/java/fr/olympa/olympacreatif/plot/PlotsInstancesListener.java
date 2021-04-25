@@ -737,12 +737,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		
-		if (plot == null) {
-			e.getEntity().remove();
-			return;
-		}
-		
-		if (!plot.getPlotId().isInPlot(e.getLoc()))
+		if (plot == null || !plot.getPlotId().isInPlot(e.getLoc()))
 			e.setCancelled(true);
 	}
 

@@ -188,7 +188,7 @@ public class Plot {
 			return;
 		
 		if (entitiesInPlot.size() == OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.get()) 
-			entitiesInPlot.remove(0).remove();
+			removeEntityInPlot(entitiesInPlot.get(0), true);
 		
 		int count = 0;
 		Entity toRemove = null;
@@ -201,8 +201,7 @@ public class Plot {
 			}
 		
 		if (count >= OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.get() && toRemove != null) {
-			entitiesInPlot.remove(toRemove);
-			toRemove.remove();
+			removeEntityInPlot(toRemove, true);
 		}
 			
 		entitiesInPlot.add(e);
