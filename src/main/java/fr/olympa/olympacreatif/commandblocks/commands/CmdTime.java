@@ -41,7 +41,7 @@ public class CmdTime extends CbCommand {
 		}
 		
 		if (time != null) {
-			time -= 6000;
+			time += 6000;
 			
 			PlotParamType.PLOT_TIME.setValue(plot, time);
 			for (Player p : plot.getPlayers())
