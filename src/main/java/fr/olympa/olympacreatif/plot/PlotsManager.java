@@ -130,21 +130,6 @@ public class PlotsManager {
 					});
 			}
 		}.runTaskTimer(plugin, 10, 300);
-		
-		
-		//load help holos plots
-		plugin.getTask().runTaskLater(() -> {
-			plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_1_LOC.get().toLoc()), false);
-			plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_2_LOC.get().toLoc()), false);
-			
-			plugin.getTask().runTaskLater(() -> {
-				forceLoadedPlots.add(getPlot(OCparam.HOLO_HELP_1_LOC.get().toLoc()));
-				forceLoadedPlots.add(getPlot(OCparam.HOLO_HELP_2_LOC.get().toLoc()));
-				
-				setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
-				setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
-			}, 30);
-		}, 20);
 	}
 	
 	/**
@@ -276,11 +261,25 @@ public class PlotsManager {
 		if (!isPlotLoaded(ap.getId())) 
 			loadedPlots.put(ap.getId().getId(), new Plot(ap));
 	}
+
+	public void loadHelpHolos() {
+		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_1_LOC.get().toLoc()), false);
+		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_2_LOC.get().toLoc()), false);
+		
+		plugin.getTask().runTaskLater(() -> {
+			forceLoadedPlots.add(getPlot(OCparam.HOLO_HELP_1_LOC.get().toLoc()));
+			forceLoadedPlots.add(getPlot(OCparam.HOLO_HELP_2_LOC.get().toLoc()));
+			
+			setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
+			setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
+		}, 30);
+	}
 	
 	
 	private void setHelpHolo(Location loc, List<String> text) {
 		plugin.getWorldManager().getWorld().getChunkAtAsync(loc, new Consumer<Chunk>() {
 			
+			@SuppressWarnings("unchecked")
 			@Override
 			public void accept(Chunk chunk) {
 				chunk.setForceLoaded(true);

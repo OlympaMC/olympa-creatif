@@ -43,7 +43,7 @@ public class PacketListener implements Listener {
 	OlympaCreatifMain plugin;
 	private Set<UUID> blockedPlayers = new HashSet<UUID>();
 	
-	private final int maxPacketsPerPeriod = 40;
+	private final int maxPacketsPerPeriod = 100;
 	private Map<UUID, Long[]> packetsLimiter = new HashMap<UUID, Long[]>();
 
 	private Field packetSetInSlotSlot;

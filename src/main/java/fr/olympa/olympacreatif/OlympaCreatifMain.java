@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif;
 
 import java.util.Random;
 
+import fr.olympa.api.command.essentials.BackCommand;
 import fr.olympa.api.command.essentials.tp.TpaHandler;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.FixedLine;
@@ -13,6 +14,7 @@ import fr.olympa.api.report.ReportReason;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.api.server.OlympaServer;
+import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.commands.CmdsLogic;
@@ -26,6 +28,7 @@ import fr.olympa.olympacreatif.commands.SkullCommand;
 import fr.olympa.olympacreatif.commands.SpawnCommand;
 import fr.olympa.olympacreatif.commands.SpeedCommand;
 import fr.olympa.olympacreatif.commands.StoplagCommand;
+import fr.olympa.olympacreatif.commands.TpfCommand;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
@@ -86,6 +89,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		OlympaPermission.registerPermissions(PermissionsList.class);
 		ReportReason.registerReason(ReportReasonsList.class);
 
+		new BackCommand(plugin, null);
+		
 		new OcCmd(this).register();
 		new OcoCmd(this).register();
 		new OcaCmd(this).register();
@@ -97,9 +102,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new SpawnCommand(this).register();
 		new ShopCommand(this).register();
 		new StoplagCommand(this).register();
+		new TpfCommand(this).register();
 
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA), plugin);
-
+		
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);
 		perksManager = new PerksManager(this);

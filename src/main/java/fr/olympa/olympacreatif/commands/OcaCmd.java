@@ -24,6 +24,9 @@ public class OcaCmd extends AbstractCmd {
 
 	public OcaCmd(OlympaCreatifMain plugin) {
 		super(plugin, "oca", PermissionsList.STAFF_OCA_CMD, "Panel de gestion pour le staff.");
+
+		addArgumentParser("STAFF_PERM", StaffPerm.class);
+		addArgumentParser("SERVER_COMPONENT", ComponentCreatif.class);
 	}
 
 	
@@ -35,7 +38,7 @@ public class OcaCmd extends AbstractCmd {
 			plugin.getCmdLogic().sendPlotsList(getOlympaPlayer(), cmd.getArgument(0));
 	}
 
-	@Cmd(syntax = "Active l'un des composants du créatif", args = {"worldedit|redstone|entities|commandblocks_and_vanilla_commands"})
+	@Cmd(syntax = "Active l'un des composants du créatif", args = {"SERVER_COMPONENT"})
 	public void activate(CommandContext cmd) {
 		if (cmd.getArgumentsLength() == 0) {
 			sendComponentsStatus();
@@ -45,7 +48,7 @@ public class OcaCmd extends AbstractCmd {
 		if (getSender() instanceof Player && !PermissionsList.STAFF_MANAGE_COMPONENT.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
-		ComponentCreatif component = ComponentCreatif.fromString(cmd.getArgument(0));
+		ComponentCreatif component = cmd.getArgument(0);
 		
 		if (component != null)
 			component.activate();
@@ -56,7 +59,7 @@ public class OcaCmd extends AbstractCmd {
 			sendMessage(Prefix.INFO, "§aLe composant " + (component == null ? "§caucun§a" : (String) cmd.getArgument(0)) + " a été activé.");
 	}
 
-	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"worldedit|redstone|entities|commandblocks_and_vanilla_commands"})
+	@Cmd(syntax = "Désactive l'un des composants du créatif", args = {"SERVER_COMPONENT"})
 	public void deactivate(CommandContext cmd) {
 		if (cmd.getArgumentsLength() == 0) {
 			sendComponentsStatus();
@@ -66,7 +69,7 @@ public class OcaCmd extends AbstractCmd {
 		if (!isConsole() && !PermissionsList.STAFF_MANAGE_COMPONENT.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
-		ComponentCreatif component = ComponentCreatif.fromString(cmd.getArgument(0));
+		ComponentCreatif component = cmd.getArgument(0);
 		
 		if (component != null)
 			component.deactivate();
@@ -91,8 +94,7 @@ public class OcaCmd extends AbstractCmd {
 	
 	
 
-	@Cmd(player = true, syntax = "Gérer ses permissions staff", description = "/oca perms <perm>", min = 0, 
-			args = "ghost_mode|owner_everywhere|worldedit|bypass_kick_ban|build_roads")
+	@Cmd(player = true, syntax = "Gérer ses permissions staff", description = "/oca perms <perm>", args = "STAFF_PERM")
 	public void perms(CommandContext cmd) {
 		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)getOlympaPlayer());
 		
@@ -107,32 +109,7 @@ public class OcaCmd extends AbstractCmd {
 			return;
 		}
 		
-		StaffPerm perm = null;
-		
-		switch ((String) cmd.getArgument(0)) {
-		case "ghost_mode":
-			perm = StaffPerm.GHOST_MODE;
-			break;
-
-		case "owner_everywhere":
-			perm = StaffPerm.OWNER_EVERYWHERE;
-			break;
-
-		case "worldedit":
-			perm = StaffPerm.WORLDEDIT;
-			break;
-
-		case "bypass_kick_ban":
-			perm = StaffPerm.BYPASS_KICK_BAN;
-			break;
-
-		case "build_roads":
-			perm = StaffPerm.BUILD_ROADS;
-			break;
-		default:
-			sendIncorrectSyntax();
-			return;
-		}
+		StaffPerm perm = cmd.getArgument(0);
 		
 		if (!perm.getOlympaPerm().hasPermissionWithMsg(getOlympaPlayer()))
 			return;

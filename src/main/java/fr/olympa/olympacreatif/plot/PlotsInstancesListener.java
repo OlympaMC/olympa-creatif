@@ -23,6 +23,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
@@ -275,9 +276,8 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		for (Block block : e.getBlocks())
-			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation())))
-				e.setCancelled(true);
+		if (e.getBlocks().stream().anyMatch(block -> !plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation()))))
+			e.setCancelled(true);
 		
 		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
 	}
@@ -294,17 +294,9 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		//cancel évent si blocks poussés sur la route
-		for (Block block : e.getBlocks()) {
-			if (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation()))) {
-				e.setCancelled(true);
-				return;
-			}
-			else if (plot.getPlotId().isOnInteriorDiameter(block.getLocation(), 2)) {
-				e.setCancelled(true);
-				return;
-			}
-		}
+		if (e.getBlocks().stream().anyMatch(block -> (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation())) || 
+				!plot.getPlotId().isInPlot(block.getLocation(), 1)) ))
+			e.setCancelled(true);
 		
 		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
 	}
@@ -342,6 +334,14 @@ public class PlotsInstancesListener implements Listener{
 		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		
 		if (plot == null || !plot.getPlotId().isInPlot(e.getBlock().getLocation()))
+			e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onDispense(BlockDispenseEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
+		
+		if (plot == null || !plot.getPlotId().isInPlot(e.getBlock().getLocation(), 1))
 			e.setCancelled(true);
 	}
 

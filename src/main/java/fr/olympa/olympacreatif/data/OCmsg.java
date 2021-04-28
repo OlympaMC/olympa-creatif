@@ -105,7 +105,6 @@ public class OCmsg {
 	public static final OCmsg PLOT_RESET_END = new OCmsg();
 	public static final OCmsg PLOT_RESET_ERROR = new OCmsg();
 	
-
 	public static final OCmsg PLOT_CANT_ENTER_CLOSED = new OCmsg();
 
 	public static final OCmsg GIVE_VIP_REWARD = new OCmsg();

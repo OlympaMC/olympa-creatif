@@ -24,11 +24,12 @@ public class OCRedisListener extends JedisPubSub {
 		super.onMessage(channel, message);
 		String[] info = message.split(";");
 		
-		//String ip = info[0];
-		//int port = Integer.valueOf(info[1]).intValue();
+		if (info.length < 3)
+			return;
+		
 		String serverName = info[2];
 		
-		if (plugin.getDataManager().getServerIndex() != -1)
+		if (plugin.getDataManager().getServerIndex() != -1 || !serverName.startsWith("creatif"))
 			return;
 		
 		int serverIndex = Integer.valueOf(serverName.substring(serverName.length() - 1));
@@ -50,6 +51,7 @@ public class OCRedisListener extends JedisPubSub {
 			public void run() {
 				plugin.getWorldManager().defineWorldParams();	
 				plugin.getWorldManager().loadCustomWorldGenerator();
+				plugin.getPlotsManager().loadHelpHolos();
 			}
 		}.runTask(plugin);
 

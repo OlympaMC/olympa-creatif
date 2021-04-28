@@ -234,38 +234,26 @@ public class PlotId {
 	}
 	
 	public boolean isInPlot(Location loc) {
-		return isInPlot(loc.getBlockX(), loc.getBlockZ());
+		return isInPlot(loc, 0);
 	}
 	
 	public boolean isInPlot(int x, int z) {
-		
-		return x >= indexX * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) && 
+		return isInPlot(x, z, 0);
+		/*return x >= indexX * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) && 
 				x < indexX * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + OCparam.PLOT_SIZE.get() && 
 				z >= indexZ * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) && 
-				z < indexZ * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + OCparam.PLOT_SIZE.get(); 
+				z < indexZ * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + OCparam.PLOT_SIZE.get();*/ 
 	}
 	
-	public boolean isOnInteriorDiameter(Location loc, int radius) {
-		return isOnInteriorDiameter(loc.getBlockX(), loc.getBlockZ(), radius);
+	public boolean isInPlot(Location loc, int radius) {
+		return isInPlot(loc.getBlockX(), loc.getBlockZ(), radius);
 	}
 	
-	public boolean isOnInteriorDiameter(int x, int z, int radius) {
-		if (!isInPlot(x, z))
-			return false;
-		
-		x = Math.floorMod(x, OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
-		z = Math.floorMod(z, OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
-		
-		if (getMinimalDifference(x, OCparam.PLOT_SIZE.get()) >= radius)
-			return false;
-		if (getMinimalDifference(z, OCparam.PLOT_SIZE.get()) >= radius)
-			return false;
-		
-		return true;
-	}
-	
-	private int getMinimalDifference(int x, int plotSize) {
-		return Math.min(x,  plotSize - x - 1);
+	public boolean isInPlot(int x, int z, int radius) {
+		return x >= indexX * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + radius && 
+				x < indexX * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + OCparam.PLOT_SIZE.get() - radius && 
+				z >= indexZ * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + radius && 
+				z < indexZ * (OCparam.PLOT_SIZE.get() + WorldManager.roadSize) + OCparam.PLOT_SIZE.get() - radius; 
 	}
 	
 	@Override

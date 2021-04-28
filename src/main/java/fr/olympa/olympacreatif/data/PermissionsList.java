@@ -27,8 +27,9 @@ public class PermissionsList {
 
 	public static final OlympaSpigotPermission STAFF_MANAGE_COMPONENT = new OlympaSpigotPermission(OlympaGroup.DEV);
 	//public static final OlympaSpigotPermission STAFF_DEACTIVATE_WORLD_EDIT = new OlympaSpigotPermission(OlympaGroup.DEV);
-	
+
 	public static final OlympaSpigotPermission CREA_TPA = new OlympaSpigotPermission(OlympaGroup.PLAYER);
+	public static final OlympaSpigotPermission CREA_TPF = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);
 	
 	public static final OlympaSpigotPermission STAFF_MANAGE_MONEY = new OlympaSpigotPermission(OlympaGroup.DEV);
 
