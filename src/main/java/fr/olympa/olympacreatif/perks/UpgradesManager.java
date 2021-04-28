@@ -29,13 +29,13 @@ public class UpgradesManager {
 			.build();
 	
 	private static Map<Integer, Integer> plotLevels = ImmutableMap.<Integer, Integer>builder()
-			.put(1, 1)
-			.put(2, 1)
-			.put(3, 1)
-			.put(4, 1)
-			.put(5, 1)
-			.put(6, 1)
-			.put(7, 1)
+			.put(1, 1000000)
+			.put(2, 1000000)
+			.put(3, 1000000)
+			.put(4, 1000000)
+			.put(5, 1000000)
+			.put(6, 1000000)
+			.put(7, 1000000)
 			.build();
 	
 	private static Map<Integer, Integer> membersLevels = ImmutableMap.<Integer, Integer>builder()
