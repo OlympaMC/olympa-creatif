@@ -178,7 +178,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 						return getLine(p.getOlympaPlayer(), line);
 					}, plugin, 20));
 		}
-		scm.addFooters(CyclingLine.olympaAnimation());
+		scm.addFooters(FixedLine.EMPTY_LINE, CyclingLine.olympaAnimation());
 	}
 
 	public String getLine(OlympaPlayerCreatif p, int i) {
@@ -225,9 +225,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		case 8:
 			return "§4";
-			/*if (p.getCustomScoreboardLines().size() > 0 && plot != null)
-				return "§8Sidebar plot " + plot;
-			else*/
+		/*if (p.getCustomScoreboardLines().size() > 0 && plot != null)
+			return "§8Sidebar plot " + plot;
+		else*/
 		}
 		return "";
 	}
@@ -274,7 +274,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	public CmdsLogic getCmdLogic() {
 		return cmdLogic;
 	}
-	
+
 	public PermissionsManager getPermissionsManager() {
 		return permsManager;
 	}
