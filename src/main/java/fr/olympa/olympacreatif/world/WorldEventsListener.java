@@ -77,7 +77,13 @@ public class WorldEventsListener implements Listener{
 	@EventHandler
 	public void onAfk(AsyncPlayerAfkEvent e) {
 		if (e.isAfk())
-			plugin.getTask().runTask(() -> e.getPlayer().teleport(OCparam.SPAWN_LOC.get().toLoc().add(ThreadLocalRandom.current().nextDouble(-1, 1), 0, ThreadLocalRandom.current().nextDouble(-1, 1))));
+			plugin.getTask().runTask(() -> {
+				ThreadLocalRandom r = ThreadLocalRandom.current();
+				if (r.nextBoolean())
+					e.getPlayer().teleport(OCparam.SPAWN_LOC.get().toLoc().add(r.nextDouble(), 0, r.nextDouble()));
+				else
+					e.getPlayer().teleport(OCparam.SPAWN_LOC.get().toLoc().subtract(r.nextDouble(), 0, r.nextDouble()));
+			});
 	}
 	
 	@EventHandler //n'autorise que certaines sources de spawn de créatures 
