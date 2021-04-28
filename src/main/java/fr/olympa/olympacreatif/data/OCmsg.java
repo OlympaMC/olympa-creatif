@@ -164,11 +164,11 @@ public class OCmsg {
 			//.put("%playerPlotRank", (pc, plot) -> {return pc == null ? PlotRank.VISITOR.getRankName() : plot.getMembers().getPlayerRank(pc).getRankName();})
 			//.put("%playerPlot", (pc, plot) -> {return plot.getPlotId().getId() + "";})
 			//.put("%plotId", (pc, plot) -> {return plot.getPlotId().getId() + "";})
-			.put("%playerPlotRank", (pc, plot) -> {return plot.getMembers().getPlayerRank(pc).getRankName();})
-			.put("%plotOwnerName", (pc, plot) -> plot.getMembers().getOwner().getName())
-			.put("%plotMembersSize", (pc, plot) -> plot.getMembers().getMembers().size() + "")
-			.put("%plotMembersMaxSize", (pc, plot) -> plot.getMembers().getMaxMembers() + "")
-			.put("%plot", (pc, plot) -> plot.toString())
+			.put("%playerPlotRank", (pc, plot) -> plot != null ? plot.getMembers().getPlayerRank(pc).getRankName() : PlotRank.VISITOR.getRankName())
+			.put("%plotOwnerName", (pc, plot) -> plot != null ? plot.getMembers().getOwner().getName() : "none")
+			.put("%plotMembersSize", (pc, plot) -> plot != null ? plot.getMembers().getMembers().size() + "" : "0")
+			.put("%plotMembersMaxSize", (pc, plot) -> plot != null ? plot.getMembers().getMaxMembers() + "" : "0")
+			.put("%plot", (pc, plot) -> plot != null ? plot.toString() : "none")
 			
 			.build();
 
@@ -269,7 +269,7 @@ public class OCmsg {
 		
 		
 		
-		if (!plotAlreadyAdded && pc != null && pc.getCurrentPlot() != null)
+		if (!plotAlreadyAdded && pc != null)
 			for (Entry<String, BiFunction<OlympaPlayerCreatif, Plot, String>> e : plotPlaceHolders.entrySet())
 				msg = msg.replace(e.getKey(), e.getValue().apply(pc, pc.getCurrentPlot()));
 		

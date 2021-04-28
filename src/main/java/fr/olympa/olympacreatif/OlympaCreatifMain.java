@@ -103,7 +103,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new ShopCommand(this).register();
 		new StoplagCommand(this).register();
 		new TpfCommand(this).register();
-
+		new BackCommand(this, null).register();
+		
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA), plugin);
 		
 		dataManager = new DataManager(this);
