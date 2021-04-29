@@ -93,7 +93,7 @@ public class PlotsManager {
 							if (!hasMemberOnline && !forceLoadedPlots.contains(plot)) {
 								plot.unload();
 								plugin.getDataManager().addPlotToSaveQueue(plot, false);
-								loadedPlots.remove(plot.getPlotId().getId());
+								loadedPlots.remove(plot.getId().getId());
 							}
 						}	
 					}
@@ -200,7 +200,7 @@ public class PlotsManager {
 		Plot plot = new Plot(plugin, pc);
 		
 		plugin.getDataManager().addPlotToSaveQueue(plot, true);
-		loadedPlots.put(plot.getPlotId().getId(), plot);
+		loadedPlots.put(plot.getId().getId(), plot);
 		return plot;
 	}
 	

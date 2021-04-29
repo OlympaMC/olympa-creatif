@@ -41,7 +41,7 @@ public class SchematicCreator {
 	    if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 	    	OCmsg.WE_DISABLED.send(p);
 	    	return;
-	    }else if (resetongPlots.contains(plot.getPlotId()))
+	    }else if (resetongPlots.contains(plot.getId()))
 	    	return;
 	    
 	    	
@@ -49,7 +49,7 @@ public class SchematicCreator {
 			
 			//création fichier & dir si existants
 		    File dir = new File(plugin.getDataFolder() + "/schematics");
-		    File schemFile = new File(dir.getAbsolutePath(), plot.getMembers().getOwner().getName() + "_" + plot.getPlotId() + ".schem");
+		    File schemFile = new File(dir.getAbsolutePath(), plot.getMembers().getOwner().getName() + "_" + plot.getId() + ".schem");
 		    plugin.getDataFolder().mkdir();
 		    dir.mkdir();
 		    try {
@@ -61,8 +61,8 @@ public class SchematicCreator {
 			}
 
 		    //create the Clipboard to copy
-		    BlockVector3 v1 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX(), 0, plot.getPlotId().getLocation().getBlockZ());
-		    BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 255, plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
+		    BlockVector3 v1 = BlockVector3.at(plot.getId().getLocation().getBlockX(), 0, plot.getId().getLocation().getBlockZ());
+		    BlockVector3 v2 = BlockVector3.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 255, plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
 		    
 		    CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), v1, v2);
 		    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
@@ -84,7 +84,7 @@ public class SchematicCreator {
 			
 			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
 			OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.send(p, plot);
-			resetongPlots.remove(plot.getPlotId());
+			resetongPlots.remove(plot.getId());
 	    });
 
 		OCmsg.WE_START_GENERATING_PLOT_SCHEM.send(p, plot);

@@ -49,7 +49,7 @@ public class CmdsLogic {
 			if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
 				
 				Plot plot = plugin.getPlotsManager().createNewPlot(pc);
-				pc.getPlayer().teleport(plot.getPlotId().getLocation());
+				pc.getPlayer().teleport(plot.getId().getLocation());
 
 				//TODO vérifier si le getCurrentPlot est bien MAJ
 				OCmsg.PLOT_NEW_CLAIM.send(pc);
@@ -88,7 +88,7 @@ public class CmdsLogic {
 			return;
 		}
 		
-		invitations.put(plot.getPlotId(), new AbstractMap.SimpleEntry<OlympaPlayerCreatif, Player>(pc, target));
+		invitations.put(plot.getId(), new AbstractMap.SimpleEntry<OlympaPlayerCreatif, Player>(pc, target));
 		OCmsg.PLOT_RECIEVE_INVITATION.send(target, plot, pc.getName());
 		OCmsg.PLOT_SEND_INVITATION.send(pc, target.getName());
 	}
@@ -105,17 +105,17 @@ public class CmdsLogic {
 		else if (pc.getPlotsSlots(false) - pc.getPlots(false).size() <= 0)
 			OCmsg.MAX_PLOT_COUNT_REACHED.send(pc, plot);
 		
-		else if (!invitations.containsKey(plot.getPlotId()) || !invitations.get(plot.getPlotId()).getValue().equals(pc.getPlayer()))
+		else if (!invitations.containsKey(plot.getId()) || !invitations.get(plot.getId()).getValue().equals(pc.getPlayer()))
 			OCmsg.PLOT_NO_PENDING_INVITATION.send(pc, plot);
 		
-		else if (!invitations.get(plot.getPlotId()).getKey().getPlayer().isOnline())
-			OCmsg.PLOT_JOIN_ERR_SENDER_OFFLINE.send(pc, plot, invitations.get(plot.getPlotId()).getKey().getName());
+		else if (!invitations.get(plot.getId()).getKey().getPlayer().isOnline())
+			OCmsg.PLOT_JOIN_ERR_SENDER_OFFLINE.send(pc, plot, invitations.get(plot.getId()).getKey().getName());
 		
 		else if (plot.getMembers().getMembers().size() >= plot.getMembers().getMaxMembers())
 			OCmsg.PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS.send(pc, plot);
 		
 		else {
-			OCmsg.PLOT_PLAYER_JOIN.send(invitations.remove(plot.getPlotId()).getKey(), pc.getName());
+			OCmsg.PLOT_PLAYER_JOIN.send(invitations.remove(plot.getId()).getKey(), pc.getName());
 			OCmsg.PLOT_ACCEPTED_INVITATION.send(pc, plot);
 			plot.getMembers().set(pc, PlotRank.MEMBER);	
 		}
@@ -245,7 +245,7 @@ public class CmdsLogic {
 		
 		if (id >= 0 && id < plots.size()) {
 			plots.get(id).getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
-			OCmsg.TELEPORT_IN_PROGRESS.send(pc, plots.get(id).getPlotId() + "");
+			OCmsg.TELEPORT_IN_PROGRESS.send(pc, plots.get(id).getId() + "");
 		}else
 			OCmsg.INVALID_PLOT_ID.send(pc);
 	}
@@ -264,7 +264,7 @@ public class CmdsLogic {
 		Collections.sort(plots, new Comparator<Plot>() {
 			@Override
 			public int compare(Plot o1, Plot o2) {
-				return o1.getPlotId().getId() - o2.getPlotId().getId(); 
+				return o1.getId().getId() - o2.getId().getId(); 
 			}
 		});
 		
@@ -298,26 +298,26 @@ public class CmdsLogic {
 			return;
 		}
 		 
-		if (!plotsResetVerifCode.containsKey(plot.getPlotId())) {
+		if (!plotsResetVerifCode.containsKey(plot.getId())) {
 			String check = "";
 			for (int i = 0 ; i < 6 ; i++) check += (char) (plugin.random.nextInt(26) + 'a');
 			
-			plotsResetVerifCode.put(plot.getPlotId(), check);
+			plotsResetVerifCode.put(plot.getId(), check);
 			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + check);
 			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dVeuillez saisir la commande /oca resetplot %s %s pour réinitialiser la parcelle %s (%s). \n§cAttention cette action est irréversible !!", plot.getPlotId(), check, plot.getPlotId(), plot.getMembers().getOwner().getName());
 			
-			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getPlotId()), 600);
+			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getId()), 600);
 			
 		} else if (code == null) {
-			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getPlotId()));
+			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getId()));
 			
 		}else {		
-			if (!plotsResetVerifCode.containsKey(plot.getPlotId()) || !plotsResetVerifCode.get(plot.getPlotId()).equals(code)) {
-				OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getPlotId()));
+			if (!plotsResetVerifCode.containsKey(plot.getId()) || !plotsResetVerifCode.get(plot.getId()).equals(code)) {
+				OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getId()));
 				return;
 			}
 
-			plotsResetVerifCode.remove(plot.getPlotId());
+			plotsResetVerifCode.remove(plot.getId());
 			OCmsg.PLOT_RESET_START.send(pc, plot);
 			plugin.getWEManager().resetPlot(pc, plot);
 			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());

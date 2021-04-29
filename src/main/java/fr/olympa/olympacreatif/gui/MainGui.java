@@ -108,11 +108,11 @@ public class MainGui extends IGui {
 						for (int i = 1 ; i <= plugin.getDataManager().getPlotsCount() ; i++)
 							set.add(i);
 
-						set.removeAll(p.getPlots(false).stream().map(pl -> pl.getPlotId().getId()).collect(Collectors.toList()));
+						set.removeAll(p.getPlots(false).stream().map(pl -> pl.getId().getId()).collect(Collectors.toList()));
 						
 						set.removeAll(plugin.getPlotsManager().getPlots().stream()
 								.filter(pl -> pl.getMembers().getOwner().getName().equals("Spawn"))
-								.map(pl -> pl.getPlotId().getId()).collect(Collectors.toList()));
+								.map(pl -> pl.getId().getId()).collect(Collectors.toList()));
 
 						if (set.size() == 0)
 							return;
@@ -189,7 +189,7 @@ public class MainGui extends IGui {
 		if (plot == null)
 			return new MainGui(OlympaCreatifMain.getInstance(), p, null, "Menu", null);
 		else
-			return new MainGui(OlympaCreatifMain.getInstance(), p, plot, "Menu >> " + plot.getPlotId(), null);
+			return new MainGui(OlympaCreatifMain.getInstance(), p, plot, "Menu >> " + plot.getId(), null);
 	}
 	
 	public static MainGui getMainGuiForStaff(OlympaPlayerCreatif p, OlympaPlayerCreatif staffPlayer) {

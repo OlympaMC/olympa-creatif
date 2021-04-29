@@ -32,6 +32,7 @@ import fr.olympa.olympacreatif.commandblocks.CbCommandListener.CbCmdResult;
 import fr.olympa.olympacreatif.gui.ShopGui.MarketItemData;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
@@ -171,7 +172,10 @@ public class OCmsg {
 			.put("%plot", (pc, plot) -> plot != null ? plot.toString() : "none")
 			
 			.build();
-
+	
+	private static final Map<String, Function<PlotId, String>> plotIdPlaceHolders = ImmutableMap.<String, Function<PlotId,String>>builder()
+			.put("%plot", plot -> plot != null ? plot.toString() : "none")
+			.build();
 	
 	private static final Map<String, Function<StopLagDetect, String>> stoplagPlaceHolders = ImmutableMap.<String, Function<StopLagDetect,String>>builder()
 			.put("%stopLagType", s -> s.toString())
@@ -248,6 +252,10 @@ public class OCmsg {
 			else if (o instanceof MarketItemData)
 				for (Entry<String, Function<MarketItemData, String>> e : shopPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((MarketItemData) o));
+
+			else if (o instanceof PlotId)
+				for (Entry<String, Function<PlotId, String>> e : plotIdPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((PlotId) o));
 
 			else if (o instanceof Plot && pc != null) {
 				plotAlreadyAdded = true;

@@ -157,10 +157,10 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 	
 	private CuboidRegion getPlotRegion(Plot plot) {
 
-    	BlockVector3 v1 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX(), 0, 
-    			plot.getPlotId().getLocation().getBlockZ());
-    	BlockVector3 v2 = BlockVector3.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 256, 
-    			plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
+    	BlockVector3 v1 = BlockVector3.at(plot.getId().getLocation().getBlockX(), 0, 
+    			plot.getId().getLocation().getBlockZ());
+    	BlockVector3 v2 = BlockVector3.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 256, 
+    			plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
     	
     	return new CuboidRegion(v1, v2);
 	}
@@ -176,9 +176,9 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		@Override
 		public void calculateRegions() {			
 			for (Plot plot : plots)
-				add(BlockVector2.at(plot.getPlotId().getLocation().getBlockX(), plot.getPlotId().getLocation().getBlockZ()), 
-						BlockVector2.at(plot.getPlotId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 
-						plot.getPlotId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1));
+				add(BlockVector2.at(plot.getId().getLocation().getBlockX(), plot.getId().getLocation().getBlockZ()), 
+						BlockVector2.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 
+						plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1));
 		}
 	}
 }

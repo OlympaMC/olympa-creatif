@@ -263,7 +263,7 @@ public class Plot {
 				plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getZ() , false);
 	}
 
-	public PlotId getPlotId() {
+	public PlotId getId() {
 		return plotId;
 	}
 	
@@ -278,7 +278,7 @@ public class Plot {
 		if (PermissionsList.USE_COLORED_TEXT.hasPermission(pc))
 			msg = ChatColor.translateAlternateColorCodes('&', msg);
 		
-		msg = "§7[Parcelle " + getPlotId() + "] §r" + 
+		msg = "§7[Parcelle " + getId() + "] §r" + 
 		pc.getGroupNameColored() + " " + pc.getPlayer().getName() + " §r§7: " + msg;
 		
 		for (Player p : getPlayers())
@@ -398,6 +398,6 @@ public class Plot {
 	
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Plot && ((Plot)o).getPlotId().equals(plotId);
+		return o instanceof Plot && ((Plot)o).getId().equals(plotId);
 	}
 }

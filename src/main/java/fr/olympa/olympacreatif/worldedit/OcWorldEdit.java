@@ -238,7 +238,7 @@ public class OcWorldEdit extends AWorldEditManager {
 				        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
 				    		//plugin.getPerksManager().getKitsManager().getKitOf(BukkitAdapter.adapt(block.getBlockType()));
 				        	return ComponentCreatif.WORLDEDIT.isActivated() && 
-				        			plot.getPlotId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
+				        			plot.getId().isInPlot(pos.getBlockX(), pos.getBlockZ()) ? super.setBlock(pos, block) : false;
 				        }
 				    });		
 			}

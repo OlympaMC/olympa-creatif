@@ -37,7 +37,7 @@ public class PlayerPlotsGui extends IGui {
 			
 			if (mat != null) {
 				i++;
-				setItem(i, ItemUtils.item(mat, "§6 Parcelle " + plot.getPlotId().getId(), 
+				setItem(i, ItemUtils.item(mat, "§6 Parcelle " + plot.getId().getId(), 
 						"§eRang : " + plot.getMembers().getPlayerRank(p).getRankName(), 
 						"§7Clic gauche : téléportation vers le plot", 
 						isOpenByStaff ? 
@@ -49,10 +49,10 @@ public class PlayerPlotsGui extends IGui {
 								p.getPlayer().closeInventory();
 								if (c == ClickType.LEFT) {
 									if (isOpenByStaff) {
-										staffPlayer.getPlayer().teleport(playerPlots.get(s).getPlotId().getLocation());
+										staffPlayer.getPlayer().teleport(playerPlots.get(s).getId().getLocation());
 										OCmsg.TELEPORT_IN_PROGRESS.send(staffPlayer, playerPlots.get(s).toString());
 									}else {
-										p.getPlayer().teleport(playerPlots.get(s).getPlotId().getLocation());
+										p.getPlayer().teleport(playerPlots.get(s).getId().getLocation());
 										OCmsg.TELEPORT_IN_PROGRESS.send(p, playerPlots.get(s).toString());	
 									}	
 								}else if (c == ClickType.RIGHT) {

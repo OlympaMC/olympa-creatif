@@ -51,23 +51,23 @@ public abstract class AWorldEditManager {
 	//private static Set<PlotId> resetingPlots = new HashSet<PlotId>();
 	
 	public final boolean isReseting(Plot plot) {
-		return resetingPlots.containsKey(plot.getPlotId());
+		return resetingPlots.containsKey(plot.getId());
 	}
 	
 	public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {
 		if (isReseting(plot))
 			return false;
 		
-		resetingPlots.put(plot.getPlotId(), 0);
-		plugin.getTask().runTaskLater(() -> resetingPlots.remove(plot.getPlotId()), 200);
+		resetingPlots.put(plot.getId(), 0);
+		plugin.getTask().runTaskLater(() -> resetingPlots.remove(plot.getId()), 200);
 		
 		Arrays.asList(plot.getEntities().toArray(new Entity[plot.getEntities().size()])).forEach(e -> plot.removeEntityInPlot(e, true));
 		
-		org.bukkit.Chunk originChunk = plot.getPlotId().getLocation().getChunk();
+		org.bukkit.Chunk originChunk = plot.getId().getLocation().getChunk();
 		
 		for (int x = originChunk.getX() ; x < originChunk.getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
 			for (int z = originChunk.getZ() ; z < originChunk.getZ() + OCparam.PLOT_SIZE.get() / 16 ; z++) {
-				resetingPlots.put(plot.getPlotId(), resetingPlots.get(plot.getPlotId()) + 1);
+				resetingPlots.put(plot.getId(), resetingPlots.get(plot.getId()) + 1);
 				
 				plugin.getWorldManager().getWorld()
 				.getChunkAtAsync(new Location(plugin.getWorldManager().getWorld(), x * 16, 0, z * 16),
@@ -97,7 +97,7 @@ public abstract class AWorldEditManager {
 			else
 				resetBlocks(requester, plot, ch);	
 		}catch(Exception ex) {
-			resetingPlots.remove(plot.getPlotId());
+			resetingPlots.remove(plot.getId());
 			plugin.getLogger().warning("Error while trying to reset plot " + plot + " on chunk " + ch.getPos().x + "," + ch.getPos().z);
 			OCmsg.PLOT_RESET_ERROR.send(requester, plot);
 		}
@@ -147,9 +147,9 @@ public abstract class AWorldEditManager {
 				ch.markDirty();
 				ch.mustNotSave = false;
 				
-				resetingPlots.put(plot.getPlotId(), resetingPlots.get(plot.getPlotId()) - 1);
-				if (resetingPlots.get(plot.getPlotId()) <= 0) {
-					resetingPlots.remove(plot.getPlotId());
+				resetingPlots.put(plot.getId(), resetingPlots.get(plot.getId()) - 1);
+				if (resetingPlots.get(plot.getId()) <= 0) {
+					resetingPlots.remove(plot.getId());
 					OCmsg.PLOT_RESET_END.send(requester, plot);
 				}
 				

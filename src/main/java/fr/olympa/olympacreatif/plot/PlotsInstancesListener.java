@@ -276,7 +276,7 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (e.getBlocks().stream().anyMatch(block -> !plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation()))))
+		if (e.getBlocks().stream().anyMatch(block -> !plot.getId().equals(PlotId.fromLoc(plugin, block.getLocation()))))
 			e.setCancelled(true);
 		
 		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
@@ -294,8 +294,8 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (e.getBlocks().stream().anyMatch(block -> (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation())) || 
-				!plot.getPlotId().isInPlot(block.getLocation(), 1)) ))
+		if (e.getBlocks().stream().anyMatch(block -> (!plot.getId().equals(PlotId.fromLoc(plugin, block.getLocation())) || 
+				!plot.getId().isInPlot(block.getLocation(), 1)) ))
 			e.setCancelled(true);
 		
 		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
@@ -333,7 +333,7 @@ public class PlotsInstancesListener implements Listener{
 	public void onGrowBlock(BlockGrowEvent e) {
 		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		
-		if (plot == null || !plot.getPlotId().isInPlot(e.getBlock().getLocation()))
+		if (plot == null || !plot.getId().isInPlot(e.getBlock().getLocation()))
 			e.setCancelled(true);
 	}
 	
@@ -341,7 +341,7 @@ public class PlotsInstancesListener implements Listener{
 	public void onDispense(BlockDispenseEvent e) {
 		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		
-		if (plot == null || !plot.getPlotId().isInPlot(e.getBlock().getLocation(), 1))
+		if (plot == null || !plot.getId().isInPlot(e.getBlock().getLocation(), 1))
 			e.setCancelled(true);
 	}
 
@@ -706,7 +706,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 		
-		plugin.getPlotsManager().setBirthPlot(plot.getPlotId(), e.getEntity());
+		plugin.getPlotsManager().setBirthPlot(plot.getId(), e.getEntity());
 		
 		plot.addEntityInPlot(e.getEntity());
 		plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
@@ -737,7 +737,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		
-		if (plot == null || !plot.getPlotId().isInPlot(e.getLoc()))
+		if (plot == null || !plot.getId().isInPlot(e.getLoc()))
 			e.setCancelled(true);
 	}
 

@@ -256,7 +256,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		Collections.sort(list, new Comparator<Plot>() {
 			@Override
 			public int compare(Plot p1, Plot p2) {
-				return p1.getPlotId().getId() - p2.getPlotId().getId();
+				return p1.getId().getId() - p2.getId().getId();
 			}
 		});
 		

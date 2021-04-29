@@ -90,7 +90,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		 
 		if (xF != null && yF != null && zF != null) {
 			Location loc = new Location(plugin.getWorldManager().getWorld(), xF, yF, zF); 
-			if (plot.getPlotId().isInPlot(loc))
+			if (plot.getId().isInPlot(loc))
 				return loc;
 			else
 				return null;

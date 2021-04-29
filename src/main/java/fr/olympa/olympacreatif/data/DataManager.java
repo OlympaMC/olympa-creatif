@@ -370,7 +370,7 @@ public class DataManager implements Listener {
 		}
 
 		try {
-			int id = plot.getPlotId().getId();
+			int id = plot.getId().getId();
 
 			//update plot datas
 			PreparedStatement updPlotParams = osUpdatePlotDatas.createStatement();
@@ -447,7 +447,7 @@ public class DataManager implements Listener {
 			PreparedStatement ps = osUpdatePlotSchem.createStatement();
 
 			ps.setInt(1, serverIndex);
-			ps.setInt(2, plot.getPlotId().getId());
+			ps.setInt(2, plot.getId().getId());
 			ps.setLong(3, p.getId());
 			ps.setString(4, schem.getName());
 			ps.setBlob(5, new FileInputStream(schem));
