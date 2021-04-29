@@ -16,6 +16,7 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -489,7 +490,7 @@ public class PlotsInstancesListener implements Listener{
 
 		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		
-		if (!PlotPerm.BUILD.has(plot, pc)) {
+		if (!PlotPerm.BUILD.has(plot, pc) && !(e.getRightClicked() instanceof Vehicle)) {
 			e.setCancelled(true);
 			return;
 		}
