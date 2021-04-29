@@ -238,7 +238,7 @@ public class CmdsLogic {
 		}
 	}
 
-	public void visitPlotFrom(OlympaPlayerCreatif pc, Player target, int id) {
+	public void visitPlotOf(OlympaPlayerCreatif pc, Player target, int id) {
 		List<Plot> plots = ((OlympaPlayerCreatif)AccountProvider.get(target.getUniqueId())).getPlots(true);
 		
 		id -= 1;

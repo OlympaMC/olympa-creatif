@@ -109,7 +109,7 @@ public class Plot {
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
-				executeEntryActions(p, true);
+				executeEntryActions(p);
 		
 		loadInitialEntitiesOnChunks();
 		
@@ -297,7 +297,7 @@ public class Plot {
 	 * @param teleportPlayer 
 	 * @return true si le joueur est autorisé à entrer, false sinon
 	 */
-	public boolean executeEntryActions(Player p, boolean tpToPlotSpawn) {
+	public boolean executeEntryActions(Player p) {
 		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		
@@ -305,8 +305,8 @@ public class Plot {
 			if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
 				OCmsg.PLOT_CANT_ENTER_BANNED.send(pc, this);
 				return false;
-			}
-			else if (!parameters.getParameter(PlotParamType.ALLOW_VISITORS) && members.getPlayerRank(p) == PlotRank.VISITOR) {
+				
+			}else if (!parameters.getParameter(PlotParamType.ALLOW_VISITORS) && members.getPlayerRank(p) == PlotRank.VISITOR) {
 				OCmsg.PLOT_CANT_ENTER_CLOSED.send(pc, this);
 				return false;
 			}
@@ -337,7 +337,7 @@ public class Plot {
 		
 		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {
 			//tp au spawn de la zone
-			if (tpToPlotSpawn && parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
+			if (parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
 				parameters.getParameter(PlotParamType.SPAWN_LOC).teleport(p);
 				OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc);
 			}

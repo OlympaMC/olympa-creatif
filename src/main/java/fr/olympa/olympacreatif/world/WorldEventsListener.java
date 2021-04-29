@@ -240,7 +240,7 @@ public class WorldEventsListener implements Listener{
 		
 		Plot plot = plugin.getPlotsManager().getPlot(OCparam.SPAWN_LOC.get().toLoc());
 		if (plot != null)
-			plot.executeEntryActions(e.getPlayer(), false);
+			plot.executeEntryActions(e.getPlayer());
 
 		OCparam.SPAWN_LOC.get().teleport(e.getPlayer());
 		
