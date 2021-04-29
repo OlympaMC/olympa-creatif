@@ -504,7 +504,7 @@ public class PlotsInstancesListener implements Listener{
 	//                       MOVE EVENTS                      //
 	////////////////////////////////////////////////////////////
 	
-	@EventHandler(priority = EventPriority.LOWEST) //modifie la destination téléport si joueur banni du plot
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true) //modifie la destination téléport si joueur banni du plot
 	public void onTeleportEvent(PlayerTeleportEvent e) {
 		
 		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
@@ -512,22 +512,20 @@ public class PlotsInstancesListener implements Listener{
 		
 		//((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).setCurrentPlot(plotTo);
 		
-		if (plotFrom != null && plotFrom.equals(plotTo))
+		if (plotFrom == plotTo)
 			return;
 		
-		
-
-		//OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
-
 		if (plotTo != null) {
-			if (!plotTo.executeEntryActions(e.getPlayer()))
+			if (plotTo.canEnter(e.getPlayer())) {
+				if (plotFrom != null)
+					plotFrom.executeExitActions(e.getPlayer());
+				
+				plotTo.executeEntryActions(e.getPlayer());	
+			}else
 				e.setCancelled(true);
-			else if (plotFrom != null) 
-				plotFrom.executeExitActions(e.getPlayer());
 			
 		}else if (plotFrom != null) 
 			plotFrom.executeExitActions(e.getPlayer());
-		
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST) //actions à effectuer lors de la sortie/entrée d'un joueur
@@ -544,24 +542,18 @@ public class PlotsInstancesListener implements Listener{
 		//sortie de l'évent si pas de changement de plot
 		if (plotTo == plotFrom)
 			return;
-
-		//Bukkit.broadcastMessage("DETECTED plot SWITCH FOR" + e.getPlayer().getName() + " : " + plotFrom + " TO " + plotTo);
-
-		//OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		
-		//expulse les joueurs bannis & actions d'entrée de plot
-		if (plotTo != null) 
-			if (!plotTo.executeEntryActions(e.getPlayer())) 
+		if (plotTo != null) {
+			if (plotTo.canEnter(e.getPlayer())) {
+				if (plotFrom != null)
+					plotFrom.executeExitActions(e.getPlayer());
+				
+				plotTo.executeEntryActions(e.getPlayer());	
+			}else
 				e.setCancelled(true);
-		
-		//actions de sortie de plot
-		if (plotFrom != null) 
-			plotFrom.executeExitActions(e.getPlayer());
-		
-				//plotTo.teleportOut(e.getPlayer());
-			/*else if (plotTo.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC))
-				e.setTo(plotTo.getParameters().getParameter(PlotParamType.SPAWN_LOC).toLoc());*/
 			
+		}else if (plotFrom != null) 
+			plotFrom.executeExitActions(e.getPlayer());
 	}
 
 	////////////////////////////////////////////////////////////

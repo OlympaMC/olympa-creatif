@@ -290,6 +290,24 @@ public class Plot {
 		return plotId.toString();
 	}
 	
+	public boolean canEnter(Player p ) {
+		return canEnter((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
+	}
+	
+	public boolean canEnter(OlympaPlayerCreatif pc) {
+		if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
+			if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
+				OCmsg.PLOT_CANT_ENTER_BANNED.send(pc, this);
+				return false;
+				
+			}else if (!parameters.getParameter(PlotParamType.ALLOW_VISITORS) && members.getPlayerRank(pc) == PlotRank.VISITOR) {
+				OCmsg.PLOT_CANT_ENTER_CLOSED.send(pc, this);
+				return false;
+			}
+		
+		return true;
+	}
+
 	
 	/**
 	 * Execute entry actions for this player for the plot
@@ -297,20 +315,21 @@ public class Plot {
 	 * @param teleportPlayer 
 	 * @return true si le joueur est autorisé à entrer, false sinon
 	 */
-	public boolean executeEntryActions(Player p) {
+	public void executeEntryActions(Player p) {
+		executeEntryActions((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
+	}
 		
-		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+	/**
+	 * Execute entry actions for this player for the plot
+	 * @param p concerned player
+	 * @param teleportPlayer 
+	 * @return true si le joueur est autorisé à entrer, false sinon
+	 */
+	public void executeEntryActions(OlympaPlayerCreatif pc) {
+		if (!canEnter(pc))
+			return;
 		
-		if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
-			if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
-				OCmsg.PLOT_CANT_ENTER_BANNED.send(pc, this);
-				return false;
-				
-			}else if (!parameters.getParameter(PlotParamType.ALLOW_VISITORS) && members.getPlayerRank(p) == PlotRank.VISITOR) {
-				OCmsg.PLOT_CANT_ENTER_CLOSED.send(pc, this);
-				return false;
-			}
-
+		Player p = pc.getPlayer();
 		pc.setCurrentPlot(this);
 		
 		//ajoute le joueur aux joueurs du plot s'il n'a pas la perm de bypass les commandes vanilla
@@ -361,8 +380,6 @@ public class Plot {
 		//reset fly speed if needed
 		if (!PlotPerm.DEFINE_OWN_FLY_SPEED.has(this, pc) && getParameters().getParameter(PlotParamType.RESET_VISITOR_FLY_SPEED))
 			pc.getPlayer().setFlySpeed(0.1f);
-		
-		return true;
 	}
 
 	/**
