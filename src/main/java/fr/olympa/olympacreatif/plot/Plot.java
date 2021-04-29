@@ -109,7 +109,10 @@ public class Plot {
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
-				executeEntryActions(p);
+				if (canEnter(p))
+					executeEntryActions(p);
+				else
+					teleportOut(p);
 		
 		loadInitialEntitiesOnChunks();
 		
