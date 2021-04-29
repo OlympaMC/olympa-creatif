@@ -137,7 +137,7 @@ public abstract class NBTcontrollerUtil {
 					//si le tag n'est ni un compound ni une liste, vérification
 					if (!isValueValid(params, tag.get(key)))
 						tag.remove(key);
-					else if (tag.get(key) instanceof NBTTagString && !(tag.getString(key).startsWith("\"") && tag.getString(key).endsWith("\"")))
+					else if (key.equals("CustomName") && tag.get(key) instanceof NBTTagString && !(tag.getString(key).startsWith("\"") && tag.getString(key).endsWith("\"")))
 						tag.setString(key, "\"" + tag.getString(key) + "\"");
 				}				
 			}

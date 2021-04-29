@@ -250,7 +250,7 @@ public class Plot {
 	}
 	
 	public Location getOutLoc() {
-		Location loc = plotId.getLocation().add(-3, 0, -3);
+		Location loc = plotId.getLocation().clone().subtract(WorldManager.roadSize / 2, 0, WorldManager.roadSize / 2);
 		loc.setY(WorldManager.worldLevel + 1);
 		return loc;
 	}
