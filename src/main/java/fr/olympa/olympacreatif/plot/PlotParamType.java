@@ -101,6 +101,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.JUNGLE_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.SPRUCE_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.WARPED_FENCE_GATE);
+		blocksWithInteractionsList.add(Material.CRIMSON_FENCE);
 
 		blocksWithInteractionsList.add(Material.OAK_DOOR);
 		blocksWithInteractionsList.add(Material.ACACIA_DOOR);
@@ -109,6 +110,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.JUNGLE_DOOR);
 		blocksWithInteractionsList.add(Material.SPRUCE_DOOR);
 		blocksWithInteractionsList.add(Material.WARPED_DOOR);
+		blocksWithInteractionsList.add(Material.CRIMSON_DOOR);
 
 		blocksWithInteractionsList.add(Material.OAK_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.ACACIA_TRAPDOOR);
@@ -117,6 +119,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.JUNGLE_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.SPRUCE_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.WARPED_TRAPDOOR);
+		blocksWithInteractionsList.add(Material.CRIMSON_DOOR);
 
 		blocksWithInteractionsList.add(Material.OAK_BUTTON);
 		blocksWithInteractionsList.add(Material.STONE_BUTTON);
@@ -126,6 +129,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.JUNGLE_BUTTON);
 		blocksWithInteractionsList.add(Material.SPRUCE_BUTTON);
 		blocksWithInteractionsList.add(Material.WARPED_BUTTON);
+		blocksWithInteractionsList.add(Material.CRIMSON_BUTTON);
 
 		blocksWithInteractionsList.add(Material.LEVER);
 		blocksWithInteractionsList.add(Material.REPEATER);

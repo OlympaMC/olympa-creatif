@@ -105,7 +105,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new TpfCommand(this).register();
 		new BackCommand(this, null).register();
 		
-		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA), plugin);
+		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA, 0), plugin);
 		
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);
