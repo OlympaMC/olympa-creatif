@@ -504,7 +504,7 @@ public class PlotsInstancesListener implements Listener{
 	//                       MOVE EVENTS                      //
 	////////////////////////////////////////////////////////////
 	
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true) //modifie la destination téléport si joueur banni du plot
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true) //modifie la destination téléport si joueur banni du plot
 	public void onTeleportEvent(PlayerTeleportEvent e) {
 		
 		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());

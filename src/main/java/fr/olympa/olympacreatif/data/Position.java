@@ -48,6 +48,7 @@ public class Position {
 		return z;
 	}
 	
+	
 	public void teleport(Player p) {
 		p.teleport(toLoc());
 	}

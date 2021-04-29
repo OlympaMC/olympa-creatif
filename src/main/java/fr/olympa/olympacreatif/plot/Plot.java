@@ -357,12 +357,14 @@ public class Plot {
 				p.removePotionEffect(effect.getType());
 		}
 		
-		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {
+		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc))
 			//tp au spawn de la zone
 			if (parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-				parameters.getParameter(PlotParamType.SPAWN_LOC).teleport(p);
-				OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc);
-			}
+				plugin.getTask().runTaskLater(() -> {
+					parameters.getParameter(PlotParamType.SPAWN_LOC).teleport(p);
+					OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc);
+				}, 1);
+			
 			
 			//définition du gamemode
 			p.setGameMode(parameters.getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
