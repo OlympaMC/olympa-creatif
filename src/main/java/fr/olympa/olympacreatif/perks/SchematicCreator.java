@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -22,11 +25,13 @@ import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class SchematicCreator {
 
 	  private OlympaCreatifMain plugin;
+	  private Set<PlotId> resetongPlots = new HashSet<PlotId>();
 	  
 	public SchematicCreator(OlympaCreatifMain plugin) {
 	    this.plugin = plugin;
@@ -36,7 +41,9 @@ public class SchematicCreator {
 	    if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 	    	OCmsg.WE_DISABLED.send(p);
 	    	return;
-	    }
+	    }else if (resetongPlots.contains(plot.getPlotId()))
+	    	return;
+	    
 	    	
 	    plugin.getTask().runTaskAsynchronously(() -> {
 			
@@ -77,6 +84,7 @@ public class SchematicCreator {
 			
 			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
 			OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.send(p, plot);
+			resetongPlots.remove(plot.getPlotId());
 	    });
 
 		OCmsg.WE_START_GENERATING_PLOT_SCHEM.send(p, plot);

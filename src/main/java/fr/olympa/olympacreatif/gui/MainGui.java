@@ -1,6 +1,13 @@
 package fr.olympa.olympacreatif.gui;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -96,9 +103,29 @@ public class MainGui extends IGui {
 		setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"), 
 				(it, c, s) -> {
 					if (plugin.getPlotsManager().getPlots().size() > 0) {
-						Plot plotR = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
-						plotR.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(p.getPlayer());
-						OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(p);
+						List<Integer> set = new ArrayList<Integer>();
+						
+						for (int i = 1 ; i <= plugin.getDataManager().getPlotsCount() ; i++)
+							set.add(i);
+
+						set.removeAll(p.getPlots(false).stream().map(pl -> pl.getPlotId().getId()).collect(Collectors.toList()));
+						
+						set.removeAll(plugin.getPlotsManager().getPlots().stream()
+								.filter(pl -> pl.getMembers().getOwner().getName().equals("Spawn"))
+								.map(pl -> pl.getPlotId().getId()).collect(Collectors.toList()));
+
+						if (set.size() == 0)
+							return;
+						
+						PlotId id = PlotId.fromId(plugin, set.get(ThreadLocalRandom.current().nextInt(set.size())));
+						Plot plotR = plugin.getPlotsManager().getPlot(id);
+						
+						if (plotR != null)
+							plotR.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(p.getPlayer());
+						else
+							p.getPlayer().teleport(id.getLocation());
+						
+						OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(p, id);
 					}
 				});
 

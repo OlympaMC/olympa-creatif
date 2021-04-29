@@ -81,8 +81,11 @@ public class OcoCmd extends AbstractCmd {
 		
 		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
 		
-		if (plot == null || !PlotPerm.EXPORT_PLOT.has((OlympaPlayerCreatif) getOlympaPlayer())) {
+		if (plot == null) {
 			OCmsg.WE_PLOT_EXPORT_FAILED.send(getPlayer(), plot);
+			return;
+		}else if (!PlotPerm.EXPORT_PLOT.has((OlympaPlayerCreatif) getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.EXPORT_PLOT);
 			return;
 		}
 
