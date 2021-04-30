@@ -139,7 +139,7 @@ public class CbCommandListener implements Listener {
 	
 	//exécute la commande et si le CommandSender est un commandblock, mise à jour des ses NBTTags
 	private void executeCommandBlockCommand(CbCommand cmd, CommandSender sender) {
-		
+		boolean isCommandBlock = sender instanceof CraftBlockCommandSender;
 		OCmsg message = OCmsg.CB_RESULT_FAILED;
 		
 		//Bukkit.broadcastMessage(cmd.getType().toString());
@@ -149,6 +149,8 @@ public class CbCommandListener implements Listener {
 		if (cmd.getPlot().getCbData().getCommandsTicketsLeft() < neededCmdTickets) {
 			//si le plot n'a plus assez de commandes restantes, cancel exécution
 			OCmsg.CB_NO_COMMANDS_LEFT.send(sender);
+			if (isCommandBlock)
+				cmd.getPlot().getPlayers().forEach(p -> OCmsg.CB_NO_COMMANDS_LEFT.send(p));
 			return;
 		}
 		
@@ -163,7 +165,7 @@ public class CbCommandListener implements Listener {
 		message.send(sender, new CbCmdResult(cmd.getType(), result));
 		
 		//mise à jour NBTTags command block
-		if (sender instanceof CraftBlockCommandSender)
+		if (isCommandBlock)
 			setCbTags(sender, result);
 	}
 	

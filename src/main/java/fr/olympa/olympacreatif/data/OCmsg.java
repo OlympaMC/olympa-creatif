@@ -50,7 +50,7 @@ public class OCmsg {
 	private static final Map<Player, Set<OCmsg>> delayedMessages = new HashMap<Player, Set<OCmsg>>();
 	
     public static final OCmsg CB_INVALID_CMD = new OCmsg();
-    public static final OCmsg CB_NO_COMMANDS_LEFT = new OCmsg();
+    public static final OCmsg CB_NO_COMMANDS_LEFT = new OCmsg(5);
     public static final OCmsg CB_RESULT_FAILED = new OCmsg();
     public static final OCmsg CB_RESULT_SUCCESS = new OCmsg();
     public static final OCmsg INSUFFICIENT_PLOT_PERMISSION = new OCmsg(1);
@@ -64,9 +64,9 @@ public class OCmsg {
     public static final OCmsg PLAYER_TARGET_OFFLINE = new OCmsg();
     public static final OCmsg PLOT_ACCEPTED_INVITATION = new OCmsg();
     public static final OCmsg PLOT_BAN_PLAYER = new OCmsg();
-    public static final OCmsg PLOT_CANT_BUILD = new OCmsg();
+    public static final OCmsg PLOT_CANT_BUILD = new OCmsg(5);
     public static final OCmsg PLOT_CANT_ENTER_BANNED = new OCmsg(5);
-    public static final OCmsg PLOT_CANT_INTERRACT = new OCmsg(1);
+    public static final OCmsg PLOT_CANT_INTERRACT = new OCmsg(5);
     public static final OCmsg PLOT_CANT_INTERRACT_NULL_PLOT = new OCmsg(10);
     public static final OCmsg PLOT_CANT_PRINT_TNT = new OCmsg();
     public static final OCmsg PLOT_CANT_UNBAN_PLAYER = new OCmsg();

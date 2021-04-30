@@ -302,8 +302,6 @@ public class ShopGui extends IGui{
 			this.itemHolder = holder;
 			this.price = defaultPrice;
 			
-			this.isBuyableMoney = p.getGameMoney().has(defaultPrice);
-			
 			//Repère les objets non achetables (déjà achetés ou prérequis non validés)
 			if (toBuy instanceof OlympaGroup) {
 				if (p.getGroups().containsKey((OlympaGroup)toBuy)) {
@@ -352,6 +350,8 @@ public class ShopGui extends IGui{
 				if (toBuy == UpgradeType.CB_LEVEL && !p.hasKit(KitType.COMMANDBLOCK))
 					isBuyableRequirements = false;
 			}
+
+			this.isBuyableMoney = p.getGameMoney().has(price);
 
 			itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§ePrix : " + price);
 			
