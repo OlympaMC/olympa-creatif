@@ -44,9 +44,6 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class Plot {
-
-	private static boolean hasLoadedHolo1 = false;
-	private static boolean hasLoadedHolo2 = false;
 	
 	private OlympaCreatifMain plugin;
 	
@@ -110,7 +107,7 @@ public class Plot {
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
 				if (canEnter(p))
-					executeEntryActions(p);
+					executeEntryActions(p, null);
 				else
 					teleportOut(p);
 		
@@ -318,8 +315,8 @@ public class Plot {
 	 * @param teleportPlayer 
 	 * @return true si le joueur est autorisé à entrer, false sinon
 	 */
-	public void executeEntryActions(Player p) {
-		executeEntryActions((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
+	public void executeEntryActions(Player p, Location tpLoc) {
+		executeEntryActions((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()), tpLoc);
 	}
 		
 	/**
@@ -328,7 +325,7 @@ public class Plot {
 	 * @param teleportPlayer 
 	 * @return true si le joueur est autorisé à entrer, false sinon
 	 */
-	public void executeEntryActions(OlympaPlayerCreatif pc) {
+	public void executeEntryActions(OlympaPlayerCreatif pc, Location tpLoc) {
 		if (!canEnter(pc))
 			return;
 		
@@ -359,7 +356,7 @@ public class Plot {
 		
 		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc))
 			//tp au spawn de la zone
-			if (parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
+			if (parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC) && !parameters.getParameter(PlotParamType.SPAWN_LOC).toLoc().equals(tpLoc)) {
 				plugin.getTask().runTaskLater(() -> {
 					parameters.getParameter(PlotParamType.SPAWN_LOC).teleport(p);
 					OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc);

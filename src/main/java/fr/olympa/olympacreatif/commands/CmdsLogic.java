@@ -21,6 +21,7 @@ import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
+import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -51,7 +52,7 @@ public class CmdsLogic {
 			if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
 				
 				Plot plot = plugin.getPlotsManager().createNewPlot(pc);
-				pc.getPlayer().teleport(plot.getId().getLocation());
+				plot.getId().teleport(pc.getPlayer());
 
 				//TODO vérifier si le getCurrentPlot est bien MAJ
 				OCmsg.PLOT_NEW_CLAIM.send(pc);
@@ -225,18 +226,11 @@ public class CmdsLogic {
 	
 
 	public void visitPlot(OlympaPlayerCreatif pc, PlotId id) {
-		Plot plot = plugin.getPlotsManager().getPlot(id);
-		
 		if (id == null)
 			OCmsg.INVALID_PLOT_ID.send(pc.getPlayer());
-		
 		else {
-			if (plot == null)
-				pc.getPlayer().teleport(id.getLocation());
-			else
-				plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
-			
-			OCmsg.TELEPORT_IN_PROGRESS.send(pc, id.toString());
+			id.teleport(pc.getPlayer());
+			OCmsg.TELEPORT_IN_PROGRESS.send(pc, id);
 		}
 	}
 
@@ -249,20 +243,14 @@ public class CmdsLogic {
 		set.removeAll(pc.getPlots(false).stream().map(pl -> pl.getId().getId()).collect(Collectors.toList()));
 		
 		set.removeAll(plugin.getPlotsManager().getPlots().stream()
-				.filter(pl -> pl.getMembers().getOwner().getName().equals("Spawn"))
+				.filter(pl -> pl.getMembers().getOwner().getName().equals("Spawn") && pl.canEnter(pc))
 				.map(pl -> pl.getId().getId()).collect(Collectors.toList()));
 
 		if (set.size() == 0)
 			return;
 		
 		PlotId id = PlotId.fromId(plugin, set.get(ThreadLocalRandom.current().nextInt(set.size())));
-		Plot plotR = plugin.getPlotsManager().getPlot(id);
-		
-		if (plotR != null)
-			plotR.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
-		else
-			pc.getPlayer().teleport(id.getLocation());
-		
+		id.teleport(pc.getPlayer());
 		OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc, id);
 	}
 

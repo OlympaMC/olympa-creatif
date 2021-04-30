@@ -49,10 +49,10 @@ public class PlayerPlotsGui extends IGui {
 								p.getPlayer().closeInventory();
 								if (c == ClickType.LEFT) {
 									if (isOpenByStaff) {
-										staffPlayer.getPlayer().teleport(playerPlots.get(s).getId().getLocation());
+										playerPlots.get(s).getId().teleport(staffPlayer.getPlayer());
 										OCmsg.TELEPORT_IN_PROGRESS.send(staffPlayer, playerPlots.get(s).toString());
 									}else {
-										p.getPlayer().teleport(playerPlots.get(s).getId().getLocation());
+										playerPlots.get(s).getId().teleport(p.getPlayer());
 										OCmsg.TELEPORT_IN_PROGRESS.send(p, playerPlots.get(s).toString());	
 									}	
 								}else if (c == ClickType.RIGHT) {

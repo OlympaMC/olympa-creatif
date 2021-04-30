@@ -521,7 +521,7 @@ public class PlotsInstancesListener implements Listener{
 				if (plotFrom != null)
 					plotFrom.executeExitActions(e.getPlayer());
 				
-				plotTo.executeEntryActions(e.getPlayer());	
+				plotTo.executeEntryActions(e.getPlayer(), e.getTo());	
 			}else
 				e.setCancelled(true);
 			
@@ -549,7 +549,7 @@ public class PlotsInstancesListener implements Listener{
 				if (plotFrom != null)
 					plotFrom.executeExitActions(e.getPlayer());
 				
-				plotTo.executeEntryActions(e.getPlayer());	
+				plotTo.executeEntryActions(e.getPlayer(), e.getTo());	
 			}else
 				e.setCancelled(true);
 			

@@ -236,11 +236,12 @@ public class WorldEventsListener implements Listener{
 	public void onJoin(PlayerJoinEvent e) {
 		
 		//fait croire au client qu'il est op (pour ouvrir l'interface des commandblocks)
-		plugin.getCommandBlocksManager().setFakeOp(e.getPlayer(), true);
+		//plugin.getCommandBlocksManager().setFakeOp(e.getPlayer(), true);
+		e.getPlayer().sendOpLevel((byte) 4);
 		
 		Plot plot = plugin.getPlotsManager().getPlot(OCparam.SPAWN_LOC.get().toLoc());
 		if (plot != null)
-			plot.executeEntryActions(e.getPlayer());
+			plot.executeEntryActions(e.getPlayer(), e.getPlayer().getLocation());
 
 		OCparam.SPAWN_LOC.get().teleport(e.getPlayer());
 		
