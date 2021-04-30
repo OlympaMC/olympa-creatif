@@ -103,29 +103,7 @@ public class MainGui extends IGui {
 		setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"), 
 				(it, c, s) -> {
 					if (plugin.getPlotsManager().getPlots().size() > 0) {
-						List<Integer> set = new ArrayList<Integer>();
-						
-						for (int i = 1 ; i <= plugin.getDataManager().getPlotsCount() ; i++)
-							set.add(i);
-
-						set.removeAll(p.getPlots(false).stream().map(pl -> pl.getId().getId()).collect(Collectors.toList()));
-						
-						set.removeAll(plugin.getPlotsManager().getPlots().stream()
-								.filter(pl -> pl.getMembers().getOwner().getName().equals("Spawn"))
-								.map(pl -> pl.getId().getId()).collect(Collectors.toList()));
-
-						if (set.size() == 0)
-							return;
-						
-						PlotId id = PlotId.fromId(plugin, set.get(ThreadLocalRandom.current().nextInt(set.size())));
-						Plot plotR = plugin.getPlotsManager().getPlot(id);
-						
-						if (plotR != null)
-							plotR.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(p.getPlayer());
-						else
-							p.getPlayer().teleport(id.getLocation());
-						
-						OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(p, id);
+						plugin.getCmdLogic().visitPlotRandom(getPlayer());
 					}
 				});
 

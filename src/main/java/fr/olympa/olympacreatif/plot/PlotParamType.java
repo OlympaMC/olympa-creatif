@@ -138,6 +138,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.CHEST);
 		blocksWithInteractionsList.add(Material.TRAPPED_CHEST);
 		blocksWithInteractionsList.add(Material.ENDER_CHEST);
+		blocksWithInteractionsList.add(Material.BARREL);
 		blocksWithInteractionsList.add(Material.DISPENSER);
 		blocksWithInteractionsList.add(Material.DROPPER);
 		blocksWithInteractionsList.add(Material.HOPPER);
@@ -151,9 +152,12 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.CARTOGRAPHY_TABLE);
 		blocksWithInteractionsList.add(Material.SMOKER);
 		blocksWithInteractionsList.add(Material.BLAST_FURNACE);
-		blocksWithInteractionsList.add(Material.BARREL);
 		blocksWithInteractionsList.add(Material.LECTERN);
 		blocksWithInteractionsList.add(Material.BELL);
+		//blocksWithInteractionsList.add(Material.LOOM);
+		//blocksWithInteractionsList.add(Material.COMPOSTER);
+		
+		//blocksWithInteractionsList.add(Material.STONECUTTER);
 		
 		
 		return blocksWithInteractionsList;

@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -236,6 +238,32 @@ public class CmdsLogic {
 			
 			OCmsg.TELEPORT_IN_PROGRESS.send(pc, id.toString());
 		}
+	}
+
+	public void visitPlotRandom(OlympaPlayerCreatif pc) {
+		List<Integer> set = new ArrayList<Integer>();
+		
+		for (int i = 1 ; i <= plugin.getDataManager().getPlotsCount() ; i++)
+			set.add(i);
+
+		set.removeAll(pc.getPlots(false).stream().map(pl -> pl.getId().getId()).collect(Collectors.toList()));
+		
+		set.removeAll(plugin.getPlotsManager().getPlots().stream()
+				.filter(pl -> pl.getMembers().getOwner().getName().equals("Spawn"))
+				.map(pl -> pl.getId().getId()).collect(Collectors.toList()));
+
+		if (set.size() == 0)
+			return;
+		
+		PlotId id = PlotId.fromId(plugin, set.get(ThreadLocalRandom.current().nextInt(set.size())));
+		Plot plotR = plugin.getPlotsManager().getPlot(id);
+		
+		if (plotR != null)
+			plotR.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
+		else
+			pc.getPlayer().teleport(id.getLocation());
+		
+		OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc, id);
 	}
 
 	public void visitPlotOf(OlympaPlayerCreatif pc, Player target, int id) {

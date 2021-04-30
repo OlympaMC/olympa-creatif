@@ -105,6 +105,12 @@ public class OcCmd extends AbstractCmd {
 		else
 			plugin.getCmdLogic().visitPlotOf(getOlympaPlayer(), cmd.getArgument(0), 1);
 	}
+	
+	
+	@Cmd(player = true, syntax = "Visiter une parcelle aléatoire")
+	public void visitrandom(CommandContext cmd) {
+		plugin.getCmdLogic().visitPlotRandom(getOlympaPlayer());
+	}
 
 	
 	@Cmd(player = true, syntax = "Afficher la liste de vos parcelles")
