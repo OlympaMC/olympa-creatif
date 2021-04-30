@@ -695,12 +695,14 @@ public class PlotsInstancesListener implements Listener{
 
 		//Bukkit.broadcastMessage("add entity : " + e.getEntity());
 		
-		if (!CmdSummon.allowedEntities.contains(e.getEntityType())) {
+		PlotId id = PlotId.fromLoc(plugin, e.getEntity().getLocation());
+		
+		if (!CmdSummon.allowedEntities.contains(e.getEntityType()) || id == null) {
 			e.getEntity().remove();
 			return;
 		}
 			
-		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		Plot plot = plugin.getPlotsManager().getPlot(id);
 		if (plot == null)
 			return;
 		
@@ -723,7 +725,7 @@ public class PlotsInstancesListener implements Listener{
 		//Bukkit.broadcastMessage("Entity removed : " + e.getEntity() + " from " + plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		
 		if (plot != null)
-			plot.removeEntityInPlot(e.getEntity(), true);
+			plot.removeEntityInPlot(e.getEntity(), false);
 		else
 			e.getEntity().remove();
 	}

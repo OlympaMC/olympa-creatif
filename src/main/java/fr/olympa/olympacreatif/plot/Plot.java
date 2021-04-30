@@ -128,12 +128,13 @@ public class Plot {
 		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
 			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getZ() + OCparam.PLOT_SIZE.get() / 16 ; z++)
 				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
-					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities()).forEach(e -> {
-						
-						if (plotId.equals(plugin.getPlotsManager().getBirthPlot(e)))
-							addEntityInPlot(e);
-						else if (e.getType() != EntityType.PLAYER)
-							e.remove();
+					
+					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities()).forEach(e -> {	
+						if (e.getType() != EntityType.PLAYER)
+							if (plotId.equals(plugin.getPlotsManager().getBirthPlot(e)))
+								addEntityInPlot(e);
+							else 
+								e.remove();
 					});
 	}
 	
