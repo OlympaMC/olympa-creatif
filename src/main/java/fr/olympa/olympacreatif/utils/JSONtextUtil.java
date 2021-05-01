@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.utils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
@@ -87,8 +88,15 @@ public abstract class JSONtextUtil {
 					
 				}else if (tag.hasKey("selector") && cmd != null) {
 					List<Entity> list = cmd.parseSelector(tag.getString("selector"), false);
-					String concat = "";
-					for (int j = 0 ; j < list.size() - 1 ; j++)
+					
+					String concat = list.stream().map(e -> {
+						if (e.getType() != EntityType.PLAYER) {
+							return e.getCustomName() == null ? e.getName() : e.getCustomName();
+						} else
+							return ((Player)e).getName();
+					}).collect(Collectors.joining(", "));
+					
+					/*for (int j = 0 ; j < list.size() - 1 ; j++)
 						if (list.get(j).getType() == EntityType.PLAYER)
 							concat += ((Player)list.get(j)).getDisplayName() + ", ";
 						else
@@ -104,7 +112,7 @@ public abstract class JSONtextUtil {
 							if (list.get(list.size() - 1).getCustomName() != null)
 								concat += list.get(list.size() - 1).getCustomName() + ", ";
 							else
-								concat += list.get(list.size() - 1).getName() + ", ";
+								concat += list.get(list.size() - 1).getName() + ", ";*/
 					
 					//Bukkit.broadcastMessage("selector : '" + concat + "'");
 					textPart.addExtra(concat);

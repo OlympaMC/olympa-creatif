@@ -198,7 +198,7 @@ public class DataManager implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (serverIndex > -1 && plotsToLoad.size() > 0)
+				if (serverIndex > -1 && !plotsToLoad.isEmpty())
 					loadPlot(plotsToLoad.remove(0));
 			}
 		}.runTaskTimerAsynchronously(plugin, 20, 1);
@@ -207,7 +207,7 @@ public class DataManager implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (plotsToSave.size() > 0 && serverIndex > -1)
+				if (!plotsToSave.isEmpty() && serverIndex > -1)
 					savePlotToBddSync(plotsToSave.remove(0));
 			}
 		}.runTaskTimer(plugin, 20, 1);

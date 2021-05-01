@@ -343,14 +343,21 @@ public class OCmsg {
 	}
 	
 	public void send(OlympaPlayerCreatif pc, Object... objs) {
-		if (delayedMessages.get(pc.getPlayer()).contains(this))
+		if (delayedMessages.get(pc.getPlayer()).contains(this) || pc.getPlayer() == null)
 			return;
 		
 		if (delay > 0 && delayedMessages.containsKey(pc.getPlayer())) {
 			delayedMessages.get(pc.getPlayer()).add(this);
 			final OCmsg msg = this;
 			
-			OlympaCreatifMain.getInstance().getTask().runTaskLater(() -> delayedMessages.get(pc.getPlayer()).remove(msg), 20 * delay);
+			OlympaCreatifMain.getInstance()
+			.getTask()
+			.runTaskLater(() -> 
+			delayedMessages
+			.get(pc
+					.getPlayer())
+			.remove(msg)
+			, 20 * delay);
 		}
 		
 		pc.getPlayer().sendMessage(getValue(pc, objs));

@@ -717,12 +717,11 @@ public class PlotsInstancesListener implements Listener{
 		if (e.getEntityType() == EntityType.PLAYER)
 			return;
 		
-		//Bukkit.broadcastMessage("remove entity : " + e.getEntity());
 		plot = plugin.getPlotsManager().getPlot(
 				plugin.getPlotsManager().getBirthPlot(
 						e.getEntity()));
 		
-		//Bukkit.broadcastMessage("Entity removed : " + e.getEntity() + " from " + plugin.getPlotsManager().getBirthPlot(e.getEntity()));
+		System.out.println("Entity removed : " + e.getEntity() + " from " + plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		
 		if (plot != null)
 			plot.removeEntityInPlot(e.getEntity(), false);
