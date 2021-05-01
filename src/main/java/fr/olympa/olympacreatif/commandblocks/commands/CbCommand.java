@@ -153,7 +153,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 			return null;
 
 		//extraction des arguments de la commande
-		String[] args = fullCommand.split(" ");
+		String[] args = fullCommand.replace("minecraft:", "").split(" ");
 		
 		//List<String> list = new ArrayList<String>();
 		List<String> concatList = new ArrayList<String>();

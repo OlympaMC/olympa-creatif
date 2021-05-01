@@ -152,15 +152,15 @@ public abstract class CbCommandSelectorParser {
 				for (String part : parts) {
 					String[] objParts = part.split("=");
 					if (objParts.length != 2)
-						continue;
+						return stream.filter(s -> false);
 					
 					Double[] range = getDoubleRange(objParts[1]);
 					if (range == null)
-						continue;
+						return stream.filter(s -> false);
 					
 					CbObjective obj = plot.getCbData().getObjective(objParts[0]);
 					if (obj == null)
-						continue;
+						return stream.filter(s -> false);
 					
 					stream = stream.filter(e -> obj.get(e) >= range[0] && obj.get(e) <= range[1]);
 				}

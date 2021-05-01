@@ -165,9 +165,11 @@ public class CmdScoreboard extends CbCommand {
 			case get:
 				if (args.length >= 4) {
 					CbObjective obj = plotCbData.getObjective(args[3]);
-
-					if (obj != null) 
-						return obj.get(args[2]);
+					
+					if (obj != null) {
+						List<Entity> list = parseSelector(args[2], false);						
+						return list.size() > 0 ? obj.get(list.get(0)) : obj.get(args[2]);
+					}
 				}
 				break;
 			case list:

@@ -201,22 +201,20 @@ public class PlotParametersGui extends IGui {
 		
 		for(Entry<ItemStack, PlotParamType<Boolean>> e : switchButtons.entrySet()) {
 			i++;
-			setItem(i, setSwitchState(e.getKey(), plot.getParameters().getParameter(e.getValue())), (item, c, s) -> {
+			setItem(i, setSwitchState(e.getKey(), plot.getParameters().getParameter(e.getValue()), canChangeSettings), (item, c, s) -> {
 				if (!canChangeSettings)
 					return;
 
 				e.getValue().setValue(plot, !getSwitchState(item));
-				changeItem(item, setSwitchState(item, !getSwitchState(item)));
+				changeItem(item, setSwitchState(item, !getSwitchState(item), canChangeSettings));
 			});
 		}
 	}
 
-	public static ItemStack setSwitchState(ItemStack item, boolean newState) {
+	public static ItemStack setSwitchState(ItemStack item, boolean newState, boolean canChangeSettings) {
 		ItemStack it = item.clone();
 		
-		List<String> list = it.getItemMeta().getLore();
-		if (list == null)
-			list = new ArrayList<String>();
+		List<String> list = new ArrayList<String>();
 		
 		if (newState) {
 			list.add(0, "§eEtat : §aactif");
@@ -229,8 +227,11 @@ public class PlotParametersGui extends IGui {
 			list.add(0, "§eEtat : §cinactif");
 			it.removeEnchantment(Enchantment.DURABILITY);
 		}
-		if (list.size() >= 2)
-			list.remove(1);
+		
+		if (canChangeSettings) {
+			list.add(" ");
+			list.add("§7Cliquez pour changer la valeur");	
+		}
 		
 		return ItemUtils.lore(it, list.toArray(new String[list.size()]));
 	}

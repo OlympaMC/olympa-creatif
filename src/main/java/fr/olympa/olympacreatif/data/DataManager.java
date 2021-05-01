@@ -198,7 +198,7 @@ public class DataManager implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (plotsToLoad.size() > 0 && serverIndex > -1)
+				if (serverIndex > -1 && plotsToLoad.size() > 0)
 					loadPlot(plotsToLoad.remove(0));
 			}
 		}.runTaskTimerAsynchronously(plugin, 20, 1);
