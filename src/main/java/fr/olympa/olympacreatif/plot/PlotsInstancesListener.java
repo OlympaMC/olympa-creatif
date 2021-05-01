@@ -66,6 +66,7 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
@@ -416,8 +417,68 @@ public class PlotsInstancesListener implements Listener{
 			}
 		}
 		
+		//GESTION COMMANDBLOCKS
+		if (commandBlockTypes.contains(clickedBlock.getType()) && PlotPerm.COMMAND_BLOCK.has(plot, pc)) {
+			if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE))
+				clickedBlock.setType(Material.AIR);
+			
+			else if (!KitType.COMMANDBLOCK.hasKit(pc)) 
+				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
+			
+			else if (!pc.getPlayer().isSneaking()) {
+				BlockPosition pos = new BlockPosition(clickedBlock.getLocation().getBlockX(), clickedBlock.getLocation().getBlockY(), clickedBlock.getLocation().getBlockZ());
+				NBTTagCompound tag = new NBTTagCompound();
+				
+				plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
+				
+				PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
+				
+		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
+		        nmsPlayer.playerConnection.sendPacket(packet);
+		        e.setCancelled(true);
+		        
+			} else if (e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
+				
+				//return si le Y est trop bas ou trop haut
+				if (clickedBlock.getLocation().getBlockY() < 2 || clickedBlock.getLocation().getBlockY() > 254)
+					return;
+				
+				Location loc = null;
+				
+				switch(e.getBlockFace()) {
+				case DOWN:
+					loc = clickedBlock.getLocation().add(0, -1, 0);
+					break;
+				case EAST:
+					loc = clickedBlock.getLocation().add(1, 0, 0);
+					break;
+				case NORTH:
+					loc = clickedBlock.getLocation().add(0, 0, -1);
+					break;
+				case SOUTH:
+					loc = clickedBlock.getLocation().add(0, 0, 1);
+					break;
+				case UP:
+					loc = clickedBlock.getLocation().add(0, 1, 0);
+					break;
+				case WEST:
+					loc = clickedBlock.getLocation().add(-1, 0, 0);
+					break;
+				default:
+					return;
+				}
+				
+				cbPlacementLocation.add(loc);
+				cbPlacementPlayer.add(e.getPlayer());
+				cbPlacementTypeCb.add(e.getItem().getType());
+				
+				e.getItem().setType(Material.DISPENSER);
+			}
+		}
+		
 		//GESTION COMMAND BLOCKS
 		//si édition/placement du commandblock
+		/*
 		if (PlotPerm.COMMAND_BLOCK.has(plot, pc) && clickedBlock != null && 
 				plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(pc, clickedBlock.getType())) {
 			
@@ -436,6 +497,7 @@ public class PlotsInstancesListener implements Listener{
 					
 			        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 			        nmsPlayer.playerConnection.sendPacket(packet);
+			        e.setCancelled(true);
 			        
 				//si l'item en main est un commandblock, placement de ce dernier
 				}else if (item != null && commandBlockTypes.contains(item.getType())){
@@ -479,7 +541,7 @@ public class PlotsInstancesListener implements Listener{
 				if (commandBlockTypes.contains(clickedBlock.getType()))
 					clickedBlock.setType(Material.AIR);
 			}
-		}
+		}*/
 	}
 	
 	@EventHandler //cancel interraction avec un itemframe

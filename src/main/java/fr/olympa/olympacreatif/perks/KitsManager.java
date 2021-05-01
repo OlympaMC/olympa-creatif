@@ -207,5 +207,9 @@ public class KitsManager {
 		public String getName() {
 			return name;
 		}
+		
+		public boolean hasKit(OlympaPlayerCreatif pc) {
+			return pc.hasKit(this);
+		}
 	}
 }
