@@ -85,19 +85,13 @@ public class CbCommandListener implements Listener {
 		
 		CbCommand cmd = CbCommand.getCommand(plugin, e.getSender(), cb.getLocation(), e.getCommand());
 		
-		if (cmd != null && !cmd.getPlot().hasStoplag()) {
+		if (cmd != null && !cmd.getPlot().hasStoplag() && cmd.getPlot().getPlayers().size() > 0) {
 			
 			//si le commandblock va trop vite, cancel de la commande et maintien des valeurs NBT du commandblock
 			if (blockedExecutionLocs.containsKey(cb.getLocation())) {
-				//if (cb.getType() == Material.REPEATING_COMMAND_BLOCK)
-				//	maintainCbTags(e.getSender());
 				return;	
 			}else
-				//commandblock lents, max 1 cmd/s
-				/*if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
-					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - OCparam.CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.get());
-				else*/
-					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
+				blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
 			
 			
 			executeCommandBlockCommand(cmd, e.getSender());		

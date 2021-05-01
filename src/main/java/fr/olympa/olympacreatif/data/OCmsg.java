@@ -50,10 +50,10 @@ public class OCmsg {
 	private static final Map<Player, Set<OCmsg>> delayedMessages = new HashMap<Player, Set<OCmsg>>();
 	
     public static final OCmsg CB_INVALID_CMD = new OCmsg();
-    public static final OCmsg CB_NO_COMMANDS_LEFT = new OCmsg(5);
+    public static final OCmsg CB_NO_COMMANDS_LEFT = new OCmsg(10);
     public static final OCmsg CB_RESULT_FAILED = new OCmsg();
     public static final OCmsg CB_RESULT_SUCCESS = new OCmsg();
-    public static final OCmsg INSUFFICIENT_PLOT_PERMISSION = new OCmsg(1);
+    public static final OCmsg INSUFFICIENT_PLOT_PERMISSION = new OCmsg(5);
     public static final OCmsg INVALID_PLOT_ID = new OCmsg();
     public static final OCmsg MAX_PLOT_COUNT_OWNER_REACHED = new OCmsg();
     public static final OCmsg MAX_PLOT_COUNT_REACHED = new OCmsg();
@@ -64,9 +64,9 @@ public class OCmsg {
     public static final OCmsg PLAYER_TARGET_OFFLINE = new OCmsg();
     public static final OCmsg PLOT_ACCEPTED_INVITATION = new OCmsg();
     public static final OCmsg PLOT_BAN_PLAYER = new OCmsg();
-    public static final OCmsg PLOT_CANT_BUILD = new OCmsg(5);
-    public static final OCmsg PLOT_CANT_ENTER_BANNED = new OCmsg(5);
-    public static final OCmsg PLOT_CANT_INTERRACT = new OCmsg(5);
+    public static final OCmsg PLOT_CANT_BUILD = new OCmsg(10);
+    public static final OCmsg PLOT_CANT_ENTER_BANNED = new OCmsg(7);
+    public static final OCmsg PLOT_CANT_INTERRACT = new OCmsg(7);
     public static final OCmsg PLOT_CANT_INTERRACT_NULL_PLOT = new OCmsg(10);
     public static final OCmsg PLOT_CANT_PRINT_TNT = new OCmsg();
     public static final OCmsg PLOT_CANT_UNBAN_PLAYER = new OCmsg();
@@ -102,7 +102,6 @@ public class OCmsg {
     public static final OCmsg WE_DISABLED = new OCmsg(2);
     public static final OCmsg WE_ERR_INSUFFICIENT_PERMISSION = new OCmsg();
     public static final OCmsg WE_PLOT_EXPORT_FAILED = new OCmsg();
-    //public static final OCmsg WE_PLOT_RESETING = new OCmsg();
     public static final OCmsg WE_START_GENERATING_PLOT_SCHEM = new OCmsg();
     
     public static final OCmsg PLOT_LEAVED = new OCmsg();
@@ -114,7 +113,7 @@ public class OCmsg {
 	public static final OCmsg PLOT_RESET_END = new OCmsg();
 	public static final OCmsg PLOT_RESET_ERROR = new OCmsg();
 	
-	public static final OCmsg PLOT_CANT_ENTER_CLOSED = new OCmsg(2);
+	public static final OCmsg PLOT_CANT_ENTER_CLOSED = new OCmsg(5);
 
 	public static final OCmsg GIVE_VIP_REWARD = new OCmsg();
 	public static final OCmsg MONEY_RECIEVED_COMMAND = new OCmsg();
@@ -122,6 +121,8 @@ public class OCmsg {
 	public static final OCmsg INSUFFICIENT_KIT_PERMISSION = new OCmsg();
 	
 	public static final OCmsg PLOT_STOPLAG_FIRED_CMD = new OCmsg();
+	
+	public static final OCmsg PLOT_ENTER_STOPLAG_ACTIVATED = new OCmsg();
     
 	static {
 		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {

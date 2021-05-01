@@ -383,6 +383,11 @@ public class Plot {
 		//reset fly speed if needed
 		if (!PlotPerm.DEFINE_OWN_FLY_SPEED.has(this, pc) && getParameters().getParameter(PlotParamType.RESET_VISITOR_FLY_SPEED))
 			pc.getPlayer().setFlySpeed(0.1f);
+		
+		
+		//send stoplag alert if activated
+		if (hasStoplag())
+			OCmsg.PLOT_ENTER_STOPLAG_ACTIVATED.send(pc, this);
 	}
 
 	/**
