@@ -396,10 +396,11 @@ public class Plot {
 	public void executeExitActions(Player p) {
 
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+		
 		pc.setCurrentPlot(null);
+		removePlayerInPlot(p);
 
 		plugin.getCommandBlocksManager().excecuteQuitActions(this, p);
-		removePlayerInPlot(p);
 		
 		plugin.getPerksManager().getSongManager().stopSong(p);
 

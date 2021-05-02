@@ -71,10 +71,6 @@ public class CommandBlocksManager {
 		if (team != null)
 			team.removeMember(p);
 		
-		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomSidebar();
-
-		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-		
 		for (PotionEffect eff : p.getActivePotionEffects())
 			p.removePotionEffect(eff.getType());
 		
@@ -83,6 +79,9 @@ public class CommandBlocksManager {
 		
 		for (CbObjective obj : fromPlot.getCbData().getObjectives())
 			obj.set(p, null);
+		
+		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomSidebar();
+		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 	}
 
 	public void setFakeOp(Player player, boolean setFakeOp) {

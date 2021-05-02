@@ -301,12 +301,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 	}
 	
 	public void clearCustomSidebar() {
-		if (!isCustomSidebarEnabled)
-			return;
-		
 		isCustomSidebarEnabled = false;
-		for (int i = 0 ; i < customScoreboardLines.length ; i++)
-			customScoreboardLines[i] = "§" + i;
+		customScoreboardLines = new String[customScoreboardLinesSize];
 	}
 	
 	
