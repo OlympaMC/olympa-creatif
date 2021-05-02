@@ -85,19 +85,13 @@ public class CbCommandListener implements Listener {
 		
 		CbCommand cmd = CbCommand.getCommand(plugin, e.getSender(), cb.getLocation(), e.getCommand());
 		
-		if (cmd != null && !cmd.getPlot().hasStoplag()) {
+		if (cmd != null && !cmd.getPlot().hasStoplag() && cmd.getPlot().getPlayers().size() > 0) {
 			
 			//si le commandblock va trop vite, cancel de la commande et maintien des valeurs NBT du commandblock
 			if (blockedExecutionLocs.containsKey(cb.getLocation())) {
-				//if (cb.getType() == Material.REPEATING_COMMAND_BLOCK)
-				//	maintainCbTags(e.getSender());
 				return;	
 			}else
-				//commandblock lents, max 1 cmd/s
-				/*if (plugin.getWorldManager().getWorld().getBlockAt(cb.getLocation().add(0, 1, 0)).getType() == Material.COBWEB)
-					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick + 20 - OCparam.CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION.get());
-				else*/
-					blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
+				blockedExecutionLocs.put(cb.getLocation(), MinecraftServer.currentTick);
 			
 			
 			executeCommandBlockCommand(cmd, e.getSender());		
@@ -139,7 +133,7 @@ public class CbCommandListener implements Listener {
 	
 	//exécute la commande et si le CommandSender est un commandblock, mise à jour des ses NBTTags
 	private void executeCommandBlockCommand(CbCommand cmd, CommandSender sender) {
-		
+		boolean isCommandBlock = sender instanceof CraftBlockCommandSender;
 		OCmsg message = OCmsg.CB_RESULT_FAILED;
 		
 		//Bukkit.broadcastMessage(cmd.getType().toString());
@@ -149,6 +143,8 @@ public class CbCommandListener implements Listener {
 		if (cmd.getPlot().getCbData().getCommandsTicketsLeft() < neededCmdTickets) {
 			//si le plot n'a plus assez de commandes restantes, cancel exécution
 			OCmsg.CB_NO_COMMANDS_LEFT.send(sender);
+			if (isCommandBlock)
+				cmd.getPlot().getPlayers().forEach(p -> OCmsg.CB_NO_COMMANDS_LEFT.send(p));
 			return;
 		}
 		
@@ -163,7 +159,7 @@ public class CbCommandListener implements Listener {
 		message.send(sender, new CbCmdResult(cmd.getType(), result));
 		
 		//mise à jour NBTTags command block
-		if (sender instanceof CraftBlockCommandSender)
+		if (isCommandBlock)
 			setCbTags(sender, result);
 	}
 	

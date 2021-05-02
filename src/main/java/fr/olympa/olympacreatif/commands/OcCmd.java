@@ -1,24 +1,13 @@
 package fr.olympa.olympacreatif.commands;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
-
-import org.bukkit.entity.Entity;
-import org.bukkit.inventory.ItemStack;
-
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
-import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.Position;
-import fr.olympa.olympacreatif.gui.IGui;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.MembersGui;
 import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
@@ -112,9 +101,15 @@ public class OcCmd extends AbstractCmd {
 	@Cmd(player = true, syntax = "Visiter la parcelle d'un joueur", args = {"PLAYERS", "INTEGER"}, min = 1)
 	public void visitp(CommandContext cmd) {
 		if (cmd.getArgumentsLength() >= 2)
-			plugin.getCmdLogic().visitPlotFrom(getOlympaPlayer(), cmd.getArgument(0), cmd.getArgument(1));
+			plugin.getCmdLogic().visitPlotOf(getOlympaPlayer(), cmd.getArgument(0), cmd.getArgument(1));
 		else
-			plugin.getCmdLogic().visitPlotFrom(getOlympaPlayer(), cmd.getArgument(0), 1);
+			plugin.getCmdLogic().visitPlotOf(getOlympaPlayer(), cmd.getArgument(0), 1);
+	}
+	
+	
+	@Cmd(player = true, syntax = "Visiter une parcelle aléatoire")
+	public void visitrandom(CommandContext cmd) {
+		plugin.getCmdLogic().visitPlotRandom(getOlympaPlayer());
 	}
 
 	

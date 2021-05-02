@@ -82,15 +82,29 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	}
 	
 	//renvoie une localisation absolue ou relative complète (null si err de syntaxe ou si hors du plot)
-	protected Location parseLocation (String x, String y, String z) {
+	protected Location parseLocation(String x, String y, String z) {
+		return parseLocation(x, y, z, null, null);
+	}
+	
+	protected Location parseLocation(String x, String y, String z, String yaw, String pitch) {
 		
 		Double xF = getUnverifiedPoint(x, sendingLoc.getX());
 		Double yF = getUnverifiedPoint(y, sendingLoc.getY());
 		Double zF = getUnverifiedPoint(z, sendingLoc.getZ());		
-		 
+
+		float yawF = 0;
+		float pitchF = 0; 
+		
+		try {
+			yawF = Float.valueOf(yaw);
+			pitchF = Float.valueOf(pitch);
+		}catch(Exception ex) {
+			
+		}
+		
 		if (xF != null && yF != null && zF != null) {
-			Location loc = new Location(plugin.getWorldManager().getWorld(), xF, yF, zF); 
-			if (plot.getPlotId().isInPlot(loc))
+			Location loc = new Location(plugin.getWorldManager().getWorld(), xF, yF, zF, yawF, pitchF); 
+			if (plot.getId().isInPlot(loc))
 				return loc;
 			else
 				return null;
@@ -153,7 +167,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 			return null;
 
 		//extraction des arguments de la commande
-		String[] args = fullCommand.split(" ");
+		String[] args = fullCommand.replace("minecraft:", "").split(" ");
 		
 		//List<String> list = new ArrayList<String>();
 		List<String> concatList = new ArrayList<String>();
@@ -200,7 +214,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		scoreboard(CmdScoreboard::new),
 		bossbar(CmdBossBar::new),
 		clear(CmdClear::new, 2),
-		give(CmdGive::new, 3),
+		give(CmdGive::new, 2),
 		enchant(CmdEnchant::new),
 		experience(CmdExperience::new), 
 		effect(CmdEffect::new), 
@@ -208,7 +222,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		kill(CmdKill::new),
 		say(CmdSay::new), 
 		me(CmdSay::new), 
-		setblock(CmdSetblock::new, 4), 
+		setblock(CmdSetblock::new, 2), 
 		gamemode(CmdGamemode::new), 
 		gm(CmdGamemode::new), 
 		op(CmdOp::new),

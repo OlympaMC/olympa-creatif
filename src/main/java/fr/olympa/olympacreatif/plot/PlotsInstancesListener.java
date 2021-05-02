@@ -3,8 +3,10 @@ package fr.olympa.olympacreatif.plot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,8 +18,8 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
+import org.bukkit.entity.Vehicle;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -39,7 +41,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.hanging.HangingEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -48,15 +50,13 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
-import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CmdSummon;
@@ -65,6 +65,7 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
@@ -85,7 +86,7 @@ public class PlotsInstancesListener implements Listener{
 	private List<Location> cbPlacementLocation = new ArrayList<Location>();
 	private List<Material> cbPlacementTypeCb = new ArrayList<Material>();
 	
-	private List<Material> interractProhibitedItems = ImmutableList.<Material>builder()
+	private Set<Material> interractProhibitedItems = ImmutableSet.<Material>builder()
 			.add(Material.WATER_BUCKET)
 			.add(Material.WATER)
 			.add(Material.LAVA_BUCKET)
@@ -95,6 +96,7 @@ public class PlotsInstancesListener implements Listener{
 			.add(Material.FURNACE_MINECART)
 			.add(Material.CHEST_MINECART)
 			.add(Material.TNT_MINECART)
+			.add(Material.MINECART)
 
 			.add(Material.ACACIA_BOAT)
 			.add(Material.JUNGLE_BOAT)
@@ -103,8 +105,10 @@ public class PlotsInstancesListener implements Listener{
 			.add(Material.OAK_BOAT)
 			.add(Material.SPRUCE_BOAT)
 			
-			.add(Material.MINECART)
 			.add(Material.BONE_MEAL)
+
+			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("_EGG")).collect(Collectors.toSet()).iterator())
+			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("BUCKET")).collect(Collectors.toSet()).iterator())
 			.build();
 	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
@@ -276,7 +280,7 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (e.getBlocks().stream().anyMatch(block -> !plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation()))))
+		if (e.getBlocks().stream().anyMatch(block -> !plot.getId().equals(PlotId.fromLoc(plugin, block.getLocation()))))
 			e.setCancelled(true);
 		
 		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
@@ -294,8 +298,8 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (e.getBlocks().stream().anyMatch(block -> (!plot.getPlotId().equals(PlotId.fromLoc(plugin, block.getLocation())) || 
-				!plot.getPlotId().isInPlot(block.getLocation(), 1)) ))
+		if (e.getBlocks().stream().anyMatch(block -> (!plot.getId().equals(PlotId.fromLoc(plugin, block.getLocation())) || 
+				!plot.getId().isInPlot(block.getLocation(), 1)) ))
 			e.setCancelled(true);
 		
 		plot.getStoplagChecker().addEvent(StopLagDetect.PISTON);
@@ -333,7 +337,7 @@ public class PlotsInstancesListener implements Listener{
 	public void onGrowBlock(BlockGrowEvent e) {
 		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		
-		if (plot == null || !plot.getPlotId().isInPlot(e.getBlock().getLocation()))
+		if (plot == null || !plot.getId().isInPlot(e.getBlock().getLocation()))
 			e.setCancelled(true);
 	}
 	
@@ -341,7 +345,7 @@ public class PlotsInstancesListener implements Listener{
 	public void onDispense(BlockDispenseEvent e) {
 		Plot plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
 		
-		if (plot == null || !plot.getPlotId().isInPlot(e.getBlock().getLocation(), 1))
+		if (plot == null || !plot.getId().isInPlot(e.getBlock().getLocation(), 1))
 			e.setCancelled(true);
 	}
 
@@ -394,29 +398,91 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		//test si permission d'interagir avec le bloc donné
-		if (!PlotPerm.BUILD.has(plot, pc) && 
-				PlotParamType.getAllPossibleIntaractibleBlocks().contains(clickedBlock.getType()) &&
-				!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(clickedBlock.getType()) ) {
-			e.setCancelled(true);
-			OCmsg.PLOT_CANT_INTERRACT.send(pc);
+		if (!PlotPerm.BUILD.has(plot, pc)) {
+			if (PlotParamType.getAllPossibleIntaractibleBlocks().contains(clickedBlock.getType()) &&! plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(clickedBlock.getType()) ) {
+				e.setCancelled(true);
+				OCmsg.PLOT_CANT_INTERRACT.send(pc);
+				
+			}else if (e.getItem() != null && interractProhibitedItems.contains(e.getItem().getType())) {
+				OCmsg.PLOT_ITEM_PROHIBITED_USED.send(pc);
+				e.setCancelled(true);
+			}
 			
 			return;
 		}
-
-		//cancel interract si un item pouvant faire spawn une entité est utilisé
-		if (e.getItem() != null && !PlotPerm.BUILD.has(plot, pc)) {
-			Material mat = e.getItem().getType();
-			//KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
+		
+		//GESTION COMMANDBLOCKS
+		if (commandBlockTypes.contains(clickedBlock.getType())) {
+			if (!PlotPerm.COMMAND_BLOCK.has(plot, pc))
+				OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.COMMAND_BLOCK);
+				
+			else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE))
+				clickedBlock.setType(Material.AIR);
 			
-			if (interractProhibitedItems.contains(mat) || mat.toString().contains("SPAWN_EGG") || mat.toString().contains("BUCKET")) {
-				OCmsg.PLOT_ITEM_PROHIBITED_USED.send(pc);
-				e.setCancelled(true);
+			else if (!KitType.COMMANDBLOCK.hasKit(pc)) 
+				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
+				
+			else if (!pc.getPlayer().isSneaking() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+				BlockPosition pos = new BlockPosition(clickedBlock.getLocation().getBlockX(), clickedBlock.getLocation().getBlockY(), clickedBlock.getLocation().getBlockZ());
+				NBTTagCompound tag = new NBTTagCompound();
+				
+				plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
+				
+				PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
+				
+		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
+		        nmsPlayer.playerConnection.sendPacket(packet);
+		        e.setUseItemInHand(Result.DENY);
+		        
+			}
+		}
+		
+		if (e.useItemInHand() != Result.DENY && e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
+			
+			if (!KitType.COMMANDBLOCK.hasKit(pc)) {
+				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
 				return;
 			}
+			
+			//return si le Y est trop bas ou trop haut
+			if (clickedBlock.getLocation().getBlockY() < 2 || clickedBlock.getLocation().getBlockY() > 254)
+				return;
+			
+			Location loc = null;
+			
+			switch(e.getBlockFace()) {
+			case DOWN:
+				loc = clickedBlock.getLocation().clone().add(0, -1, 0);
+				break;
+			case EAST:
+				loc = clickedBlock.getLocation().clone().add(1, 0, 0);
+				break;
+			case NORTH:
+				loc = clickedBlock.getLocation().clone().add(0, 0, -1);
+				break;
+			case SOUTH:
+				loc = clickedBlock.getLocation().clone().add(0, 0, 1);
+				break;
+			case UP:
+				loc = clickedBlock.getLocation().clone().add(0, 1, 0);
+				break;
+			case WEST:
+				loc = clickedBlock.getLocation().clone().add(-1, 0, 0);
+				break;
+			default:
+				return;
+			}
+			
+			cbPlacementLocation.add(loc);
+			cbPlacementPlayer.add(e.getPlayer());
+			cbPlacementTypeCb.add(e.getItem().getType());
+			
+			e.getItem().setType(Material.DISPENSER);
 		}
 		
 		//GESTION COMMAND BLOCKS
 		//si édition/placement du commandblock
+		/*
 		if (PlotPerm.COMMAND_BLOCK.has(plot, pc) && clickedBlock != null && 
 				plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(pc, clickedBlock.getType())) {
 			
@@ -435,6 +501,7 @@ public class PlotsInstancesListener implements Listener{
 					
 			        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 			        nmsPlayer.playerConnection.sendPacket(packet);
+			        e.setCancelled(true);
 			        
 				//si l'item en main est un commandblock, placement de ce dernier
 				}else if (item != null && commandBlockTypes.contains(item.getType())){
@@ -478,7 +545,7 @@ public class PlotsInstancesListener implements Listener{
 				if (commandBlockTypes.contains(clickedBlock.getType()))
 					clickedBlock.setType(Material.AIR);
 			}
-		}
+		}*/
 	}
 	
 	@EventHandler //cancel interraction avec un itemframe
@@ -489,7 +556,7 @@ public class PlotsInstancesListener implements Listener{
 
 		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		
-		if (!PlotPerm.BUILD.has(plot, pc)) {
+		if (!PlotPerm.BUILD.has(plot, pc) && !(e.getRightClicked() instanceof Vehicle)) {
 			e.setCancelled(true);
 			return;
 		}
@@ -504,27 +571,28 @@ public class PlotsInstancesListener implements Listener{
 	//                       MOVE EVENTS                      //
 	////////////////////////////////////////////////////////////
 	
-	@EventHandler(priority = EventPriority.LOWEST) //modifie la destination téléport si joueur banni du plot
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true) //modifie la destination téléport si joueur banni du plot
 	public void onTeleportEvent(PlayerTeleportEvent e) {
 		
 		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
 		Plot plotTo = plugin.getPlotsManager().getPlot(e.getTo());
 		
-		((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).setCurrentPlot(plotTo);
+		//((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId())).setCurrentPlot(plotTo);
 		
-		if (plotFrom != null && plotFrom.equals(plotTo))
+		if (plotFrom == plotTo)
 			return;
 		
-		if (plotFrom != null) 
-			plotFrom.executeExitActions(e.getPlayer());
-
-		//OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
-
-		if (plotTo != null) 
-			if (!plotTo.executeEntryActions(e.getPlayer(), false))
+		if (plotTo != null) {
+			if (plotTo.canEnter(e.getPlayer())) {
+				if (plotFrom != null)
+					plotFrom.executeExitActions(e.getPlayer());
+				
+				plotTo.executeEntryActions(e.getPlayer(), e.getTo());	
+			}else
 				e.setCancelled(true);
-			else if (plotTo.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC))
-				e.setTo(plotTo.getParameters().getParameter(PlotParamType.SPAWN_LOC).toLoc());
+			
+		}else if (plotFrom != null) 
+			plotFrom.executeExitActions(e.getPlayer());
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST) //actions à effectuer lors de la sortie/entrée d'un joueur
@@ -541,21 +609,17 @@ public class PlotsInstancesListener implements Listener{
 		//sortie de l'évent si pas de changement de plot
 		if (plotTo == plotFrom)
 			return;
-
-		//Bukkit.broadcastMessage("DETECTED plot SWITCH FOR" + e.getPlayer().getName() + " : " + plotFrom + " TO " + plotTo);
-
-		//OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
 		
-		//expulse les joueurs bannis & actions d'entrée de plot
-		if (plotTo != null) 
-			if (!plotTo.executeEntryActions(e.getPlayer(), false)) 
-				//plotTo.teleportOut(e.getPlayer());
+		if (plotTo != null) {
+			if (plotTo.canEnter(e.getPlayer())) {
+				if (plotFrom != null)
+					plotFrom.executeExitActions(e.getPlayer());
+				
+				plotTo.executeEntryActions(e.getPlayer(), e.getTo());	
+			}else
 				e.setCancelled(true);
-			else if (plotTo.getParameters().getParameter(PlotParamType.FORCE_SPAWN_LOC))
-				e.setTo(plotTo.getParameters().getParameter(PlotParamType.SPAWN_LOC).toLoc());
 			
-		//actions de sortie de plot
-		if (plotFrom != null) 
+		}else if (plotFrom != null) 
 			plotFrom.executeExitActions(e.getPlayer());
 	}
 
@@ -640,15 +704,20 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		}
 		
-		plot.removeEntityInPlot(e.getEntity(), true);
-		
-		//remove entity si joueur a une houe en bois dans la main
-		/*if (((Player)e.getRemover()).getInventory().getItemInMainHand() != null && 
-				((Player)e.getRemover()).getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && 
-				plot.getMembers().getPlayerRank((Player) e.getRemover()) != PlotRank.VISITOR) {
+		plot.removeEntityInPlot(e.getEntity(), false);
+	}
 
-			plot.removeEntityInPlot(e.getEntity());
-		}*/
+	@EventHandler //cancel place
+	public void onItemFramePlace(HangingPlaceEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (plot == null)
+			e.setCancelled(true);
+		
+		else if (!PlotPerm.BUILD.has(plot, AccountProvider.get(e.getPlayer().getUniqueId()))) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer(), PlotPerm.BUILD);
+			e.setCancelled(true);
+		}
 	}
 	
 	@EventHandler //empêche le drop d'items si interdit sur le plot (et cancel si route)
@@ -697,16 +766,18 @@ public class PlotsInstancesListener implements Listener{
 
 		//Bukkit.broadcastMessage("add entity : " + e.getEntity());
 		
-		if (!CmdSummon.allowedEntities.contains(e.getEntityType())) {
+		PlotId id = PlotId.fromLoc(plugin, e.getEntity().getLocation());
+		
+		if (!CmdSummon.allowedEntities.contains(e.getEntityType()) || id == null) {
 			e.getEntity().remove();
 			return;
 		}
 			
-		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		Plot plot = plugin.getPlotsManager().getPlot(id);
 		if (plot == null)
 			return;
 		
-		plugin.getPlotsManager().setBirthPlot(plot.getPlotId(), e.getEntity());
+		plugin.getPlotsManager().setBirthPlot(plot.getId(), e.getEntity());
 		
 		plot.addEntityInPlot(e.getEntity());
 		plot.getStoplagChecker().addEvent(StopLagDetect.ENTITY);
@@ -717,17 +788,25 @@ public class PlotsInstancesListener implements Listener{
 		if (e.getEntityType() == EntityType.PLAYER)
 			return;
 		
-		//Bukkit.broadcastMessage("remove entity : " + e.getEntity());
 		plot = plugin.getPlotsManager().getPlot(
 				plugin.getPlotsManager().getBirthPlot(
 						e.getEntity()));
 		
-		//Bukkit.broadcastMessage("Entity removed : " + e.getEntity() + " from " + plugin.getPlotsManager().getBirthPlot(e.getEntity()));
+		/*try {
+			throw new UnsupportedOperationException("§4[DEBUG] Entity " + e.getEntity() + " removed from " + plot);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+		}*/
 		
 		if (plot != null)
-			plot.removeEntityInPlot(e.getEntity(), true);
+			plugin.getLogger().info("§aEntity " + e.getEntity() + " removed from plot " + plot);
 		else
-			e.getEntity().remove();
+			plugin.getLogger().info("§cEntity " + e.getEntity() + " removed without birth plot!");
+		
+		if (plot != null)
+			plot.removeEntityInPlot(e.getEntity(), false);
+		/*else
+			e.getEntity().remove();*/
 	}
 	
 	@EventHandler //cancel entity pathfind of entity try to go outside of the plot
@@ -737,7 +816,7 @@ public class PlotsInstancesListener implements Listener{
 		
 		plot = plugin.getPlotsManager().getPlot(plugin.getPlotsManager().getBirthPlot(e.getEntity()));
 		
-		if (plot == null || !plot.getPlotId().isInPlot(e.getLoc()))
+		if (plot == null || !plot.getId().isInPlot(e.getLoc()))
 			e.setCancelled(true);
 	}
 

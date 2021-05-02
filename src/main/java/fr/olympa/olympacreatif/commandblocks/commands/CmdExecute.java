@@ -177,7 +177,7 @@ public class CmdExecute extends CbCommand {
 					Integer result = executeIfUnlessTest(subCmd.getValue());
 					cmdResults.add(result == null ? 0 : result);
 					
-					if (result == null || result == 1)
+					if (result == null || result >= 1)
 						iterator2.remove();
 				}			
 				break;

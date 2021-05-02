@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.plot;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
@@ -227,6 +228,14 @@ public class PlotId {
 	
 	public Location getLocation() {
 		return loc;
+	}
+	
+	public void teleport(Player p) {
+		Plot plot = plugin.getPlotsManager().getPlot(this);
+		if (plot != null)
+			plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(p);
+		else
+			p.teleport(getLocation());
 	}
 	
 	public boolean isInPlot(Position loc) {

@@ -16,6 +16,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -32,6 +37,7 @@ import fr.olympa.olympacreatif.commandblocks.CbCommandListener.CbCmdResult;
 import fr.olympa.olympacreatif.gui.ShopGui.MarketItemData;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
@@ -40,11 +46,14 @@ import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 
 
 public class OCmsg {
+	
+	private static final Map<Player, Set<OCmsg>> delayedMessages = new HashMap<Player, Set<OCmsg>>();
+	
     public static final OCmsg CB_INVALID_CMD = new OCmsg();
-    public static final OCmsg CB_NO_COMMANDS_LEFT = new OCmsg();
+    public static final OCmsg CB_NO_COMMANDS_LEFT = new OCmsg(10);
     public static final OCmsg CB_RESULT_FAILED = new OCmsg();
     public static final OCmsg CB_RESULT_SUCCESS = new OCmsg();
-    public static final OCmsg INSUFFICIENT_PLOT_PERMISSION = new OCmsg();
+    public static final OCmsg INSUFFICIENT_PLOT_PERMISSION = new OCmsg(5);
     public static final OCmsg INVALID_PLOT_ID = new OCmsg();
     public static final OCmsg MAX_PLOT_COUNT_OWNER_REACHED = new OCmsg();
     public static final OCmsg MAX_PLOT_COUNT_REACHED = new OCmsg();
@@ -55,13 +64,13 @@ public class OCmsg {
     public static final OCmsg PLAYER_TARGET_OFFLINE = new OCmsg();
     public static final OCmsg PLOT_ACCEPTED_INVITATION = new OCmsg();
     public static final OCmsg PLOT_BAN_PLAYER = new OCmsg();
-    public static final OCmsg PLOT_CANT_BUILD = new OCmsg();
-    public static final OCmsg PLOT_CANT_ENTER_BANNED = new OCmsg();
-    public static final OCmsg PLOT_CANT_INTERRACT = new OCmsg();
-    public static final OCmsg PLOT_CANT_INTERRACT_NULL_PLOT = new OCmsg();
+    public static final OCmsg PLOT_CANT_BUILD = new OCmsg(10);
+    public static final OCmsg PLOT_CANT_ENTER_BANNED = new OCmsg(7);
+    public static final OCmsg PLOT_CANT_INTERRACT = new OCmsg(7);
+    public static final OCmsg PLOT_CANT_INTERRACT_NULL_PLOT = new OCmsg(10);
     public static final OCmsg PLOT_CANT_PRINT_TNT = new OCmsg();
     public static final OCmsg PLOT_CANT_UNBAN_PLAYER = new OCmsg();
-    public static final OCmsg PLOT_DENY_ITEM_DROP = new OCmsg();
+    public static final OCmsg PLOT_DENY_ITEM_DROP = new OCmsg(5);
     public static final OCmsg PLOT_FORCED_STOPLAG_FIRED = new OCmsg();
     public static final OCmsg PLOT_HAVE_BEEN_BANNED = new OCmsg();
     public static final OCmsg PLOT_HAVE_BEEN_KICKED = new OCmsg();
@@ -69,7 +78,7 @@ public class OCmsg {
     public static final OCmsg PLOT_IMPOSSIBLE_TO_KICK_PLAYER = new OCmsg();
     public static final OCmsg PLOT_INSUFFICIENT_MEMBERS_SIZE = new OCmsg();
     public static final OCmsg PLOT_INVITATION_TARGET_ALREADY_MEMBER = new OCmsg();
-    public static final OCmsg PLOT_ITEM_PROHIBITED_USED = new OCmsg();
+    public static final OCmsg PLOT_ITEM_PROHIBITED_USED = new OCmsg(2);
     public static final OCmsg PLOT_JOIN_ERR_NOT_ENOUGH_SLOTS = new OCmsg();
     public static final OCmsg PLOT_JOIN_ERR_SENDER_OFFLINE = new OCmsg();
     public static final OCmsg PLOT_KICK_PLAYER = new OCmsg();
@@ -90,10 +99,9 @@ public class OCmsg {
     public static final OCmsg TELEPORTED_TO_PLOT_SPAWN = new OCmsg();
     public static final OCmsg TELEPORTED_TO_WORLD_SPAWN = new OCmsg();
     public static final OCmsg WE_COMPLETE_GENERATING_PLOT_SCHEM = new OCmsg();
-    public static final OCmsg WE_DISABLED = new OCmsg();
+    public static final OCmsg WE_DISABLED = new OCmsg(2);
     public static final OCmsg WE_ERR_INSUFFICIENT_PERMISSION = new OCmsg();
     public static final OCmsg WE_PLOT_EXPORT_FAILED = new OCmsg();
-    //public static final OCmsg WE_PLOT_RESETING = new OCmsg();
     public static final OCmsg WE_START_GENERATING_PLOT_SCHEM = new OCmsg();
     
     public static final OCmsg PLOT_LEAVED = new OCmsg();
@@ -105,7 +113,7 @@ public class OCmsg {
 	public static final OCmsg PLOT_RESET_END = new OCmsg();
 	public static final OCmsg PLOT_RESET_ERROR = new OCmsg();
 	
-	public static final OCmsg PLOT_CANT_ENTER_CLOSED = new OCmsg();
+	public static final OCmsg PLOT_CANT_ENTER_CLOSED = new OCmsg(5);
 
 	public static final OCmsg GIVE_VIP_REWARD = new OCmsg();
 	public static final OCmsg MONEY_RECIEVED_COMMAND = new OCmsg();
@@ -113,7 +121,22 @@ public class OCmsg {
 	public static final OCmsg INSUFFICIENT_KIT_PERMISSION = new OCmsg();
 	
 	public static final OCmsg PLOT_STOPLAG_FIRED_CMD = new OCmsg();
+	
+	public static final OCmsg PLOT_ENTER_STOPLAG_ACTIVATED = new OCmsg();
     
+	static {
+		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {
+			@EventHandler(priority = EventPriority.LOW)
+			public void onJoin(PlayerJoinEvent e) {
+				delayedMessages.put(e.getPlayer(), new HashSet<OCmsg>());
+			}
+			@EventHandler
+			public void onQuit(PlayerQuitEvent e) {
+				delayedMessages.remove(e.getPlayer());
+			}
+		}, OlympaCreatifMain.getInstance());
+	}
+	
 	private static final Map<String, Function<OlympaPlayerCreatif, String>> playerPlaceHolders = ImmutableMap.<String, Function<OlympaPlayerCreatif,String>>builder()
 			.put("%playerName", pc -> {return pc.getName();})
 			//.put("%plotOwnerName", pc -> {return pc.getCurrentPlot() == null ? "aucun" : pc.getCurrentPlot().getMembers().getOwner().getName();})
@@ -171,7 +194,10 @@ public class OCmsg {
 			.put("%plot", (pc, plot) -> plot != null ? plot.toString() : "none")
 			
 			.build();
-
+	
+	private static final Map<String, Function<PlotId, String>> plotIdPlaceHolders = ImmutableMap.<String, Function<PlotId,String>>builder()
+			.put("%plot", plot -> plot != null ? plot.toString() : "none")
+			.build();
 	
 	private static final Map<String, Function<StopLagDetect, String>> stoplagPlaceHolders = ImmutableMap.<String, Function<StopLagDetect,String>>builder()
 			.put("%stopLagType", s -> s.toString())
@@ -196,6 +222,15 @@ public class OCmsg {
 	
 	
 	private String message = null;
+	private int delay;
+	
+	public OCmsg() {
+		this(0);
+	}
+	
+	public OCmsg(int delay) {
+		this.delay = delay;
+	}
 	
 	private String getValue(OlympaPlayerCreatif pc, Object... args) {
 		if (message == null)
@@ -248,6 +283,10 @@ public class OCmsg {
 			else if (o instanceof MarketItemData)
 				for (Entry<String, Function<MarketItemData, String>> e : shopPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((MarketItemData) o));
+
+			else if (o instanceof PlotId)
+				for (Entry<String, Function<PlotId, String>> e : plotIdPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((PlotId) o));
 
 			else if (o instanceof Plot && pc != null) {
 				plotAlreadyAdded = true;
@@ -304,6 +343,23 @@ public class OCmsg {
 	}
 	
 	public void send(OlympaPlayerCreatif pc, Object... objs) {
+		if (delayedMessages.get(pc.getPlayer()).contains(this) || pc.getPlayer() == null)
+			return;
+		
+		if (delay > 0 && delayedMessages.containsKey(pc.getPlayer())) {
+			delayedMessages.get(pc.getPlayer()).add(this);
+			final OCmsg msg = this;
+			
+			OlympaCreatifMain.getInstance()
+			.getTask()
+			.runTaskLater(() -> 
+			delayedMessages
+			.get(pc
+					.getPlayer())
+			.remove(msg)
+			, 20 * delay);
+		}
+		
 		pc.getPlayer().sendMessage(getValue(pc, objs));
 	}
 	

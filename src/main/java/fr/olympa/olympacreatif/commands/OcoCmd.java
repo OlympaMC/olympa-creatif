@@ -36,7 +36,7 @@ public class OcoCmd extends AbstractCmd {
 			return;
 		}
 		
-		String debug = "\n   §6>>> Débug parcelle " + plot.getPlotId() + " :";
+		String debug = "\n   §6>>> Débug parcelle " + plot.getId() + " :";
 		debug += "\n   §e> Joueurs : §a" + plot.getPlayers().size();
 		debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.get() + " (max " + OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.get() + " de chaque type) §7(détails avec /debugentities)";
 		debug += "\n   §e> Tile entities : §a" + plot.getLoadedTileEntitiesCount();
@@ -65,7 +65,7 @@ public class OcoCmd extends AbstractCmd {
 			}
 		});
 		
-		String debug = "\n   §6>>> Débug entités parcelle " + plot.getPlotId() + " :";
+		String debug = "\n   §6>>> Débug entités parcelle " + plot.getId() + " :";
 		for (Entity e : entList)
 			debug += "\n§7" + (entList.indexOf(e) + 1) + ".   §e> " + e.getType().toString().toLowerCase() + (e.getCustomName() == null ? "" : " §7(" + e.getCustomName() + "§7)") + ", " + 
 					e.getLocation().getBlockX() + " " + e.getLocation().getBlockY() + " " + e.getLocation().getBlockZ() +  
@@ -81,8 +81,11 @@ public class OcoCmd extends AbstractCmd {
 		
 		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
 		
-		if (plot == null || !PlotPerm.EXPORT_PLOT.has((OlympaPlayerCreatif) getOlympaPlayer())) {
+		if (plot == null) {
 			OCmsg.WE_PLOT_EXPORT_FAILED.send(getPlayer(), plot);
+			return;
+		}else if (!PlotPerm.EXPORT_PLOT.has((OlympaPlayerCreatif) getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.EXPORT_PLOT);
 			return;
 		}
 

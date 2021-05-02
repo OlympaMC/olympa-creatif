@@ -54,7 +54,7 @@ public class CmdScoreboard extends CbCommand {
 				break;
 				
 			case list:
-				sender.sendMessage("§6  >>>  Objectifs du plot " + plot.getPlotId() + " <<<");
+				sender.sendMessage("§6  >>>  Objectifs du plot " + plot.getId() + " <<<");
 				for (CbObjective o : plotCbData.getObjectives()) {
 					String paramType = "";
 					if (o.getParamType() != null)
@@ -165,9 +165,11 @@ public class CmdScoreboard extends CbCommand {
 			case get:
 				if (args.length >= 4) {
 					CbObjective obj = plotCbData.getObjective(args[3]);
-
-					if (obj != null) 
-						return obj.get(args[2]);
+					
+					if (obj != null) {
+						List<Entity> list = parseSelector(args[2], false);						
+						return list.size() > 0 ? obj.get(list.get(0)) : obj.get(args[2]);
+					}
 				}
 				break;
 			case list:
@@ -184,39 +186,47 @@ public class CmdScoreboard extends CbCommand {
 					CbObjective obj1 = plotCbData.getObjective(args[3]);
 					CbObjective obj2 = plotCbData.getObjective(args[6]);
 					
+					//System.out.println("operation on " + obj1.getName() + " and " + obj2.getName());
+					
+					
 					if (obj1 != null && obj2 != null) {
 						List<Object> e1;
 						
+						
 						//définition des deux listes d'entités/strings concernés
-						if (args[2].startsWith("@")) {
+						if (args[2].startsWith("@") || Bukkit.getPlayer(args[2]) != null) {
 							List<Entity> list = parseSelector(args[2], false);
-							if (list.size() != 1)
+							
+							//System.out.println("list 1 : " + list);
+							
+							if (list.size() == 0)
 								return 0;
 							
 							e1 = new ArrayList<Object>(list);
 						}else
 							e1 = new ArrayList<Object>(Arrays.asList(args[2]));
 						
+						
 						List<Object> e2;
 						
-						if (args[5].startsWith("@")){
+						if (args[5].startsWith("@") || Bukkit.getPlayer(args[5]) != null) {
 							List<Entity> list = parseSelector(args[5], false);
-							if (list.size() != 1)
+						
+							//System.out.println("list 2 : " + list);
+							
+							if (list.size() == 0)
 								return 0;
 
 							e2 = new ArrayList<Object>(list);
 						}else 
 							e2 = new ArrayList<Object>(Arrays.asList(args[5]));
 						
-						//si les deux listes ne sont pas vides, sortie de la fonction
-						if (e1.size() > 0 && e2.size() > 0) {
-							for (Object o : e1)
-								if (evaluateOperation(obj1, obj2, args[4], o, e2) == 0)
-									return 0;
-							return 1;
-						}
-						else
-							return 0;
+							
+						//évanuation de la fonction
+						for (Object o : e1)
+							if (evaluateOperation(obj1, obj2, args[4], o, e2) == 0)
+								return 0;
+						return 1;
 					}
 				}
 				break;

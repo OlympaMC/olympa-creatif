@@ -1,16 +1,6 @@
 package fr.olympa.olympacreatif.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
 
@@ -22,21 +12,21 @@ public class PlayerParametersGui extends IGui{
 		super(gui, "Paramètres de " + gui.getPlayer().getName(), 1, gui.staffPlayer);
 		
 		setItem(0, PlotParametersGui.setSwitchState(ItemUtils.item(Material.PAPER, "§6Activation par défaut du chat parcelle"), 
-				p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)),
+				p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT), true),
 				(it, i, s) -> {
 					if (!isOpenByStaff)
 						p.setPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT, !p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT));
 					
-					changeItem(it, PlotParametersGui.setSwitchState(it, p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT)));
+					changeItem(it, PlotParametersGui.setSwitchState(it, p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT), true));
 				});
 		
 		setItem(1, PlotParametersGui.setSwitchState(ItemUtils.item(Material.CRAFTING_TABLE, "§6Double sneak pour ouvrir le menu"), 
-				p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)), 
+				p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK), true), 
 				(it, i, s) -> {
 					if (!isOpenByStaff)
 						p.setPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK, !p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK));
 					
-					changeItem(it, PlotParametersGui.setSwitchState(it, p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK)));
+					changeItem(it, PlotParametersGui.setSwitchState(it, p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK), true));
 				});
 	}
 	

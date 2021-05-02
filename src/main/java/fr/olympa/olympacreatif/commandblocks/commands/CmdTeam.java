@@ -34,7 +34,7 @@ public class CmdTeam extends CbCommand {
 		
 		switch (args[0]) {
 		case "list":
-			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getPlotId() + " <<<");
+			sender.sendMessage("§6  >>>  Equipes du plot " + plot.getId() + " <<<");
 			for (CbTeam t : plotCbData.getTeams()) {
 				
 				ColorType color = t.getColor();

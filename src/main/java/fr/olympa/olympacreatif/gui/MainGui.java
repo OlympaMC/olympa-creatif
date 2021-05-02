@@ -1,6 +1,13 @@
 package fr.olympa.olympacreatif.gui;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -96,9 +103,7 @@ public class MainGui extends IGui {
 		setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"), 
 				(it, c, s) -> {
 					if (plugin.getPlotsManager().getPlots().size() > 0) {
-						Plot plotR = ((Plot) plugin.getPlotsManager().getPlots().toArray()[plugin.random.nextInt(plugin.getPlotsManager().getPlots().size())]);
-						plotR.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(p.getPlayer());
-						OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(p);
+						plugin.getCmdLogic().visitPlotRandom(getPlayer());
 					}
 				});
 
@@ -162,7 +167,7 @@ public class MainGui extends IGui {
 		if (plot == null)
 			return new MainGui(OlympaCreatifMain.getInstance(), p, null, "Menu", null);
 		else
-			return new MainGui(OlympaCreatifMain.getInstance(), p, plot, "Menu >> " + plot.getPlotId(), null);
+			return new MainGui(OlympaCreatifMain.getInstance(), p, plot, "Menu >> " + plot.getId(), null);
 	}
 	
 	public static MainGui getMainGuiForStaff(OlympaPlayerCreatif p, OlympaPlayerCreatif staffPlayer) {

@@ -198,7 +198,7 @@ public class OcaCmd extends AbstractCmd {
 	
 	
 	private String getPlotIdOnFixedLength(Plot plot) {
-		String s = plot.getPlotId().toString();
+		String s = plot.getId().toString();
 		while (s.length() < 7)
 			s = " " + s;
 		return s;

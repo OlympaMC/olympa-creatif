@@ -245,4 +245,17 @@ public class PlotCbData {
 			plugin.getCommandBlocksManager().addUnusedScoreboard(scb);
 		}*/	
 	}
+
+	public void clearEntity(Entity e) {
+		for (CbObjective o : objectives) 
+			o.set(e, null);
+			
+		for (CbTeam t : teams)
+			if (t.isMember(e))
+				t.removeMember(e);
+	}
 }
+
+
+
+

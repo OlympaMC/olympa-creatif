@@ -198,7 +198,7 @@ public class DataManager implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (plotsToLoad.size() > 0 && serverIndex > -1)
+				if (serverIndex > -1 && !plotsToLoad.isEmpty())
 					loadPlot(plotsToLoad.remove(0));
 			}
 		}.runTaskTimerAsynchronously(plugin, 20, 1);
@@ -207,7 +207,7 @@ public class DataManager implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (plotsToSave.size() > 0 && serverIndex > -1)
+				if (!plotsToSave.isEmpty() && serverIndex > -1)
 					savePlotToBddSync(plotsToSave.remove(0));
 			}
 		}.runTaskTimer(plugin, 20, 1);
@@ -370,7 +370,7 @@ public class DataManager implements Listener {
 		}
 
 		try {
-			int id = plot.getPlotId().getId();
+			int id = plot.getId().getId();
 
 			//update plot datas
 			PreparedStatement updPlotParams = osUpdatePlotDatas.createStatement();
@@ -447,7 +447,7 @@ public class DataManager implements Listener {
 			PreparedStatement ps = osUpdatePlotSchem.createStatement();
 
 			ps.setInt(1, serverIndex);
-			ps.setInt(2, plot.getPlotId().getId());
+			ps.setInt(2, plot.getId().getId());
 			ps.setLong(3, p.getId());
 			ps.setString(4, schem.getName());
 			ps.setBlob(5, new FileInputStream(schem));

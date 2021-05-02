@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.utils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
@@ -86,25 +87,14 @@ public abstract class JSONtextUtil {
 					}
 					
 				}else if (tag.hasKey("selector") && cmd != null) {
-					List<Entity> list = cmd.parseSelector(tag.getString("selector"), false);
-					String concat = "";
-					for (int j = 0 ; j < list.size() - 1 ; j++)
-						if (list.get(j).getType() == EntityType.PLAYER)
-							concat += ((Player)list.get(j)).getDisplayName() + ", ";
-						else
-							if (list.get(j).getCustomName() != null)
-								concat += list.get(j).getCustomName() + ", ";
-							else
-								concat += list.get(j).getName() + ", ";
-
-					if (list.size() > 0)
-						if (list.get(list.size() - 1).getType() == EntityType.PLAYER)
-							concat += ((Player)list.get(list.size() - 1)).getDisplayName();
-						else
-							if (list.get(list.size() - 1).getCustomName() != null)
-								concat += list.get(list.size() - 1).getCustomName() + ", ";
-							else
-								concat += list.get(list.size() - 1).getName() + ", ";
+					List<Entity> list = cmd.parseSelector(tag.getString("selector").replace(":", "="), false);
+					
+					String concat = list.stream().map(e -> {
+						if (e.getType() != EntityType.PLAYER) {
+							return e.getCustomName() == null ? e.getName() : e.getCustomName();
+						} else
+							return ((Player)e).getName();
+					}).collect(Collectors.joining(", "));
 					
 					//Bukkit.broadcastMessage("selector : '" + concat + "'");
 					textPart.addExtra(concat);
@@ -121,7 +111,8 @@ public abstract class JSONtextUtil {
 					if (name == null || obj == null)
 						continue;
 
-					List<Entity> list = cmd.parseSelector(name, false);
+					List<Entity> list = cmd.parseSelector(name.replace(":", "="), false);
+					//System.out.println("LIST for json parser : " + list + " FROM " + name);
 					CbObjective cbObj = cmd.getPlot().getCbData().getObjective(obj);
 					
 					if (list.size() == 0 || cbObj == null)

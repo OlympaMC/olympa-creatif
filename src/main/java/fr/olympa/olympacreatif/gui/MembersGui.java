@@ -21,7 +21,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 public class MembersGui extends IGui {
 	
 	public MembersGui(IGui gui) {
-		super(gui, "Membres parcelle " + gui.getPlot().getPlotId() + " (" + gui.getPlot().getMembers().getCount() + "/" + 
+		super(gui, "Membres parcelle " + gui.getPlot().getId() + " (" + gui.getPlot().getMembers().getCount() + "/" + 
 				UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(gui.getPlayer().getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3, gui.staffPlayer);
 		
 		//affichage des perms par rang

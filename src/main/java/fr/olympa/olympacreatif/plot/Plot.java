@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -44,9 +45,6 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class Plot {
-
-	private static boolean hasLoadedHolo1 = false;
-	private static boolean hasLoadedHolo2 = false;
 	
 	private OlympaCreatifMain plugin;
 	
@@ -109,31 +107,37 @@ public class Plot {
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
-				executeEntryActions(p, true);
+				if (canEnter(p))
+					executeEntryActions(p, null);
+				else
+					teleportOut(p);
 		
 		loadInitialEntitiesOnChunks();
 		
-		//forceload 2*2 chunks à l'origine du plot
+		//forceload 1 chunk à l'origine du plot
 		/*for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + 2 ; x++)
 			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
 				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z, true);*/
-		plugin.getWorldManager().getWorld().setChunkForceLoaded(
-				plotId
-				.getLocation()
-				.getChunk()
-				.getX(), 
-				plotId.getLocation().getChunk().getZ() , true);
+		plugin.getWorldManager().getWorld().getChunkAtAsync(plotId.getLocation(), new Consumer<Chunk>() {
+
+			@Override
+			public void accept(Chunk t) {
+				plugin.getWorldManager().getWorld().setChunkForceLoaded(t.getX(), t.getZ(), true);
+			}
+			
+		});
 		
 		//add entities from already loaded chunks
 		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
 			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getZ() + OCparam.PLOT_SIZE.get() / 16 ; z++)
 				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
-					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities()).forEach(e -> {
-						
-						if (plotId.equals(plugin.getPlotsManager().getBirthPlot(e)))
-							addEntityInPlot(e);
-						else if (e.getType() != EntityType.PLAYER)
-							e.remove();
+					
+					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities()).forEach(e -> {	
+						if (e.getType() != EntityType.PLAYER)
+							if (plotId.equals(plugin.getPlotsManager().getBirthPlot(e)))
+								addEntityInPlot(e);
+							else 
+								e.remove();
 					});
 	}
 	
@@ -211,6 +215,7 @@ public class Plot {
 		if (killEntity)
 			e.remove();
 		entitiesInPlot.remove(e);
+		cbData.clearEntity(e);
 	}
 	
 	public Set<Player> getPlayers(){
@@ -247,7 +252,7 @@ public class Plot {
 	}
 	
 	public Location getOutLoc() {
-		Location loc = plotId.getLocation().add(-3, 0, -3);
+		Location loc = plotId.getLocation().clone().subtract(WorldManager.roadSize / 2, 0, WorldManager.roadSize / 2);
 		loc.setY(WorldManager.worldLevel + 1);
 		return loc;
 	}
@@ -255,15 +260,11 @@ public class Plot {
 	public void unload() {
 		cbData.unload();
 		
-		//unload des forced chunks
-		/*for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + 2 ; x++)
-			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
-				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z , false);*/
-		plugin.getWorldManager().getWorld().setChunkForceLoaded(
-				plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getZ() , false);
+		//unload du forced loaded chunk
+		plugin.getWorldManager().getWorld().setChunkForceLoaded(plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getX(), false);
 	}
 
-	public PlotId getPlotId() {
+	public PlotId getId() {
 		return plotId;
 	}
 	
@@ -278,7 +279,7 @@ public class Plot {
 		if (PermissionsList.USE_COLORED_TEXT.hasPermission(pc))
 			msg = ChatColor.translateAlternateColorCodes('&', msg);
 		
-		msg = "§7[Parcelle " + getPlotId() + "] §r" + 
+		msg = "§7[Parcelle " + getId() + "] §r" + 
 		pc.getGroupNameColored() + " " + pc.getPlayer().getName() + " §r§7: " + msg;
 		
 		for (Player p : getPlayers())
@@ -290,6 +291,24 @@ public class Plot {
 		return plotId.toString();
 	}
 	
+	public boolean canEnter(Player p ) {
+		return canEnter((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
+	}
+	
+	public boolean canEnter(OlympaPlayerCreatif pc) {
+		if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
+			if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
+				OCmsg.PLOT_CANT_ENTER_BANNED.send(pc, this);
+				return false;
+				
+			}else if (!parameters.getParameter(PlotParamType.ALLOW_VISITORS) && members.getPlayerRank(pc) == PlotRank.VISITOR) {
+				OCmsg.PLOT_CANT_ENTER_CLOSED.send(pc, this);
+				return false;
+			}
+		
+		return true;
+	}
+
 	
 	/**
 	 * Execute entry actions for this player for the plot
@@ -297,20 +316,21 @@ public class Plot {
 	 * @param teleportPlayer 
 	 * @return true si le joueur est autorisé à entrer, false sinon
 	 */
-	public boolean executeEntryActions(Player p, boolean tpToPlotSpawn) {
+	public void executeEntryActions(Player p, Location tpLoc) {
+		executeEntryActions((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()), tpLoc);
+	}
 		
-		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+	/**
+	 * Execute entry actions for this player for the plot
+	 * @param p concerned player
+	 * @param teleportPlayer 
+	 * @return true si le joueur est autorisé à entrer, false sinon
+	 */
+	public void executeEntryActions(OlympaPlayerCreatif pc, Location tpLoc) {
+		if (!canEnter(pc))
+			return;
 		
-		if (!pc.hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
-			if (parameters.getParameter(PlotParamType.BANNED_PLAYERS).contains(pc.getId())) {
-				OCmsg.PLOT_CANT_ENTER_BANNED.send(pc, this);
-				return false;
-			}
-			else if (!parameters.getParameter(PlotParamType.ALLOW_VISITORS) && members.getPlayerRank(p) == PlotRank.VISITOR) {
-				OCmsg.PLOT_CANT_ENTER_CLOSED.send(pc, this);
-				return false;
-			}
-
+		Player p = pc.getPlayer();
 		pc.setCurrentPlot(this);
 		
 		//ajoute le joueur aux joueurs du plot s'il n'a pas la perm de bypass les commandes vanilla
@@ -335,12 +355,14 @@ public class Plot {
 				p.removePotionEffect(effect.getType());
 		}
 		
-		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {
+		if (!PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc))
 			//tp au spawn de la zone
-			if (tpToPlotSpawn && parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC)) {
-				parameters.getParameter(PlotParamType.SPAWN_LOC).teleport(p);
-				OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc);
-			}
+			if (parameters.getParameter(PlotParamType.FORCE_SPAWN_LOC) && !parameters.getParameter(PlotParamType.SPAWN_LOC).toLoc().equals(tpLoc)) {
+				plugin.getTask().runTaskLater(() -> {
+					parameters.getParameter(PlotParamType.SPAWN_LOC).teleport(p);
+					OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc);
+				}, 1);
+			
 			
 			//définition du gamemode
 			p.setGameMode(parameters.getParameter(PlotParamType.GAMEMODE_INCOMING_PLAYERS));
@@ -362,7 +384,10 @@ public class Plot {
 		if (!PlotPerm.DEFINE_OWN_FLY_SPEED.has(this, pc) && getParameters().getParameter(PlotParamType.RESET_VISITOR_FLY_SPEED))
 			pc.getPlayer().setFlySpeed(0.1f);
 		
-		return true;
+		
+		//send stoplag alert if activated
+		if (hasStoplag())
+			OCmsg.PLOT_ENTER_STOPLAG_ACTIVATED.send(pc, this);
 	}
 
 	/**
@@ -372,10 +397,11 @@ public class Plot {
 	public void executeExitActions(Player p) {
 
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+		
 		pc.setCurrentPlot(null);
+		removePlayerInPlot(p);
 
 		plugin.getCommandBlocksManager().excecuteQuitActions(this, p);
-		removePlayerInPlot(p);
 		
 		plugin.getPerksManager().getSongManager().stopSong(p);
 
@@ -398,6 +424,6 @@ public class Plot {
 	
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Plot && ((Plot)o).getPlotId().equals(plotId);
+		return o instanceof Plot && ((Plot)o).getId().equals(plotId);
 	}
 }
