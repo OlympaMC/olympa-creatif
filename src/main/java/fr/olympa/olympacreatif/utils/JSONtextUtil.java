@@ -45,7 +45,7 @@ public abstract class JSONtextUtil {
 			
 			NBTTagList mainTag = MojangsonParser.parse(component.replace("=", ":")).getList("rawText", NBT.TAG_COMPOUND);
 			
-			//Bukkit.broadcastMessage("parse : " + mainTag.asString());
+			Bukkit.broadcastMessage("parse : " + mainTag.asString());
 			
 			for (int i = 0 ; i < mainTag.size() ; i++) {
 				
@@ -87,7 +87,7 @@ public abstract class JSONtextUtil {
 					}
 					
 				}else if (tag.hasKey("selector") && cmd != null) {
-					List<Entity> list = cmd.parseSelector(tag.getString("selector"), false);
+					List<Entity> list = cmd.parseSelector(tag.getString("selector").replace(":", "="), false);
 					
 					String concat = list.stream().map(e -> {
 						if (e.getType() != EntityType.PLAYER) {
@@ -129,7 +129,8 @@ public abstract class JSONtextUtil {
 					if (name == null || obj == null)
 						continue;
 
-					List<Entity> list = cmd.parseSelector(name, false);
+					List<Entity> list = cmd.parseSelector(name.replace(":", "="), false);
+					//System.out.println("LIST for json parser : " + list + " FROM " + name);
 					CbObjective cbObj = cmd.getPlot().getCbData().getObjective(obj);
 					
 					if (list.size() == 0 || cbObj == null)

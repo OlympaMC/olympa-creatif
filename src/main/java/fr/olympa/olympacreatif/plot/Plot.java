@@ -215,6 +215,7 @@ public class Plot {
 		if (killEntity)
 			e.remove();
 		entitiesInPlot.remove(e);
+		cbData.clearEntity(e);
 	}
 	
 	public Set<Player> getPlayers(){

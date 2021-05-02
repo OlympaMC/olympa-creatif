@@ -3,6 +3,9 @@ package fr.olympa.olympacreatif.plot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -57,6 +60,7 @@ import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.provider.AccountProvider;
@@ -88,7 +92,7 @@ public class PlotsInstancesListener implements Listener{
 	private List<Location> cbPlacementLocation = new ArrayList<Location>();
 	private List<Material> cbPlacementTypeCb = new ArrayList<Material>();
 	
-	private List<Material> interractProhibitedItems = ImmutableList.<Material>builder()
+	private Set<Material> interractProhibitedItems = ImmutableSet.<Material>builder()
 			.add(Material.WATER_BUCKET)
 			.add(Material.WATER)
 			.add(Material.LAVA_BUCKET)
@@ -98,6 +102,7 @@ public class PlotsInstancesListener implements Listener{
 			.add(Material.FURNACE_MINECART)
 			.add(Material.CHEST_MINECART)
 			.add(Material.TNT_MINECART)
+			.add(Material.MINECART)
 
 			.add(Material.ACACIA_BOAT)
 			.add(Material.JUNGLE_BOAT)
@@ -106,8 +111,10 @@ public class PlotsInstancesListener implements Listener{
 			.add(Material.OAK_BOAT)
 			.add(Material.SPRUCE_BOAT)
 			
-			.add(Material.MINECART)
 			.add(Material.BONE_MEAL)
+
+			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("_EGG")).collect(Collectors.toSet()).iterator())
+			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("BUCKET")).collect(Collectors.toSet()).iterator())
 			.build();
 	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {
@@ -397,36 +404,33 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		//test si permission d'interagir avec le bloc donné
-		if (!PlotPerm.BUILD.has(plot, pc) && 
-				PlotParamType.getAllPossibleIntaractibleBlocks().contains(clickedBlock.getType()) &&
-				!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(clickedBlock.getType()) ) {
-			e.setCancelled(true);
-			OCmsg.PLOT_CANT_INTERRACT.send(pc);
+		if (!PlotPerm.BUILD.has(plot, pc)) {
+			if (PlotParamType.getAllPossibleIntaractibleBlocks().contains(clickedBlock.getType()) &&! plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(clickedBlock.getType()) ) {
+				e.setCancelled(true);
+				OCmsg.PLOT_CANT_INTERRACT.send(pc);
+				
+			}else if (e.getItem() != null && interractProhibitedItems.contains(e.getItem().getType())) {
+				OCmsg.PLOT_ITEM_PROHIBITED_USED.send(pc);
+				e.setCancelled(true);
+			}
 			
 			return;
 		}
-
-		//cancel interract si un item pouvant faire spawn une entité est utilisé
-		if (e.getItem() != null && !PlotPerm.BUILD.has(plot, pc)) {
-			Material mat = e.getItem().getType();
-			//KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
-			
-			if (interractProhibitedItems.contains(mat) || mat.toString().contains("SPAWN_EGG") || mat.toString().contains("BUCKET")) {
-				OCmsg.PLOT_ITEM_PROHIBITED_USED.send(pc);
-				e.setCancelled(true);
-				return;
-			}
-		}
 		
 		//GESTION COMMANDBLOCKS
-		if (commandBlockTypes.contains(clickedBlock.getType()) && PlotPerm.COMMAND_BLOCK.has(plot, pc)) {
-			if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE))
+		boolean hasClickedCommandblock = commandBlockTypes.contains(clickedBlock.getType());
+		
+		if (commandBlockTypes.contains(clickedBlock.getType())) {
+			if (!PlotPerm.COMMAND_BLOCK.has(plot, pc))
+				OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.COMMAND_BLOCK);
+				
+			else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE))
 				clickedBlock.setType(Material.AIR);
 			
-			else if (!KitType.COMMANDBLOCK.hasKit(pc)) {
+			else if (!KitType.COMMANDBLOCK.hasKit(pc)) 
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
 				
-			} else if (!pc.getPlayer().isSneaking() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			else if (!pc.getPlayer().isSneaking() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				BlockPosition pos = new BlockPosition(clickedBlock.getLocation().getBlockX(), clickedBlock.getLocation().getBlockY(), clickedBlock.getLocation().getBlockZ());
 				NBTTagCompound tag = new NBTTagCompound();
 				
@@ -438,9 +442,10 @@ public class PlotsInstancesListener implements Listener{
 		        nmsPlayer.playerConnection.sendPacket(packet);
 		        e.setUseItemInHand(Result.DENY);
 		        
-			} 
-			
-		} else if (e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
+			}
+		}
+		
+		if (e.useItemInHand() != Result.DENY && e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
 			
 			if (!KitType.COMMANDBLOCK.hasKit(pc)) {
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
@@ -790,16 +795,21 @@ public class PlotsInstancesListener implements Listener{
 				plugin.getPlotsManager().getBirthPlot(
 						e.getEntity()));
 		
-		try {
+		/*try {
 			throw new UnsupportedOperationException("§4[DEBUG] Entity " + e.getEntity() + " removed from " + plot);
 		}catch (Exception ex) {
 			ex.printStackTrace();
-		}
+		}*/
+		
+		if (plot != null)
+			plugin.getLogger().info("§aEntity " + e.getEntity() + " removed from plot " + plot);
+		else
+			plugin.getLogger().info("§cEntity " + e.getEntity() + " removed without birth plot!");
 		
 		if (plot != null)
 			plot.removeEntityInPlot(e.getEntity(), false);
-		else
-			e.getEntity().remove();
+		/*else
+			e.getEntity().remove();*/
 	}
 	
 	@EventHandler //cancel entity pathfind of entity try to go outside of the plot
