@@ -2,11 +2,8 @@ package fr.olympa.olympacreatif.worldedit;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -14,13 +11,13 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.bukkit.regions.BukkitMaskManager;
 import com.boydti.fawe.regions.FaweMask;
-import com.boydti.fawe.regions.FaweMaskManager.MaskType;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.boydti.fawe.regions.general.RegionFilter;
-import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
+
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
+
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -39,12 +36,13 @@ import com.sk89q.worldedit.util.eventbus.EventHandler;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.util.eventbus.EventHandler.Priority;
 import com.sk89q.worldedit.world.World;
+
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+
 import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
@@ -52,35 +50,35 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
-import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcFastAsyncWorldEdit extends AWorldEditManager {
-	
+
 	public OcFastAsyncWorldEdit(OlympaCreatifMain pl) {
 		super(pl);
-		
+
 		FaweAPI.addMaskManager(new OlympaCreatifMask());
-		
+
 		LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
 		for (Material mat : Material.values())
 			if (plugin.getPerksManager().getKitsManager().getKitOf(mat) != null)
 				config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());
+
 		
 		registerAntiCommandblockEditSession();
+
 		plugin.getLogger().info("§dLoaded FastAsyncWorldEdit.");
 	}
-	
+
 	/*
 	@Override
 	public void resetPlot(Player requester, Plot plot) {
 		if (resetingPlots.contains(plot.getPlotId()))
 			return;
-		
+	
 		resetingPlots.add(plot.getPlotId());
 		plugin.getTask().runTaskAsynchronously(() -> {
-			
+	
 			int xMin = plot.getPlotId().getLocation().getBlockX();
 			int zMin = plot.getPlotId().getLocation().getBlockZ();
 			int xMax = xMin + OCparam.PLOT_SIZE.get() - 1;
@@ -88,7 +86,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
 			try (EditSession session = new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld())))) {
 				Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s a commencé.", plot);
-				
+	
 				for (int x = xMin ; x <= xMax ; x++)
 					for (int z = zMin ; z <= zMax ; z++)
 						session.setBlock(x, 0, z, BlockTypes.BEDROCK);
@@ -105,13 +103,13 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				for (int x = xMin ; x <= xMax ; x++)
 					for (int z = zMin ; z <= zMax ; z++)
 						for (int y = WorldManager.worldLevel + 1 ; y < 256 ; y++)
-							session.setBlock(x, y, z, BlockTypes.AIR);		
-				
+							session.setBlock(x, y, z, BlockTypes.AIR);
+	
 				session.close();
 			}
 
 			Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s est terminée !", plot);
-			
+	
 			resetingPlots.remove(plot.getPlotId());
 		});
 	}*/
@@ -121,27 +119,28 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
 		if (pc.hasStaffPerm(StaffPerm.WORLDEDIT))
 			return;
-		
+
 		LocalSession weSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p));
-		
+
 		if (weSession != null) {
 			//clear clipboard si le joueur n'en est pas le proprio
 			if (!PlotPerm.BYPASS_EXIT_CLIPBOARD_CLEAR.has(plot, pc))
 				weSession.setClipboard(null);
-			
+
 			World world = weSession.getSelectionWorld();
-			
+
 			//reset worldedit positions
 			if (world != null && weSession.getRegionSelector(world) != null)
-				weSession.getRegionSelector(world).clear();	
+				weSession.getRegionSelector(world).clear();
 		}
 	}
-	
+
 	private class OlympaCreatifMask extends BukkitMaskManager {
 
 		public OlympaCreatifMask() {
 			super(plugin.getName());
 		}
+
 		
 	    @Override
 	    public RegionFilter getFilter(String w) {
@@ -181,31 +180,29 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
             };
 	    }
 	}
-	
-	private CuboidRegion getPlotRegion(Plot plot) {
 
-    	BlockVector3 v1 = BlockVector3.at(plot.getId().getLocation().getBlockX(), 0, 
-    			plot.getId().getLocation().getBlockZ());
-    	BlockVector3 v2 = BlockVector3.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 256, 
-    			plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
-    	
-    	return new CuboidRegion(v1, v2);
+	private CuboidRegion getPlotRegion(Plot plot) {
+		BlockVector3 v1 = BlockVector3.at(plot.getId().getLocation().getBlockX(), 0,
+				plot.getId().getLocation().getBlockZ());
+		BlockVector3 v2 = BlockVector3.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 256,
+				plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
+
+		return new CuboidRegion(v1, v2);
 	}
-	
+
 	public class OlympaCreatifRegionFilter extends CuboidRegionFilter {
 		Collection<Plot> plots;
 
 		public OlympaCreatifRegionFilter() {
-		    this.plots = (Collection<Plot>)TaskManager.IMP.sync(() -> 
-	        new ArrayDeque<Plot>(plugin.getPlotsManager().getPlots()));
+			plots = TaskManager.IMP.sync(() -> new ArrayDeque<>(plugin.getPlotsManager().getPlots()));
 		}
 
 		@Override
-		public void calculateRegions() {			
+		public void calculateRegions() {
 			for (Plot plot : plots)
-				add(BlockVector2.at(plot.getId().getLocation().getBlockX(), plot.getId().getLocation().getBlockZ()), 
-						BlockVector2.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 
-						plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1));
+				add(BlockVector2.at(plot.getId().getLocation().getBlockX(), plot.getId().getLocation().getBlockZ()),
+						BlockVector2.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1,
+								plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1));
 		}
 	}
 	
