@@ -58,7 +58,7 @@ public abstract class NBTcontrollerUtil {
 	public static NBTTagCompound getValidTags(String string) {
 		try {
 			//Bukkit.broadcastMessage("String tag : " + string + " - parsed tag : " + MojangsonParser.parse(string.replace("minecraft:", "")));
-			return getValidTags(MojangsonParser.parse(string.replace("minecraft:", "")));
+			return getValidTags(MojangsonParser.parse(string/*.replace("minecraft:", "")*/));
 		} catch (CommandSyntaxException e) {
 			return new NBTTagCompound();
 		}
@@ -90,7 +90,7 @@ public abstract class NBTcontrollerUtil {
 			//traitement si le tag n'est pas un compound
 			else {
 				
-				//Bukkit.broadcastMessage("key : " + key + " - class : " + tag.get(key).getClass().getName() + " - params : " + params);
+				//System.out.println("key : " + key + " - class : " + tag.get(key).getClass().getName() + " - params : " + params);
 				
 				if (params == null) {
 					tag.remove(key);
@@ -110,7 +110,7 @@ public abstract class NBTcontrollerUtil {
 					NBTTagList oldList = tag.getList(key, params.getListType());
 					NBTTagList newList = new NBTTagList();
 					
-					//Bukkit.broadcastMessage("LIST : " + oldList.asString());
+					//System.out.println("LIST : " + oldList.asString());
 					
 					//pour chaque élément de la liste, vérification
 					for (int i = 0 ; i < Math.min(oldList.size(), maxListSize) ; i++) 
@@ -119,7 +119,7 @@ public abstract class NBTcontrollerUtil {
 							//Bukkit.broadcastMessage("tag liste : " + oldList.getCompound(i).asString() + " - " + getValidTags(oldList.getCompound(i)).asString());
 							newList.add(getValidTags(oldList.getCompound(i), recurIndex + 1));	
 						}else {
-							//Bukkit.broadcastMessage("list contains : " + oldList.get(i).asString());
+							//System.out.println("list contains : " + oldList.get(i).asString() + " ----- is valid : " + isValueValid(params, oldList.get(i)));
 							if (isValueValid(params, oldList.get(i)))
 								newList.add(oldList.get(i));
 					
@@ -142,6 +142,8 @@ public abstract class NBTcontrollerUtil {
 				}				
 			}
 		}
+		
+		//System.out.println("Returned tag : " + tag.asString());
 		return tag;
 	}
 	

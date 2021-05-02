@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
@@ -14,6 +15,7 @@ import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagList;
 
 public class CmdSummon extends CbCommand {
 
@@ -142,6 +144,14 @@ public class CmdSummon extends CbCommand {
 		//application du tag
 		if (tag != null) {
 			((CraftEntity)e).getHandle().load(tag);
+			if (tag.hasKey("Rotation")) {
+				net.minecraft.server.v1_16_R3.Entity ent = ((CraftEntity)e).getHandle();
+				
+				NBTTagList list = tag.getList("Rotation", NBT.TAG_FLOAT);
+				if (list.size() >= 2)
+					ent.setPositionRotation(ent.locX(), ent.locY(), ent.locZ(), 0f, 0f);
+			}
+			
 			e.teleport(sendingLoc);
 		}
 		

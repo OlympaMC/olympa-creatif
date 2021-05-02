@@ -45,7 +45,7 @@ public abstract class JSONtextUtil {
 			
 			NBTTagList mainTag = MojangsonParser.parse(component.replace("=", ":")).getList("rawText", NBT.TAG_COMPOUND);
 			
-			Bukkit.broadcastMessage("parse : " + mainTag.asString());
+			//Bukkit.broadcastMessage("parse : " + mainTag.asString());
 			
 			for (int i = 0 ; i < mainTag.size() ; i++) {
 				
@@ -95,24 +95,6 @@ public abstract class JSONtextUtil {
 						} else
 							return ((Player)e).getName();
 					}).collect(Collectors.joining(", "));
-					
-					/*for (int j = 0 ; j < list.size() - 1 ; j++)
-						if (list.get(j).getType() == EntityType.PLAYER)
-							concat += ((Player)list.get(j)).getDisplayName() + ", ";
-						else
-							if (list.get(j).getCustomName() != null)
-								concat += list.get(j).getCustomName() + ", ";
-							else
-								concat += list.get(j).getName() + ", ";
-
-					if (list.size() > 0)
-						if (list.get(list.size() - 1).getType() == EntityType.PLAYER)
-							concat += ((Player)list.get(list.size() - 1)).getDisplayName();
-						else
-							if (list.get(list.size() - 1).getCustomName() != null)
-								concat += list.get(list.size() - 1).getCustomName() + ", ";
-							else
-								concat += list.get(list.size() - 1).getName() + ", ";*/
 					
 					//Bukkit.broadcastMessage("selector : '" + concat + "'");
 					textPart.addExtra(concat);
