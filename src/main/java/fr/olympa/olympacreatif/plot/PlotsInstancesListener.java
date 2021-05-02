@@ -106,6 +106,8 @@ public class PlotsInstancesListener implements Listener{
 			.add(Material.SPRUCE_BOAT)
 			
 			.add(Material.BONE_MEAL)
+			
+			.add(Material.ARMOR_STAND)
 
 			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("_EGG")).collect(Collectors.toSet()).iterator())
 			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("BUCKET")).collect(Collectors.toSet()).iterator())
@@ -423,6 +425,7 @@ public class PlotsInstancesListener implements Listener{
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
 				
 			else if (!pc.getPlayer().isSneaking() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+				
 				BlockPosition pos = new BlockPosition(clickedBlock.getLocation().getBlockX(), clickedBlock.getLocation().getBlockY(), clickedBlock.getLocation().getBlockZ());
 				NBTTagCompound tag = new NBTTagCompound();
 				
@@ -441,6 +444,11 @@ public class PlotsInstancesListener implements Listener{
 			
 			if (!KitType.COMMANDBLOCK.hasKit(pc)) {
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
+				return;
+			}
+			
+			if (plot.getCommandBlocksCount() > 5) {
+				pc.getPlayer().sendMessage("[DEBUG] plus de 5 commandblocks ont été posés, pas bien !!");
 				return;
 			}
 			

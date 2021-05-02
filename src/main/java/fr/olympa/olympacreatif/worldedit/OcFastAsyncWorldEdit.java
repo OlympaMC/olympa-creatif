@@ -19,15 +19,28 @@ import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.boydti.fawe.regions.general.RegionFilter;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.event.platform.CommandEvent;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.eventbus.EventHandler;
+import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.util.eventbus.EventHandler.Priority;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import fr.olympa.api.provider.AccountProvider;
@@ -55,6 +68,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			if (plugin.getPerksManager().getKitsManager().getKitOf(mat) != null)
 				config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());
 		
+		registerAntiCommandblockEditSession();
 		plugin.getLogger().info("§dLoaded FastAsyncWorldEdit.");
 	}
 	
@@ -135,9 +149,9 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 	    }
 		
 	    @Override
-	    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
+	    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayerSuper, MaskType typeSuper) {
 	    	
-	    	final OlympaPlayerCreatif p = AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId());
+	    	final OlympaPlayerCreatif p = AccountProvider.get(BukkitAdapter.adapt(wePlayerSuper).getUniqueId());
 	    	final Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
 	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p) || !ComponentCreatif.WORLDEDIT.isActivated() || isReseting(plot)) {
@@ -149,6 +163,19 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
             	
                 @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
+                	/*if (wePlayer.getSession() != null) {
+                		System.out.println("DETECTED MASK WITH " + wePlayer.getSession().getSelection(wePlayer.getSession().getSelectionWorld()).getMinimumPoint() + " AND " + wePlayer.getSession().getSelection(wePlayer.getSession().getSelectionWorld()));
+
+                		BlockVector3 min = wePlayer.getSession().getSelection(wePlayer.getSession().getSelectionWorld()).getMinimumPoint();
+                		BlockVector3 max = wePlayer.getSession().getSelection(wePlayer.getSession().getSelectionWorld()).getMaximumPoint();
+                		
+                		for (int x = min.getX() ; x <= max.getX() ; x++)
+                    		for (int y = min.getY() ; y <= max.getY() ; y++)
+                        		for (int z = min.getZ() ; z <= max.getZ() ; z++)
+                        			System.out.println(plugin.getWorldManager().getWorld().getBlockAt(x, y, z));
+                	}*/
+                	
+                	
                 	return PlotPerm.USE_WE.has(plot, AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId())) && !isReseting(plot);
                 }
             };
@@ -180,5 +207,110 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 						BlockVector2.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 
 						plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1));
 		}
+	}
+	
+	
+	private void registerAntiCommandblockEditSession() {
+		Fawe.get().getWorldEdit().getEventBus().register(new EventHandler(Priority.EARLY) {
+			
+			/*
+			@Subscribe
+			public void onCommand(CommandEvent e) {
+				System.out.println("Command executed : " + e.getArguments() + " BY " + e.getActor());
+				LocalSession session = e.getActor().getSession();
+				
+				if (session == null)
+					return;
+				
+				if (!session.isSelectionDefined(session.getSelectionWorld()))
+					System.out.println("Selection not defined!");
+				else
+					System.out.println("Selection : " + session.getSelection(session.getSelectionWorld()).getMinimumPoint() +  " TO " + session.getSelection(session.getSelectionWorld()).getMaximumPoint());
+			}*/
+			
+			@Subscribe //cancel actions we's actions if performed out of plot
+			public void onEditSession(EditSessionEvent e) {
+				if (e.getActor() == null || e.getActor().getUniqueId() == null)
+					return;
+				
+				OlympaPlayerCreatif p = AccountProvider.get(e.getActor().getUniqueId());
+
+				if (p.hasStaffPerm(StaffPerm.WORLDEDIT))
+					return;
+
+				e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
+			        @Override
+			        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+			        	System.out.println("Paste block " + block.getBlockType() + " for " + p.getName());
+			        	
+			        	return (block.getBlockType() != BlockTypes.COMMAND_BLOCK && 
+			        			block.getBlockType() != BlockTypes.CHAIN_COMMAND_BLOCK && 
+			        			block.getBlockType() != BlockTypes.REPEATING_COMMAND_BLOCK) ? super.setBlock(pos, block) : false;
+			        }
+			        
+			        @Override
+			        public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) {
+			        	setPattern(material);
+			        	super.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
+			        }
+			        
+			        @Override
+			        public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
+			        	setPattern(pattern);
+			        	return super.setBlocks(vset, pattern);
+			        }
+			        
+			        @Override
+			        public int setBlocks(Region region, Pattern pattern) {
+			        	setPattern(pattern);
+			        	return super.setBlocks(region, pattern);
+			        }
+			        
+			        @Override
+			        public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) {
+			        	setPattern(pattern);
+			        	return super.replaceBlocks(region, filter, pattern);
+			        }
+			        
+			        @Override
+			        public int replaceBlocks(Region region, Mask mask, Pattern pattern) {
+			        	setPattern(pattern);
+			        	return super.replaceBlocks(region, mask, pattern);
+			        }
+			        
+			        @Override
+			        public int center(Region region, Pattern pattern) {
+			        	setPattern(pattern);
+			        	return super.center(region, pattern);
+			        }
+			        
+			        private void setPattern(Pattern pat) {
+			        	System.out.println("DETECTED PATTERN : " + pat);
+			        }
+			        
+			        /*
+			        @Override
+			        public boolean setTile(int x, int y, int z, CompoundTag tag) {
+			        	System.out.println("Cancelled tag placement for " + tag.toString());
+			        	return false;
+			        }*/
+			    });	
+			}
+			
+			
+			@Override
+			public int hashCode() {
+				return 1;
+			}
+			
+			@Override
+			public boolean equals(Object arg0) {
+				return this == arg0;
+			}
+			
+			@Override
+			public void dispatch(Object arg0) throws Exception {
+			}
+		});
 	}
 }

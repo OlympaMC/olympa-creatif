@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,6 +19,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
+import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -43,6 +45,8 @@ import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.world.WorldManager;
+import net.minecraft.server.v1_16_R3.TileEntity;
+import net.minecraft.server.v1_16_R3.TileEntityTypes;
 
 public class Plot {
 	
@@ -143,29 +147,44 @@ public class Plot {
 	
 	private void loadInitialEntitiesOnChunks() {
 
-		int initialX = plotId.getIndexX() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
-		int initialZ = plotId.getIndexZ() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
-		int chunksRowCount = Math.floorDiv(OCparam.PLOT_SIZE.get(), 16);
-
 		//Bukkit.broadcastMessage("x min : " + initialX + " - max : " + initialX + chunksRowCount);
 		//Bukkit.broadcastMessage("z min : " + initialZ + " - max : " + initialZ + chunksRowCount);
 		
+		getLoadedChunks().forEach(chunk -> {
+			new ArrayList<Entity>(Arrays.asList(chunk.getEntities())).forEach(e -> {
+				if (e.getType() != EntityType.PLAYER)
+					addEntityInPlot(e);
+			});
+		});
+					
+	}
+	
+	private Set<Chunk> getLoadedChunks() {
+
+		int initialX = plotId.getIndexX() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
+		int initialZ = plotId.getIndexZ() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
+		int chunksRowCount = Math.floorDiv(OCparam.PLOT_SIZE.get(), 16);
+		
+		Set<Chunk> set = new HashSet<Chunk>();
 		
 		for (int x = initialX ; x < initialX + chunksRowCount ; x++)
 			for (int z = initialZ ; z < initialZ + chunksRowCount ; z++)
 				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
-					new ArrayList<Entity>(Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities())).forEach(e -> {
-						if (e.getType() != EntityType.PLAYER)
-							addEntityInPlot(e);
-						//Bukkit.broadcastMessage("detected entity " + e + " on chunk " + chunk);
-					});
+					set.add(plugin.getWorldManager().getWorld().getChunkAt(x, z));
+		
+		return set;
+	}
+	
+	public long getCommandBlocksCount() {
+		return getLoadedChunks().stream().mapToLong(ch -> ((CraftChunk)ch).getHandle().getTileEntities().values()
+				.stream().filter(tile -> tile.getTileType().equals(TileEntityTypes.COMMAND_BLOCK)).count()).sum();
 	}
 	
 	public PlotParameters getParameters() {
 		return parameters;
 	}
 	
-	public PlotMembers getMembers(){
+	public PlotMembers getMembers() {
 		return members;
 	}
 	
