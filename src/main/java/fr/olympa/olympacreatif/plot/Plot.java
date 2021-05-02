@@ -117,12 +117,12 @@ public class Plot {
 		/*for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + 2 ; x++)
 			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
 				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z, true);*/
-		plugin.getWorldManager().getWorld().setChunkForceLoaded(
+		/*plugin.getWorldManager().getWorld().setChunkForceLoaded(
 				plotId
 				.getLocation()
 				.getChunk()
 				.getX(), 
-				plotId.getLocation().getChunk().getZ() , true);
+				plotId.getLocation().getChunk().getZ() , true);*/
 		
 		//add entities from already loaded chunks
 		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
@@ -257,11 +257,8 @@ public class Plot {
 		cbData.unload();
 		
 		//unload des forced chunks
-		/*for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + 2 ; x++)
-			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
-				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z , false);*/
-		plugin.getWorldManager().getWorld().setChunkForceLoaded(
-				plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getZ() , false);
+		/*plugin.getWorldManager().getWorld().setChunkForceLoaded(
+				plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getZ() , false);*/
 	}
 
 	public PlotId getId() {

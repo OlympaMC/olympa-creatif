@@ -193,7 +193,7 @@ public class CbObjective {
 			ent.getCustomName() == null ? ent.getName() : ent.getCustomName(), score));
 		
 		if (sortValues)
-			return values.entrySet().stream().sorted(Comparator.comparingInt(e -> e.getValue())).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldKey, newKey) -> newKey, () -> new LinkedHashMap<String, Integer>()));//(e -> e.getKey(), e -> e.getValue()));
+			return values.entrySet().stream().sorted(Comparator.comparingInt(e -> -e.getValue())).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldKey, newKey) -> newKey, () -> new LinkedHashMap<String, Integer>()));//(e -> e.getKey(), e -> e.getValue()));
 		else
 			return values;
 	}

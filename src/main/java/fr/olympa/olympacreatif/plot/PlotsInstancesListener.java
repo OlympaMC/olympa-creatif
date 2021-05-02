@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -422,10 +423,10 @@ public class PlotsInstancesListener implements Listener{
 			if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE))
 				clickedBlock.setType(Material.AIR);
 			
-			else if (!KitType.COMMANDBLOCK.hasKit(pc)) 
+			else if (!KitType.COMMANDBLOCK.hasKit(pc)) {
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
-			
-			else if (!pc.getPlayer().isSneaking()) {
+				
+			} else if (!pc.getPlayer().isSneaking() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				BlockPosition pos = new BlockPosition(clickedBlock.getLocation().getBlockX(), clickedBlock.getLocation().getBlockY(), clickedBlock.getLocation().getBlockZ());
 				NBTTagCompound tag = new NBTTagCompound();
 				
@@ -435,45 +436,51 @@ public class PlotsInstancesListener implements Listener{
 				
 		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 		        nmsPlayer.playerConnection.sendPacket(packet);
-		        e.setCancelled(true);
+		        e.setUseItemInHand(Result.DENY);
 		        
-			} else if (e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
-				
-				//return si le Y est trop bas ou trop haut
-				if (clickedBlock.getLocation().getBlockY() < 2 || clickedBlock.getLocation().getBlockY() > 254)
-					return;
-				
-				Location loc = null;
-				
-				switch(e.getBlockFace()) {
-				case DOWN:
-					loc = clickedBlock.getLocation().add(0, -1, 0);
-					break;
-				case EAST:
-					loc = clickedBlock.getLocation().add(1, 0, 0);
-					break;
-				case NORTH:
-					loc = clickedBlock.getLocation().add(0, 0, -1);
-					break;
-				case SOUTH:
-					loc = clickedBlock.getLocation().add(0, 0, 1);
-					break;
-				case UP:
-					loc = clickedBlock.getLocation().add(0, 1, 0);
-					break;
-				case WEST:
-					loc = clickedBlock.getLocation().add(-1, 0, 0);
-					break;
-				default:
-					return;
-				}
-				
-				cbPlacementLocation.add(loc);
-				cbPlacementPlayer.add(e.getPlayer());
-				cbPlacementTypeCb.add(e.getItem().getType());
-				
-				e.getItem().setType(Material.DISPENSER);
+			} 
+			
+		} else if (e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
+			
+			if (!KitType.COMMANDBLOCK.hasKit(pc)) {
+				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
+				return;
 			}
+			
+			//return si le Y est trop bas ou trop haut
+			if (clickedBlock.getLocation().getBlockY() < 2 || clickedBlock.getLocation().getBlockY() > 254)
+				return;
+			
+			Location loc = null;
+			
+			switch(e.getBlockFace()) {
+			case DOWN:
+				loc = clickedBlock.getLocation().clone().add(0, -1, 0);
+				break;
+			case EAST:
+				loc = clickedBlock.getLocation().clone().add(1, 0, 0);
+				break;
+			case NORTH:
+				loc = clickedBlock.getLocation().clone().add(0, 0, -1);
+				break;
+			case SOUTH:
+				loc = clickedBlock.getLocation().clone().add(0, 0, 1);
+				break;
+			case UP:
+				loc = clickedBlock.getLocation().clone().add(0, 1, 0);
+				break;
+			case WEST:
+				loc = clickedBlock.getLocation().clone().add(-1, 0, 0);
+				break;
+			default:
+				return;
+			}
+			
+			cbPlacementLocation.add(loc);
+			cbPlacementPlayer.add(e.getPlayer());
+			cbPlacementTypeCb.add(e.getItem().getType());
+			
+			e.getItem().setType(Material.DISPENSER);
 		}
 		
 		//GESTION COMMAND BLOCKS
@@ -783,7 +790,11 @@ public class PlotsInstancesListener implements Listener{
 				plugin.getPlotsManager().getBirthPlot(
 						e.getEntity()));
 		
-		System.out.println("Entity removed : " + e.getEntity() + " from " + plugin.getPlotsManager().getBirthPlot(e.getEntity()));
+		try {
+			throw new UnsupportedOperationException("§4[DEBUG] Entity " + e.getEntity() + " removed from " + plot);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		
 		if (plot != null)
 			plot.removeEntityInPlot(e.getEntity(), false);
