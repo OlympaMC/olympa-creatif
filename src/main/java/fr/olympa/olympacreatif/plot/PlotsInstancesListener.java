@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,8 +19,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -44,7 +41,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.hanging.HangingEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -53,16 +50,13 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CmdSummon;
@@ -418,8 +412,6 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		//GESTION COMMANDBLOCKS
-		boolean hasClickedCommandblock = commandBlockTypes.contains(clickedBlock.getType());
-		
 		if (commandBlockTypes.contains(clickedBlock.getType())) {
 			if (!PlotPerm.COMMAND_BLOCK.has(plot, pc))
 				OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.COMMAND_BLOCK);
@@ -712,15 +704,20 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		}
 		
-		plot.removeEntityInPlot(e.getEntity(), true);
-		
-		//remove entity si joueur a une houe en bois dans la main
-		/*if (((Player)e.getRemover()).getInventory().getItemInMainHand() != null && 
-				((Player)e.getRemover()).getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && 
-				plot.getMembers().getPlayerRank((Player) e.getRemover()) != PlotRank.VISITOR) {
+		plot.removeEntityInPlot(e.getEntity(), false);
+	}
 
-			plot.removeEntityInPlot(e.getEntity());
-		}*/
+	@EventHandler //cancel place
+	public void onItemFramePlace(HangingPlaceEvent e) {
+		Plot plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (plot == null)
+			e.setCancelled(true);
+		
+		else if (!PlotPerm.BUILD.has(plot, AccountProvider.get(e.getPlayer().getUniqueId()))) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer(), PlotPerm.BUILD);
+			e.setCancelled(true);
+		}
 	}
 	
 	@EventHandler //empêche le drop d'items si interdit sur le plot (et cancel si route)

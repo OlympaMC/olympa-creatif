@@ -104,8 +104,9 @@ public class CmdSummon extends CbCommand {
 
 			.add(EntityType.SPLASH_POTION)
 			.add(EntityType.DROPPED_ITEM)
-			
+
 			.add(EntityType.ITEM_FRAME)
+			.add(EntityType.PAINTING)
 			.build();
 	
 	public CmdSummon(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {

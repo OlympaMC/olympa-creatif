@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 
@@ -44,6 +45,8 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
+import com.google.common.collect.ImmutableSet;
+
 import fr.olympa.api.command.essentials.AfkCommand;
 import fr.olympa.api.customevents.AsyncPlayerAfkEvent;
 import fr.olympa.api.item.ItemUtils;
@@ -70,6 +73,21 @@ public class WorldEventsListener implements Listener{
 	List<Entity> entities = new ArrayList<Entity>(); 
 	List<Entity> entitiesToRemove = new ArrayList<Entity>();
 	
+	private Set<SpawnReason> allowedSpawnReasons = ImmutableSet.<SpawnReason>builder()
+			.add(SpawnReason.ENDER_PEARL)
+			.add(SpawnReason.BEEHIVE)
+			.add(SpawnReason.CUSTOM)
+			.add(SpawnReason.SPAWNER)
+			.add(SpawnReason.BREEDING)
+			.add(SpawnReason.SPAWNER_EGG)
+			.add(SpawnReason.DISPENSE_EGG)
+			.add(SpawnReason.DROWNED)
+			.add(SpawnReason.BUILD_IRONGOLEM)
+			.add(SpawnReason.BUILD_SNOWMAN)
+			.add(SpawnReason.OCELOT_BABY)
+			.add(SpawnReason.SLIME_SPLIT)
+			.build();
+	
 	public WorldEventsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 	}
@@ -86,23 +104,20 @@ public class WorldEventsListener implements Listener{
 			});
 	}
 	
-	@EventHandler //n'autorise que certaines sources de spawn de créatures 
+	@EventHandler(priority = EventPriority.LOW) //n'autorise que certaines sources de spawn de créatures 
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
-		if (e.isCancelled())
-			return;
+		//System.out.println("Tryng to spawn " + e.getEntity() + " with reason " + e.getSpawnReason() + " is allowed : " + allowedSpawnReasons.contains(e.getSpawnReason()));
 		
 		if (plugin.getPlotsManager().getPlot(e.getLocation()) == null) {
 			e.setCancelled(true);
 			return;
 		}
 		
-		if (e.getSpawnReason() != SpawnReason.ENDER_PEARL && 
-				e.getSpawnReason() != SpawnReason.CUSTOM && e.getSpawnReason() != SpawnReason.BREEDING && 
-				e.getSpawnReason() != SpawnReason.SPAWNER && e.getSpawnReason() != SpawnReason.SPAWNER_EGG)
+		if (!allowedSpawnReasons.contains(e.getSpawnReason()) && e.getEntityType() != EntityType.ARMOR_STAND)
 			e.setCancelled(true);
 	}
 	
-	@EventHandler(priority = EventPriority.LOW) //cancel spawn if outside of the creative world
+	@EventHandler(priority = EventPriority.LOWEST) //cancel spawn if outside of the creative world
 	public void onEntitySpawn(EntitySpawnEvent e) {
 		if (!ComponentCreatif.ENTITIES.isActivated() || !e.getLocation().getWorld().getUID().equals(plugin.getWorldManager().getWorld().getUID()))
 			e.setCancelled(true);
@@ -149,7 +164,7 @@ public class WorldEventsListener implements Listener{
 				effect.withAmplifier(9);
 	}
 	
-	@EventHandler //cancel potion avec effet >5
+	@EventHandler //cancel potion avec effet > 10
 	public void onPotionConsume(PlayerItemConsumeEvent e) {
 		if (e.getItem().getType() != Material.POTION)
 			return;
