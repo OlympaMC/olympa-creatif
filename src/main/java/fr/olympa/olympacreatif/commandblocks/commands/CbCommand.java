@@ -82,14 +82,28 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	}
 	
 	//renvoie une localisation absolue ou relative complète (null si err de syntaxe ou si hors du plot)
-	protected Location parseLocation (String x, String y, String z) {
+	protected Location parseLocation(String x, String y, String z) {
+		return parseLocation(x, y, z, null, null);
+	}
+	
+	protected Location parseLocation(String x, String y, String z, String yaw, String pitch) {
 		
 		Double xF = getUnverifiedPoint(x, sendingLoc.getX());
 		Double yF = getUnverifiedPoint(y, sendingLoc.getY());
 		Double zF = getUnverifiedPoint(z, sendingLoc.getZ());		
-		 
+
+		float yawF = 0;
+		float pitchF = 0; 
+		
+		try {
+			yawF = Float.valueOf(yaw);
+			pitchF = Float.valueOf(pitch);
+		}catch(Exception ex) {
+			
+		}
+		
 		if (xF != null && yF != null && zF != null) {
-			Location loc = new Location(plugin.getWorldManager().getWorld(), xF, yF, zF); 
+			Location loc = new Location(plugin.getWorldManager().getWorld(), xF, yF, zF, yawF, pitchF); 
 			if (plot.getId().isInPlot(loc))
 				return loc;
 			else

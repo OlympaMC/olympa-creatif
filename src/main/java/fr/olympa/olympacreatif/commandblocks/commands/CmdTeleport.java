@@ -34,14 +34,14 @@ public class CmdTeleport extends CbCommand {
 		case 3:
 			if (sender instanceof Entity) {
 				targetEntities.add((Entity) sender);
-				Location loc1 = parseLocation(args[0], args[1], args[2]);
+				Location loc1 = args.length == 5 ? parseLocation(args[0], args[1], args[2], args[3], args[4]) : parseLocation(args[0], args[1], args[2]);
 				if (loc1 != null)
 					tpPoints.add(loc1);	
 			}
 			break;
 		case 4:
 			targetEntities = parseSelector(args[0], false);
-			Location loc2 = parseLocation(args[1], args[2], args[3]);
+			Location loc2 = args.length == 5 ? parseLocation(args[0], args[1], args[2], args[3], args[4]) : parseLocation(args[0], args[1], args[2]);
 			if (loc2 != null)
 				tpPoints.add(loc2);
 			break;

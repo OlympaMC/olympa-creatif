@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -113,16 +114,18 @@ public class Plot {
 		
 		loadInitialEntitiesOnChunks();
 		
-		//forceload 2*2 chunks à l'origine du plot
+		//forceload 1 chunk à l'origine du plot
 		/*for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + 2 ; x++)
 			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
 				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z, true);*/
-		/*plugin.getWorldManager().getWorld().setChunkForceLoaded(
-				plotId
-				.getLocation()
-				.getChunk()
-				.getX(), 
-				plotId.getLocation().getChunk().getZ() , true);*/
+		plugin.getWorldManager().getWorld().getChunkAtAsync(plotId.getLocation(), new Consumer<Chunk>() {
+
+			@Override
+			public void accept(Chunk t) {
+				plugin.getWorldManager().getWorld().setChunkForceLoaded(t.getX(), t.getZ(), true);
+			}
+			
+		});
 		
 		//add entities from already loaded chunks
 		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
@@ -256,9 +259,8 @@ public class Plot {
 	public void unload() {
 		cbData.unload();
 		
-		//unload des forced chunks
-		/*plugin.getWorldManager().getWorld().setChunkForceLoaded(
-				plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getZ() , false);*/
+		//unload du forced loaded chunk
+		plugin.getWorldManager().getWorld().setChunkForceLoaded(plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getX(), false);
 	}
 
 	public PlotId getId() {
