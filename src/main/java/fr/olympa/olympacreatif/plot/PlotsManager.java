@@ -47,7 +47,7 @@ public class PlotsManager {
 	
 	private Map<Integer, Plot> loadedPlots = new HashMap<Integer, Plot>();
 	
-	private Vector<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
+	//private Vector<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
 	
 	private int plotCount;
 	
@@ -58,7 +58,7 @@ public class PlotsManager {
 		plugin.getServer().getPluginManager().registerEvents(new PlotsInstancesListener(plugin), plugin);
 		
 		//construit les objets Plot chargés depuis la bdd de manière synchrone avec le serveur
-		new BukkitRunnable() {
+		/*new BukkitRunnable() {
 			
 			@Override
 			public void run() {
@@ -69,7 +69,7 @@ public class PlotsManager {
 					asyncPlots.clear();	
 				}
 			}
-		}.runTaskTimer(plugin, 20, 1);
+		}.runTaskTimer(plugin, 20, 1);*/
 		
 		//libère la RAM des plots non utilisés (càd aucun membre connecté et aucun joueur dessus)
 		new BukkitRunnable() {
@@ -252,14 +252,15 @@ public class PlotsManager {
 		this.plotCount = plotsCount;
 	}
 	
+	/*
 	public void addAsyncPlot(AsyncPlot plot) {
 		if (plot != null)
 			synchronized (plot) {
 				asyncPlots.add(plot);	
 			}
-	}
+	}*/
 	
-	private void loadPlot(AsyncPlot ap) {
+	public void loadPlot(AsyncPlot ap) {
 		if (!isPlotLoaded(ap.getId())) 
 			loadedPlots.put(ap.getId().getId(), new Plot(ap));
 	}

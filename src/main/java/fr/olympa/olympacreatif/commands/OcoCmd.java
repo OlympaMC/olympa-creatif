@@ -42,7 +42,7 @@ public class OcoCmd extends AbstractCmd {
 		debug += "\n   §e> Tile entities : §a" + plot.getLoadedTileEntitiesCount();
 		debug += "\n   §e> Equipes : §a" + plot.getCbData().getTeams().size() + "/" + OCparam.CB_MAX_TEAMS_PER_PLOT.get();
 		debug += "\n   §e> Objectifs : §a" + plot.getCbData().getObjectives().size() + "/" + OCparam.CB_MAX_OBJECTIVES_PER_PLOT.get();
-		debug += "\n   §e> Tickets commandblocks : §a" + plot.getCbData().getCommandsTicketsLeft() + "/" +
+		debug += "\n   §e> Tickets commandblocks : §a" + plot.getCbData().getCommandTicketsLeft() + "/" +
 				OCparam.CB_MAX_CMDS_LEFT.get() + " (+" + plot.getCbData().getCpt() * 20 + "/s)";
 		
 		sender.sendMessage(debug);

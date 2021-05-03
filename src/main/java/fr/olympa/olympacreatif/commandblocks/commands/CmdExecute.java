@@ -200,7 +200,7 @@ public class CmdExecute extends CbCommand {
 					sendingLoc = e.getValue();
 					
 					CommandType type = CbCommand.getCommandType(stringCmd);
-					if (plot.getCbData().getCommandsTicketsLeft() < type.getRequiredCbTickets())
+					if (plot.getCbData().getCommandTicketsLeft() < type.getRequiredCbTickets())
 						return -1;
 					
 					CbCommand runCmd = CbCommand.getCommand(type, plugin, sender, sendingLoc, stringCmd);

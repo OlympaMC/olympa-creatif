@@ -140,7 +140,7 @@ public class CbCommandListener implements Listener {
 
 		int neededCmdTickets = cmd.getType().getRequiredCbTickets();
 		
-		if (cmd.getPlot().getCbData().getCommandsTicketsLeft() < neededCmdTickets) {
+		if (cmd.getPlot().getCbData().getCommandTicketsLeft() < neededCmdTickets) {
 			//si le plot n'a plus assez de commandes restantes, cancel exécution
 			OCmsg.CB_NO_COMMANDS_LEFT.send(sender);
 			if (isCommandBlock)

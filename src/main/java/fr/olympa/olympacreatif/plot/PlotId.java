@@ -145,8 +145,71 @@ public class PlotId {
 		}
 	}
 	
+	public static PlotId fromPosition(OlympaCreatifMain plugin, int xLoc, int zLoc) {
+		int x = Math.floorMod(xLoc, OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
+		int z = Math.floorMod(zLoc, OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
+		
+		//return null si route
+		if (x >= OCparam.PLOT_SIZE.get() || z >= OCparam.PLOT_SIZE.get())
+			return null;
+		
+		//Bukkit.broadcastMessage("x = " + x + " - z = " + z);
+
+		//recherche de l'id du plot selon ses coords
+		int plotId = 0;
+		
+		int plotX = Math.floorDiv(xLoc, OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
+		int plotZ = Math.floorDiv(zLoc, OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
+		
+		int circleIndex = Math.max(Math.abs(plotX), Math.abs(plotZ)) + 1;
+		plotId += Math.pow((circleIndex - 1) * 2 - 1, 2);
+		
+		int plotsPerLine = circleIndex * 2 - 2;
+		
+		//Bukkit.broadcastMessage("circleIndex = " + circleIndex + " - plotsPerLine = " + plotsPerLine);
+		
+		int lineIndex = -1;
+		//recherche de l'indice de la rangée du plot (entre 0 et 3)
+		if (plotX >= -circleIndex + 1 && plotX <= circleIndex - 2 && plotZ == circleIndex - 1)
+			lineIndex = 0;
+		else if (plotZ >= -circleIndex + 2 && plotZ <= circleIndex - 1 && plotX == circleIndex - 1)
+			lineIndex = 1;
+		else if (plotX >= -circleIndex + 2 && plotX <= circleIndex - 1 && plotZ == -circleIndex + 1)
+			lineIndex = 2;
+		else if (plotZ >= -circleIndex + 1 && plotZ <= circleIndex - 2 && plotX == -circleIndex + 1)
+			lineIndex = 3;
+		
+		//Bukkit.broadcastMessage("lineIndex = " + lineIndex);
+		
+		plotId += lineIndex * plotsPerLine;
+		
+		switch(lineIndex) {
+		case 0:
+			plotId += circleIndex + plotX;
+			break;
+		case 1:
+			plotId += circleIndex - plotZ;
+			break;
+		case 2:
+			plotId += circleIndex - plotX;
+			break;
+		case 3:
+			plotId += circleIndex + plotZ;
+			break;
+		}
+		
+		//Bukkit.broadcastMessage("plotId = " + plotId);
+		
+		if (plotId <= plugin.getPlotsManager().getTotalPlotCount())
+			return new PlotId(plugin, plotId, plotX, plotZ);
+		else
+			return null;
+	}
+	
 	//retourne un PlotId si la localisation est sur un plot (chargé ou non)
 	public static PlotId fromLoc(OlympaCreatifMain plugin, Location loc) {
+		return fromPosition(plugin, loc.getBlockX(), loc.getBlockZ());
+		/*
 		int x = Math.floorMod(loc.getBlockX(), OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
 		int z = Math.floorMod(loc.getBlockZ(), OCparam.PLOT_SIZE.get() + WorldManager.roadSize);
 		
@@ -204,7 +267,7 @@ public class PlotId {
 		if (plotId <= plugin.getPlotsManager().getTotalPlotCount())
 			return new PlotId(plugin, plotId, plotX, plotZ);
 		else
-			return null;
+			return null;*/
 	}
 	
 	
