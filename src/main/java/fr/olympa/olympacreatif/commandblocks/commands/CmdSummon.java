@@ -108,9 +108,32 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.ITEM_FRAME)
 			.add(EntityType.PAINTING)
 			.build();
+
+	private NBTTagCompound tag = null;
+	private Location spawnLoc = null;
+	private EntityType type = null;
 	
 	public CmdSummon(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.summon, sender, loc, plugin, plot, args);
+
+		
+		if (args.length >= 4) {
+			spawnLoc = parseLocation(args[1], args[2], args[3]);
+			
+			if (spawnLoc != null)
+				sendingLoc = spawnLoc;
+			else
+				return;
+		}
+		
+		if (args.length >= 5) 			
+			tag = NBTcontrollerUtil.getValidTags(args[4]);
+		
+		type = EntityType.fromName(getUndomainedString(args[0]));
+		
+		if (!allowedEntities.contains(type)) 
+			type = null;
+		
 	}
 
 	
@@ -118,26 +141,7 @@ public class CmdSummon extends CbCommand {
 	public int execute() {
 		
 		//return si le proprio du plot n'a pas débloqué le /summon
-		if (!plotCbData.hasUnlockedSummon())
-			return 0;
-		
-		NBTTagCompound tag = null;
-		
-		if (args.length >= 4) {
-			Location loc = parseLocation(args[1], args[2], args[3]);
-			
-			if (loc != null)
-				sendingLoc = loc;
-			else
-				return 0;
-		}
-		
-		if (args.length >= 5) 			
-			tag = NBTcontrollerUtil.getValidTags(args[4]);
-		
-		EntityType type = EntityType.fromName(getUndomainedString(args[0]));
-		
-		if (type == null || !allowedEntities.contains(type)) 
+		if (!plotCbData.hasUnlockedSummon() || spawnLoc == null || type == null)
 			return 0;
 		
 		Entity e = plugin.getWorldManager().getWorld().spawnEntity(sendingLoc, type);
@@ -145,13 +149,13 @@ public class CmdSummon extends CbCommand {
 		//application du tag
 		if (tag != null) {
 			((CraftEntity)e).getHandle().load(tag);
-			if (tag.hasKey("Rotation")) {
+			/*if (tag.hasKey("Rotation")) {
 				net.minecraft.server.v1_16_R3.Entity ent = ((CraftEntity)e).getHandle();
 				
 				NBTTagList list = tag.getList("Rotation", NBT.TAG_FLOAT);
 				if (list.size() >= 2)
 					ent.setPositionRotation(ent.locX(), ent.locY(), ent.locZ(), 0f, 0f);
-			}
+			}*/
 			
 			e.teleport(sendingLoc);
 		}

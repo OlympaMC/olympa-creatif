@@ -24,7 +24,6 @@ public class CmdEnchant extends CbCommand {
 		super(CommandType.enchant, sender, loc, plugin, plot, args);
 	
 		if (args.length >= 2) {
-			targetEntities = parseSelector(args[0], true);
 			ench = args[1].startsWith("minecraft:") ? 
 					Enchantment.getByKey(NamespacedKey.fromString(args[1])) : Enchantment.getByKey(NamespacedKey.minecraft(args[1]));
 		}
@@ -38,6 +37,9 @@ public class CmdEnchant extends CbCommand {
 	public int execute() {
 		if (ench == null)
 			return 0;
+		
+		if (args.length >= 2)
+			targetEntities = parseSelector(args[0], true);
 		
 		int i = 0;
 		

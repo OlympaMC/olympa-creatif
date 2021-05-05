@@ -214,7 +214,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		kill(CmdKill::new),
 		say(CmdSay::new), 
 		me(CmdSay::new), 
-		setblock(CmdSetblock::new, 2), 
+		setblock(CmdSetblock::new, 3), 
 		gamemode(CmdGamemode::new), 
 		gm(CmdGamemode::new), 
 		op(CmdOp::new),

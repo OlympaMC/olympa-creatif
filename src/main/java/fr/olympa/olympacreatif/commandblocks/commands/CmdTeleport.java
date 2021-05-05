@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -14,6 +15,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 public class CmdTeleport extends CbCommand {
 
 	private Location tpLoc = null;
+	private Supplier<List<Entity>> getEntities = null;
 	
 	public CmdTeleport(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.teleport, sender, loc, plugin, plot, args);
@@ -26,7 +28,7 @@ public class CmdTeleport extends CbCommand {
 		}
 		
 		else if (args.length == 2) {
-			targetEntities = parseSelector(args[0], false);
+			getEntities = () -> parseSelector(args[0], false);
 			tpLoc = getLocFromSelector(args[1]);
 		} 
 		
@@ -38,7 +40,7 @@ public class CmdTeleport extends CbCommand {
 		}
 		
 		else if (args.length == 4) {
-			targetEntities = parseSelector(args[0], false);
+			getEntities = () -> parseSelector(args[0], false);
 			tpLoc = parseLocation(args[1], args[2], args[3]);
 		}
 		
@@ -50,7 +52,7 @@ public class CmdTeleport extends CbCommand {
 		}
 		
 		else if (args.length == 6) {
-			targetEntities = parseSelector(args[0], false);
+			getEntities = () -> parseSelector(args[0], false);
 			tpLoc = parseLocation(args[1], args[2], args[3], args[4], args[5]);
 		}
 	}
@@ -65,7 +67,11 @@ public class CmdTeleport extends CbCommand {
 		if (tpLoc == null)
 			return 0;
 		
-		targetEntities.forEach(ent -> ent.teleport(tpLoc));
+		if (getEntities == null)
+			targetEntities.forEach(ent -> ent.teleport(tpLoc));
+		else
+			(targetEntities = getEntities.get()).forEach(ent -> ent.teleport(tpLoc));
+		
 		return targetEntities.size();
 	}
 }

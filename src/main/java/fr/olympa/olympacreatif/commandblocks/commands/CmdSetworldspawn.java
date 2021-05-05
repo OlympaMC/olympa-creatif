@@ -12,17 +12,20 @@ import fr.olympa.olympacreatif.plot.PlotParamType;
 
 public class CmdSetworldspawn extends CbCommand {
 
+	private Location loc = null;
+	
 	public CmdSetworldspawn(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		super(CommandType.setworldspawn, sender, sendingLoc, plugin, plot, commandString);
+
+		if (args.length != 3)
+			return;
+		
+		loc = parseLocation(args[0], args[1], args[2]);
 		
 	}
 
 	@Override
 	public int execute() {
-		if (args.length != 3)
-			return 0;
-		
-		Location loc = parseLocation(args[0], args[1], args[2]);
 		
 		if (loc == null)
 			return 0;
