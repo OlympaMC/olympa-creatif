@@ -471,10 +471,10 @@ public class PlotsInstancesListener implements Listener{
 				return;
 			}
 			
-			if (plot.getCommandBlocksCount() > 5) {
+			/*if (plot.getCommandBlocksCount() > 5) {
 				pc.getPlayer().sendMessage("[DEBUG] plus de 5 commandblocks ont été posés, pas bien !!");
 				return;
-			}
+			}*/
 			
 			//return si le Y est trop bas ou trop haut
 			if (clickedBlock.getLocation().getBlockY() < 2 || clickedBlock.getLocation().getBlockY() > 254)

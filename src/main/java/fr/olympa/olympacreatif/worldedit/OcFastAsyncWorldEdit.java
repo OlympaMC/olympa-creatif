@@ -13,6 +13,7 @@ import com.boydti.fawe.bukkit.regions.BukkitMaskManager;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.boydti.fawe.regions.general.RegionFilter;
+import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 
 import com.sk89q.jnbt.CompoundTag;
@@ -44,6 +45,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
@@ -52,6 +54,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
+import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
@@ -71,22 +74,22 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		plugin.getLogger().info("§dLoaded FastAsyncWorldEdit.");
 	}
 
-	/*
-	@Override
-	public void resetPlot(Player requester, Plot plot) {
-		if (resetingPlots.contains(plot.getPlotId()))
-			return;
 	
-		resetingPlots.add(plot.getPlotId());
+	@Override
+	public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {
+		if (resetingPlots.containsKey(plot.getId()))
+			return false;
+	
+		resetingPlots.put(plot.getId(), 0);
 		plugin.getTask().runTaskAsynchronously(() -> {
 	
-			int xMin = plot.getPlotId().getLocation().getBlockX();
-			int zMin = plot.getPlotId().getLocation().getBlockZ();
+			int xMin = plot.getId().getLocation().getBlockX();
+			int zMin = plot.getId().getLocation().getBlockZ();
 			int xMax = xMin + OCparam.PLOT_SIZE.get() - 1;
 			int zMax = zMin + OCparam.PLOT_SIZE.get() - 1;
 
 			try (EditSession session = new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld())))) {
-				Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s a commencé.", plot);
+				Prefix.DEFAULT.sendMessage(requester.getPlayer(), "§dLa réinitialisation de la parcelle %s a commencé.", plot);
 	
 				for (int x = xMin ; x <= xMax ; x++)
 					for (int z = zMin ; z <= zMax ; z++)
@@ -106,14 +109,16 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 						for (int y = WorldManager.worldLevel + 1 ; y < 256 ; y++)
 							session.setBlock(x, y, z, BlockTypes.AIR);
 	
+				session.flushQueue();
 				session.close();
 			}
 
-			Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s est terminée !", plot);
+			//Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s est terminée !", plot);
 	
-			resetingPlots.remove(plot.getPlotId());
+			resetingPlots.remove(plot.getId());
 		});
-	}*/
+		return true;
+	}
 
 	@Override
 	public void clearClipboard(Plot plot, Player p) {

@@ -40,7 +40,7 @@ public abstract class AWorldEditManager {
 	
 	protected OlympaCreatifMain plugin;
 	
-	private static Map<PlotId, Integer> resetingPlots = new HashMap<PlotId, Integer>();
+	protected static Map<PlotId, Integer> resetingPlots = new HashMap<PlotId, Integer>();
 	
 	public AWorldEditManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
