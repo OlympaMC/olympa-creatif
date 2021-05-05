@@ -33,6 +33,7 @@ import fr.olympa.olympacreatif.perks.KitsManager;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
+import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -63,13 +64,13 @@ public class PacketListener implements Listener {
 	OlympaCreatifMain plugin;
 	private Set<UUID> blockedPlayers = new HashSet<UUID>();
 	
-	private final int maxPacketsPerPeriod = 100;
+	//private final int maxPacketsPerPeriod = 100;
 	private Map<UUID, Long[]> packetsLimiter = new HashMap<UUID, Long[]>();
 
 	private Field packetSetInSlotSlot;
 	private Field packetSetInCreativeSlotItem;
 	
-	private static final ItemStack airItem = CraftItemStack.asNMSCopy(new org.bukkit.inventory.ItemStack(Material.AIR)); 
+	//private static final ItemStack airItem = CraftItemStack.asNMSCopy(new org.bukkit.inventory.ItemStack(Material.AIR)); 
 	
 	public PacketListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -109,7 +110,7 @@ public class PacketListener implements Listener {
 
     private void handlePlayerPackets(Player player) {
     	
-    	OlympaPlayerCreatif p = AccountProvider.get(player.getUniqueId());
+    	final OlympaPlayerCreatif p = AccountProvider.get(player.getUniqueId());
     	
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
         	
@@ -132,16 +133,16 @@ public class PacketListener implements Listener {
             	}
             	
             	if (handledPacket instanceof PacketPlayInSetCommandBlock) {
-            		PacketPlayInSetCommandBlock packet = (PacketPlayInSetCommandBlock) handledPacket;
+            		/*PacketPlayInSetCommandBlock packet = (PacketPlayInSetCommandBlock) handledPacket;
             			System.out.println("COMMANDBLOCK PACKET RECIEVED : \n"
             					+ "position = " + packet.b() + 
             					"\nc = " + packet.c() + 
             					"\nd = " + packet.d() + 
             					"\ne = " + packet.e() + 
             					"\nf = " + packet.f() + 
-            					"\ng = " + packet.g() + "\n\n");
+            					"\ng = " + packet.g() + "\n\n");*/
             			
-               		 handleCbPacket(packet);
+               		 handleCbPacket(p, (PacketPlayInSetCommandBlock) handledPacket);
                		 
             		 /*Plot plot = plugin.getPlotsManager().getPlot(PlotId.fromPosition(plugin, pos.getX(), pos.getZ()));
             		 if (plot != null)
@@ -191,38 +192,51 @@ public class PacketListener implements Listener {
         pipeline.addBefore("packet_handler", player.getName(), channelDuplexHandler);
     }
     
-    public void handleCbPacket(PacketPlayInSetCommandBlock packet) {
+    public void handleCbPacket(OlympaPlayerCreatif p, PacketPlayInSetCommandBlock packet) {
     	plugin.getTask().runTask(() -> {
-    		String cmd = packet.c();
+    		String stringCmd = packet.c();
         	boolean conditional = packet.e();
         	boolean needRedstone = !packet.f();
         	Material mat = packet.g() == Type.REDSTONE ?
-        			Material.COMMAND_BLOCK : 
-        				packet.g() == Type.SEQUENCE ?
-        						Material.CHAIN_COMMAND_BLOCK :
-        						Material.REPEATING_COMMAND_BLOCK;
+			        			Material.COMMAND_BLOCK : 
+			    				packet.g() == Type.SEQUENCE ?
+			    						Material.CHAIN_COMMAND_BLOCK :
+			    						Material.REPEATING_COMMAND_BLOCK;
         	
         	Location loc = new Location(plugin.getWorldManager().getWorld(), packet.b().getX(), packet.b().getY(), packet.b().getZ());
         	 if (!loc.isChunkLoaded())
         		 return;
         	 
+        	 //checks avant de mettre la commande
+        	 if (!p.hasKit(KitType.COMMANDBLOCK)) {
+        		 OCmsg.INSUFFICIENT_KIT_PERMISSION.send(p, KitType.COMMANDBLOCK);
+        		 return;
+        	 }
+        	 if (!PlotPerm.COMMAND_BLOCK.has(plugin.getPlotsManager().getPlot(loc), p)) {
+        		 OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(p, PlotPerm.COMMAND_BLOCK);
+        		 return;
+        	 }
+        	 
         	 Block block = loc.getBlock();
         	 
         	 if (block.getBlockData() instanceof CommandBlock) {
-        		 block.setType(mat);
         		 
-        		 NBTTagCompound tag = new NBTTagCompound();
-        		 TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(packet.b());
-        		 tile.save(tag);
-        		 tag.setByte("auto", needRedstone ? (byte)0 : (byte)1);
-        		 tag.setString("Command", cmd);
-        		 tile.load(tile.getBlock(), tag);
-        		 
-        		//org.bukkit.block.CommandBlock cb = (org.bukkit.block.CommandBlock)block.getState();
-        		 CommandBlock cbData = (CommandBlock) block.getBlockData();        		 
-        		 cbData.setConditional(conditional);
-        		 block.setBlockData(cbData, false);
-        		 
+				NBTTagCompound tag = new NBTTagCompound();
+				TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(packet.b());
+				tile.save(tag);
+				CommandBlock cbData = (CommandBlock) block.getBlockData();
+				 
+				plugin.getPlotsManager().getPlot(loc).getCbData().handleSetCommandBlockPacket((org.bukkit.block.CommandBlock) block.getState(), block.getType(), mat, conditional, needRedstone, stringCmd);
+				
+				cbData.setConditional(conditional);
+				tag.setByte("auto", needRedstone ? (byte)0 : (byte)1);
+				tag.setString("Command", stringCmd);
+				 
+				tile.load(tile.getBlock(), tag);
+				block.setBlockData(cbData, false);
+				block.setType(mat);
+        		
+				OCmsg.COMMANDBLOCK_COMMAND_SET.send(p, stringCmd);
         	 }else {
         		 plugin.getLogger().warning("§cTrying to set commandblock metadata at " + SpigotUtils.convertLocationToHumanString(loc) + ", but there is no commandblock at this location!");
         	 }

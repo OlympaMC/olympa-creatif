@@ -7,11 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
@@ -29,7 +29,6 @@ import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.PacketPlayInSetCommandBlock;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.TileEntityCommand;
 import net.minecraft.server.v1_16_R3.TileEntityTypes;
@@ -62,27 +61,57 @@ public class PlotCbData {
 	private Map<Location, OcCommandBlockData> greenCommandblocks = new HashMap<Location, OcCommandBlockData>();
 	private Map<Location, OcCommandBlockData> blueCommandblocks = new HashMap<Location, OcCommandBlockData>();
 	
-	public PlotCbData(OlympaCreatifMain plugin, Plot plot, int cpt, boolean hasUnlockedSummonCmd, boolean hasUnlockedSetblockSpawnerCmd) {
+	private int cbTask = -1;
+	
+	public PlotCbData(OlympaCreatifMain plugin, int cpt, boolean hasUnlockedSummonCmd, boolean hasUnlockedSetblockSpawnerCmd) {
 		this.plugin = plugin;
-		this.plot = plot;
 		
 		this.cpt = cpt;
 		this.hasUnlockedSetblockSpawnerCmd = hasUnlockedSummonCmd;
 		this.hasUnlockedSummonCmd = hasUnlockedSummonCmd;
 		
+		System.out.println("TICKETS : " + OCparam.CB_MAX_CMDS_LEFT.get());
 		commandsLeft = OCparam.CB_MAX_CMDS_LEFT.get();
+		
 	}
 
 	public void setPlot(Plot plot) {
 		if (this.plot != null)
 			throw new UnsupportedOperationException("Plot " + this.plot + " has already been defined for this plot cb data.");
+
 		this.plot = plot;
+		cbTask = plugin.getTask().scheduleSyncRepeatingTask(() -> {
+			if (plot != null && !plot.hasStoplag())
+				executeTickingCommandBlocks();
+		}, 5, 5);
+	}
+	
+	public void unload() {
+		if (cbTask > -1)
+			plugin.getTask().cancelTaskById(cbTask);
+		
+		for (CbObjective o : objectives) 
+			o.clearDisplaySlot();
+			
+		for (CbTeam t : teams)
+			for (Entity e : t.getMembers())
+				t.removeMember(e);
+		
+		for (Entry<String, CbBossBar> e : bossbars.entrySet())
+			e.getValue().getBar().removeAll();
+
+		if (objectives != null)
+			objectives.clear();
+		if (teams != null)
+			teams.clear();
+		if (bossbars != null)
+			bossbars.clear();
 	}
 	
 	//GETTERS
 	public Scoreboard getScoreboard() {
-		//if (scb == null)
-			//scb = plugin.getCommandBlocksManager().getScoreboardForPlotCbData();
+		if (scb == null)
+			scb = Bukkit.getScoreboardManager().getNewScoreboard();
 		
 		return scb;
 	}
@@ -250,32 +279,6 @@ public class PlotCbData {
 				
 		return null;
 	}
-	
-	public void unload() {
-		for (CbObjective o : objectives) 
-			o.clearDisplaySlot();
-			
-		for (CbTeam t : teams)
-			for (Entity e : t.getMembers())
-				t.removeMember(e);
-		
-		for (Entry<String, CbBossBar> e : bossbars.entrySet())
-			e.getValue().getBar().removeAll();
-
-		if (objectives != null)
-			objectives.clear();
-		if (teams != null)
-			teams.clear();
-		if (bossbars != null)
-			bossbars.clear();
-		
-		/*
-		if (scb != null) {
-			if (scb.getObjective(DisplaySlot.BELOW_NAME) != null)
-				scb.getObjective(DisplaySlot.BELOW_NAME).unregister();
-			plugin.getCommandBlocksManager().addUnusedScoreboard(scb);
-		}*/	
-	}
 
 	public void clearEntityDatas(Entity e) {
 		for (CbObjective o : objectives) 
@@ -285,15 +288,29 @@ public class PlotCbData {
 			if (t.isMember(e))
 				t.removeMember(e);
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////////
+	//                               MANAGE COMMANDBLOCKS                               //
+	//////////////////////////////////////////////////////////////////////////////////////
 	
-	public synchronized void handleSetCommandBlockPacket(PacketPlayInSetCommandBlock packet) {
-		System.out.println("COMMANDBLOCK PACKET RECIEVED : \n"
-				+ "position = " + packet.b() + 
-				"\nc = " + packet.c() + 
-				"\nd = " + packet.d() + 
-				"\ne = " + packet.e() + 
-				"\nf = " + packet.f() + 
-				"\ng = " + packet.g() + "\n\n");
+	public void handleSetCommandBlockPacket(org.bukkit.block.CommandBlock cb, Material oldMat, Material newMat, boolean conditionnal, boolean needsRedstone, String cmd) {
+		Map<Location, OcCommandBlockData> oldMap = getCbMap(oldMat);
+		Map<Location, OcCommandBlockData> newMap = getCbMap(newMat);
+		
+		if (oldMap != newMap)
+			oldMap.remove(cb.getLocation());
+		
+		newMap.put(cb.getLocation(), new OcCommandBlockData(cb, cmd, conditionnal, needsRedstone, false));
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void registerAllCommandBlocks(boolean removeExisting) {
+
+		for (int x = plot.getId().getLocation().getChunk().getX() ; x < plot.getId().getLocation().getChunk().getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
+			for (int z = plot.getId().getLocation().getChunk().getZ() ; z < plot.getId().getLocation().getChunk().getZ() + OCparam.PLOT_SIZE.get() / 16 ; z++)
+				plugin.getWorldManager().getWorld().getChunkAtAsync(x, z, ch -> {
+					registerCommandBlocks(ch, removeExisting);
+				});
 	}
 	
 	public void registerCommandBlocks(Chunk ch, boolean removeExisting) {
@@ -339,10 +356,8 @@ public class PlotCbData {
 					TileEntityCommand cbTile = (TileEntityCommand) tile;
 					Location loc = new Location(plugin.getWorldManager().getWorld(), pos.getX(), pos.getY(), pos.getZ());
 					
-					CbCommand cmd = CbCommand.getCommand(plugin, cbTile.getCommandBlock().getBukkitSender(cbTile.getCommandBlock().getWrapper()), 
-							loc, cbTile.getCommandBlock().getCommand());
-					
-					OcCommandBlockData cbDatas = new OcCommandBlockData(cmd, cb.isConditional(), cbTile.g(), false, getPointingLoc(cb, loc));
+					//OcCommandBlockData cbDatas = new OcCommandBlockData(cmd, cb.isConditional(), cbTile.g(), false, getPointingLoc(cb, loc));
+					OcCommandBlockData cbDatas = new OcCommandBlockData(cb, loc, cbTile.getCommandBlock().getCommand(), cb.isConditional(), cbTile.g(), false);
 					
 					if (cb.getMaterial() == Material.COMMAND_BLOCK) {
 						orange.put(loc, cbDatas);
@@ -362,7 +377,7 @@ public class PlotCbData {
 		});
 	}
 	
-	@SuppressWarnings("incomplete-switch")
+	/*@SuppressWarnings("incomplete-switch")
 	public void registerCommandBlock(Block block) {
 		switch(block.getType()) {
 		case COMMAND_BLOCK:
@@ -381,38 +396,32 @@ public class PlotCbData {
 			break;
 		case REPEATING_COMMAND_BLOCK:
 			blueCommandblocks.put(block.getLocation(), 
-					new OcCommandBlockData(
-							CbCommand.getCommand(plugin, null, block.getLocation(), ((org.bukkit.block.CommandBlock)block).getCommand()), 
-							false, true, block.isBlockPowered()
-							, getPointingLoc((CommandBlock)block.getBlockData(), block.getLocation())));
+					new OcCommandBlockData(block, ((org.bukkit.block.CommandBlock)block).getCommand()), conditionnal, needsRedstone, isPowered);
 			break;
 		}
-	}
+	}*/
 	
 	public void handleCommandBlockPowered(BlockRedstoneEvent e) {
-		if (e.getNewCurrent() > 0 && e.getOldCurrent() > 0)
+		if ((plot == null) || (e.getNewCurrent() > 0 && e.getOldCurrent() > 0))
 			return;
 		
 		OcCommandBlockData cbData = null;
-		cbData = orangeCommandblocks.get(e.getBlock().getLocation());
+		cbData = getCbData(e.getBlock().getType(), e.getBlock().getLocation());
 		
-		if (cbData != null && cbData.isPowered && e.getNewCurrent() > 0) {
-			if (cbData.cmd != null)
-				if (removeCommandTickets(cbData.cmd.getType().getRequiredCbTickets()))
-					cbData.cmd.execute();
-				else
-					plot.getPlayers().forEach(p -> OCmsg.CB_NO_COMMANDS_LEFT.send(p));
-		}else {
-			cbData = greenCommandblocks.containsKey(e.getBlock().getLocation()) ?
-						greenCommandblocks.get(e.getBlock().getLocation()) :
-						blueCommandblocks.get(e.getBlock().getLocation());
-						
-			if (cbData != null)
-				cbData.isPowered = e.getNewCurrent() > 0;
+		if (cbData != null) {
+			if (cbData.cmd != null && e.getBlock().getType() == Material.COMMAND_BLOCK)
+				if (cbData.needsRedstone && !cbData.isPowered && e.getNewCurrent() > 0) 
+					if (removeCommandTickets(cbData.cmd.getType().getRequiredCbTickets()))
+						cbData.cmd.execute();/*((org.bukkit.block.CommandBlock)e.getBlock().getState()) */
+					else
+						plot.getPlayers().forEach(p -> OCmsg.CB_NO_COMMANDS_LEFT.send(p));
+
+			cbData.isPowered = e.getNewCurrent() > 0;
 		}
+		
 	}
 	
-	public void executeTickingCommandBlocks() {
+	private void executeTickingCommandBlocks() {
 		int lastResult = 0;
 		
 		for (Entry<Location, OcCommandBlockData> e : blueCommandblocks.entrySet()) {
@@ -454,26 +463,46 @@ public class PlotCbData {
 	}
 	
 	
-	
-	private Location getPointingLoc(CommandBlock cb, Location initLoc) {
-		switch (cb.getFacing()) {
+	private Location getPointingLoc(CommandBlock cbData, Location blockLoc) {
+		switch (cbData.getFacing()) {
 		case UP:
-			return initLoc.getBlockY() < 255 ? initLoc.clone().add(0, 1, 0) : null;
+			return blockLoc.getBlockY() < 255 ? blockLoc.clone().add(0, 1, 0) : null;
 		case DOWN:
-			return initLoc.getBlockY() > 0 ? initLoc.clone().add(0, -1, 0) : null;
+			return blockLoc.getBlockY() > 0 ? blockLoc.clone().add(0, -1, 0) : null;
 		case EAST:
-			return initLoc.clone().add(1, 0, 0);
+			return blockLoc.clone().add(1, 0, 0);
 		case WEST:
-			return initLoc.clone().add(-1, 0, 0);
+			return blockLoc.clone().add(-1, 0, 0);
 		case SOUTH:
-			return initLoc.clone().add(0, 0, 1);
+			return blockLoc.clone().add(0, 0, 1);
 		case NORTH:
-			return initLoc.clone().add(0, 0, -1);
+			return blockLoc.clone().add(0, 0, -1);
 		default:
-			return initLoc.clone();
+			return blockLoc.clone();
 		}
 	}
 	
+	private Location getPointingLoc(org.bukkit.block.CommandBlock cb) {
+		return getPointingLoc((CommandBlock) cb.getBlockData(), cb.getLocation());
+	}
+	
+	private Map<Location, OcCommandBlockData> getCbMap(Material mat) {
+		switch (mat) {
+		case COMMAND_BLOCK:
+			return orangeCommandblocks;
+		case CHAIN_COMMAND_BLOCK:
+			return greenCommandblocks;
+		case REPEATING_COMMAND_BLOCK:
+			return blueCommandblocks;
+		default:
+			return null;
+		}
+	}
+	
+	private OcCommandBlockData getCbData(Material mat, Location loc) {
+		Map<Location, OcCommandBlockData> map = getCbMap(mat);
+		return map == null ? null : map.get(loc);
+	}
 	
 	private class OcCommandBlockData {
 		
@@ -486,12 +515,16 @@ public class PlotCbData {
 		 */
 		public Location direction;
 		
-		private OcCommandBlockData(CbCommand cmd, boolean conditionnal, boolean needsRedstone, boolean isPowered, Location direction) {
-			this.cmd = cmd;
+		private OcCommandBlockData(org.bukkit.block.CommandBlock cb, String cmd, boolean conditionnal, boolean needsRedstone, boolean isPowered) {
+			this((CommandBlock) cb.getBlockData(), cb.getLocation(), cmd, conditionnal, needsRedstone, isPowered);
+		}
+
+		private OcCommandBlockData(CommandBlock cbData, Location loc, String cmd, boolean conditionnal, boolean needsRedstone, boolean isPowered) {
+			this.cmd = CbCommand.getCommand(plugin, null, loc, cmd);
 			this.conditionnal = conditionnal;
 			this.needsRedstone = needsRedstone;
 			this.isPowered = isPowered;
-			this.direction = direction;
+			this.direction = getPointingLoc(cbData, loc);
 		}
 		
 		public boolean isExecutablePowered() {

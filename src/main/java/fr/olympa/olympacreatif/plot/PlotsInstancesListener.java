@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.plot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
@@ -79,7 +81,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	//private Map<UUID, List<ItemStack>> itemsToKeepOnDeath = new HashMap<UUID, List<ItemStack>>();
 	
-	private List<Material> commandBlockTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
+	private Set<Material> commandBlockTypes = new HashSet<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
 
 	//gère le placement des commandblocks
 	private List<Player> cbPlacementPlayer = new ArrayList<Player>();
@@ -239,6 +241,9 @@ public class PlotsInstancesListener implements Listener{
 				plot.getStoplagChecker().addEvent(StopLagDetect.LAMP);
 			else if (e.getBlock().getType() == Material.REDSTONE_WIRE)
 				plot.getStoplagChecker().addEvent(StopLagDetect.WIRE);
+		
+			else if (commandBlockTypes.contains(e.getBlock().getType()))
+				plot.getCbData().handleCommandBlockPowered(e);
 		
 		//Bukkit.broadcastMessage("REDSTONE EVENT plot : " + plot + ", new current : " + e.getNewCurrent());
 	}
@@ -424,6 +429,7 @@ public class PlotsInstancesListener implements Listener{
 			else if (!KitType.COMMANDBLOCK.hasKit(pc)) 
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
 				
+			//TODO retirer ce truc moche !
 			else if (!pc.getPlayer().isSneaking() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				
 				BlockPosition pos = new BlockPosition(clickedBlock.getLocation().getBlockX(), clickedBlock.getLocation().getBlockY(), clickedBlock.getLocation().getBlockZ());
@@ -440,7 +446,7 @@ public class PlotsInstancesListener implements Listener{
 			}
 		}
 		
-		if (e.useItemInHand() != Result.DENY && e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
+		if ((e.useItemInHand() != Result.DENY || e.getPlayer().isSneaking()) && e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
 			
 			if (!KitType.COMMANDBLOCK.hasKit(pc)) {
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);

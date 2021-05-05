@@ -341,12 +341,12 @@ public class DataManager implements Listener {
 			}
 
 			//création plotCbData
-			PlotCbData cbData = new PlotCbData(plugin, null, 
+			PlotCbData cbData = new PlotCbData(plugin,  
 					UpgradeType.CB_LEVEL.getValueOf(getPlotOwnerDatasResult.getInt(UpgradeType.CB_LEVEL.getBddKey())),
 					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()) && getPlotOwnerDatasResult.getBoolean(KitType.PEACEFUL_MOBS.getBddKey()),
 					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()));
 
-			AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, 
+			AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData,
 					getPlotOwnerDatasResult.getBoolean(KitType.FLUIDS.getBddKey()));
 
 			plugin.getTask().runTaskLater(() -> plugin.getPlotsManager().loadPlot(plot), nextPlotInitTick++);

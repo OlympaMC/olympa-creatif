@@ -123,6 +123,7 @@ public class OCmsg {
 	public static final OCmsg PLOT_STOPLAG_FIRED_CMD = new OCmsg();
 	
 	public static final OCmsg PLOT_ENTER_STOPLAG_ACTIVATED = new OCmsg();
+	public static final OCmsg COMMANDBLOCK_COMMAND_SET = new OCmsg();
     
 	static {
 		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {

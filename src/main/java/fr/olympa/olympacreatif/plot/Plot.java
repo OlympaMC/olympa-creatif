@@ -77,7 +77,7 @@ public class Plot {
 		
 		members.set(p, PlotRank.OWNER);
 		
-		cbData = new PlotCbData(plugin, this, 
+		cbData = new PlotCbData(plugin, 
 				UpgradeType.CB_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.CB_LEVEL)), 
 				p.hasKit(KitType.HOSTILE_MOBS) && p.hasKit(KitType.PEACEFUL_MOBS), p.hasKit(KitType.HOSTILE_MOBS));
 		
@@ -96,16 +96,17 @@ public class Plot {
 		this.members = ap.getMembers();
 		this.plotId = ap.getId();
 		this.stoplagChecker = new PlotStoplagChecker(plugin, this);
+		this.cbData = ap.getCbData();
 		
 		allowLiquidFlow = ap.getAllowLiquidFlow();
-		
-		cbData.setPlot(this);
 		
 		executeCommonInstanciationActions();
 	}
 	
 	//actions to execute, wether if the plot is a new one or loaded from an asyncplot
 	private void executeCommonInstanciationActions() {
+		
+		cbData.setPlot(this);
 		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())

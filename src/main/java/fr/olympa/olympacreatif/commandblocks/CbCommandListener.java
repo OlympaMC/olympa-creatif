@@ -69,7 +69,7 @@ public class CbCommandListener implements Listener {
 	}
 	
 	
-	@EventHandler //Handle commandes des commandsblocks
+	/*@EventHandler //Handle commandes des commandsblocks
 	public void onPreprocessCommandServer(ServerCommandEvent e) {
 		if (!(e.getSender() instanceof CraftBlockCommandSender))
 			return;
@@ -97,7 +97,7 @@ public class CbCommandListener implements Listener {
 			executeCommandBlockCommand(cmd, e.getSender());		
 		}	
 		
-	}
+	}*/
 	
 	@EventHandler //Handle commandes des joueurs
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e) {

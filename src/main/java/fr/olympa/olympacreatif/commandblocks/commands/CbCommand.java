@@ -153,15 +153,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		if (type == null)
 			return null;
 		
-		Plot plot = null;
-
-		if (((sender instanceof CraftBlockCommandSender) && ((CraftBlockCommandSender) sender).getBlock().getState() instanceof CommandBlock)) {
-			plot = plugin.getPlotsManager().getPlot(((CraftBlockCommandSender) sender).getBlock().getState().getLocation());
-			
-		} else if (sender instanceof Entity) {
-			plot = plugin.getPlotsManager().getPlot(((Entity) sender).getLocation());	
-		}else
-			return null;
+		Plot plot = plugin.getPlotsManager().getPlot(loc);
 		
 		if (plot == null)
 			return null;
@@ -201,7 +193,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		return type == null ? null : type.getBuilder().getCmd(sender, loc, plugin, plot, args);
 	}
 	
-	public static CbCommand getCommand(OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {
+	public static CbCommand getCommand(OlympaCreatifMain plugin, Entity sender, Location loc, String fullCommand) {
 		return getCommand(getCommandType(fullCommand), plugin, sender, loc, fullCommand);
 	}
 	
