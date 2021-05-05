@@ -863,8 +863,8 @@ public class PlotsInstancesListener implements Listener{
 		
 		Plot p = plugin.getPlotsManager().getPlot(new Location(e.getChunk().getWorld(), e.getChunk().getX() * 16, 1, e.getChunk().getZ() * 16));
 		
-		if (plot != null) {
-			System.out.println("EVENT CHUNK LOAD CALLED");
+		if (p != null) {
+			//System.out.println("EVENT CHUNK LOAD CALLED");
 			p.getCbData().registerCommandBlocks(e.getChunk(), false);
 		}
 		

@@ -244,12 +244,12 @@ public class PacketListener implements Listener {
         	 Block block = loc.getBlock();
         	 
         	 if (block.getBlockData() instanceof CommandBlock) {
-
- 				CommandBlock cbData = (CommandBlock) block.getBlockData();
  				
         		Material oldMat = block.getType();
-        		BlockFace facing = cbData.getFacing();
+        		BlockFace facing = ((CommandBlock) block.getBlockData()).getFacing();
  				block.setType(mat);
+
+ 				CommandBlock cbData = (CommandBlock) block.getBlockData();
         		 
 				NBTTagCompound tag = new NBTTagCompound();
 				TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(packet.b());

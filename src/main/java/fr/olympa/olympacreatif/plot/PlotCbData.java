@@ -380,7 +380,8 @@ public class PlotCbData {
 	}
 	
 	public void registerCommandBlocks(final Chunk ch, boolean resetChunk) {
-		System.out.println("SET COMMANDS FOR CHUNK " + ch);
+		//System.out.println("SET COMMANDS FOR CHUNK " + ch)
+		
 		//clear les commandblocks déjà enregistrés de ce chunk si demandé 
 		if (resetChunk) {
 			Iterator<Entry<Location, OcCommandBlockData>> iter = orangeCommandblocks.entrySet().iterator();
