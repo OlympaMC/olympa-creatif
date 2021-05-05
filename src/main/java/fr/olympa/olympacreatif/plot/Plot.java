@@ -158,7 +158,7 @@ public class Plot {
 		});	
 	}
 	
-	private Set<Chunk> getLoadedChunks() {
+	public Set<Chunk> getLoadedChunks() {
 
 		int initialX = plotId.getIndexX() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
 		int initialZ = plotId.getIndexZ() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
@@ -279,7 +279,7 @@ public class Plot {
 		cbData.unload();
 		
 		//unload du forced loaded chunk
-		plugin.getWorldManager().getWorld().setChunkForceLoaded(plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getX(), false);
+		//plugin.getWorldManager().getWorld().setChunkForceLoaded(plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getX(), false);
 	}
 
 	public PlotId getId() {

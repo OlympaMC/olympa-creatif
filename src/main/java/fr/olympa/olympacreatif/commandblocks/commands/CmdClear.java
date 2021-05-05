@@ -23,12 +23,6 @@ public class CmdClear extends CbCommand {
 	
 	public CmdClear(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.clear, sender, loc, plugin, plot, args);
-		
-		if (args.length > 0)
-			targetEntities = parseSelector(args[0], true);
-		else
-			if (sender instanceof Player)
-				targetEntities.add((Player) sender);
 
 		if (args.length >=2) {
 			ItemStack item = getItemFromString(args[1]);
@@ -45,12 +39,16 @@ public class CmdClear extends CbCommand {
 	@Override
 	public int execute() {
 		
+		if (args.length > 0)
+			targetEntities = parseSelector(args[0], true);
+		else
+			if (sender instanceof Player)
+				targetEntities.add((Player) sender);
+		
 		int totalRemovedItems = 0;
 		int playerItemsToRemove = 0;
 		
 		for (Entity e : targetEntities) {
-			if (e.getType() != EntityType.PLAYER)
-				continue;
 			
 			playerItemsToRemove = removedItemLimit;
 			

@@ -26,6 +26,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -225,8 +226,11 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 					System.out.println("Selection : " + session.getSelection(session.getSelectionWorld()).getMinimumPoint() +  " TO " + session.getSelection(session.getSelectionWorld()).getMaximumPoint());
 			}*/
 			
-			@Subscribe //cancel actions we's actions if performed out of plot
+			/*@Subscribe //NOT WORKING AT ALL TY INTELLECTUAL SITES, GG
 			public void onEditSession(EditSessionEvent e) {
+				
+				//e.setExtent(new AbstractDelegateExtent(null));
+				
 				if (e.getActor() == null || e.getActor().getUniqueId() == null)
 					return;
 				
@@ -244,55 +248,8 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			        			block.getBlockType() != BlockTypes.CHAIN_COMMAND_BLOCK && 
 			        			block.getBlockType() != BlockTypes.REPEATING_COMMAND_BLOCK) ? super.setBlock(pos, block) : false;
 			        }
-			        
-			        @Override
-			        public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) {
-			        	setPattern(material);
-			        	super.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
-			        }
-			        
-			        @Override
-			        public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.setBlocks(vset, pattern);
-			        }
-			        
-			        @Override
-			        public int setBlocks(Region region, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.setBlocks(region, pattern);
-			        }
-			        
-			        @Override
-			        public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.replaceBlocks(region, filter, pattern);
-			        }
-			        
-			        @Override
-			        public int replaceBlocks(Region region, Mask mask, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.replaceBlocks(region, mask, pattern);
-			        }
-			        
-			        @Override
-			        public int center(Region region, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.center(region, pattern);
-			        }
-			        
-			        private void setPattern(Pattern pat) {
-			        	System.out.println("DETECTED PATTERN : " + pat);
-			        }
-			        
-			        /*
-			        @Override
-			        public boolean setTile(int x, int y, int z, CompoundTag tag) {
-			        	System.out.println("Cancelled tag placement for " + tag.toString());
-			        	return false;
-			        }*/
 			    });	
-			}
+			}*/
 			
 			
 			@Override

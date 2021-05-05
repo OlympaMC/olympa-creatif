@@ -19,6 +19,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
+import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class OcoCmd extends AbstractCmd {
@@ -43,7 +44,7 @@ public class OcoCmd extends AbstractCmd {
 		debug += "\n   §e> Equipes : §a" + plot.getCbData().getTeams().size() + "/" + OCparam.CB_MAX_TEAMS_PER_PLOT.get();
 		debug += "\n   §e> Objectifs : §a" + plot.getCbData().getObjectives().size() + "/" + OCparam.CB_MAX_OBJECTIVES_PER_PLOT.get();
 		debug += "\n   §e> Tickets commandblocks : §a" + plot.getCbData().getCommandTicketsLeft() + "/" +
-				OCparam.CB_MAX_CMDS_LEFT.get() + " (+" + plot.getCbData().getCpt() * 20 + "/s)";
+				OCparam.CB_MAX_CMDS_LEFT.get() + " (+" + plot.getCbData().getCommandsPerSecond() * 20 + "/s)";
 		
 		sender.sendMessage(debug);
 	}
@@ -115,4 +116,51 @@ public class OcoCmd extends AbstractCmd {
 		getPlayer().setFlySpeed(level);
 		OCmsg.OCO_SET_FLY_SPEED.send(getPlayer(), cmd.getArgument(0).toString());
 	}*/
+
+	@Cmd(player = true, syntax = "Définir la vitesse de tick de la parcelle (entre 1 et 20)", args = {"INTEGER"}, min = 1/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
+	public void settickspeed(CommandContext cmd) {
+		Plot plot = ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot();
+		
+		if (plot == null) {
+			OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
+			return;
+		}else if (!PlotPerm.COMMAND_BLOCK.has(plot, getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif) getOlympaPlayer(), PlotPerm.COMMAND_BLOCK);
+			return;
+		}
+		
+		int tickSpeed = cmd.getArgument(0); 
+		
+		if (tickSpeed > 0 && tickSpeed <= 20) {
+			plot.getParameters().setParameter(PlotParamType.TICK_SPEED, tickSpeed);
+			plot.getCbData().setTickSpeed(tickSpeed);
+			OCmsg.CB_SET_TICK_SPEED.send(getPlayer(), tickSpeed + "", plot);
+		}else
+			sendIncorrectSyntax();
+	}
+
+	
+	@Cmd(player = true, syntax = "Recharger tous les commandblocks de la parcelle"/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
+	public void reloadcommandblocks(CommandContext cmd) {
+		Plot plot = ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot();
+		
+		if (plot == null) {
+			OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
+			return;
+		}else if (!PlotPerm.COMMAND_BLOCK.has(plot, getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif) getOlympaPlayer(), PlotPerm.COMMAND_BLOCK);
+			return;
+		}
+		
+		plot.getCbData().reloadAllCommandBlocks(true);
+		OCmsg.PLOT_COMMANDBLOCKS_WILL_RELOAD.send(getPlayer());
+	}
+	
+	
 }
+
+
+
+
+
+

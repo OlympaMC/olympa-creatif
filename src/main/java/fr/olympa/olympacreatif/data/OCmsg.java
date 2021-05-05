@@ -124,7 +124,10 @@ public class OCmsg {
 	
 	public static final OCmsg PLOT_ENTER_STOPLAG_ACTIVATED = new OCmsg();
 	public static final OCmsg COMMANDBLOCK_COMMAND_SET = new OCmsg();
-    
+	public static final OCmsg PLOT_LOAD_TOO_MUCH_CB = new OCmsg(1);
+	public static final OCmsg CB_SET_TICK_SPEED = new OCmsg();
+	public static final OCmsg PLOT_COMMANDBLOCKS_WILL_RELOAD = new OCmsg();
+	
 	static {
 		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {
 			@EventHandler(priority = EventPriority.LOW)

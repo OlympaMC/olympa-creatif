@@ -48,6 +48,8 @@ public class OCparam<T> {
 	public static final OCparam<String> ROAD_SCHEM_NAME_X = new OCparam<String>("fileName");
 	public static final OCparam<String> ROAD_SCHEM_NAME_Z = new OCparam<String>("fileName");
 	
+	public static final OCparam<Integer> MAX_CB_PER_CHUNK = new OCparam<Integer>(100);
+	
 	private T value;
 	private Type type;
 

@@ -5,16 +5,20 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Hopper;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.block.data.type.Dispenser;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -52,6 +56,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
@@ -389,7 +394,18 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (clickedBlock == null)
 			return;
-
+		
+		/*
+		if (clickedBlock.getState() instanceof org.bukkit.block.CommandBlock) {
+			org.bukkit.block.CommandBlock cb = ((org.bukkit.block.CommandBlock)clickedBlock.getState());
+			
+			if (cb.getPersistentDataContainer().getKeys().contains(NamespacedKey.minecraft("cb_auto")))
+				System.out.println("Old value : " + cb.getPersistentDataContainer().get(NamespacedKey.minecraft("cb_auto"), PersistentDataType.BYTE));
+			cb.getPersistentDataContainer().set(NamespacedKey.minecraft("cb_auto"), PersistentDataType.BYTE, (byte) ThreadLocalRandom.current().nextInt(100));
+			System.out.println("New value : " + cb.getPersistentDataContainer().get(NamespacedKey.minecraft("cb_auto"), PersistentDataType.BYTE));
+			cb.update();
+		}*/
+		
 		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 
 		
@@ -423,19 +439,21 @@ public class PlotsInstancesListener implements Listener{
 			if (!PlotPerm.COMMAND_BLOCK.has(plot, pc))
 				OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.COMMAND_BLOCK);
 				
-			else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE))
+			else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE)) {
+				plot.getCbData().removeCommandBlock(clickedBlock);
 				clickedBlock.setType(Material.AIR);
+			}
 			
 			else if (!KitType.COMMANDBLOCK.hasKit(pc)) 
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
 				
-			//TODO retirer ce truc moche !
 			else if (!pc.getPlayer().isSneaking() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				
 				BlockPosition pos = new BlockPosition(clickedBlock.getLocation().getBlockX(), clickedBlock.getLocation().getBlockY(), clickedBlock.getLocation().getBlockZ());
 				NBTTagCompound tag = new NBTTagCompound();
 				
 				plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
+				tag.setByte("auto", PlotCbData.isCbAuto.apply((org.bukkit.block.CommandBlock) clickedBlock.getState()) ? (byte) 1 : (byte) 0);
 				
 				PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
 				
@@ -842,6 +860,13 @@ public class PlotsInstancesListener implements Listener{
 	public void onChunkLoad(ChunkLoadEvent e) {
 		if (e.isNewChunk())
 			return;
+		
+		Plot p = plugin.getPlotsManager().getPlot(new Location(e.getChunk().getWorld(), e.getChunk().getX() * 16, 1, e.getChunk().getZ() * 16));
+		
+		if (plot != null) {
+			System.out.println("EVENT CHUNK LOAD CALLED");
+			p.getCbData().registerCommandBlocks(e.getChunk(), false);
+		}
 		
 		Arrays.asList(e.getChunk().getEntities()).forEach(ent -> {
 			if (ent.getType() == EntityType.PLAYER)

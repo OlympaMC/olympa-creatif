@@ -8,15 +8,21 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftCommandBlock;
+import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,6 +38,7 @@ import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.perks.KitsManager;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotCbData;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
@@ -54,6 +61,8 @@ import net.minecraft.server.v1_16_R3.PacketPlayInSetCommandBlock;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCreativeSlot;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetJigsaw;
 import net.minecraft.server.v1_16_R3.PacketPlayInStruct;
+import net.minecraft.server.v1_16_R3.PacketPlayOutBlockChange;
+import net.minecraft.server.v1_16_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.TileEntityCommand;
 import net.minecraft.server.v1_16_R3.TileEntityCommand.Type;
@@ -181,10 +190,21 @@ public class PacketListener implements Listener {
             }
 
             @Override
-            public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise channelPromise) throws Exception {
+            public void write(ChannelHandlerContext channelHandlerContext, Object packetObject, ChannelPromise channelPromise) throws Exception {
             	//Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "PACKET OUTPUT: " + ChatColor.RED + packet.toString());
             	
-                super.write(channelHandlerContext, packet, channelPromise);
+            	/*if (packetObject instanceof PacketPlayOutBlockChange) {
+            		PacketPlayOutBlockChange packet = (PacketPlayOutBlockChange) packetObject;
+            		Material mat = CraftMagicNumbers.getMaterial(packet.block.getBlock());
+            		
+            		packet.block = ((CraftBlockData)Bukkit.createBlockData(mat)).getState();
+            	}else if (packetObject instanceof PacketPlayOutMapChunk) {
+            		PacketPlayOutMapChunk packet = (PacketPlayOutMapChunk) packetObject;
+            		//packet.
+            		//plugin.getWorldManager().getWorld().getChunkAt(0, 0).sna
+            	}*/
+            	
+                super.write(channelHandlerContext, packetObject, channelPromise);
             }
         };
 
@@ -192,11 +212,15 @@ public class PacketListener implements Listener {
         pipeline.addBefore("packet_handler", player.getName(), channelDuplexHandler);
     }
     
-    public void handleCbPacket(OlympaPlayerCreatif p, PacketPlayInSetCommandBlock packet) {
+    /*private Material getCorrectMaterial(Material mat) {
+    	
+    }*/
+    
+    private void handleCbPacket(OlympaPlayerCreatif p, PacketPlayInSetCommandBlock packet) {
     	plugin.getTask().runTask(() -> {
     		String stringCmd = packet.c();
         	boolean conditional = packet.e();
-        	boolean needRedstone = !packet.f();
+        	boolean isAuto = packet.f();
         	Material mat = packet.g() == Type.REDSTONE ?
 			        			Material.COMMAND_BLOCK : 
 			    				packet.g() == Type.SEQUENCE ?
@@ -220,21 +244,26 @@ public class PacketListener implements Listener {
         	 Block block = loc.getBlock();
         	 
         	 if (block.getBlockData() instanceof CommandBlock) {
+
+ 				CommandBlock cbData = (CommandBlock) block.getBlockData();
+ 				
+        		Material oldMat = block.getType();
+        		BlockFace facing = cbData.getFacing();
+ 				block.setType(mat);
         		 
 				NBTTagCompound tag = new NBTTagCompound();
 				TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(packet.b());
 				tile.save(tag);
-				CommandBlock cbData = (CommandBlock) block.getBlockData();
-				 
-				plugin.getPlotsManager().getPlot(loc).getCbData().handleSetCommandBlockPacket((org.bukkit.block.CommandBlock) block.getState(), block.getType(), mat, conditional, needRedstone, stringCmd);
+				//tag.setByte("auto", isAuto ? (byte)1 : (byte)0);
+				tag.setString("Command", stringCmd);
+				tile.load(tile.getBlock(), tag);
+				PlotCbData.setCbAuto.accept((org.bukkit.block.CommandBlock) block.getState(), isAuto);
 				
 				cbData.setConditional(conditional);
-				tag.setByte("auto", needRedstone ? (byte)0 : (byte)1);
-				tag.setString("Command", stringCmd);
-				 
-				tile.load(tile.getBlock(), tag);
+				cbData.setFacing(facing);
 				block.setBlockData(cbData, false);
-				block.setType(mat);
+
+ 				plugin.getPlotsManager().getPlot(loc).getCbData().handleSetCommandBlockPacket((org.bukkit.block.CommandBlock) block.getState(), oldMat, block.getType());
         		
 				OCmsg.COMMANDBLOCK_COMMAND_SET.send(p, stringCmd);
         	 }else {

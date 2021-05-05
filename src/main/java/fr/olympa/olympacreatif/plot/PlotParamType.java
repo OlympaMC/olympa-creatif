@@ -48,9 +48,10 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	
 	public static PlotParamType<List<Material>> LIST_ALLOWED_INTERRACTION = new PlotParamType<List<Material>>("LIST_ALLOWED_INTERRACTION", new ArrayList<Material>(), new TypeToken<ArrayList<Material>>(){}.getType());
 	public static PlotParamType<List<Long>> BANNED_PLAYERS = new PlotParamType<List<Long>>("BANNED_PLAYERS", new ArrayList<Long>(), new TypeToken<ArrayList<Long>>(){}.getType());
-	
+
 	public static PlotParamType<Boolean> RESET_VISITOR_FLY_SPEED = new PlotParamType<Boolean>("RESET_VISITOR_FLY_SPEED", false);
-	
+
+	public static PlotParamType<Integer> TICK_SPEED = new PlotParamType<Integer>("TICK_SPEED", 4);
 	
 	
 	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();
