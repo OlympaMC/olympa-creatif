@@ -358,7 +358,12 @@ public class PlotCbData {
 		if (oldMap != newMap)
 			oldMap.remove(cb.getLocation());
 		
-		newMap.put(cb.getLocation(), new OcCommandBlockData(cb));
+		if (newMap.size() <= OCparam.MAX_CB_PER_PLOT.get())
+			newMap.put(cb.getLocation(), new OcCommandBlockData(cb));
+		else
+			plot.getMembers().getList().entrySet().stream().filter(e -> PlotPerm.COMMAND_BLOCK.has(e.getValue()))
+			.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_PLOT.send(p, plot, newMat.toString().toLowerCase()));
+			
 	}
 
 	public void removeCommandBlock(Block block) {
@@ -416,13 +421,18 @@ public class PlotCbData {
 			plugin.getTask().runTask(() -> {
 				if (locs.size() > OCparam.MAX_CB_PER_CHUNK.get()) {
 					plot.getMembers().getList().entrySet().stream().filter(e -> PlotPerm.COMMAND_BLOCK.has(e.getValue()))
-					.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB.send(p, plot, "[" + ch.getX() + "," + ch.getZ() + "]"));
+					.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_CHUNK.send(p, plot, "[" + ch.getX() + "," + ch.getZ() + "]"));
 					
 					//System.out.println("CANCELLED CB LOADING for " + ch);	
 				}else 
 					locs.forEach(loc -> {
+						Map<Location, OcCommandBlockData> map = getCbMap(loc.getBlock().getType());
 						if (loc.getBlock().getState() instanceof org.bukkit.block.CommandBlock)
-							getCbMap(loc.getBlock().getType()).put(loc, new OcCommandBlockData((org.bukkit.block.CommandBlock) loc.getBlock().getState()));
+							if (map.size() < OCparam.MAX_CB_PER_PLOT.get())
+								map.put(loc, new OcCommandBlockData((org.bukkit.block.CommandBlock) loc.getBlock().getState()));
+							else
+								plot.getMembers().getList().entrySet().stream().filter(e -> PlotPerm.COMMAND_BLOCK.has(e.getValue()))
+								.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_PLOT.send(p, plot, loc.getBlock().getType().toString().toLowerCase()));
 					});
 				ch.setForceLoaded(false);
 			});
