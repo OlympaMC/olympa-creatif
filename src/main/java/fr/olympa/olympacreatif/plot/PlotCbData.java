@@ -49,7 +49,18 @@ import net.minecraft.server.v1_16_R3.TileEntityTypes;
 public class PlotCbData {
 	
 	private static final NamespacedKey cbAutoKey = NamespacedKey.minecraft("cb_is_auto");
-	private int nextChunkCbLoadTick = Bukkit.getCurrentTick();
+	private int nextChunkCbLoadTick = 0;
+	
+	private static double nextChunkLoad = 1;
+	
+	public static void addChunkToCbLoadList(final Plot plot, final Chunk ch) {
+		nextChunkLoad += 0.5;
+		
+		OlympaCreatifMain.getInstance().getTask().runTaskLater(() -> {
+			plot.getCbData().registerCommandBlocks(ch);
+			nextChunkLoad-= 0.5;
+		}, (int) nextChunkLoad);
+	}
 	
 	public static BiConsumer<org.bukkit.block.CommandBlock, Boolean> setCbAuto = (cb, isAuto) -> {
 		cb.getPersistentDataContainer().set(cbAutoKey, PersistentDataType.BYTE, isAuto ? (byte) 1 : (byte) 0);
@@ -377,18 +388,18 @@ public class PlotCbData {
 			blueCommandblocks.clear();	
 		}
 		
-		nextChunkCbLoadTick = Bukkit.getCurrentTick();
-		plot.getLoadedChunks().forEach(ch -> plugin.getTask().runTaskLater(() -> registerCommandBlocks(ch, false), nextChunkCbLoadTick++));
+		nextChunkCbLoadTick = 1;
+		plot.getLoadedChunks().forEach(ch -> plugin.getTask().runTaskLater(() -> registerCommandBlocks(ch), nextChunkCbLoadTick++));
 		//plugin.getTask().runTaskLater(() -> plot.getLoadedChunks().forEach(ch -> registerCommandBlocks(ch, false))), nextChunkCbLoadTick++);
 		
 		//plot.getLoadedChunks().forEach(regist);
 	}
 	
-	public void registerCommandBlocks(final Chunk ch, boolean resetChunk) {
-		//System.out.println("SET COMMANDS FOR CHUNK " + ch)
+	private void registerCommandBlocks(final Chunk ch) {
+		//System.out.println("[DEBUG] SET COMMANDS FOR CHUNK " + ch);
 		
 		//clear les commandblocks déjà enregistrés de ce chunk si demandé 
-		if (resetChunk) {
+		/*if (resetChunk) {
 			Iterator<Entry<Location, OcCommandBlockData>> iter = orangeCommandblocks.entrySet().iterator();
 			while (iter.hasNext()) {
 				Entry<Location, OcCommandBlockData> entry = iter.next();
@@ -409,7 +420,7 @@ public class PlotCbData {
 				if (entry.getKey().getChunk().equals(ch))
 					iter3.remove();
 			}
-		}
+		}*/
 		
 		Map<BlockPosition, TileEntity> tiles = new HashMap<BlockPosition, TileEntity>(((CraftChunk)ch).getHandle().tileEntities);
 		ch.setForceLoaded(true);
