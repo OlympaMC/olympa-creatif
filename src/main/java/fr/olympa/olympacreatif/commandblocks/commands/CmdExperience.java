@@ -1,5 +1,9 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -16,6 +20,8 @@ public class CmdExperience extends CbCommand {
 	private Experience expType = Experience.LEVELS;
 	private int definedAmount = 0;
 	
+	private Supplier<List<Entity>> getEntities = () -> new ArrayList<Entity>();
+	
 	public CmdExperience(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.experience, sender, loc, plugin, plot, args);
 		
@@ -25,7 +31,7 @@ public class CmdExperience extends CbCommand {
 		switch(args[0]) {
 		case "add":
 			if (args.length >= 3) {
-				targetEntities = parseSelector(args[1], true);
+				getEntities = () -> parseSelector(args[1], true);
 				type = Type.ADD;
 
 				if (StringUtils.isNumeric(args[2]))
@@ -41,7 +47,7 @@ public class CmdExperience extends CbCommand {
 			
 		case "query":
 			if (args.length == 3) {
-				targetEntities = parseSelector(args[1], true);
+				getEntities = () -> parseSelector(args[1], true);
 				type = Type.QUERY;
 				expType = Experience.getExperienceType(args[2]);
 			}
@@ -50,7 +56,7 @@ public class CmdExperience extends CbCommand {
 			
 		case "set":
 			if (args.length >= 3) {
-				targetEntities = parseSelector(args[1], true);
+				getEntities = () -> parseSelector(args[1], true);
 				type = Type.SET;
 				
 				if (StringUtils.isNumeric(args[2]))
@@ -87,6 +93,8 @@ public class CmdExperience extends CbCommand {
 	public int execute() {
 		if (type == null)
 			return 0;
+
+		targetEntities = getEntities.get();
 		
 		//TODO gérer correctement les points d'exp
 		expType = Experience.LEVELS;

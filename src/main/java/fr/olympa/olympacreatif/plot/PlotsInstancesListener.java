@@ -2,18 +2,23 @@ package fr.olympa.olympacreatif.plot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Hopper;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.block.data.type.Dispenser;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -26,6 +31,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
@@ -50,6 +56,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
@@ -67,6 +74,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
+import fr.olympa.olympacreatif.utils.OcCommandBlockPacket;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -79,7 +87,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	//private Map<UUID, List<ItemStack>> itemsToKeepOnDeath = new HashMap<UUID, List<ItemStack>>();
 	
-	private List<Material> commandBlockTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
+	private Set<Material> commandBlockTypes = new HashSet<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
 
 	//gère le placement des commandblocks
 	private List<Player> cbPlacementPlayer = new ArrayList<Player>();
@@ -240,6 +248,9 @@ public class PlotsInstancesListener implements Listener{
 			else if (e.getBlock().getType() == Material.REDSTONE_WIRE)
 				plot.getStoplagChecker().addEvent(StopLagDetect.WIRE);
 		
+			else if (commandBlockTypes.contains(e.getBlock().getType()))
+				plot.getCbData().handleCommandBlockPowered(e);
+		
 		//Bukkit.broadcastMessage("REDSTONE EVENT plot : " + plot + ", new current : " + e.getNewCurrent());
 	}
 	
@@ -384,7 +395,18 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (clickedBlock == null)
 			return;
-
+		
+		/*
+		if (clickedBlock.getState() instanceof org.bukkit.block.CommandBlock) {
+			org.bukkit.block.CommandBlock cb = ((org.bukkit.block.CommandBlock)clickedBlock.getState());
+			
+			if (cb.getPersistentDataContainer().getKeys().contains(NamespacedKey.minecraft("cb_auto")))
+				System.out.println("Old value : " + cb.getPersistentDataContainer().get(NamespacedKey.minecraft("cb_auto"), PersistentDataType.BYTE));
+			cb.getPersistentDataContainer().set(NamespacedKey.minecraft("cb_auto"), PersistentDataType.BYTE, (byte) ThreadLocalRandom.current().nextInt(100));
+			System.out.println("New value : " + cb.getPersistentDataContainer().get(NamespacedKey.minecraft("cb_auto"), PersistentDataType.BYTE));
+			cb.update();
+		}*/
+		
 		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 
 		
@@ -418,8 +440,10 @@ public class PlotsInstancesListener implements Listener{
 			if (!PlotPerm.COMMAND_BLOCK.has(plot, pc))
 				OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.COMMAND_BLOCK);
 				
-			else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE))
+			else if (e.getAction() == Action.LEFT_CLICK_BLOCK && (e.getItem() == null || e.getItem().getType() != Material.WOODEN_AXE)) {
+				plot.getCbData().removeCommandBlock(clickedBlock);
 				clickedBlock.setType(Material.AIR);
+			}
 			
 			else if (!KitType.COMMANDBLOCK.hasKit(pc)) 
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
@@ -430,8 +454,12 @@ public class PlotsInstancesListener implements Listener{
 				NBTTagCompound tag = new NBTTagCompound();
 				
 				plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
+				tag.setByte("auto", PlotCbData.isCbAuto.apply((org.bukkit.block.CommandBlock) clickedBlock.getState()) ? (byte) 1 : (byte) 0);
+				//tag.setByte("conditionMet", PlotCbData.isCbAuto.apply((org.bukkit.block.CommandBlock) clickedBlock.getState()) ? (byte) 1 : (byte) 0);
 				
-				PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
+				//System.out.println("TAG : " + tag.asString());
+				
+				PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);// OcCommandBlockPacket(pos, tag);
 				
 		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 		        nmsPlayer.playerConnection.sendPacket(packet);
@@ -440,17 +468,17 @@ public class PlotsInstancesListener implements Listener{
 			}
 		}
 		
-		if (e.useItemInHand() != Result.DENY && e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
+		if ((e.useItemInHand() != Result.DENY || e.getPlayer().isSneaking()) && e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
 			
 			if (!KitType.COMMANDBLOCK.hasKit(pc)) {
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
 				return;
 			}
 			
-			if (plot.getCommandBlocksCount() > 5) {
+			/*if (plot.getCommandBlocksCount() > 5) {
 				pc.getPlayer().sendMessage("[DEBUG] plus de 5 commandblocks ont été posés, pas bien !!");
 				return;
-			}
+			}*/
 			
 			//return si le Y est trop bas ou trop haut
 			if (clickedBlock.getLocation().getBlockY() < 2 || clickedBlock.getLocation().getBlockY() > 254)
@@ -836,6 +864,12 @@ public class PlotsInstancesListener implements Listener{
 	public void onChunkLoad(ChunkLoadEvent e) {
 		if (e.isNewChunk())
 			return;
+		
+		Plot p = plugin.getPlotsManager().getPlot(new Location(e.getChunk().getWorld(), e.getChunk().getX() * 16, 1, e.getChunk().getZ() * 16));
+		
+		if (p != null)
+			p.getCbData().addChunkToLoadQueue(e.getChunk());
+		
 		
 		Arrays.asList(e.getChunk().getEntities()).forEach(ent -> {
 			if (ent.getType() == EntityType.PLAYER)

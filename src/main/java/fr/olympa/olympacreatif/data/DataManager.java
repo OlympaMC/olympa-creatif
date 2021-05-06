@@ -38,6 +38,7 @@ import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotParameters;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
+import net.minecraft.server.v1_16_R3.MinecraftServer;
 
 
 
@@ -51,6 +52,8 @@ public class DataManager implements Listener {
 	private Vector<Plot> plotsToSave = new Vector<>();
 
 	private int serverIndex = -1;
+	
+	private int nextPlotInitTick;
 
 	//statements de création des tables
 	private final String osTableCreateMessages =
@@ -159,6 +162,8 @@ public class DataManager implements Listener {
 	public DataManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 
+		nextPlotInitTick = MinecraftServer.currentTick + 10;
+		
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		//register redis
 		OlympaCore.getInstance().registerRedisSub(RedisAccess.INSTANCE.connect(), new OCRedisListener(plugin), RedisChannel.BUNGEE_ASK_SEND_SERVERNAME.name());
@@ -261,12 +266,16 @@ public class DataManager implements Listener {
 						updPlayerMember.setInt(6, getPlayerPlotsResult.getInt("player_plot_level"));
 						
 						osUpdatePlayerPlotRank.executeUpdate(updPlayerMember);
+						updPlayerMember.close();
 					}
 				}
 				
 				//add plot to load task
 				addPlotToLoadQueue(id, false);
 			}
+			
+			getPlayerPlots.close();
+			getPlayerPlotsResult.close();
 		}catch (SQLException ex) {
 			ex.printStackTrace();
 		}
@@ -332,7 +341,7 @@ public class DataManager implements Listener {
 			}
 
 			//création plotCbData
-			PlotCbData cbData = new PlotCbData(plugin,
+			PlotCbData cbData = new PlotCbData(plugin,  
 					UpgradeType.CB_LEVEL.getValueOf(getPlotOwnerDatasResult.getInt(UpgradeType.CB_LEVEL.getBddKey())),
 					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()) && getPlotOwnerDatasResult.getBoolean(KitType.PEACEFUL_MOBS.getBddKey()),
 					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()));
@@ -340,7 +349,7 @@ public class DataManager implements Listener {
 			AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData,
 					getPlotOwnerDatasResult.getBoolean(KitType.FLUIDS.getBddKey()));
 
-			plugin.getPlotsManager().addAsyncPlot(plot);
+			plugin.getTask().runTaskLater(() -> plugin.getPlotsManager().loadPlot(plot), nextPlotInitTick++);
 			
 			getPlotOwnerResult.close();
 			getPlotOwner.close();

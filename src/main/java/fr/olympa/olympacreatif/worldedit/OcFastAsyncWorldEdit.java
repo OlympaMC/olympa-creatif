@@ -13,6 +13,7 @@ import com.boydti.fawe.bukkit.regions.BukkitMaskManager;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.boydti.fawe.regions.general.RegionFilter;
+import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 
 import com.sk89q.jnbt.CompoundTag;
@@ -26,6 +27,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -43,6 +45,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
@@ -51,6 +54,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
+import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
@@ -70,22 +74,22 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		plugin.getLogger().info("§dLoaded FastAsyncWorldEdit.");
 	}
 
-	/*
-	@Override
-	public void resetPlot(Player requester, Plot plot) {
-		if (resetingPlots.contains(plot.getPlotId()))
-			return;
 	
-		resetingPlots.add(plot.getPlotId());
+	@Override
+	public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {
+		if (resetingPlots.containsKey(plot.getId()))
+			return false;
+	
+		resetingPlots.put(plot.getId(), 0);
 		plugin.getTask().runTaskAsynchronously(() -> {
 	
-			int xMin = plot.getPlotId().getLocation().getBlockX();
-			int zMin = plot.getPlotId().getLocation().getBlockZ();
+			int xMin = plot.getId().getLocation().getBlockX();
+			int zMin = plot.getId().getLocation().getBlockZ();
 			int xMax = xMin + OCparam.PLOT_SIZE.get() - 1;
 			int zMax = zMin + OCparam.PLOT_SIZE.get() - 1;
 
 			try (EditSession session = new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld())))) {
-				Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s a commencé.", plot);
+				Prefix.DEFAULT.sendMessage(requester.getPlayer(), "§dLa réinitialisation de la parcelle %s a commencé.", plot);
 	
 				for (int x = xMin ; x <= xMax ; x++)
 					for (int z = zMin ; z <= zMax ; z++)
@@ -105,14 +109,16 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 						for (int y = WorldManager.worldLevel + 1 ; y < 256 ; y++)
 							session.setBlock(x, y, z, BlockTypes.AIR);
 	
+				session.flushQueue();
 				session.close();
 			}
 
-			Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s est terminée !", plot);
+			//Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s est terminée !", plot);
 	
-			resetingPlots.remove(plot.getPlotId());
+			resetingPlots.remove(plot.getId());
 		});
-	}*/
+		return true;
+	}
 
 	@Override
 	public void clearClipboard(Plot plot, Player p) {
@@ -225,8 +231,11 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 					System.out.println("Selection : " + session.getSelection(session.getSelectionWorld()).getMinimumPoint() +  " TO " + session.getSelection(session.getSelectionWorld()).getMaximumPoint());
 			}*/
 			
-			@Subscribe //cancel actions we's actions if performed out of plot
+			/*@Subscribe //NOT WORKING AT ALL TY INTELLECTUAL SITES, GG
 			public void onEditSession(EditSessionEvent e) {
+				
+				//e.setExtent(new AbstractDelegateExtent(null));
+				
 				if (e.getActor() == null || e.getActor().getUniqueId() == null)
 					return;
 				
@@ -244,55 +253,8 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			        			block.getBlockType() != BlockTypes.CHAIN_COMMAND_BLOCK && 
 			        			block.getBlockType() != BlockTypes.REPEATING_COMMAND_BLOCK) ? super.setBlock(pos, block) : false;
 			        }
-			        
-			        @Override
-			        public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) {
-			        	setPattern(material);
-			        	super.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
-			        }
-			        
-			        @Override
-			        public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.setBlocks(vset, pattern);
-			        }
-			        
-			        @Override
-			        public int setBlocks(Region region, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.setBlocks(region, pattern);
-			        }
-			        
-			        @Override
-			        public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.replaceBlocks(region, filter, pattern);
-			        }
-			        
-			        @Override
-			        public int replaceBlocks(Region region, Mask mask, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.replaceBlocks(region, mask, pattern);
-			        }
-			        
-			        @Override
-			        public int center(Region region, Pattern pattern) {
-			        	setPattern(pattern);
-			        	return super.center(region, pattern);
-			        }
-			        
-			        private void setPattern(Pattern pat) {
-			        	System.out.println("DETECTED PATTERN : " + pat);
-			        }
-			        
-			        /*
-			        @Override
-			        public boolean setTile(int x, int y, int z, CompoundTag tag) {
-			        	System.out.println("Cancelled tag placement for " + tag.toString());
-			        	return false;
-			        }*/
 			    });	
-			}
+			}*/
 			
 			
 			@Override

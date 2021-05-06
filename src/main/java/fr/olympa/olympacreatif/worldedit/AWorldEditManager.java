@@ -40,7 +40,7 @@ public abstract class AWorldEditManager {
 	
 	protected OlympaCreatifMain plugin;
 	
-	private static Map<PlotId, Integer> resetingPlots = new HashMap<PlotId, Integer>();
+	protected static Map<PlotId, Integer> resetingPlots = new HashMap<PlotId, Integer>();
 	
 	public AWorldEditManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -147,8 +147,10 @@ public abstract class AWorldEditManager {
 				ch.markDirty();
 				ch.mustNotSave = false;
 				
-				resetingPlots.put(plot.getId(), resetingPlots.get(plot.getId()) - 1);
-				if (resetingPlots.get(plot.getId()) <= 0) {
+				if (resetingPlots.containsKey(plot.getId()))
+					resetingPlots.put(plot.getId(), resetingPlots.get(plot.getId()) - 1);
+				
+				if (plot != null && resetingPlots.get(plot.getId()) <= 0) {
 					resetingPlots.remove(plot.getId());
 					OCmsg.PLOT_RESET_END.send(requester, plot);
 				}

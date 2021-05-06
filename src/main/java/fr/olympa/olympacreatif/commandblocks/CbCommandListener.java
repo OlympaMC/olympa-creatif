@@ -69,7 +69,7 @@ public class CbCommandListener implements Listener {
 	}
 	
 	
-	@EventHandler //Handle commandes des commandsblocks
+	/*@EventHandler //Handle commandes des commandsblocks
 	public void onPreprocessCommandServer(ServerCommandEvent e) {
 		if (!(e.getSender() instanceof CraftBlockCommandSender))
 			return;
@@ -97,7 +97,7 @@ public class CbCommandListener implements Listener {
 			executeCommandBlockCommand(cmd, e.getSender());		
 		}	
 		
-	}
+	}*/
 	
 	@EventHandler //Handle commandes des joueurs
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e) {
@@ -140,7 +140,7 @@ public class CbCommandListener implements Listener {
 
 		int neededCmdTickets = cmd.getType().getRequiredCbTickets();
 		
-		if (cmd.getPlot().getCbData().getCommandsTicketsLeft() < neededCmdTickets) {
+		if (cmd.getPlot().getCbData().getCommandTicketsLeft() < neededCmdTickets) {
 			//si le plot n'a plus assez de commandes restantes, cancel exécution
 			OCmsg.CB_NO_COMMANDS_LEFT.send(sender);
 			if (isCommandBlock)

@@ -23,16 +23,16 @@
 		  <id>github-asyncworldedit-api</id>
 		  <url>https://raw.githubusercontent.com/SBPrime/AsyncWorldEdit/maven-artifact/</url>            
 	  </repository>
-
-      <repository>
-          <id>spigot-repo</id>
-          <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-      </repository>
       
       <repository>
 	    <id>papermc</id>
 	    <url>https://papermc.io/repo/repository/maven-public/</url>
 	  </repository>
+
+      <repository>
+          <id>spigot-repo</id>
+          <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+      </repository>
 	  
 	  <repository>
 	    <id>sk89q-snapshots</id>

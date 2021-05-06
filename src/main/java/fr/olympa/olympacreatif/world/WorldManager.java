@@ -127,7 +127,7 @@ public class WorldManager {
             lines.add("spawn-monsters=false");
             lines.add("spawn-protection=0");
             lines.add("allow-nether=false");
-            lines.add("enable-command-block=true");
+            lines.add("enable-command-block=false");
             lines.add("difficulty=easy");
             lines.add("op-permission-level=1");
             lines.add("broadcast-rcon-to-ops=false");

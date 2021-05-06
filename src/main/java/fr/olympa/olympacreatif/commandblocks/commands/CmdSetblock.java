@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -15,19 +16,24 @@ import net.minecraft.server.v1_16_R3.TileEntity;
 
 public class CmdSetblock extends CbCommand {
 
+	Location placingLoc;
+	ItemStack item;
+	
 	public CmdSetblock(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
 		super(CommandType.setblock, sender, sendingLoc, plugin, plot, commandString);
-		// TODO Auto-generated constructor stub
+		
+
+		if (args.length < 4)
+			return;
+		
+		placingLoc = parseLocation(args[0], args[1], args[2]);
+		item = getItemFromString(args[3]);
+		
 	}
 
 	@Override
 	public int execute() {
-		if (args.length < 4)
-			return 0;
-		
-		Location placingLoc = parseLocation(args[0], args[1], args[2]);
-		ItemStack item = getItemFromString(args[3]);
 		
 		if (placingLoc == null || item == null)
 			return 0;
@@ -36,7 +42,9 @@ public class CmdSetblock extends CbCommand {
 		if (item.getType() == Material.SPAWNER && !plotCbData.hasUnlockedSpawnerSetblock() || plugin.getWEManager().isReseting(getPlot()))
 			return 0;
 		
-		plugin.getWorldManager().getWorld().getBlockAt(placingLoc).setType(item.getType());
+		Block block = plugin.getWorldManager().getWorld().getBlockAt(placingLoc);
+		block.setType(item.getType());
+		plot.getCbData().removeCommandBlock(block);
 		
 		net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 		

@@ -19,7 +19,7 @@ public class CmdSpreadplayers extends CbCommand {
 
 	@Override
 	public int execute() {
-		sender.sendMessage("§cLe /spreadplayers n'est pas encore implémenté.");
+		sender.sendMessage("§cLe /spreadplayers n'est pas encore prêt.");
 		
 		return 0;
 	}

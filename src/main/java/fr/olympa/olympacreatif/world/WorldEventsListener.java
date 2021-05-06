@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
@@ -135,6 +136,11 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler //cancel explosion TNT
 	public void onEntityExplodeEvent(EntityExplodeEvent e) {
+		e.blockList().clear();
+	}
+	
+	@EventHandler
+	public void onBlockExplodeEvent(BlockExplodeEvent e) {
 		e.blockList().clear();
 	}
 	

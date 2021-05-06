@@ -36,7 +36,7 @@ public class AsyncPlot {
 	public PlotParameters getParameters() {
 		return params;
 	}
-
+	
 	public PlotCbData getCbData() {
 		return cbData;
 	}

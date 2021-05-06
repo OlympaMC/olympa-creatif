@@ -95,8 +95,8 @@ public class Plot {
 		this.parameters = ap.getParameters();
 		this.members = ap.getMembers();
 		this.plotId = ap.getId();
-		this.cbData = ap.getCbData();
 		this.stoplagChecker = new PlotStoplagChecker(plugin, this);
+		this.cbData = ap.getCbData();
 		
 		allowLiquidFlow = ap.getAllowLiquidFlow();
 		
@@ -106,7 +106,7 @@ public class Plot {
 	//actions to execute, wether if the plot is a new one or loaded from an asyncplot
 	private void executeCommonInstanciationActions() {
 		
-		cbData.executeSynchronousInit();
+		cbData.setPlot(this);
 		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
@@ -122,14 +122,14 @@ public class Plot {
 		/*for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + 2 ; x++)
 			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
 				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z, true);*/
-		plugin.getWorldManager().getWorld().getChunkAtAsync(plotId.getLocation(), new Consumer<Chunk>() {
+		/*plugin.getWorldManager().getWorld().getChunkAtAsync(plotId.getLocation(), new Consumer<Chunk>() {
 
 			@Override
 			public void accept(Chunk t) {
 				plugin.getWorldManager().getWorld().setChunkForceLoaded(t.getX(), t.getZ(), true);
 			}
 			
-		});
+		});*/
 		
 		//add entities from already loaded chunks
 		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
@@ -155,11 +155,10 @@ public class Plot {
 				if (e.getType() != EntityType.PLAYER)
 					addEntityInPlot(e);
 			});
-		});
-					
+		});	
 	}
 	
-	private Set<Chunk> getLoadedChunks() {
+	public Set<Chunk> getLoadedChunks() {
 
 		int initialX = plotId.getIndexX() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
 		int initialZ = plotId.getIndexZ() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
@@ -234,7 +233,7 @@ public class Plot {
 		if (killEntity)
 			e.remove();
 		entitiesInPlot.remove(e);
-		cbData.clearEntity(e);
+		cbData.clearEntityDatas(e);
 	}
 	
 	public Set<Player> getPlayers(){
@@ -280,7 +279,7 @@ public class Plot {
 		cbData.unload();
 		
 		//unload du forced loaded chunk
-		plugin.getWorldManager().getWorld().setChunkForceLoaded(plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getX(), false);
+		//plugin.getWorldManager().getWorld().setChunkForceLoaded(plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getX(), false);
 	}
 
 	public PlotId getId() {
