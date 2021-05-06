@@ -194,7 +194,7 @@ public class CmdExecute extends CbCommand {
 				for (String s : subArgs)
 					if (!s.equals("run"))
 						stringCmd += s + " ";
-				
+
 				for (CbEntry e : senders) {
 					sender = e.getKey();
 					sendingLoc = e.getValue();
