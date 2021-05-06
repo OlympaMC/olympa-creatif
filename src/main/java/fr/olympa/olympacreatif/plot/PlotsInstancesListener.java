@@ -74,6 +74,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
+import fr.olympa.olympacreatif.utils.OcCommandBlockPacket;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -454,8 +455,11 @@ public class PlotsInstancesListener implements Listener{
 				
 				plugin.getWorldManager().getNmsWorld().getTileEntity(pos).save(tag);
 				tag.setByte("auto", PlotCbData.isCbAuto.apply((org.bukkit.block.CommandBlock) clickedBlock.getState()) ? (byte) 1 : (byte) 0);
+				//tag.setByte("conditionMet", PlotCbData.isCbAuto.apply((org.bukkit.block.CommandBlock) clickedBlock.getState()) ? (byte) 1 : (byte) 0);
 				
-				PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);
+				//System.out.println("TAG : " + tag.asString());
+				
+				PacketPlayOutTileEntityData packet = new PacketPlayOutTileEntityData(pos, 2, tag);// OcCommandBlockPacket(pos, tag);
 				
 		        EntityPlayer nmsPlayer = ((CraftPlayer) e.getPlayer()).getHandle();
 		        nmsPlayer.playerConnection.sendPacket(packet);
@@ -864,7 +868,7 @@ public class PlotsInstancesListener implements Listener{
 		Plot p = plugin.getPlotsManager().getPlot(new Location(e.getChunk().getWorld(), e.getChunk().getX() * 16, 1, e.getChunk().getZ() * 16));
 		
 		if (p != null)
-			PlotCbData.addChunkToCbLoadList(p, e.getChunk());
+			p.getCbData().addChunkToLoadQueue(e.getChunk());
 		
 		
 		Arrays.asList(e.getChunk().getEntities()).forEach(ent -> {

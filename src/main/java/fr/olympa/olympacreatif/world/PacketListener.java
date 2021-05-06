@@ -8,21 +8,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.CommandBlock;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_16_R3.block.CraftCommandBlock;
-import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,38 +27,25 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsList;
-import fr.olympa.olympacreatif.perks.KitsManager;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
-import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotCbData;
-import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
+import fr.olympa.olympacreatif.utils.OcCommandBlockPacket;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
-import net.minecraft.server.v1_16_R3.BlockCommand;
-import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.Blocks;
-import net.minecraft.server.v1_16_R3.CommandBlockListenerAbstract;
-import net.minecraft.server.v1_16_R3.EnumDirection;
-import net.minecraft.server.v1_16_R3.IBlockData;
-import net.minecraft.server.v1_16_R3.IMaterial;
-import net.minecraft.server.v1_16_R3.ItemStack;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PacketPlayInJigsawGenerate;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCommandBlock;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCreativeSlot;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetJigsaw;
 import net.minecraft.server.v1_16_R3.PacketPlayInStruct;
-import net.minecraft.server.v1_16_R3.PacketPlayOutBlockChange;
-import net.minecraft.server.v1_16_R3.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_16_R3.PacketPlayOutTileEntityData;
 import net.minecraft.server.v1_16_R3.TileEntity;
-import net.minecraft.server.v1_16_R3.TileEntityCommand;
 import net.minecraft.server.v1_16_R3.TileEntityCommand.Type;
-import net.minecraft.server.v1_16_R3.WorldServer;
 
 public class PacketListener implements Listener {
 
@@ -135,28 +114,14 @@ public class PacketListener implements Listener {
                 
             	if (player.isOp() && !PermissionsList.STAFF_BYPASS_OP_CHECK.hasPermission(p)) {
             		if (blockedPlayers.add(player.getUniqueId())) {
-            			player.sendMessage("§2Very interesting!! §aHow did you get operator permissions? §bAnyway, you won't be able to do anything. §6Don't forget to have fun on Olympa!\n§7If you think that's an error (but I think it isn't), please contact a server administrator.\n§a");
+            			player.sendMessage("§2Very interesting!! §aHow did you get operator permissions? §bAnyway, you won't be able to do anything §l§4>=D \n§6Don't forget to have fun on Olympa!\n§7If you think that's an error (but I think it isn't), please contact a server administrator.\n§a");
             			plugin.getTask().runTaskLater(() -> blockedPlayers.remove(player.getUniqueId()), 20*30);
             		}
             		return;
             	}
             	
-            	if (handledPacket instanceof PacketPlayInSetCommandBlock) {
-            		/*PacketPlayInSetCommandBlock packet = (PacketPlayInSetCommandBlock) handledPacket;
-            			System.out.println("COMMANDBLOCK PACKET RECIEVED : \n"
-            					+ "position = " + packet.b() + 
-            					"\nc = " + packet.c() + 
-            					"\nd = " + packet.d() + 
-            					"\ne = " + packet.e() + 
-            					"\nf = " + packet.f() + 
-            					"\ng = " + packet.g() + "\n\n");*/
-            			
+            	if (handledPacket instanceof PacketPlayInSetCommandBlock) {            			
                		 handleCbPacket(p, (PacketPlayInSetCommandBlock) handledPacket);
-               		 
-            		 /*Plot plot = plugin.getPlotsManager().getPlot(PlotId.fromPosition(plugin, pos.getX(), pos.getZ()));
-            		 if (plot != null)
-            			 plot.getCbData().handleSetCommandBlockPacket((PacketPlayInSetCommandBlock) handledPacket);*/
-            		 
             		 return;
             	}
                 
@@ -191,19 +156,15 @@ public class PacketListener implements Listener {
 
             @Override
             public void write(ChannelHandlerContext channelHandlerContext, Object packetObject, ChannelPromise channelPromise) throws Exception {
-            	//Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "PACKET OUTPUT: " + ChatColor.RED + packet.toString());
+            	/*if (packetObject instanceof PacketPlayOutTileEntityData && !(packetObject instanceof OcCommandBlockPacket)) 
+            		return;
             	
-            	/*if (packetObject instanceof PacketPlayOutBlockChange) {
-            		PacketPlayOutBlockChange packet = (PacketPlayOutBlockChange) packetObject;
-            		Material mat = CraftMagicNumbers.getMaterial(packet.block.getBlock());
-            		
-            		packet.block = ((CraftBlockData)Bukkit.createBlockData(mat)).getState();
-            	}else if (packetObject instanceof PacketPlayOutMapChunk) {
-            		PacketPlayOutMapChunk packet = (PacketPlayOutMapChunk) packetObject;
-            		//packet.
-            		//plugin.getWorldManager().getWorld().getChunkAt(0, 0).sna
+            	if (packetObject instanceof PacketPlayOutTileEntityData) {
+            		PacketPlayOutTileEntityData packet = (PacketPlayOutTileEntityData) packetObject;
+            		Field f = packet.getClass().getDeclaredField("c");
+            		f.setAccessible(true);
+                	System.out.println("§cSent packet : " + ((NBTTagCompound)f.get(packet)).asString());	
             	}*/
-            	
                 super.write(channelHandlerContext, packetObject, channelPromise);
             }
         };
@@ -217,6 +178,14 @@ public class PacketListener implements Listener {
     }*/
     
     private void handleCbPacket(OlympaPlayerCreatif p, PacketPlayInSetCommandBlock packet) {
+
+		/*System.out.println("COMMANDBLOCK PACKET RECIEVED : \n"
+				+ "position = " + packet.b() + 
+				"\nc (cmd) = " + packet.c() + 
+				"\ne (conditional) = " + packet.e() + 
+				"\nf (isAuto) = " + packet.f() + 
+				"\ng (type) = " + packet.g() + "\n\n");*/
+		
     	plugin.getTask().runTask(() -> {
     		String stringCmd = packet.c();
         	boolean conditional = packet.e();

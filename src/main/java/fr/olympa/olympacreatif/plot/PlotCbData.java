@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.plot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,9 +50,8 @@ import net.minecraft.server.v1_16_R3.TileEntityTypes;
 public class PlotCbData {
 	
 	private static final NamespacedKey cbAutoKey = NamespacedKey.minecraft("cb_is_auto");
-	private int nextChunkCbLoadTick = 0;
 	
-	private static double nextChunkLoad = 1;
+	/*private static double nextChunkLoad = 1;
 	
 	public static void addChunkToCbLoadList(final Plot plot, final Chunk ch) {
 		nextChunkLoad += 0.5;
@@ -60,13 +60,16 @@ public class PlotCbData {
 			plot.getCbData().registerCommandBlocks(ch);
 			nextChunkLoad-= 0.5;
 		}, (int) nextChunkLoad);
-	}
+	}*/
 	
 	public static BiConsumer<org.bukkit.block.CommandBlock, Boolean> setCbAuto = (cb, isAuto) -> {
 		cb.getPersistentDataContainer().set(cbAutoKey, PersistentDataType.BYTE, isAuto ? (byte) 1 : (byte) 0);
 		cb.update();
 	};
 	public static Function<org.bukkit.block.CommandBlock, Boolean> isCbAuto = cb -> {
+		
+		//System.out.println("GET is auro custom tag : " + cb.getPersistentDataContainer().get(cbAutoKey, PersistentDataType.BYTE));
+		
 		if (cb.getPersistentDataContainer().getKeys().contains(cbAutoKey))
 			return cb.getPersistentDataContainer().get(cbAutoKey, PersistentDataType.BYTE) == (byte) 1;
 		else {
@@ -84,6 +87,9 @@ public class PlotCbData {
 	
 	private OlympaCreatifMain plugin;
 	private Plot plot;
+	
+	private Set<Long> loadedChunks = new HashSet<Long>();
+	private int nextChunkCbLoadTick = 0;
 	
 	private List<CbObjective> objectives = new ArrayList<CbObjective>();
 	private List<CbTeam> teams = new ArrayList<CbTeam>();
@@ -385,14 +391,24 @@ public class PlotCbData {
 		if (resetChunks) {
 			orangeCommandblocks.clear();
 			greenCommandblocks.clear();
-			blueCommandblocks.clear();	
+			blueCommandblocks.clear();
+			loadedChunks.clear();
 		}
 		
 		nextChunkCbLoadTick = 1;
-		plot.getLoadedChunks().forEach(ch -> plugin.getTask().runTaskLater(() -> registerCommandBlocks(ch), nextChunkCbLoadTick++));
-		//plugin.getTask().runTaskLater(() -> plot.getLoadedChunks().forEach(ch -> registerCommandBlocks(ch, false))), nextChunkCbLoadTick++);
+		plot.getLoadedChunks().forEach(ch -> addChunkToLoadQueue(ch));
+	}
+	
+	public void addChunkToLoadQueue(final Chunk ch) {
+		if (!loadedChunks.add(ch.getChunkKey()))
+			return;
 		
-		//plot.getLoadedChunks().forEach(regist);
+		nextChunkCbLoadTick++;
+		
+		plugin.getTask().runTaskLater(() -> {
+			nextChunkCbLoadTick--;
+			registerCommandBlocks(ch);
+		}, nextChunkCbLoadTick);
 	}
 	
 	private void registerCommandBlocks(final Chunk ch) {
