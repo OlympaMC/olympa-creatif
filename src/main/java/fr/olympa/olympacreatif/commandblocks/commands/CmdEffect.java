@@ -53,7 +53,7 @@ public class CmdEffect extends CbCommand {
 			new AbstractMap.SimpleEntry<String, PotionEffectType>("WITHER", PotionEffectType.WITHER))
 			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	
-	public CmdEffect(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdEffect(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.effect, sender, loc, plugin, plot, args);
 	}
 

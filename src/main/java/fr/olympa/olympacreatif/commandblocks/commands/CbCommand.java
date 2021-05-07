@@ -1,53 +1,22 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.CommandBlock;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.command.CraftBlockCommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.enginehub.piston.CommandValue;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.sk89q.jnbt.NBTUtils;
-
-import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.CbObjective;
-import fr.olympa.olympacreatif.commandblocks.CbTeam;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotCbData;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
-import fr.olympa.olympacreatif.utils.NbtParserUtil;
-import net.minecraft.server.v1_16_R3.MojangsonParser;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 
 public abstract class CbCommand extends CbCommandSelectorParser {
 	
 	//la commande comprend un commandsender, une localisation (imposée par le execute at), le plugin, le plot à la commande est exécutée et les arguments de la commande
-	public CbCommand(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+	public CbCommand(CommandType cmdType, Entity sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		super(cmdType, sender, sendingLoc, plugin, plot, commandString);
 	}
 	
@@ -68,15 +37,11 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		int indexOfNbt = s.indexOf("{");
 		if (s.indexOf("{") == -1)  
 			return item;
-		
-		try {			
-			NBTTagCompound tag = NBTcontrollerUtil.getValidTags(MojangsonParser.parse(s.substring(indexOfNbt)));
-			net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-			nmsItem.setTag(tag);
-			item = CraftItemStack.asBukkitCopy(nmsItem);
-		} catch (CommandSyntaxException e) {
-			return null;
-		}
+
+		NBTTagCompound tag = NBTcontrollerUtil.getValidTags(s.substring(indexOfNbt));
+		net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+		nmsItem.setTag(tag);
+		item = CraftItemStack.asBukkitCopy(nmsItem);
 		
 		return item;
 	}
@@ -149,7 +114,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		//return CommandType.get(s.split(":")[s.split(":").length - 1]);
 	}
 	
-	public static CbCommand getCommand(CommandType type, OlympaCreatifMain plugin, CommandSender sender, Location loc, String fullCommand) {
+	public static CbCommand getCommand(CommandType type, OlympaCreatifMain plugin, Entity sender, Location loc, String fullCommand) {
 		if (type == null)
 			return null;
 		
@@ -261,7 +226,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	
 	@FunctionalInterface
 	static interface CommandBuilder {
-		CbCommand getCmd(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args);
+		CbCommand getCmd(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args);
 	}
 	
 }

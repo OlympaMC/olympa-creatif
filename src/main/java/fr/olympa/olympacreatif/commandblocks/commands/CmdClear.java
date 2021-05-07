@@ -21,7 +21,7 @@ public class CmdClear extends CbCommand {
 	private NBTTagCompound tagToRemove = null;
 	int removedItemLimit = 1000000;
 	
-	public CmdClear(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdClear(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.clear, sender, loc, plugin, plot, args);
 
 		if (args.length >=2) {

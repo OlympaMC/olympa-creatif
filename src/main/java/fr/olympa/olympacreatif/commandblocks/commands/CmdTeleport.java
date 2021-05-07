@@ -17,7 +17,7 @@ public class CmdTeleport extends CbCommand {
 	private Location tpLoc = null;
 	private Supplier<List<Entity>> getEntities = null;
 	
-	public CmdTeleport(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdTeleport(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.teleport, sender, loc, plugin, plot, args);
 		
 		if (args.length == 1) {

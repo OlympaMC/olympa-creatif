@@ -13,7 +13,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class CmdTellraw extends CbCommand {
 	
-	public CmdTellraw(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdTellraw(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.tellraw, sender, loc, plugin, plot, args);
 	}
 	

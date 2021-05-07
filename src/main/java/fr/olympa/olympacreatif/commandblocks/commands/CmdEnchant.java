@@ -20,7 +20,7 @@ public class CmdEnchant extends CbCommand {
 	private Enchantment ench = null;
 	private int level = 1;
 	
-	public CmdEnchant(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdEnchant(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.enchant, sender, loc, plugin, plot, args);
 	
 		if (args.length >= 2) {

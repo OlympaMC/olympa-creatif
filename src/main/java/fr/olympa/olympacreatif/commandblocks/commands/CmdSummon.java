@@ -8,6 +8,7 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import com.google.common.collect.ImmutableList;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -113,7 +114,7 @@ public class CmdSummon extends CbCommand {
 	private Location spawnLoc = null;
 	private EntityType type = null;
 	
-	public CmdSummon(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdSummon(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.summon, sender, loc, plugin, plot, args);
 
 		
@@ -127,7 +128,7 @@ public class CmdSummon extends CbCommand {
 		}
 		
 		if (args.length >= 5) 			
-			tag = NBTcontrollerUtil.getValidTags(args[4]);
+			tag = NBTcontrollerUtil.getValidTags(args[4], getSender() instanceof Player ? (Player) getSender() : null);
 		
 		type = EntityType.fromName(getUndomainedString(args[0]));
 		

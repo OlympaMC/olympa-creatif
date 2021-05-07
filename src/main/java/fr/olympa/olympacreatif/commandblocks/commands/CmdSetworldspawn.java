@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -14,7 +15,7 @@ public class CmdSetworldspawn extends CbCommand {
 
 	private Location loc = null;
 	
-	public CmdSetworldspawn(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+	public CmdSetworldspawn(Entity sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		super(CommandType.setworldspawn, sender, sendingLoc, plugin, plot, commandString);
 
 		if (args.length != 3)

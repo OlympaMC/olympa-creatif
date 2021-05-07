@@ -43,7 +43,7 @@ public abstract class CbCommandSelectorParser {
 	protected PlotCbData plotCbData;
 	protected List<Entity> targetEntities = new ArrayList<Entity>();
 	protected String[] args;
-	protected CommandSender sender;
+	protected Entity sender;
 	
 	protected Location sendingLoc;
 	protected CommandType cmdType;
@@ -51,7 +51,7 @@ public abstract class CbCommandSelectorParser {
 	protected PlotRank neededPlotRankToExecute = PlotPerm.EXECUTE_CB_CMD.getRank();
 	protected boolean needCbKitToExecute = true;
 	
-	public CbCommandSelectorParser(CommandType cmdType, CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+	public CbCommandSelectorParser(CommandType cmdType, Entity sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		this.plugin = plugin;
 		this.plot = plot;
 		plotCbData = plot.getCbData();
@@ -67,6 +67,10 @@ public abstract class CbCommandSelectorParser {
 	
 	public boolean needCbKitToExecute() {
 		return needCbKitToExecute;
+	}
+	
+	public Entity getSender() {
+		return sender;
 	}
 
 	@SuppressWarnings("deprecation")

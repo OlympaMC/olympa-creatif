@@ -18,11 +18,11 @@ import fr.olympa.olympacreatif.commandblocks.CbTeam;
 import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.utils.NbtParserUtil;
+import fr.olympa.olympacreatif.utils.JSONtextUtil;
 
 public class CmdTeam extends CbCommand {
 	
-	public CmdTeam(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdTeam(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.team, sender, loc, plugin, plot, args);
 	}
 	
@@ -152,7 +152,7 @@ public class CmdTeam extends CbCommand {
 				switch (args[2]) {
 				case "suffix":					
 					if (args.length >= 4) 
-						t.setName(NbtParserUtil.parseJsonFromCompoundd(NbtParserUtil.getTagFromStringss(args)));
+						t.setName(JSONtextUtil.getJsonText(this, args[3]).toLegacyText());
 					
 					return 1;
 					

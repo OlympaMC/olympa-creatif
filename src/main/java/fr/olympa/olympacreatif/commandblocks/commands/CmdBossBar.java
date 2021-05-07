@@ -19,11 +19,12 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.utils.NbtParserUtil;
+import fr.olympa.olympacreatif.utils.JSONtextUtil;
+import fr.olympa.olympacreatif.utils.OcMojangsonParser;
 
 public class CmdBossBar extends CbCommand {
 	
-	public CmdBossBar(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdBossBar(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.bossbar, sender, loc, plugin, plot, args);
 	}
 	
@@ -41,7 +42,7 @@ public class CmdBossBar extends CbCommand {
 				return 0;
 			
 			BossBar bukkitBar = Bukkit.createBossBar(
-					args[2].startsWith("{") ? NbtParserUtil.parseJsonFromCompoundd(NbtParserUtil.getTagFromStringg(args[2])) : 
+					args[2].startsWith("{") ? JSONtextUtil.getJsonText(this, args[2]).toLegacyText() ://NbtParserUtil.parseJsonFromCompoundd(NbtParserUtil.getTagFromStringg(args[2])) : 
 						ChatColor.translateAlternateColorCodes('&', args[2]), BarColor.WHITE, BarStyle.SOLID);
 			
 			plotCbData.addBossBar(args[1], new CbBossBar(plugin, bukkitBar));
@@ -116,8 +117,8 @@ public class CmdBossBar extends CbCommand {
 					return 0;
 				}
 				
-			case "name":
-				bar.getBar().setTitle(args[3].startsWith("{") ? NbtParserUtil.parseJsonFromCompoundd(NbtParserUtil.getTagFromStringg(args[3])) : 
+			case "name":;
+				bar.getBar().setTitle(args[3].startsWith("{") ? JSONtextUtil.getJsonText(this, args[3]).toLegacyText() ://new OcMojangsonParser(args[3]).parse(getSender() instanceof Player ? (Player) getSender() : null) ://NbtParserUtil.parseJsonFromCompoundd(NbtParserUtil.getTagFromStringg(args[3])) : 
 					ChatColor.translateAlternateColorCodes('&', args[3]));
 				return 1;
 				

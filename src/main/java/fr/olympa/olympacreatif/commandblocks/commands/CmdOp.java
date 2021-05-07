@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -11,7 +12,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class CmdOp extends CbCommand {
 	
-	public CmdOp(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot,
+	public CmdOp(Entity sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot,
 			String[] commandString) {
 		super(CommandType.op, sender, sendingLoc, plugin, plot, commandString);
 		

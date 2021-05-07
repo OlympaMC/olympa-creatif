@@ -1,22 +1,23 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdGive extends CbCommand {
 
 	private ItemStack item = null;
 	
-	public CmdGive(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdGive(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.give, sender, loc, plugin, plot, args);
+		
+		if (args.length >= 2)
+			item = getItemFromString(args[1]);
 	}
 	
 	@Override
@@ -24,15 +25,13 @@ public class CmdGive extends CbCommand {
 		
 		if (args.length < 2)
 			return 0;
+		
+		if (item == null)
+			return 0;
 	
 		targetEntities = parseSelector(args[0], true);
 		
 		if (targetEntities.size() == 0)
-			return 0;
-		
-		item = getItemFromString(args[1]);
-		
-		if (item == null)
 			return 0;
 		
 		int amount = 1;

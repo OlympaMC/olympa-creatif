@@ -22,7 +22,7 @@ public class CmdExperience extends CbCommand {
 	
 	private Supplier<List<Entity>> getEntities = () -> new ArrayList<Entity>();
 	
-	public CmdExperience(CommandSender sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdExperience(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.experience, sender, loc, plugin, plot, args);
 		
 		if (args.length == 0)

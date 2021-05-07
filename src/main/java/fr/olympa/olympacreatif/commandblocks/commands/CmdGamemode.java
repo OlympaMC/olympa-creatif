@@ -13,7 +13,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class CmdGamemode extends CbCommand {
 
-	public CmdGamemode(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
+	public CmdGamemode(Entity sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
 		super(CommandType.gamemode, sender, sendingLoc, plugin, plot, commandString);
 		

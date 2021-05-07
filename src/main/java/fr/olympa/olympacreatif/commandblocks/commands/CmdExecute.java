@@ -22,7 +22,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdExecute extends CbCommand {
 
-	public CmdExecute(CommandSender sender, Location loc, OlympaCreatifMain plugin,	Plot plot, String[] args) {
+	public CmdExecute(Entity sender, Location loc, OlympaCreatifMain plugin,	Plot plot, String[] args) {
 		super(CommandType.execute, sender, loc, plugin, plot, args);
 	}
 	
@@ -99,11 +99,11 @@ public class CmdExecute extends CbCommand {
 				if (subCmd.getValue().size() != 1)
 					return 0;
 
-				Set<CommandSender> sendersSet = senders.stream().map(e -> e.getKey()).collect(Collectors.toSet());
+				Set<Entity> sendersSet = senders.stream().map(e -> e.getKey()).collect(Collectors.toSet());
 				senders = new HashSet<CbEntry>();
 				
 				//ajout de toutes les positions des entités du sélecteur à la liste des sending loc
-				for (CommandSender s : sendersSet) {
+				for (Entity s : sendersSet) {
 					sender = s;
 					
 					/*if (s instanceof Entity)
@@ -120,10 +120,10 @@ public class CmdExecute extends CbCommand {
 			case cmd_positioned:
 				if (subCmd.getValue().size() == 2 && subCmd.getValue().get(0).equals("as")) {
 
-					Set<CommandSender> sendersSet2 = senders.stream().map(e -> e.getKey()).collect(Collectors.toSet());
+					Set<Entity> sendersSet2 = senders.stream().map(e -> e.getKey()).collect(Collectors.toSet());
 					senders = new HashSet<CbEntry>();
 
-					for (CommandSender s : sendersSet2) {
+					for (Entity s : sendersSet2) {
 						sender = s;
 						for (Entity e : parseSelector(subCmd.getValue().get(1), false))
 							senders.add(new CbEntry(s, e.getLocation()));
@@ -131,13 +131,13 @@ public class CmdExecute extends CbCommand {
 					
 				}else if (subCmd.getValue().size() == 3) {
 					
-					Set<CommandSender> sendersSet2 = senders.stream().map(e -> e.getKey()).collect(Collectors.toSet());
+					Set<Entity> sendersSet2 = senders.stream().map(e -> e.getKey()).collect(Collectors.toSet());
 					senders = new HashSet<CbEntry>();
 					
 					Location loc = parseLocation(subCmd.getValue().get(0), subCmd.getValue().get(1), subCmd.getValue().get(2));
 					
 					if (loc != null)
-						for (CommandSender s : sendersSet2) 
+						for (Entity s : sendersSet2) 
 							senders.add(new CbEntry(s, loc));
 				}
 				
@@ -466,14 +466,14 @@ public class CmdExecute extends CbCommand {
 		}
 	}
 	
-	private class CbEntry extends SimpleEntry<CommandSender, Location> {
+	private class CbEntry extends SimpleEntry<Entity, Location> {
 
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = -2308946095098425283L;
 
-		public CbEntry(CommandSender key, Location value) {
+		public CbEntry(Entity key, Location value) {
 			super(key, value);
 		}
 		

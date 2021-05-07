@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -54,14 +55,20 @@ public abstract class NBTcontrollerUtil {
 			e.printStackTrace();
 		}
 	}*/
+
+	public static NBTTagCompound getValidTags(String string, Player requester) {
+		return getValidTags(new OcMojangsonParser(string.replace("minecraft:", "")).parse(requester));
+	}
 	
 	public static NBTTagCompound getValidTags(String string) {
+		return getValidTags(string, null);
+		/*
 		try {
 			//Bukkit.broadcastMessage("String tag : " + string + " - parsed tag : " + MojangsonParser.parse(string.replace("minecraft:", "")));
-			return getValidTags(MojangsonParser.parse(string/*.replace("minecraft:", "")*/));
+			return getValidTags(MojangsonParser.parse(string.replace("minecraft:", "")));
 		} catch (CommandSyntaxException e) {
 			return new NBTTagCompound();
-		}
+		}*/
 	}
 	 
 	public static NBTTagCompound getValidTags(NBTTagCompound tag) {

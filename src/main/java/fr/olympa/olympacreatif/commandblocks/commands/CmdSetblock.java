@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -19,7 +20,7 @@ public class CmdSetblock extends CbCommand {
 	Location placingLoc;
 	ItemStack item;
 	
-	public CmdSetblock(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
+	public CmdSetblock(Entity sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
 		super(CommandType.setblock, sender, sendingLoc, plugin, plot, commandString);
 		

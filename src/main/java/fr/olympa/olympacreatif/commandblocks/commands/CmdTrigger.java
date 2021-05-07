@@ -13,7 +13,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
 public class CmdTrigger extends CbCommand {
 
-	public CmdTrigger(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
+	public CmdTrigger(Entity sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
 		super(CommandType.trigger, sender, sendingLoc, plugin, plot, commandString);
 		

@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -11,7 +12,7 @@ import fr.olympa.olympacreatif.plot.PlotParamType;
 
 public class CmdWeather extends CbCommand {
 
-	public CmdWeather(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+	public CmdWeather(Entity sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		super(CommandType.weather, sender, sendingLoc, plugin, plot, commandString);
 		
 	}

@@ -15,11 +15,11 @@ import net.minecraft.server.v1_16_R3.MojangsonParser;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.NBTTagList;
 
-public class NbtParserUtil {
+public class NbtParserUtilLEGACY {
 
 	private static List<String> copyValue = new ArrayList<String>();
 	
-	public NbtParserUtil() {
+	public NbtParserUtilLEGACY() {
 		copyValue.add("CustomNameVisible");
 		copyValue.add("NoAI");
 		copyValue.add("Glowing");
@@ -317,7 +317,7 @@ public class NbtParserUtil {
 		EGG,
 		SUMMON;
 	}
-	
+	/*
 	//renvoie le NBTTagCompound compris dans la liste de strings
 	public static NBTTagCompound getTagFromStringss(String[] args) {
 		
@@ -329,6 +329,7 @@ public class NbtParserUtil {
 		return getTagFromStringg(concat);
 	}
 	
+	*/
 	public static NBTTagCompound getTagFromStringg(String arg) {
 		try {
 			if (!arg.contains("{") || !arg.contains("}")) 
@@ -393,7 +394,7 @@ public class NbtParserUtil {
 		return getListCompoundFromString(concat);
 	}
 	*/
-
+	/*
 	//renvoie un NBTTagList à partir d'arguments d'un string json
 	public static NBTTagList getListCompoundFromStringg(String concat) {
 
@@ -422,5 +423,5 @@ public class NbtParserUtil {
 		}
 		
 		return new NBTTagList();
-	}
+	}*/
 }

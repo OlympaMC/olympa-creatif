@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -12,7 +13,7 @@ import fr.olympa.olympacreatif.plot.PlotParamType;
 
 public class CmdTime extends CbCommand {
 
-	public CmdTime(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
+	public CmdTime(Entity sender, Location sendingLoc, OlympaCreatifMain plugin, Plot plot, String[] commandString) {
 		super(CommandType.time, sender, sendingLoc, plugin, plot, commandString);
 		
 	}

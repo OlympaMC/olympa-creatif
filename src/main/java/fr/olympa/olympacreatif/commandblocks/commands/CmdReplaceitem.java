@@ -20,7 +20,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdReplaceitem extends CbCommand {
 
-	public CmdReplaceitem(CommandSender sender, Location sendingLoc, OlympaCreatifMain plugin,
+	public CmdReplaceitem(Entity sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
 		super(CommandType.replaceitem, sender, sendingLoc, plugin, plot, commandString);
 		// TODO Auto-generated constructor stub
