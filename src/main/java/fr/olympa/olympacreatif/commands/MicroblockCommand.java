@@ -18,7 +18,7 @@ public class MicroblockCommand extends OlympaCommand {
 	private OlympaCreatifMain plugin;
 	
 	public MicroblockCommand(OlympaCreatifMain plugin) {
-		super(plugin, "mb", "Ouvrir le menu des microblocks", PermissionsList.USE_MICRO_BLOCKS, new String[] {"mbs", "microblock", "microblocks"});
+		super(plugin, "mb", "Ouvrir le menu des microblocks", PermissionsList.MICRO_BLOCKS_COMMAND, new String[] {"mbs", "microblock", "microblocks"});
 		this.plugin = plugin;
 		allowConsole = false;
 	}

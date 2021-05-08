@@ -4,8 +4,8 @@ import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaSpigotPermission;
 
 public class PermissionsList {	
-	public static final OlympaSpigotPermission USE_MICRO_BLOCKS = new OlympaSpigotPermission(OlympaGroup.CREA_CONSTRUCTOR);
-	public static final OlympaSpigotPermission USE_SKULL_COMMAND = new OlympaSpigotPermission(OlympaGroup.CREA_CONSTRUCTOR);
+	public static final OlympaSpigotPermission MICRO_BLOCKS_COMMAND = new OlympaSpigotPermission(OlympaGroup.CREA_CONSTRUCTOR);
+	public static final OlympaSpigotPermission SKULL_COMMAND = new OlympaSpigotPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	
 	public static final OlympaSpigotPermission USE_PLOT_EXPORTATION = new OlympaSpigotPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	//public static final OlympaSpigotPermission CREA_USE_PLOT_RESET = new OlympaSpigotPermission(OlympaGroup.CREA_CONSTRUCTOR);
@@ -28,13 +28,15 @@ public class PermissionsList {
 	public static final OlympaSpigotPermission STAFF_MANAGE_COMPONENT = new OlympaSpigotPermission(OlympaGroup.DEV);
 	//public static final OlympaSpigotPermission STAFF_DEACTIVATE_WORLD_EDIT = new OlympaSpigotPermission(OlympaGroup.DEV);
 
-	public static final OlympaSpigotPermission CREA_TPA = new OlympaSpigotPermission(OlympaGroup.PLAYER);
-	public static final OlympaSpigotPermission CREA_TPF = new OlympaSpigotPermission(OlympaGroup.DEV);
+	public static final OlympaSpigotPermission CREA_TPA_COMMAND = new OlympaSpigotPermission(OlympaGroup.PLAYER);
+	public static final OlympaSpigotPermission CREA_TPF_COMMAND = new OlympaSpigotPermission(OlympaGroup.DEV);
 	
 	public static final OlympaSpigotPermission STAFF_MANAGE_MONEY = new OlympaSpigotPermission(OlympaGroup.DEV);
 
 	public static final OlympaSpigotPermission STAFF_BYPASS_OP_CHECK = new OlympaSpigotPermission(OlympaGroup.DEV);
 	public static final OlympaSpigotPermission STAFF_BUILD_ROADS = new OlympaSpigotPermission(OlympaGroup.DEV);
+	
+	public static final OlympaSpigotPermission CREA_HAT_COMMAND = new OlympaSpigotPermission(OlympaGroup.CREA_CONSTRUCTOR);
 	
 	
 	 

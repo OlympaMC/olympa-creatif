@@ -140,7 +140,8 @@ class OcStringReader extends StringReader {
 		
 		return getString().substring(start, getCursor());	
 	}
-		
+
+	@Override
 	public String readQuotedString() throws IllegalArgumentException {
 		if (!canRead()) {
 			return "";

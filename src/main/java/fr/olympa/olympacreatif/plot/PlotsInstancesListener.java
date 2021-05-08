@@ -359,6 +359,8 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (plot == null || !plot.getId().isInPlot(e.getBlock().getLocation(), 1))
 			e.setCancelled(true);
+		else if (e.getItem().getType() == Material.FIREWORK_ROCKET || e.getItem().getType() == Material.FIRE_CHARGE)
+			e.setCancelled(true);
 	}
 
 	////////////////////////////////////////////////////////////

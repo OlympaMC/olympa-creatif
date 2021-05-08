@@ -113,7 +113,7 @@ public class WorldEventsListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-		
+
 		if (!allowedSpawnReasons.contains(e.getSpawnReason()) && e.getEntityType() != EntityType.ARMOR_STAND)
 			e.setCancelled(true);
 	}

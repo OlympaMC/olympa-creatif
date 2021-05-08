@@ -22,7 +22,7 @@ public class SkullCommand extends OlympaCommand {
 	private OlympaCreatifMain plugin;
 	
 	public SkullCommand(OlympaCreatifMain plugin) {
-		super(plugin, "sk", "Obtenir la tête d'un joueur", PermissionsList.USE_SKULL_COMMAND, new String[] {"skull"});
+		super(plugin, "sk", "Obtenir la tête d'un joueur", PermissionsList.SKULL_COMMAND, new String[] {"skull"});
 		this.plugin = plugin;
 		allowConsole = false;
 	}

@@ -77,10 +77,10 @@ public abstract class CbCommandSelectorParser {
 	private static final ImmutableSet<Entry<String, SelectorFunction>> selectorParametersFunctions = ImmutableMap.<String, SelectorFunction>builder()
 			.put("gamemode", (plot, loc, stream, param) -> 
 				EnumUtils.isValidEnum(GameMode.class, param.toUpperCase()) ? 
-				stream.filter(e -> e.getType() == EntityType.PLAYER).filter(e -> ((Player)e).getGameMode() == GameMode.valueOf(param)) : 
-				EnumUtils.isValidEnum(GameMode.class, getNonString(param.toUpperCase())) ? 
-				stream.filter(e -> e.getType() == EntityType.PLAYER).filter(e -> ((Player)e).getGameMode() == GameMode.valueOf(getNonString(param.toUpperCase()))) : 
-				stream)
+						stream.filter(e -> e.getType() == EntityType.PLAYER).filter(e -> ((Player)e).getGameMode() == GameMode.valueOf(param)) : 
+						EnumUtils.isValidEnum(GameMode.class, getNonString(param.toUpperCase())) ? 
+								stream.filter(e -> e.getType() == EntityType.PLAYER).filter(e -> ((Player)e).getGameMode() == GameMode.valueOf(getNonString(param.toUpperCase()))) : 
+								stream)
 			
 			.put("sort", (plot, loc, stream, param) -> 
 				param == "nearest" ? 
@@ -139,7 +139,8 @@ public abstract class CbCommandSelectorParser {
 				Double[] range = getDoubleRange(param);
 				if (range == null)
 					return stream.limit(0);					
-				return stream.filter(e -> e.getType() == EntityType.PLAYER).filter(e -> ((Player)e).getLevel() > range[0] && ((Player)e).getLevel() < range[1]); })
+				return stream.filter(e -> e.getType() == EntityType.PLAYER)
+						.filter(e -> ((Player)e).getLevel() > range[0] && ((Player)e).getLevel() < range[1]); })
 			
 			.put("type", (plot, loc, stream, param) ->
 				getNonString(param) == null ?
@@ -153,6 +154,10 @@ public abstract class CbCommandSelectorParser {
 			
 			.put("scores", (plot, loc, stream, param) -> {
 				String[] parts = param.split(",");
+				
+				if (parts.length > 10)
+					return stream;
+				
 				for (String part : parts) {
 					String[] objParts = part.split("=");
 					if (objParts.length != 2)
@@ -199,10 +204,10 @@ public abstract class CbCommandSelectorParser {
 			return new ArrayList<Entity>();
 		
 		if (s.equals("@s"))
-			return (sender instanceof Entity) ? Arrays.asList(new Entity[]{(Entity) sender})  : new ArrayList<Entity>();
+			return sender != null ? Arrays.asList(new Entity[]{sender})  : new ArrayList<Entity>();
 		
-		if (!s.startsWith("@") && plot.getPlayers().contains(Bukkit.getPlayer(s)))
-			return new ArrayList<Entity>(Arrays.asList(Bukkit.getPlayer(s)));
+		if (!s.startsWith("@") && plot.getPlayers().contains(Bukkit.getPlayerExact((s))))
+			return new ArrayList<Entity>(Arrays.asList(Bukkit.getPlayerExact(s)));
 		
 		if (s.length() < 2)
 			return new ArrayList<Entity>();
@@ -271,7 +276,8 @@ public abstract class CbCommandSelectorParser {
 				if (iterations++ > 10)
 					return entitiesStream.collect(Collectors.toList());
 			}
-					
+
+		return entitiesStream.collect(Collectors.toList());	
 					/*
 			selectorParams.removeAll(e.getKey()).forEach(paramValue -> {
 				entitiesStream = e.getValue().apply(plot, sendingLoc, entitiesStream, paramValue);
@@ -281,7 +287,6 @@ public abstract class CbCommandSelectorParser {
 					break;
 			});*/
 				
-		return entitiesStream.collect(Collectors.toList());
 	}
 	
 	//renvoie deux entiers resprésentant les bornes du string (qui doit être sur le modèle 4..7)

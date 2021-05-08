@@ -18,6 +18,7 @@ import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.commands.CmdsLogic;
+import fr.olympa.olympacreatif.commands.HatCommand;
 import fr.olympa.olympacreatif.commands.MenuCommand;
 import fr.olympa.olympacreatif.commands.MicroblockCommand;
 import fr.olympa.olympacreatif.commands.OcCmd;
@@ -103,9 +104,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new ShopCommand(this).register();
 		new StoplagCommand(this).register();
 		new TpfCommand(this).register();
-		new BackCommand(this, null).register();
 		
-		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA, 0), plugin);
+		new BackCommand(this, null).register();
+		new HatCommand(this).register();
+		
+		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA_COMMAND, 0), plugin);
 		
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);

@@ -20,7 +20,7 @@ public class TpfCommand extends OlympaCommand {
 	private OlympaCreatifMain plugin;
 	
 	public TpfCommand(OlympaCreatifMain plugin) {
-		super(plugin, "tpf", "Se téléporter à un joueur", PermissionsList.CREA_TPF, new String[] {});
+		super(plugin, "tpf", "Se téléporter à un joueur", PermissionsList.CREA_TPF_COMMAND, new String[] {});
 		this.plugin = plugin;
 		allowConsole = false;
 	}
