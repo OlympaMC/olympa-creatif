@@ -257,7 +257,12 @@ public class PlotsInstancesListener implements Listener{
 	@EventHandler //test print TNT
 	public void onPrintTnt(BlockIgniteEvent e) {
 		plot = plugin.getPlotsManager().getPlot(e.getBlock().getLocation());
-
+		
+		if (e.getPlayer() == null) {
+			e.setCancelled(true);
+			return;
+		}
+		
 		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		
 		if (plot == null || plot.hasStoplag()) {
@@ -376,17 +381,16 @@ public class PlotsInstancesListener implements Listener{
 	//               POTIONS & INTERRACT EVENTS               //
 	////////////////////////////////////////////////////////////
 	
-	@EventHandler //cancel splash potion sin interdites dans le plot
+	@EventHandler(ignoreCancelled = true) //cancel splash potion sin interdites dans le plot
 	public void onPotionThrows(PotionSplashEvent e) {
 		if (e.getAffectedEntities().size() == 0)
 			return;
 		
 		plot = plugin.getPlotsManager().getPlot(((Entity) e.getAffectedEntities().toArray()[0]).getLocation());
 		
-		if (e.isCancelled() || plot == null)
-			return;
-		
-		if(!plot.getParameters().getParameter(PlotParamType.ALLOW_SPLASH_POTIONS) || plot.hasStoplag())
+		if (plot == null) {
+			e.setCancelled(true);
+		}else if(!plot.getParameters().getParameter(PlotParamType.ALLOW_SPLASH_POTIONS) || plot.hasStoplag())
 			e.setCancelled(true);
 	}
 	

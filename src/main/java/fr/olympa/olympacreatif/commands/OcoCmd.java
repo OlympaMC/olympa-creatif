@@ -3,10 +3,13 @@ package fr.olympa.olympacreatif.commands;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
@@ -23,6 +26,8 @@ import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class OcoCmd extends AbstractCmd {
+	
+	private Set<Player> launchedCbRecalculation = new HashSet<Player>();
 	
 	public OcoCmd(OlympaCreatifMain plugin) {
 		super(plugin, "oco", null, "Commandes spécialisées du Créatif");
@@ -142,6 +147,15 @@ public class OcoCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Recharger tous les commandblocks de la parcelle"/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
 	public void reloadcommandblocks(CommandContext cmd) {
+		if (launchedCbRecalculation.contains(getPlayer())) {
+			OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(getPlayer(), "/oco reloadcommandblocks");
+			return;
+		}
+		
+		final Player p = getPlayer();
+		launchedCbRecalculation.add(getPlayer());
+		plugin.getTask().runTaskLater(() -> launchedCbRecalculation.remove(p), 30 * 20);
+		
 		Plot plot = ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot();
 		
 		if (plot == null) {

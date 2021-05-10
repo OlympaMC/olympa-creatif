@@ -131,8 +131,10 @@ public class OCmsg {
 	public static final OCmsg CB_SET_TICK_SPEED = new OCmsg();
 	public static final OCmsg PLOT_COMMANDBLOCKS_WILL_RELOAD = new OCmsg();
 	public static final OCmsg HAT_SET = new OCmsg();
-	
+
 	public static final OCmsg HAS_NOT_UNLOCKED_SUMMON = new OCmsg(5);
+	
+	public static final OCmsg WAIT_BEFORE_REEXECUTE_COMMAND = new OCmsg();
 	
 	static {
 		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {

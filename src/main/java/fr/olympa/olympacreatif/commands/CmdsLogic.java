@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -42,6 +44,8 @@ public class CmdsLogic {
 
 	private OlympaCreatifMain plugin;
 	private Map<PlotId, Entry<OlympaPlayerCreatif, Player>> invitations = new HashMap<PlotId, Entry<OlympaPlayerCreatif, Player>>();
+	
+	private Set<Player> delayRandomPlotVisit = new HashSet<Player>();
 	
 	public CmdsLogic (OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -234,7 +238,15 @@ public class CmdsLogic {
 		}
 	}
 
-	public void visitPlotRandom(OlympaPlayerCreatif pc) {
+	public void visitPlotRandom(final OlympaPlayerCreatif pc) {
+		if (delayRandomPlotVisit.contains(pc.getPlayer())) {
+			OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(pc, "/oc visitrandom");
+			return;
+		}
+		
+		delayRandomPlotVisit.add(pc.getPlayer());
+		plugin.getTask().runTaskLater(() -> delayRandomPlotVisit.remove(pc.getPlayer()), 30);
+		
 		List<Integer> set = new ArrayList<Integer>();
 		
 		for (int i = 1 ; i <= plugin.getDataManager().getPlotsCount() ; i++)
@@ -243,7 +255,7 @@ public class CmdsLogic {
 		set.removeAll(pc.getPlots(false).stream().map(pl -> pl.getId().getId()).collect(Collectors.toList()));
 		
 		set.removeAll(plugin.getPlotsManager().getPlots().stream()
-				.filter(pl -> pl.getMembers().getOwner().getName().equals("Spawn") && pl.canEnter(pc))
+				.filter(pl -> pl.getMembers().getOwner().getName().equals("Spawn") || !pl.canEnter(pc))
 				.map(pl -> pl.getId().getId()).collect(Collectors.toList()));
 
 		if (set.size() == 0)
