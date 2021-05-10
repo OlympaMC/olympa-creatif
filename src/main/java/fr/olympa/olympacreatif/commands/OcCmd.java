@@ -21,7 +21,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 public class OcCmd extends AbstractCmd {
 
 	public OcCmd(OlympaCreatifMain plugin) {
-		super(plugin, "oc", null, "Commandes principales du Créatif d'Olympa");
+		super(plugin, "oc", null, "Commandes principales du Créatif d'Olympa", "plot");
 	}
 
 

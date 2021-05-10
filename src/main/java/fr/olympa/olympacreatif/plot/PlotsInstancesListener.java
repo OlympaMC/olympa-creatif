@@ -42,6 +42,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -263,7 +264,7 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 			return;	
 		}
-		
+
 		if (e.getPlayer() == null || (e.getCause() != IgniteCause.ARROW && e.getCause() != IgniteCause.FLINT_AND_STEEL)) {
 			e.setCancelled(true);
 			return;
@@ -359,7 +360,15 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (plot == null || !plot.getId().isInPlot(e.getBlock().getLocation(), 1))
 			e.setCancelled(true);
-		else if (e.getItem().getType() == Material.FIREWORK_ROCKET || e.getItem().getType() == Material.FIRE_CHARGE)
+		/*else if (e.getItem().getType() == Material.FIREWORK_ROCKET || e.getItem().getType() == Material.FIRE_CHARGE)
+			e.setCancelled(true);*/
+	}
+	
+	@EventHandler
+	public void onExplode(EntityExplodeEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (plot == null || !plot.getId().equals(plugin.getPlotsManager().getBirthPlot(e.getEntity())))
 			e.setCancelled(true);
 	}
 

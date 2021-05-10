@@ -1,27 +1,25 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
-import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
-import net.minecraft.server.v1_16_R3.NBTTagList;
 
 public class CmdSummon extends CbCommand {
 
 	//private static List<EntityType> allowedEntities = new ArrayList<EntityType>();
-	public static List<EntityType> allowedEntities  = ImmutableList.<EntityType>builder()
+	public static Set<EntityType> allowedEntities  = ImmutableSet.<EntityType>builder()
 			.add(EntityType.ARMOR_STAND)
 			.add(EntityType.BAT)
 			.add(EntityType.BEE)
@@ -79,9 +77,10 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.WITHER_SKELETON)
 			.add(EntityType.WOLF)
 			.add(EntityType.ZOMBIE_HORSE)
-			//.add(EntityType.PIG_ZOMBIE)
+			
 			.add(EntityType.ZOMBIE)
 			.add(EntityType.ZOMBIE_VILLAGER)
+			.add(EntityType.VILLAGER)
 
 			.add(EntityType.MINECART)
 			.add(EntityType.MINECART_CHEST)
@@ -89,6 +88,12 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.MINECART_HOPPER)
 			
 			.add(EntityType.BOAT)
+
+			.add(EntityType.ZOMBIE_VILLAGER)
+			
+			.add(EntityType.PIGLIN)
+			.add(EntityType.PIGLIN_BRUTE)
+			.add(EntityType.ZOMBIFIED_PIGLIN)
 
 			.add(EntityType.ARROW)
 			.add(EntityType.SPECTRAL_ARROW)
@@ -141,8 +146,14 @@ public class CmdSummon extends CbCommand {
 	@Override
 	public int execute() {
 		
+		if (!plotCbData.hasUnlockedSummon()) {
+			if (sender instanceof Player)
+				OCmsg.HAS_NOT_UNLOCKED_SUMMON.send((Player)sender);
+			return 0;
+		}
+		
 		//return si le proprio du plot n'a pas débloqué le /summon
-		if (!plotCbData.hasUnlockedSummon() || spawnLoc == null || type == null)
+		if (spawnLoc == null || type == null)
 			return 0;
 		
 		Entity e = plugin.getWorldManager().getWorld().spawnEntity(sendingLoc, type);

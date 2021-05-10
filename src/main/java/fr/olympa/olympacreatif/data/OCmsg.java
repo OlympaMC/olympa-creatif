@@ -132,6 +132,8 @@ public class OCmsg {
 	public static final OCmsg PLOT_COMMANDBLOCKS_WILL_RELOAD = new OCmsg();
 	public static final OCmsg HAT_SET = new OCmsg();
 	
+	public static final OCmsg HAS_NOT_UNLOCKED_SUMMON = new OCmsg(5);
+	
 	static {
 		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {
 			@EventHandler(priority = EventPriority.LOW)

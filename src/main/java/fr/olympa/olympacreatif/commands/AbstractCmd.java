@@ -7,9 +7,14 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 public abstract class AbstractCmd extends ComplexCommand {
 
 	protected OlympaCreatifMain plugin;
-	
+
 	public AbstractCmd(OlympaCreatifMain plugin, String command, OlympaSpigotPermission permission, String desc) {
-		super(plugin, command, desc, permission);
+		this(plugin, command, permission, desc, new String[] {});
+	}
+	
+		
+	public AbstractCmd(OlympaCreatifMain plugin, String command, OlympaSpigotPermission permission, String desc, String...aliases) {
+		super(plugin, command, desc, permission, aliases);
 		this.plugin = plugin;
 	}
 }

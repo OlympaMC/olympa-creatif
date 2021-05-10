@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.utils;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.commands.OcCmd;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -23,11 +25,13 @@ import net.minecraft.server.v1_16_R3.NBTTagList;
 
 public abstract class JSONtextUtil {
 	
+	@Deprecated
 	public static TextComponent getJsonText(String component) {
 		return getJsonText(null, component);
 	}
 	
 	public static TextComponent getJsonText(CbCommand cmd, String component) {
+		component = StringEscapeUtils.unescapeJava(component.replace("\"\",", "").replace(",\"\"", ""));
 		
 		TextComponent text = new TextComponent();
 		
@@ -37,16 +41,15 @@ public abstract class JSONtextUtil {
 			component = "{rawText:" + component + "}";
 
 		
-		//Bukkit.broadcastMessage("basic string tag : " + listAsString);
+		//System.out.println("basic string tag : " + component);
 		
 		try {
 			
 			//Bukkit.broadcastMessage("try to parse : " + component);
 			
-			NBTTagList mainTag = new OcMojangsonParser(component.replace("=", ":"))
-					.parse(cmd.getSender() instanceof Player ? (Player) cmd.getSender() : null).getList("rawText", NBT.TAG_COMPOUND);
+			NBTTagList mainTag = MojangsonParser.parse(component.replace("=", ":")).getList("rawText", NBT.TAG_COMPOUND);
 			
-			//Bukkit.broadcastMessage("parse : " + mainTag.asString());
+			System.out.println("PARSED : " + mainTag.asString());
 			
 			for (int i = 0 ; i < mainTag.size() ; i++) {
 				
@@ -58,7 +61,7 @@ public abstract class JSONtextUtil {
 					textPart.addExtra(tag.getString("text"));
 
 					//ajout HoverEvent
-					if (tag.hasKey("hoverEvent") && cmd != null) {
+					if (tag.hasKey("hoverEvent")) {
 						NBTTagCompound subTag = tag.getCompound("hoverEvent");
 						
 						if (subTag == null)
@@ -69,22 +72,28 @@ public abstract class JSONtextUtil {
 						if (subString == null)
 							continue;
 						
+						System.out.println("SUB STRING : " + subString);
+						
 						textPart.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.translateAlternateColorCodes('&', subString.replace("{", ""))).create()));
 					}
 					
 					//ajout ClickEvent
-					if (tag.hasKey("clickEvent") && cmd != null) {
+					if (tag.hasKey("clickEvent")) {
 						NBTTagCompound subTag = tag.getCompound("clickEvent");
 						
 						if (subTag == null)
 							continue;
-						
+
 						String value = subTag.getString("value");
+						String clickType = subTag.getString("action");
 						
-						if (value == null || !value.startsWith("/trigger "))
+						if (value == null || clickType == null)
 							continue;
 						
-						textPart.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, value));
+						if (clickType.equals("run_command") && (value.startsWith("/trigger ") || value.startsWith("/oc visit")))
+							textPart.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, value));
+						else
+							textPart.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "Action non autorisée. Seules les commandes /trigger et /oc visit sont permises dans les messages Json."));
 					}
 					
 				}else if (tag.hasKey("selector") && cmd != null) {
@@ -113,18 +122,15 @@ public abstract class JSONtextUtil {
 						continue;
 
 					List<Entity> list = cmd.parseSelector(name.replace(":", "="), false);
-					//System.out.println("LIST for json parser : " + list + " FROM " + name);
-					CbObjective cbObj = cmd.getPlot().getCbData().getObjective(obj);
+
+					Object cbObj = null;
 					
 					if (list.size() == 0 || cbObj == null)
 						continue;
 					
-					textPart.addExtra("" + cbObj.get(list.get(0)));
 				}
 				
-				//Bukkit.broadcastMessage("textPart : " + textPart.toString());
 				text.addExtra(textPart);
-				//Bukkit.broadcastMessage("text : " + text.toString());
 			}
 			
 		} catch (Exception e) {

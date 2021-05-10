@@ -35,10 +35,8 @@ public class CmdTellraw extends CbCommand {
 		mark.addExtra("[CB] ");
 		text.addExtra(mark);
 		
-		String listAsString = StringEscapeUtils.unescapeJava(args[1].replace("\"\",", "").replace(",\"\"", ""));//.replace("\\", "\\\\");
-		
 		//Bukkit.broadcastMessage("listAsString : " + listAsString);
-		text.addExtra(JSONtextUtil.getJsonText(this, listAsString));
+		text.addExtra(JSONtextUtil.getJsonText(this, args[1]));
 		for (Entity e : targetEntities)
 			if (e.getType() == EntityType.PLAYER)
 				e.spigot().sendMessage(text);

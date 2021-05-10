@@ -134,12 +134,12 @@ public class WorldEventsListener implements Listener{
 		e.setCancelled(true);
 	}
 	
-	@EventHandler //cancel explosion TNT
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true) //cancel explosion TNT
 	public void onEntityExplodeEvent(EntityExplodeEvent e) {
 		e.blockList().clear();
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onBlockExplodeEvent(BlockExplodeEvent e) {
 		e.blockList().clear();
 	}
