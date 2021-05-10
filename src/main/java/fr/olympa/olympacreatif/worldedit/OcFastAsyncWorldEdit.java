@@ -333,7 +333,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
 		        			commandBlocksCount.put(chFull.getChunkKey(), currentCbCount);
 		        			
-		        			if (currentCbCount >= OCparam.MAX_CB_PER_CHUNK.get()) {
+		        			if (currentCbCount > OCparam.MAX_CB_PER_CHUNK.get()) {
 		        				OCmsg.PLOT_LOAD_TOO_MUCH_CB_CHUNK.send(pc, plot, ch.getX() + ", " + ch.getZ());
 		        				return false;
 		        			}
