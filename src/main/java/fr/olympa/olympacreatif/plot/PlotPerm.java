@@ -33,10 +33,11 @@ public class PlotPerm {
 	public static final PlotPerm USE_WE = new PlotPerm(PlotRank.TRUSTED, "Utiliser WorldEdit", PermissionsList.USE_WORLD_EDIT);
 	public static final PlotPerm DEFINE_MUSIC = new PlotPerm(PlotRank.TRUSTED, "Définir la musique", PermissionsList.USE_PLOT_MUSIC);
 	public static final PlotPerm KICK_VISITOR = new PlotPerm(PlotRank.TRUSTED, "Ejecter un visiteur");
+	public static final PlotPerm USE_STOPLAG = new PlotPerm(PlotRank.TRUSTED, "Gérer l'état de stoplag de la parcelle (/stoplag)");
 
 	public static final PlotPerm BYPASS_ENTRY_ACTIONS = new PlotPerm(PlotRank.MEMBER, null);
 	public static final PlotPerm BUILD = new PlotPerm(PlotRank.MEMBER, "Construire sur la parcelle");
-	public static final PlotPerm USE_STOPLAG = new PlotPerm(PlotRank.MEMBER, "Gérer l'état de stoplag de la parcelle (/stoplag)");
+	public static final PlotPerm CHANGE_GAMEMODE = new PlotPerm(PlotRank.MEMBER, "Gérer votre gamemode avec /gm");
 	public static final PlotPerm DROP_ITEM = new PlotPerm(PlotRank.MEMBER, null);
 	public static final PlotPerm DEFINE_OWN_FLY_SPEED = new PlotPerm(PlotRank.MEMBER, null);
 	

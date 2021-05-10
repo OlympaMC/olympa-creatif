@@ -2,11 +2,15 @@ package fr.olympa.olympacreatif;
 
 import java.util.Random;
 
+import org.bukkit.entity.Player;
+
 import fr.olympa.api.command.essentials.BackCommand;
 import fr.olympa.api.command.essentials.tp.TpaHandler;
+import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
+import fr.olympa.api.permission.OlympaAPIPermissions;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
@@ -14,7 +18,6 @@ import fr.olympa.api.report.ReportReason;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.api.server.OlympaServer;
-import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.commands.CmdsLogic;
@@ -37,6 +40,7 @@ import fr.olympa.olympacreatif.data.PermissionsManager;
 import fr.olympa.olympacreatif.data.ReportReasonsList;
 import fr.olympa.olympacreatif.perks.PerksManager;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldManager;
@@ -90,7 +94,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		OlympaPermission.registerPermissions(PermissionsList.class);
 		ReportReason.registerReason(ReportReasonsList.class);
 
-		new BackCommand(plugin, null);
+		//new BackCommand(plugin, null);
 		
 		new OcCmd(this).register();
 		new OcoCmd(this).register();
@@ -107,6 +111,30 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		
 		new BackCommand(this, null).register();
 		new HatCommand(this).register();
+		
+		//set restrictions to /gm command
+		OlympaAPIPermissions.GAMEMODE_COMMAND.setMinGroup(OlympaGroup.PLAYER);
+		OlympaAPIPermissions.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.PLAYER);
+		
+		OlympaCore.getInstance().gamemodeCommand.setCanExecuteFunction((sender, target) -> {
+			
+			if (!(sender instanceof Player))
+				return false;
+			
+			OlympaPlayerCreatif pc = AccountProvider.get(((Player)sender).getUniqueId());
+			
+			if (pc == null)
+				return false;
+			else if (PermissionsList.STAFF_OCA_CMD.hasPermission(pc))
+				return true;
+			
+			Plot plot = getPlotsManager().getPlot(pc.getPlayer().getLocation());
+			
+			if (plot == null || !PlotPerm.CHANGE_GAMEMODE.has(plot, pc) || sender != target)
+				return false;
+			else
+				return true;
+		});
 		
 		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA_COMMAND, 0), plugin);
 		

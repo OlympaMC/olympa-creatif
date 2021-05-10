@@ -86,9 +86,8 @@
 		
 		<dependency>
 			<groupId>fr.olympa</groupId>
-			<!--TODO use olympa-api -->
 			<artifactId>olympa-core</artifactId>
-			<version>0.1</version>
+			<version>0.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		
