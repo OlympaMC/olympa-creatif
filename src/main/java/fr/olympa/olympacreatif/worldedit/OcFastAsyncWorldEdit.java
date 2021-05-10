@@ -2,10 +2,15 @@ package fr.olympa.olympacreatif.worldedit;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
@@ -52,8 +57,11 @@ import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
+import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
+import fr.olympa.olympacreatif.utils.OtherUtils;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcFastAsyncWorldEdit extends AWorldEditManager {
@@ -63,10 +71,10 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
 		FaweAPI.addMaskManager(new OlympaCreatifMask());
 
-		LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
+		/*LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
 		for (Material mat : Material.values())
 			if (plugin.getPerksManager().getKitsManager().getKitOf(mat) != null)
-				config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());
+				config.disallowedBlocks.add("minecraft:" + mat.toString().toLowerCase());*/
 
 		
 		registerAntiCommandblockEditSession();
@@ -231,7 +239,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 					System.out.println("Selection : " + session.getSelection(session.getSelectionWorld()).getMinimumPoint() +  " TO " + session.getSelection(session.getSelectionWorld()).getMaximumPoint());
 			}*/
 			
-			/*@Subscribe //NOT WORKING AT ALL TY INTELLECTUAL SITES, GG
+			@Subscribe //NOT WORKING AT ALL TY INTELLECTUAL SITES, GG / or maybe.. yes ?
 			public void onEditSession(EditSessionEvent e) {
 				
 				//e.setExtent(new AbstractDelegateExtent(null));
@@ -244,17 +252,8 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				if (p.hasStaffPerm(StaffPerm.WORLDEDIT))
 					return;
 
-				e.setExtent(new AbstractDelegateExtent(e.getExtent()) {
-			        @Override
-			        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
-			        	System.out.println("Paste block " + block.getBlockType() + " for " + p.getName());
-			        	
-			        	return (block.getBlockType() != BlockTypes.COMMAND_BLOCK && 
-			        			block.getBlockType() != BlockTypes.CHAIN_COMMAND_BLOCK && 
-			        			block.getBlockType() != BlockTypes.REPEATING_COMMAND_BLOCK) ? super.setBlock(pos, block) : false;
-			        }
-			    });	
-			}*/
+				e.setExtent(new OcExtent(e.getExtent(), p, plugin.getPlotsManager().getPlot(p.getPlayer().getLocation())));
+			}
 			
 			
 			@Override
@@ -269,6 +268,81 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			
 			@Override
 			public void dispatch(Object arg0) throws Exception {
+			}
+			
+			class OcExtent extends AbstractDelegateExtent {
+				
+				private OlympaPlayerCreatif pc;
+				private Plot plot;
+				private Map<Long, Integer> commandBlocksCount = new HashMap<Long, Integer>();
+				private boolean pasteCommandBlocks = true;
+				
+				public OcExtent(Extent extent, OlympaPlayerCreatif pc, Plot plot) {
+					super(extent);
+					this.pc = pc;
+					this.plot = plot;
+				}
+				
+		        @Override
+		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
+		        	//System.out.println("SET BLOCK POS " + block.getBlockType());
+		        	
+		        	return isBlockAllowed(pos.getX(), pos.getY(), pos.getZ(), block) ? 
+		        			super.setBlock(pos, block) : false;
+		        }
+		        
+		        @Override
+		        public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) {
+		        	//System.out.println("SET BLOCK LOCATIONS " + block.getBlockType());
+
+		        	return isBlockAllowed(x, y, z, block) ? 
+		        			super.setBlock(x, y, z, block) : false;
+		        }
+		        
+		        private <T extends BlockStateHolder<T>> boolean isBlockAllowed(int x, int y, int z, T block) {
+		        	Material mat = BukkitAdapter.adapt(block.getBlockType());
+		        	KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
+		        	
+		        	if (kit != null && !kit.hasKit(pc)) {
+		        		OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, kit);
+		        		return false;
+		        	}
+		        	
+		        	if (kit == KitType.COMMANDBLOCK)
+		        		if (pasteCommandBlocks && plugin.getWorldManager().getWorld().isChunkLoaded(Math.floorDiv(x, 16), Math.floorDiv(z, 16))) {
+		        			Chunk chFull;
+		        			
+		        			ChunkSnapshot ch = (chFull = plugin.getWorldManager().getWorld()
+		        					.getChunkAt(Math.floorDiv(x, 16), Math.floorDiv(z, 16))).getChunkSnapshot();
+		        			
+		        			//System.out.println("CHUNK : " + ch.getX() + ", " + ch.getZ());
+		        			
+		        			Integer currentCbCount = commandBlocksCount.get(chFull.getChunkKey());
+		        			if (currentCbCount == null) {
+			        			int cbCount = 0;
+
+			        			for (int xCh = 0 ; xCh < 16 ; xCh++)
+				        			for (int yCh = 0 ; yCh < 256 ; yCh++)
+					        			for (int zCh = 0 ; zCh < 16 ; zCh++)
+					        				if (OtherUtils.isCommandBlock(ch.getBlockType(xCh, yCh, zCh)))
+					        					cbCount++;
+			        			
+			        			currentCbCount = cbCount + 1;
+		        			}else
+		        				currentCbCount++;
+
+		        			commandBlocksCount.put(chFull.getChunkKey(), currentCbCount);
+		        			
+		        			if (currentCbCount >= OCparam.MAX_CB_PER_CHUNK.get()) {
+		        				OCmsg.PLOT_LOAD_TOO_MUCH_CB_CHUNK.send(pc, plot, ch.getX() + ", " + ch.getZ());
+		        				return false;
+		        			}
+		        		}
+		        		else
+		        			return false;
+		        			        	
+		        	return true;
+		        }
 			}
 		});
 	}

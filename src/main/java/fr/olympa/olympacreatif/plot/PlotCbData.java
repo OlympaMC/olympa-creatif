@@ -375,11 +375,12 @@ public class PlotCbData {
 		if (oldMap != newMap)
 			oldMap.remove(cb.getLocation());
 		
-		if (newMap.size() <= OCparam.MAX_CB_PER_PLOT.get())
+		newMap.put(cb.getLocation(), new OcCommandBlockData(cb));
+		/*if (newMap.size() <= OCparam.MAX_CB_PER_PLOT.get())
 			newMap.put(cb.getLocation(), new OcCommandBlockData(cb));
 		else
 			plot.getMembers().getList().entrySet().stream().filter(e -> PlotPerm.COMMAND_BLOCK.has(e.getValue()))
-			.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_PLOT.send(p, plot, newMat.toString().toLowerCase()));
+			.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_PLOT.send(p, plot, newMat.toString().toLowerCase()));*/
 			
 	}
 
@@ -454,12 +455,13 @@ public class PlotCbData {
 				}else 
 					locs.forEach(loc -> {
 						Map<Location, OcCommandBlockData> map = getCbMap(loc.getBlock().getType());
-						if (loc.getBlock().getState() instanceof org.bukkit.block.CommandBlock)
+						map.put(loc, new OcCommandBlockData((org.bukkit.block.CommandBlock) loc.getBlock().getState()));
+						/*if (loc.getBlock().getState() instanceof org.bukkit.block.CommandBlock)
 							if (map.size() < OCparam.MAX_CB_PER_PLOT.get())
 								map.put(loc, new OcCommandBlockData((org.bukkit.block.CommandBlock) loc.getBlock().getState()));
 							else
 								plot.getMembers().getList().entrySet().stream().filter(e -> PlotPerm.COMMAND_BLOCK.has(e.getValue()))
-								.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_PLOT.send(p, plot, loc.getBlock().getType().toString().toLowerCase()));
+								.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_PLOT.send(p, plot, loc.getBlock().getType().toString().toLowerCase()));*/
 					});
 				ch.setForceLoaded(false);
 			});

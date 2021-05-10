@@ -10,7 +10,9 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.utils.OtherUtils;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.TileEntity;
@@ -36,12 +38,15 @@ public class CmdSetblock extends CbCommand {
 	@Override
 	public int execute() {
 		
-		if (placingLoc == null || item == null)
+		if (placingLoc == null || item == null || !placingLoc.isChunkLoaded())
 			return 0;
 		
 		//return si le proprio n'a pas débloqué les spawners
 		if (item.getType() == Material.SPAWNER && !plotCbData.hasUnlockedSpawnerSetblock() || plugin.getWEManager().isReseting(getPlot()))
 			return 0;
+		
+		/*if (OtherUtils.isCommandBlock(item) && OtherUtils.getCbCount(placingLoc.getChunk()) > OCparam.MAX_CB_PER_CHUNK.get())
+			return 0;*/
 		
 		Block block = plugin.getWorldManager().getWorld().getBlockAt(placingLoc);
 		block.setType(item.getType());

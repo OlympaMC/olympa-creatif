@@ -120,7 +120,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.JUNGLE_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.SPRUCE_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.WARPED_TRAPDOOR);
-		blocksWithInteractionsList.add(Material.CRIMSON_DOOR);
+		blocksWithInteractionsList.add(Material.CRIMSON_TRAPDOOR);
 
 		blocksWithInteractionsList.add(Material.OAK_BUTTON);
 		blocksWithInteractionsList.add(Material.STONE_BUTTON);

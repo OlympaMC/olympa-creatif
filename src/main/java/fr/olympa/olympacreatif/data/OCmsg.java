@@ -118,15 +118,15 @@ public class OCmsg {
 	public static final OCmsg GIVE_VIP_REWARD = new OCmsg();
 	public static final OCmsg MONEY_RECIEVED_COMMAND = new OCmsg();
 	public static final OCmsg MONEY_WITHDRAWED_COMMAND = new OCmsg();
-	public static final OCmsg INSUFFICIENT_KIT_PERMISSION = new OCmsg();
+	public static final OCmsg INSUFFICIENT_KIT_PERMISSION = new OCmsg(2);
 	
 	public static final OCmsg PLOT_STOPLAG_FIRED_CMD = new OCmsg();
 	
 	public static final OCmsg PLOT_ENTER_STOPLAG_ACTIVATED = new OCmsg();
 	public static final OCmsg COMMANDBLOCK_COMMAND_SET = new OCmsg();
 	
-	public static final OCmsg PLOT_LOAD_TOO_MUCH_CB_CHUNK = new OCmsg(1);
-	public static final OCmsg PLOT_LOAD_TOO_MUCH_CB_PLOT = new OCmsg(1);
+	public static final OCmsg PLOT_LOAD_TOO_MUCH_CB_CHUNK = new OCmsg(3);
+	//public static final OCmsg PLOT_LOAD_TOO_MUCH_CB_PLOT = new OCmsg(3);
 	
 	public static final OCmsg CB_SET_TICK_SPEED = new OCmsg();
 	public static final OCmsg PLOT_COMMANDBLOCKS_WILL_RELOAD = new OCmsg();

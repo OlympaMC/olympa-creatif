@@ -55,7 +55,6 @@ public class InteractionParametersGui extends IGui {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		super.onClick(p, current, slot, click);

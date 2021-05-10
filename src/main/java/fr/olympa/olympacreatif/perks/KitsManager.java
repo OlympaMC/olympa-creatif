@@ -10,6 +10,9 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -18,23 +21,30 @@ import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 public class KitsManager {
 
 	OlympaCreatifMain plugin;
-	Map<Material, KitType> kits = new HashMap<Material, KitType>();
-	Map<Material, ItemStack> noKitItem = new HashMap<Material, ItemStack>();
-	Map<Material, net.minecraft.server.v1_16_R3.ItemStack> noKitItemNMS = new HashMap<Material, net.minecraft.server.v1_16_R3.ItemStack>();
+	Map<Material, KitType> kits2;// = new HashMap<Material, KitType>();
+	Map<Material, ItemStack> noKitItem2;// = new HashMap<Material, ItemStack>();
+	Map<Material, net.minecraft.server.v1_16_R3.ItemStack> noKitItemNMS2;// = new HashMap<Material, net.minecraft.server.v1_16_R3.ItemStack>();
 	
 	public KitsManager (OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		initKitItems();
+
+		Builder<Material, ItemStack> noKitItembuilder = ImmutableMap.<Material, ItemStack>builder();
 		
-		for (Material mat : kits.keySet())
-			noKitItem.put(mat, ItemUtils.item(Material.STONE, "§cLe kit §6" + getKitOf(mat).toString().toLowerCase() + " §cest requis pour utiliser §6" + mat.toString().toLowerCase().replace("_", " ")));
+		for (Material mat : kits2.keySet())
+			noKitItembuilder.put(mat, ItemUtils.item(Material.STONE, "§cLe kit §6" + getKitOf(mat).toString().toLowerCase() + " §cest requis pour utiliser §6" + mat.toString().toLowerCase().replace("_", " ")));
 		
-		for (Entry<Material, ItemStack> e : noKitItem.entrySet())
-			noKitItemNMS.put(e.getKey(), CraftItemStack.asNMSCopy(e.getValue()));
+		noKitItem2 = noKitItembuilder.build();
+		Builder<Material, net.minecraft.server.v1_16_R3.ItemStack> noKitItemNMSbuilder = ImmutableMap.<Material, net.minecraft.server.v1_16_R3.ItemStack>builder();
+		
+		for (Entry<Material, ItemStack> e : noKitItem2.entrySet())
+			noKitItemNMSbuilder.put(e.getKey(), CraftItemStack.asNMSCopy(e.getValue()));
+		
+		noKitItemNMS2 = noKitItemNMSbuilder.build();
 	}
 	
 	public KitType getKitOf(Material mat) {
-		return kits.get(mat);
+		return kits2.get(mat);
 	}
     
     public boolean hasPlayerPermissionFor(OlympaPlayerCreatif p, Material mat) {
@@ -48,24 +58,27 @@ public class KitsManager {
 			return true;
     }
 
+    /*
 	public List<Material> getMaterialsOf(KitType kit) {
 		List<Material> list = new ArrayList<Material>();
 		
-		for (Entry<Material, KitType> e : kits.entrySet()) 
+		for (Entry<Material, KitType> e : kits2.entrySet()) 
 			if (e.getValue() == kit)
 				list.add(e.getKey());
 		return list;
-	}
+	}*/
 	
 	public ItemStack getNoKitPermItem(Material mat) {
-		return noKitItem.get(mat);
+		return noKitItem2.get(mat);
 	}
 	
 	public net.minecraft.server.v1_16_R3.ItemStack getNoKitPermItemNMS(Material mat) {
-		return noKitItemNMS.get(mat);
+		return noKitItemNMS2.get(mat);
 	}
 	
 	private void initKitItems() {
+		Builder<Material, KitType> builder = ImmutableMap.<Material, KitType>builder();
+		
 		List<Material> list = new ArrayList<Material>();
 
 		list.add(Material.DEBUG_STICK);
@@ -77,7 +90,7 @@ public class KitsManager {
 			if (mat.toString().contains("SHULKER_BOX"))
 				list.add(mat);
 		
-		list.forEach(mat -> kits.put(mat, KitType.ADMIN));
+		list.forEach(mat -> builder.put(mat, KitType.ADMIN));
 		list.clear();
 		
 		
@@ -99,7 +112,7 @@ public class KitsManager {
 		list.add(Material.HOPPER);
 		list.add(Material.HOPPER_MINECART);
 		
-		list.forEach(mat -> kits.put(mat, KitType.REDSTONE));
+		list.forEach(mat -> builder.put(mat, KitType.REDSTONE));
 		list.clear();
 
 		list.add(Material.COMMAND_BLOCK);
@@ -107,7 +120,7 @@ public class KitsManager {
 		list.add(Material.CHAIN_COMMAND_BLOCK);
 		list.add(Material.REPEATING_COMMAND_BLOCK);
 		
-		list.forEach(mat -> kits.put(mat, KitType.COMMANDBLOCK));
+		list.forEach(mat -> builder.put(mat, KitType.COMMANDBLOCK));
 		list.clear();
 
 		list.add(Material.SPAWNER);
@@ -144,7 +157,7 @@ public class KitsManager {
 		list.add(Material.WITCH_SPAWN_EGG);
 		list.add(Material.WITHER_SKELETON_SPAWN_EGG);
 		
-		list.forEach(mat -> kits.put(mat, KitType.HOSTILE_MOBS));
+		list.forEach(mat -> builder.put(mat, KitType.HOSTILE_MOBS));
 		list.clear();
 
 		list.add(Material.LLAMA_SPAWN_EGG);
@@ -180,8 +193,9 @@ public class KitsManager {
 		list.add(Material.SALMON_BUCKET);
 		list.add(Material.TROPICAL_FISH_BUCKET);
 
-		list.forEach(mat -> kits.put(mat, KitType.PEACEFUL_MOBS));
+		list.forEach(mat -> builder.put(mat, KitType.PEACEFUL_MOBS));
 		
+		kits2 = builder.build();
 	}
 	
 	public static enum KitType{

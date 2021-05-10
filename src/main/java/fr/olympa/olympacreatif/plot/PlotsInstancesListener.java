@@ -70,11 +70,13 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CmdSummon;
 import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
+import fr.olympa.olympacreatif.utils.OtherUtils;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -86,8 +88,7 @@ public class PlotsInstancesListener implements Listener{
 	private Plot plot;
 	
 	//private Map<UUID, List<ItemStack>> itemsToKeepOnDeath = new HashMap<UUID, List<ItemStack>>();
-	
-	private Set<Material> commandBlockTypes = new HashSet<Material>(Arrays.asList(new Material[] {Material.COMMAND_BLOCK, Material.CHAIN_COMMAND_BLOCK, Material.REPEATING_COMMAND_BLOCK}));
+			
 
 	//gère le placement des commandblocks
 	private List<Player> cbPlacementPlayer = new ArrayList<Player>();
@@ -136,7 +137,7 @@ public class PlotsInstancesListener implements Listener{
 					Location loc = cbPlacementLocation.get(i);
 					Material mat = cbPlacementTypeCb.get(i);
 					
-					if (!commandBlockTypes.contains(mat))
+					if (!OtherUtils.isCommandBlock(mat))
 						continue;
 					
 					if (p.getInventory().getItemInMainHand().getType() != null)
@@ -248,7 +249,7 @@ public class PlotsInstancesListener implements Listener{
 			else if (e.getBlock().getType() == Material.REDSTONE_WIRE)
 				plot.getStoplagChecker().addEvent(StopLagDetect.WIRE);
 		
-			else if (commandBlockTypes.contains(e.getBlock().getType()))
+			else if (OtherUtils.isCommandBlock(e.getBlock()))
 				plot.getCbData().handleCommandBlockPowered(e);
 		
 		//Bukkit.broadcastMessage("REDSTONE EVENT plot : " + plot + ", new current : " + e.getNewCurrent());
@@ -421,8 +422,11 @@ public class PlotsInstancesListener implements Listener{
 			cb.update();
 		}*/
 		
-		plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
-
+		
+		if (e.getMaterial().isSolid())
+			plot = plugin.getPlotsManager().getPlot(OtherUtils.getFacingLoc(clickedBlock.getLocation(), e.getBlockFace()));
+		else
+			plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 		
 		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS) && plot == null)
 			return;
@@ -450,7 +454,7 @@ public class PlotsInstancesListener implements Listener{
 		}
 		
 		//GESTION COMMANDBLOCKS
-		if (commandBlockTypes.contains(clickedBlock.getType())) {
+		if (OtherUtils.isCommandBlock(clickedBlock)) {
 			if (!PlotPerm.COMMAND_BLOCK.has(plot, pc))
 				OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.COMMAND_BLOCK);
 				
@@ -482,7 +486,7 @@ public class PlotsInstancesListener implements Listener{
 			}
 		}
 		
-		if ((e.useItemInHand() != Result.DENY || e.getPlayer().isSneaking()) && e.getItem() != null && commandBlockTypes.contains(e.getItem().getType())) {
+		if ((e.useItemInHand() != Result.DENY || e.getPlayer().isSneaking()) && e.getItem() != null && OtherUtils.isCommandBlock(e.getItem())) {
 			
 			if (!KitType.COMMANDBLOCK.hasKit(pc)) {
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
@@ -523,11 +527,15 @@ public class PlotsInstancesListener implements Listener{
 				return;
 			}
 			
-			cbPlacementLocation.add(loc);
-			cbPlacementPlayer.add(e.getPlayer());
-			cbPlacementTypeCb.add(e.getItem().getType());
-			
-			e.getItem().setType(Material.DISPENSER);
+			if (OtherUtils.getCbCount(loc.getChunk()) >= OCparam.MAX_CB_PER_CHUNK.get()) {
+				OCmsg.PLOT_LOAD_TOO_MUCH_CB_CHUNK.send(pc, loc.getChunk().getX() + ", " + loc.getChunk().getZ(), plot);
+			}else {
+				cbPlacementLocation.add(loc);
+				cbPlacementPlayer.add(e.getPlayer());
+				cbPlacementTypeCb.add(e.getItem().getType());
+				
+				e.getItem().setType(Material.DISPENSER);	
+			}
 		}
 		
 		//GESTION COMMAND BLOCKS
