@@ -59,9 +59,9 @@ public class ShopGui extends IGui{
 				" ",
 				"§aPréfixe " + OlympaGroup.CREA_CONSTRUCTOR.getPrefix(p.getGender()) + p.getPlayer().getName(),  
 				"§a+1 parcelle (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 1) + ")", 
-				"§aAccès aux microblocks et aux têtes", 
-				"§aAccès à la réinitialisation, à la sauvegarde",
-				"§aet à la restauration de vos parcelles"
+				"§aAccès aux microblocks et aux têtes (/mb)", 
+				"§aAccès à la réinitialisation de vos parcelles (/oco reset)",
+				"§aAccès au /hat"
 				)));
 		
 		ranks.add(new MarketItemData(p, OlympaGroup.CREA_ARCHITECT, 1, ItemUtils.item(Material.GOLDEN_AXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), 
@@ -71,8 +71,8 @@ public class ShopGui extends IGui{
 				"§aPréfixe " + OlympaGroup.CREA_ARCHITECT.getPrefix(p.getGender()) + p.getPlayer().getName(), 
 				"§a+2 parcelles (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 2) + ")",
 				"§aAccès aux commandes WorldEdit et goBrush",
-				"§aExport de vos parcelles en .schematic",
-				//"§aAccès au /hat",
+				"§aExport de vos parcelles en .schematic (/oco export)",
+				"§aRestauration de vos parcelles vers le dernier schématic généré (/oco restore)",
 				" ",
 				"§7Le niveau précédent est requis pour acheter ce grade.")));
 		
@@ -84,6 +84,8 @@ public class ShopGui extends IGui{
 				"§aAccès à toutes les couleurs dans le chat",
 				"§aAccès aux hologrammes (/holo)",
 				"§aMessage quand vous rejoignez le serveur",
+				" ",
+				"§7Le niveau précédent est requis pour acheter ce grade.",
 				" ",
 				"§6Mais avant tout, nous vous remercions",
 				"§6chaleureusement du soutien que vous nous apportez !",
