@@ -1,23 +1,30 @@
 package fr.olympa.olympacreatif.perks;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.boydti.fawe.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.session.ClipboardHolder;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
@@ -26,25 +33,27 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
-import fr.olympa.olympacreatif.world.WorldManager;
 
 public class SchematicCreator {
 
 	  private OlympaCreatifMain plugin;
-	  private Set<PlotId> resetongPlots = new HashSet<PlotId>();
+	  private Set<PlotId> exportingPlotsCache = new HashSet<PlotId>();
+	  private Set<PlotId> restoringPlotCache = new HashSet<PlotId>();
 	  
 	public SchematicCreator(OlympaCreatifMain plugin) {
 	    this.plugin = plugin;
 	}
 	    
-	public void export(Plot plot, OlympaPlayerCreatif p) {
+	public void export(final Plot plot, final OlympaPlayerCreatif p) {
 	    if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 	    	OCmsg.WE_DISABLED.send(p);
 	    	return;
-	    }else if (resetongPlots.contains(plot.getId()))
+	    }else if (exportingPlotsCache.contains(plot.getId()))
 	    	return;
-	    
-	    	
+
+		OCmsg.WE_START_GENERATING_PLOT_SCHEM.send(p, plot);
+		exportingPlotsCache.add(plot.getId());
+		
 	    plugin.getTask().runTaskAsynchronously(() -> {
 			
 			//création fichier & dir si existants
@@ -84,11 +93,53 @@ public class SchematicCreator {
 			
 			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
 			OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.send(p, plot);
-			resetongPlots.remove(plot.getId());
+			exportingPlotsCache.remove(plot.getId());
 	    });
-
-		OCmsg.WE_START_GENERATING_PLOT_SCHEM.send(p, plot);
 		//return "§4La fonctionnalité d'export de la parcelle est indisponible pendant la bêta, désolé ¯\\_༼ ಥ ‿ ಥ ༽_/¯";
+	}
+    
+	public void restore(final Plot plot, final OlympaPlayerCreatif p) {
+	    if (!ComponentCreatif.WORLDEDIT.isActivated()) {
+	    	OCmsg.WE_DISABLED.send(p);
+	    	return;
+	    }else if (restoringPlotCache.contains(plot.getId()))
+	    	return;
+
+		OCmsg.WE_START_RESTORING_PLOT.send(p, plot);
+	    restoringPlotCache.add(plot.getId());
+	    
+	    plugin.getTask().runTaskAsynchronously(() -> {
+	    	Blob blob = plugin.getDataManager().loadSchemFromDb(p, plot);
+	    	
+	    	if (blob == null) {
+	    		OCmsg.WE_NO_PLOT_SCHEM_FOUND.send(p);
+	    		return;	
+	    	}
+	    	
+	    	try (ClipboardReader reader = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getReader(blob.getBinaryStream())) {
+				Clipboard clipboard = reader.read();
+			    BlockVector3 origin = BlockVector3.at(plot.getId().getLocation().getBlockX(), 0, plot.getId().getLocation().getBlockZ());
+
+			    try (EditSession editSession = new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()))
+			    		.allowedRegionsEverywhere().limitUnlimited().build()) {
+			        Operation operation = new ClipboardHolder(clipboard)
+			                .createPaste(editSession)
+			                .to(origin)
+			                .ignoreAirBlocks(false)
+			                .build();
+			        
+			        Operations.complete(operation);
+			    }
+			    
+				OCmsg.WE_COMPLETE_RESTORING_PLOT.send(p, plot);
+			    
+			} catch (IOException | SQLException e) {
+				OCmsg.WE_FAIL_RESTORING_PLOT.send(p, plot);
+				e.printStackTrace();
+			}
+	    	
+	    	restoringPlotCache.remove(plot.getId());
+	    });
 	}
 	
 

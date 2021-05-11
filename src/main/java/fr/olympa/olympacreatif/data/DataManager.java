@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -122,6 +123,9 @@ public class DataManager implements Listener {
 
 	private final OlympaStatement osSelectServerParams = new OlympaStatement(
 			"SELECT * FROM creatif_server_params WHERE `server_id` = ?;");
+
+	private final OlympaStatement osSelectPlotSchem = new OlympaStatement(
+			"SELECT * FROM creatif_plotschems WHERE `server_id` = ? AND `plot_id` = ?;");
 
 	//statement update data
 	private final OlympaStatement osUpdatePlayerPlotRank = new OlympaStatement(
@@ -465,6 +469,34 @@ public class DataManager implements Listener {
 
 		} catch (SQLException | FileNotFoundException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public synchronized Blob loadSchemFromDb(OlympaPlayerCreatif p, Plot plot) {
+		if (serverIndex == -1) {
+			plugin.getLogger().warning("§4[DataManager] §cIndex du serveur = -1 : impossible de charger un schematic depuis la bdd !");
+			return null;
+		}
+		
+		PreparedStatement ps;
+		try {
+			ps = osSelectPlotSchem.createStatement();
+			ps.setInt(1, serverIndex);
+			ps.setInt(2, plot.getId().getId());
+			ResultSet result = ps.executeQuery();
+			ps.close();
+			
+			Blob blob = null;
+			
+			if (result.next()) 
+				blob = result.getBlob("schem_data");
+			
+			result.close();
+			return blob;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 

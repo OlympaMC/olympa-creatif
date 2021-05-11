@@ -38,6 +38,45 @@ public class OcaCmd extends AbstractCmd {
 			plugin.getCmdLogic().sendPlotsList(getOlympaPlayer(), cmd.getArgument(0));
 	}
 
+	@Cmd(syntax = "Gérer les composants du créatif", args = {"activate|deactivate", "SERVER_COMPONENT"})
+	public void component(CommandContext cmd) {
+		if (cmd.getArgumentsLength() == 0) {
+
+			sendMessage(Prefix.INFO, "§6Etat des composants créatif");
+			if (!isConsole())
+				for (ComponentCreatif component : ComponentCreatif.values())
+					sendHoverAndCommand(Prefix.INFO, "§e" + component.getName() + " activé : " + (component.isActivated() ? "§aOUI" : "§cNON"),
+							"§7Cliquez ici pour changer la valeur", 
+							"/oca component " + (component.isActivated() ? "deactivate " : "activate ") + component.toString());
+			else
+				for (ComponentCreatif component : ComponentCreatif.values())
+					sendMessage(Prefix.INFO, "§e" + component.getName() + " activé : " + (component.isActivated() ? "§aOUI" : "§cNON"));
+			
+		}else if (cmd.getArgumentsLength() == 1) {
+			sendIncorrectSyntax();
+		
+		}else if (cmd.getArgumentsLength() >= 2) {
+			ComponentCreatif component = cmd.getArgument(1);
+			
+			if (cmd.getArgument(0).equals("activate")) {
+				component.activate();
+				
+				if (!isConsole())
+					OCmsg.STAFF_ACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
+				else
+					sendMessage(Prefix.INFO, "§aLe composant " + (component == null ? "§caucun§a" : (String) cmd.getArgument(0)) + " a été activé.");	
+			}else {
+				component.deactivate();
+				
+				if (!isConsole())
+					OCmsg.STAFF_DEACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
+				else
+					sendMessage(Prefix.INFO, "§cLe composant " + (component == null ? "§caucun§c" : (String) cmd.getArgument(0)) + " a été désactivé.");
+			}
+		}
+	}
+
+	/*
 	@Cmd(syntax = "Active l'un des composants du créatif", args = {"SERVER_COMPONENT"})
 	public void activate(CommandContext cmd) {
 		if (cmd.getArgumentsLength() == 0) {
@@ -78,20 +117,7 @@ public class OcaCmd extends AbstractCmd {
 			OCmsg.STAFF_DEACTIVATE_COMPONENT.send(getPlayer(), component == null ? "§caucun" : (String) cmd.getArgument(0));
 		else
 			sendMessage(Prefix.INFO, "§cLe composant " + (component == null ? "§caucun§c" : (String) cmd.getArgument(0)) + " a été activé.");
-	}
-	
-	private void sendComponentsStatus() {
-		sendMessage(Prefix.INFO, "§6Etat des composants créatif");
-		if (!isConsole())
-			for (ComponentCreatif component : ComponentCreatif.values())
-				sendHoverAndCommand(Prefix.INFO, "§e" + component.getName() + " activé : " + (component.isActivated() ? "§aOUI" : "§cNON"),
-						"§7Cliquez ici pour changer la valeur", 
-						"/oca " + (component.isActivated() ? "deactivate" : "activate") + " " + component.getName());
-		else
-			for (ComponentCreatif component : ComponentCreatif.values())
-				sendMessage(Prefix.INFO, "§e" + component.getName() + " activé : " + (component.isActivated() ? "§aOUI" : "§cNON"));
-	}
-	
+	}*/	
 	
 
 	@Cmd(player = true, syntax = "Gérer ses permissions staff", description = "/oca perms <perm>", args = "STAFF_PERM")

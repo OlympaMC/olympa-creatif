@@ -846,9 +846,9 @@ public class PlotsInstancesListener implements Listener{
 		if (e.getEntityType() == EntityType.PLAYER)
 			return;
 		
-		plot = plugin.getPlotsManager().getPlot(
-				plugin.getPlotsManager().getBirthPlot(
-						e.getEntity()));
+		PlotId id = plugin.getPlotsManager().getBirthPlot(e.getEntity());
+		
+		plot = plugin.getPlotsManager().getPlot(id);
 		
 		/*try {
 			throw new UnsupportedOperationException("§4[DEBUG] Entity " + e.getEntity() + " removed from " + plot);
@@ -856,9 +856,7 @@ public class PlotsInstancesListener implements Listener{
 			ex.printStackTrace();
 		}*/
 		
-		if (plot != null)
-			plugin.getLogger().info("§aEntity " + e.getEntity() + " removed from plot " + plot);
-		else
+		if (id == null)
 			plugin.getLogger().info("§cEntity " + e.getEntity() + " removed without birth plot!");
 		
 		if (plot != null)

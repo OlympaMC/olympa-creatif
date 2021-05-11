@@ -133,8 +133,15 @@ public class OCmsg {
 	public static final OCmsg HAT_SET = new OCmsg();
 
 	public static final OCmsg HAS_NOT_UNLOCKED_SUMMON = new OCmsg(5);
-	
+
 	public static final OCmsg WAIT_BEFORE_REEXECUTE_COMMAND = new OCmsg();
+	//public static final OCmsg WE_PLOT_RESTAURATION_FAILED = new OCmsg();
+	public static final OCmsg WE_NO_PLOT_SCHEM_FOUND = new OCmsg();
+	public static final OCmsg WE_FAIL_RESTORING_PLOT = new OCmsg();
+	public static final OCmsg WE_COMPLETE_RESTORING_PLOT = new OCmsg();
+	public static final OCmsg WE_START_RESTORING_PLOT = new OCmsg();
+	
+	
 	
 	static {
 		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {

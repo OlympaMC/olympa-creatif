@@ -112,7 +112,8 @@ public abstract class IGui extends OlympaGUI{
 		if (inv.first(from) == -1)
 			return;
 		 
-		inv.setItem(inv.first(from.clone()), to.clone());
+		//#clone retirés ici, peut-être à remettre ? TODO
+		inv.setItem(inv.first(from), to);
 		actionItems.put(to, actionItems.remove(from));		
 	}
 	

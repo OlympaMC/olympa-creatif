@@ -88,7 +88,8 @@ public class OcoCmd extends AbstractCmd {
 		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
 		
 		if (plot == null) {
-			OCmsg.WE_PLOT_EXPORT_FAILED.send(getPlayer(), plot);
+			//OCmsg.WE_PLOT_EXPORT_FAILED.send(getPlayer(), plot);
+			OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
 			return;
 		}else if (!PlotPerm.EXPORT_PLOT.has((OlympaPlayerCreatif) getOlympaPlayer())) {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.EXPORT_PLOT);
@@ -99,8 +100,28 @@ public class OcoCmd extends AbstractCmd {
 	}
 	
 	
+	@Cmd(player = true, syntax = "Restaurer sa parcelle vers la dernière version sauvegardée")
+	public void restore(CommandContext cmd) {
+		if (!PermissionsList.USE_PLOT_EXPORTATION.hasPermissionWithMsg(getOlympaPlayer()))
+			return;
+		
+		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
+		
+		if (plot == null) {
+			//OCmsg.WE_PLOT_RESTAURATION_FAILED.send(getPlayer(), plot);
+			OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
+			return;
+		}else if (!PlotPerm.EXPORT_PLOT.has((OlympaPlayerCreatif) getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.EXPORT_PLOT);
+			return;
+		}
+
+		plugin.getPerksManager().getSchematicCreator().restore(plot, getOlympaPlayer());
+	}
+	
+	
 	@Cmd(player = true, syntax = "Réinitialiser une parcelle. §cATTENTION : §4ACTION IRREVERSIBLE !!", args = {"INTEGER", "code"}/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
-	public void resetplot(CommandContext cmd) {
+	public void reset(CommandContext cmd) {
 		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null), (cmd.getArgumentsLength() > 1 ? (String) cmd.getArgument(1) : null));
 	}
 
@@ -122,8 +143,8 @@ public class OcoCmd extends AbstractCmd {
 		OCmsg.OCO_SET_FLY_SPEED.send(getPlayer(), cmd.getArgument(0).toString());
 	}*/
 
-	@Cmd(player = true, syntax = "Définir la vitesse de tick de la parcelle (entre 1 et 20)", args = {"INTEGER"}, min = 1/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
-	public void settickspeed(CommandContext cmd) {
+	@Cmd(player = true, syntax = "Définir la vitesse de tick des commandblocks (entre 1 et 20)", args = {"INTEGER"}, min = 1/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
+	public void tickspeed(CommandContext cmd) {
 		Plot plot = ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot();
 		
 		if (plot == null) {
