@@ -140,7 +140,10 @@ public class OCmsg {
 	public static final OCmsg WE_FAIL_RESTORING_PLOT = new OCmsg();
 	public static final OCmsg WE_COMPLETE_RESTORING_PLOT = new OCmsg();
 	public static final OCmsg WE_START_RESTORING_PLOT = new OCmsg();
+
 	public static final OCmsg PLOT_UNKNOWN_HOLO = new OCmsg();
+	public static final OCmsg PLOT_TOO_MUCH_HOLOS = new OCmsg();
+	public static final OCmsg PLOT_TOO_MUCH_LINES_ON_HOLO = new OCmsg();
 	
 	
 	

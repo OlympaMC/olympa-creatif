@@ -36,6 +36,7 @@ import fr.olympa.olympacreatif.commands.StoplagCommand;
 import fr.olympa.olympacreatif.commands.TpfCommand;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsManager;
@@ -169,34 +170,43 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 				
 			case CREATE_PREPROCESS:
-				if (!canEditHoloWithMsg(pc, holo, false))
+				if (!canEditHoloWithMsg(pc, holo, true))
 					return false;
 				return true;
 				
 			case CREATED:
-				if (!canEditHoloWithMsg(pc, holo, false))
+				if (!canEditHoloWithMsg(pc, holo, true))
 					return false;
 				pc.getCurrentPlot().getCbData().addHolo(holo);
 				return true;
 				
-			case EDIT:
-				if (!canEditHoloWithMsg(pc, holo, true))
+			case EDIT_ADDLINE:
+				if (!canEditHoloWithMsg(pc, holo, false))
+					return false;
+				if (holo.getLines().size() >= OCparam.MAX_LINES_PER_HOLO.get()) {
+					OCmsg.PLOT_TOO_MUCH_LINES_ON_HOLO.send(pc, OCparam.MAX_LINES_PER_HOLO.get() + "");
+					return false;
+				}
+				return true;
+				
+			case EDIT_OTHER:
+				if (!canEditHoloWithMsg(pc, holo, false))
 					return false;
 				return true;
 				
 			case MOVE:
-				if (!canEditHoloWithMsg(pc, holo, true))
+				if (!canEditHoloWithMsg(pc, holo, false))
 					return false;
 				return true;
 				
 			case REMOVE:
-				if (!canEditHoloWithMsg(pc, holo, true))
+				if (!canEditHoloWithMsg(pc, holo, false))
 					return false;
 				pc.getCurrentPlot().getCbData().removeHolo(holo);
 				return true;
 				
 			case TELEPORT:
-				if (!canEditHoloWithMsg(pc, holo, true))
+				if (!canEditHoloWithMsg(pc, holo, false))
 					return false;
 				return true;
 				
@@ -212,7 +222,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		});
 	}
 	
-	private boolean canEditHoloWithMsg(OlympaPlayerCreatif pc, Hologram holo, boolean checkHoloExistence) {
+	private boolean canEditHoloWithMsg(OlympaPlayerCreatif pc, Hologram holo, boolean isForHoloCreation) {
 		if (pc.getCurrentPlot() == null) {
 			OCmsg.NULL_CURRENT_PLOT.send(pc);
 			return false;
@@ -221,8 +231,12 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.MANAGE_HOLOS);
 			return false;
 			
-		}else if (checkHoloExistence && !pc.getCurrentPlot().getCbData().containsHolo(holo)) {
+		}else if (!isForHoloCreation && !pc.getCurrentPlot().getCbData().containsHolo(holo)) {
 			OCmsg.PLOT_UNKNOWN_HOLO.send(pc, holo.getID() + "");
+			return false;
+			
+		}else if (isForHoloCreation && pc.getCurrentPlot().getCbData().getHolos().size() >= OCparam.MAX_HOLOS_PER_PLOT.get()) {
+			OCmsg.PLOT_TOO_MUCH_HOLOS.send(pc, OCparam.MAX_HOLOS_PER_PLOT.get() + "");
 			return false;
 			
 		}else 
