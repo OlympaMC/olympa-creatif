@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -42,4 +43,12 @@ public class PlotsManagerListener implements Listener {
 		if (newId != null && !newId.equals(oldId))
 			plugin.getPlotsManager().loadExistingPlot(newId);
 	}
+	
+	@EventHandler
+	public void onJoin(PlayerJoinEvent e) {
+		plugin.getPlotsManager().showHelpHolosTo(e.getPlayer());
+	}
+	
 }
+
+

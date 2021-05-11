@@ -26,7 +26,7 @@ import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotCbData;
 import fr.olympa.olympacreatif.plot.PlotPerm;
@@ -110,7 +110,7 @@ public class PacketListener implements Listener {
                 /*if (packetsLimiter.get(player.getUniqueId())[0]++ > maxPacketsPerPeriod)
                 	return;*/
                 
-            	if (player.isOp() && !PermissionsList.STAFF_BYPASS_OP_CHECK.hasPermission(p)) {
+            	if (player.isOp() && !OcPermissions.STAFF_BYPASS_OP_CHECK.hasPermission(p)) {
             		if (blockedPlayers.add(player.getUniqueId())) {
             			player.sendMessage("§2Very interesting!! §aHow did you get operator permissions? §bAnyway, you won't be able to do anything §l§4>=D \n§6Don't forget to have fun on Olympa!\n§7If you think that's an error (but I think it isn't), please contact a server administrator.\n§a");
             			plugin.getTask().runTaskLater(() -> blockedPlayers.remove(player.getUniqueId()), 20*30);

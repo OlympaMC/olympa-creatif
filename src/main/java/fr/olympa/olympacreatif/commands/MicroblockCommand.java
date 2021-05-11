@@ -10,7 +10,7 @@ import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class MicroblockCommand extends OlympaCommand {
@@ -18,7 +18,7 @@ public class MicroblockCommand extends OlympaCommand {
 	private OlympaCreatifMain plugin;
 	
 	public MicroblockCommand(OlympaCreatifMain plugin) {
-		super(plugin, "mb", "Ouvrir le menu des microblocks", PermissionsList.MICRO_BLOCKS_COMMAND, new String[] {"mbs", "microblock", "microblocks"});
+		super(plugin, "mb", "Ouvrir le menu des microblocks", OcPermissions.MICRO_BLOCKS_COMMAND, new String[] {"mbs", "microblock", "microblocks"});
 		this.plugin = plugin;
 		allowConsole = false;
 	}

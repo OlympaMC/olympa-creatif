@@ -39,7 +39,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
@@ -294,7 +294,7 @@ public class Plot {
 	}
 	
 	public void sendMessage(OlympaPlayerCreatif pc, String msg) {
-		if (PermissionsList.USE_COLORED_TEXT.hasPermission(pc))
+		if (OcPermissions.USE_COLORED_TEXT.hasPermission(pc))
 			msg = ChatColor.translateAlternateColorCodes('&', msg);
 		
 		msg = "§7[Parcelle " + getId() + "] §r" + 
@@ -356,7 +356,7 @@ public class Plot {
 			addPlayerInPlot(p);
 		
 		//exécution instruction commandblock d'entrée
-		plugin.getCommandBlocksManager().executeJoinActions(this, p);
+		plugin.getCommandBlocksManager().executeEntryActions(this, p);
 		
 		//clear les visiteurs en entrée & stockage de leur inventaire
 		if (parameters.getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS) && !PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {

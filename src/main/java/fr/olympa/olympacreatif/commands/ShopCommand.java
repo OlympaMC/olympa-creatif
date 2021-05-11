@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.ShopGui;
 

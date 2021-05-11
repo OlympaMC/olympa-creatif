@@ -59,7 +59,9 @@ public class ShopGui extends IGui{
 				" ",
 				"§aPréfixe " + OlympaGroup.CREA_CONSTRUCTOR.getPrefix(p.getGender()) + p.getPlayer().getName(),  
 				"§a+1 parcelle (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 1) + ")", 
-				"§aAccès aux microblocks et aux têtes"
+				"§aAccès aux microblocks et aux têtes", 
+				"§aAccès à la réinitialisation, à la sauvegarde",
+				"§aet à la restauration de vos parcelles"
 				)));
 		
 		ranks.add(new MarketItemData(p, OlympaGroup.CREA_ARCHITECT, 1, ItemUtils.item(Material.GOLDEN_AXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), 
@@ -80,8 +82,8 @@ public class ShopGui extends IGui{
 				" ",
 				"§aPréfixe " + OlympaGroup.CREA_CREATOR.getPrefix(p.getGender()) + p.getPlayer().getName(), 
 				"§aAccès à toutes les couleurs dans le chat",
+				"§aAccès aux hologrammes (/holo)",
 				"§aMessage quand vous rejoignez le serveur",
-				"§aReset de vos parcelles à volonté",
 				" ",
 				"§6Mais avant tout, nous vous remercions",
 				"§6chaleureusement du soutien que vous nous apportez !",

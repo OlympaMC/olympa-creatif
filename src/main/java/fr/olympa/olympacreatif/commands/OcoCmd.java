@@ -19,7 +19,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
@@ -82,7 +82,7 @@ public class OcoCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Exporter sa parcelle en .schematic")
 	public void export(CommandContext cmd) {
-		if (!PermissionsList.USE_PLOT_EXPORTATION.hasPermissionWithMsg(getOlympaPlayer()))
+		if (!OcPermissions.USE_PLOT_EXPORTATION.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
 		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
@@ -102,7 +102,7 @@ public class OcoCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Restaurer sa parcelle vers la dernière version sauvegardée")
 	public void restore(CommandContext cmd) {
-		if (!PermissionsList.USE_PLOT_EXPORTATION.hasPermissionWithMsg(getOlympaPlayer()))
+		if (!OcPermissions.USE_PLOT_EXPORTATION.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
 		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();

@@ -9,12 +9,12 @@ import org.bukkit.plugin.Plugin;
 
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 
 public class HatCommand extends OlympaCommand {
 
 	public HatCommand(Plugin plugin) {
-		super(plugin, "hat", PermissionsList.CREA_HAT_COMMAND, new String[] {});
+		super(plugin, "hat", OcPermissions.CREA_HAT_COMMAND, new String[] {});
 	}
 
 	@Override

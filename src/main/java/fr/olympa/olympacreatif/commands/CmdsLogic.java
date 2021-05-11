@@ -27,7 +27,7 @@ import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -321,7 +321,7 @@ public class CmdsLogic {
 			return;
 		}
 		
-		if (!PlotPerm.RESET_PLOT.has(plot, pc) && !PermissionsList.STAFF_RESET_PLOT.hasPermission(pc)) {
+		if (!PlotPerm.RESET_PLOT.has(plot, pc) && !OcPermissions.STAFF_RESET_PLOT.hasPermission(pc)) {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.RESET_PLOT);
 			return;
 		}
@@ -337,11 +337,11 @@ public class CmdsLogic {
 			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getId()), 600);
 			
 		} else if (code == null) {
-			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getId()));
+			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco reset " + plot + " " + plotsResetVerifCode.get(plot.getId()));
 			
 		}else {		
-			if (!plotsResetVerifCode.containsKey(plot.getId()) || !plotsResetVerifCode.get(plot.getId()).equals(code)) {
-				OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + plotsResetVerifCode.get(plot.getId()));
+			if (!plotsResetVerifCode.get(plot.getId()).equals(code)) {
+				OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetp " + plot + " " + plotsResetVerifCode.get(plot.getId()));
 				return;
 			}
 

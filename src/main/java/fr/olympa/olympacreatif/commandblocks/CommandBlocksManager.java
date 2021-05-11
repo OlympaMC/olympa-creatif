@@ -10,6 +10,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -42,8 +43,7 @@ public class CommandBlocksManager {
 	}
 	
 	//Actions à exécuter en entrée et sortie de plot
-	public void executeJoinActions(Plot toPlot, Player p) {
-		
+	public void executeEntryActions(Plot toPlot, Player p) {
 		p.setExp(0);
 		
 		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
@@ -64,6 +64,9 @@ public class CommandBlocksManager {
 				pc.setCustomScoreboardLines(obj.getName(), (LinkedHashMap<String, Integer>) obj.getValues(true));
 			}	
 		}
+		
+		//show holos
+		toPlot.getCbData().getHolos().forEach(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i).show(p));
 	}
 	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
@@ -82,6 +85,9 @@ public class CommandBlocksManager {
 		
 		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomSidebar();
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+		
+		//hide holos
+		fromPlot.getCbData().getHolos().forEach(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i).hide(p));
 	}
 
 	public void setFakeOp(Player player, boolean setFakeOp) {

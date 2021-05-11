@@ -1,18 +1,12 @@
 package fr.olympa.olympacreatif.plot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
-import java.util.function.Consumer;
 import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
@@ -20,8 +14,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.google.common.cache.CacheBuilder;
 
 import fr.olympa.api.holograms.Hologram;
 import fr.olympa.api.holograms.Hologram.HologramLine;
@@ -38,7 +30,9 @@ import net.minecraft.server.v1_16_R3.NBTTagString;
 
 public class PlotsManager {
 
-	private final Set<Plot> forceLoadedPlots = new HashSet<Plot>(); 
+	//private final Set<Plot> forceLoadedPlots = new HashSet<Plot>();
+	
+	private Set<Hologram> serverHolos = new HashSet<Hologram>();
 	
 	private static final int delayBetweenPlotsCheckup = 20 * 30;
 	public static final int maxPlotsPerPlayer = 36;
@@ -92,7 +86,7 @@ public class PlotsManager {
 									hasMemberOnline = true;
 								}
 							}
-							if (!hasMemberOnline && !forceLoadedPlots.contains(plot)) {
+							if (!hasMemberOnline/* && !forceLoadedPlots.contains(plot)*/) {
 								plot.unload();
 								plugin.getDataManager().addPlotToSaveQueue(plot, false);
 								loadedPlots.remove(plot.getId().getId());
@@ -266,33 +260,31 @@ public class PlotsManager {
 	}
 
 	public void loadHelpHolos() {
-		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_1_LOC.get().toLoc()), false);
-		plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_2_LOC.get().toLoc()), false);
-		
-		plugin.getTask().runTaskLater(() -> {
-			forceLoadedPlots.add(getPlot(OCparam.HOLO_HELP_1_LOC.get().toLoc()));
-			forceLoadedPlots.add(getPlot(OCparam.HOLO_HELP_2_LOC.get().toLoc()));
-			
-			setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
-			setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
-		}, 30);
+		//plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_1_LOC.get().toLoc()), false);
+		//plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_2_LOC.get().toLoc()), false);
+
+		setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
+		setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
 	}
 	
-	
-	private void setHelpHolo(Location loc, List<String> text) {
-		plugin.getWorldManager().getWorld().getChunkAtAsync(loc, new Consumer<Chunk>() {
-			
-			@SuppressWarnings("unchecked")
-			@Override
-			public void accept(Chunk chunk) {
-				chunk.setForceLoaded(true);
-				Hologram holo = OlympaCore.getInstance().getHologramsManager().createHologram(loc, false, true);
-				text.forEach(s -> holo.addLine(new FixedLine<HologramLine>(s)));
-				holo.show();
 
-				plugin.getLogger().info("§aHelp holo " + text.get(0) + " §aplaced at " + new Position(loc));
-			}
-		});
+	@SuppressWarnings("unchecked")
+	private void setHelpHolo(Location loc, List<String> text) {
+		Hologram holo = OlympaCore.getInstance().getHologramsManager()
+				.createHologram(loc, false, false, true/*, text.stream().map(s -> new FixedLine<HologramLine>(s)).collect(Collectors.toSet()).toArray(FixedLine[]::new)*/);
+		
+		text.forEach(s -> holo.addLine(new FixedLine<HologramLine>(s)));
+		//holo.getLines().forEach(HologramLine::updatePosition);
+		serverHolos.add(holo);
+
+		plugin.getLogger().info("§aHelp holo " + text.get(0) + " §aplaced at " + new Position(loc));
+	}
+	
+	public void showHelpHolosTo(final Player p) {
+		plugin.getTask().runTaskLater(() -> serverHolos.forEach(holo -> {
+			holo.show(p);
+			//System.out.println("Show holo " + holo.getLines() + " to " + p.getName());
+		}), 15);
 	}
 }
 

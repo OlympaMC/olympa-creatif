@@ -32,6 +32,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
+import fr.olympa.api.holograms.Hologram;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
@@ -50,6 +51,7 @@ import net.minecraft.server.v1_16_R3.TileEntityTypes;
 public class PlotCbData {
 	
 	private static final NamespacedKey cbAutoKey = NamespacedKey.minecraft("cb_is_auto");
+	
 	
 	/*private static double nextChunkLoad = 1;
 	
@@ -108,6 +110,8 @@ public class PlotCbData {
 	private Map<Location, OcCommandBlockData> blueCommandblocks = new HashMap<Location, OcCommandBlockData>();
 	
 	private int cbTask = -1;
+	
+	private Set<Integer> holos = new HashSet<Integer>();
 
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -162,6 +166,38 @@ public class PlotCbData {
 	}
 
 
+	//////////////////////////////////////////////////////////////////////////////////////
+	//                              HOLOGRAMS MANAGEMENT                                //
+	//////////////////////////////////////////////////////////////////////////////////////
+
+
+	public boolean addHolo(Hologram holo) {
+		if (holo == null)
+			return false;
+		
+		plot.getPlayers().forEach(p -> holo.show(p));
+		return holos.add(holo.getID());
+	}
+
+	public boolean removeHolo(Hologram holo) {
+		if (holo == null)
+			return false;
+		
+		if (containsHolo(holo))
+			plot.getPlayers().forEach(p -> holo.hide(p));
+		
+		return holos.remove(holo.getID());
+	}
+	
+	public boolean containsHolo(Hologram holo) {
+		return holos.contains(holo.getID());
+	}
+	
+	public Set<Integer> getHolos() {
+		return holos;
+	}
+	
+	
 	//////////////////////////////////////////////////////////////////////////////////////
 	//                      SCOREBOARDS AND OBJECTIVES MANAGEMENT                       //
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -415,30 +451,6 @@ public class PlotCbData {
 	private void registerCommandBlocks(final Chunk ch) {
 		//System.out.println("[DEBUG] SET COMMANDS FOR CHUNK " + ch);
 		
-		//clear les commandblocks déjà enregistrés de ce chunk si demandé 
-		/*if (resetChunk) {
-			Iterator<Entry<Location, OcCommandBlockData>> iter = orangeCommandblocks.entrySet().iterator();
-			while (iter.hasNext()) {
-				Entry<Location, OcCommandBlockData> entry = iter.next();
-				if (entry.getKey().getChunk().equals(ch))
-					iter.remove();
-			}
-			
-			Iterator<Entry<Location, OcCommandBlockData>> iter2 = blueCommandblocks.entrySet().iterator();
-			while (iter2.hasNext()) {
-				Entry<Location, OcCommandBlockData> entry = iter2.next();
-				if (entry.getKey().getChunk().equals(ch))
-					iter2.remove();
-			}
-			
-			Iterator<Entry<Location, OcCommandBlockData>> iter3 = greenCommandblocks.entrySet().iterator();
-			while (iter3.hasNext()) {
-				Entry<Location, OcCommandBlockData> entry = iter3.next();
-				if (entry.getKey().getChunk().equals(ch))
-					iter3.remove();
-			}
-		}*/
-		
 		Map<BlockPosition, TileEntity> tiles = new HashMap<BlockPosition, TileEntity>(((CraftChunk)ch).getHandle().tileEntities);
 		ch.setForceLoaded(true);
 		final World w = plugin.getWorldManager().getWorld();
@@ -456,56 +468,10 @@ public class PlotCbData {
 					locs.forEach(loc -> {
 						Map<Location, OcCommandBlockData> map = getCbMap(loc.getBlock().getType());
 						map.put(loc, new OcCommandBlockData((org.bukkit.block.CommandBlock) loc.getBlock().getState()));
-						/*if (loc.getBlock().getState() instanceof org.bukkit.block.CommandBlock)
-							if (map.size() < OCparam.MAX_CB_PER_PLOT.get())
-								map.put(loc, new OcCommandBlockData((org.bukkit.block.CommandBlock) loc.getBlock().getState()));
-							else
-								plot.getMembers().getList().entrySet().stream().filter(e -> PlotPerm.COMMAND_BLOCK.has(e.getValue()))
-								.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_PLOT.send(p, plot, loc.getBlock().getType().toString().toLowerCase()));*/
 					});
 				ch.setForceLoaded(false);
 			});
 		});
-		/*
-		final ChunkSnapshot chSnapshot = ch.getChunkSnapshot();
-		final World w = plugin.getWorldManager().getWorld();
-		
-		//récupère tous les commandsblocks du chunk et les enregistre
-		plugin.getTask().runTaskAsynchronously(() -> {
-
-			Map<Location, OcCommandBlockData> orange = new HashMap<Location, OcCommandBlockData>();
-			Map<Location, OcCommandBlockData> green = new HashMap<Location, OcCommandBlockData>();
-			Map<Location, OcCommandBlockData> blue = new HashMap<Location, OcCommandBlockData>();
-			
-			tiles.entrySet().stream().filter(e -> e.getValue() instanceof TileEntityCommand).map(e -> new Location(w, 0, 0, 0)).collect(Collectors.toSet());
-			
-			tiles.forEach((pos, tile) -> {
-				
-				BlockData data = chSnapshot.getBlockData(Math.floorMod(pos.getX(), 16), pos.getY(), Math.floorMod(pos.getZ(), 16));
-				
-				if (data instanceof CommandBlock && tile instanceof TileEntityCommand) {
-					CommandBlock cb = (CommandBlock) data;
-					TileEntityCommand cbTile = (TileEntityCommand) tile;
-					Location loc = new Location(plugin.getWorldManager().getWorld(), pos.getX(), pos.getY(), pos.getZ());
-					
-					OcCommandBlockData cbDatas = new OcCommandBlockData(cb, loc, cbTile.getCommandBlock().getCommand(), cb.isConditional(), cbTile.g(), false);
-					
-					if (cb.getMaterial() == Material.COMMAND_BLOCK) {
-						orange.put(loc, cbDatas);
-					}else if (cb.getMaterial() == Material.REPEATING_COMMAND_BLOCK) {
-						blue.put(loc, cbDatas);
-					}else if (cb.getMaterial() == Material.CHAIN_COMMAND_BLOCK) {
-						green.put(loc, cbDatas);
-					}
-				}
-			});
-			
-			plugin.getTask().runTask(() -> {
-				orangeCommandblocks.putAll(orange);
-				greenCommandblocks.putAll(green);
-				blueCommandblocks.putAll(blue);
-			});
-		});*/
 	}
 
 

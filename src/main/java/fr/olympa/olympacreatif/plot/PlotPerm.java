@@ -12,12 +12,12 @@ import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 
 public class PlotPerm {
 
-	public static final PlotPerm EXPORT_PLOT = new PlotPerm(PlotRank.OWNER, "Exporter la parcelle", PermissionsList.USE_PLOT_EXPORTATION);
-	public static final PlotPerm RESET_PLOT = new PlotPerm(PlotRank.OWNER, "Réinitialiser la parcelle", PermissionsList.USE_PLOT_RESET);
+	public static final PlotPerm EXPORT_PLOT = new PlotPerm(PlotRank.OWNER, "Exporter la parcelle", OcPermissions.USE_PLOT_EXPORTATION);
+	public static final PlotPerm RESET_PLOT = new PlotPerm(PlotRank.OWNER, "Réinitialiser la parcelle", OcPermissions.USE_PLOT_RESET);
 	public static final PlotPerm INVITE_MEMBER = new PlotPerm(PlotRank.OWNER, "Inviter des membres");
 	public static final PlotPerm SET_PLOT_SPAWN = new PlotPerm(PlotRank.CO_OWNER, "Définir le spawn parcelle");
 	//public static final PlotPerm RESET_PLOT = new PlotPerm(PlotRank.OWNER, "Reset la parcelle ", PermissionsList.CREA_USE_PLOT_RESET);
@@ -29,9 +29,10 @@ public class PlotPerm {
 	public static final PlotPerm CHANGE_PARAM_INTERRACTION = new PlotPerm(PlotRank.CO_OWNER, "Modifier params d'interraction");
 	public static final PlotPerm COMMAND_BLOCK = new PlotPerm(PlotRank.CO_OWNER, "Interragir avec les commandblocks");
 	public static final PlotPerm EXECUTE_CB_CMD = new PlotPerm(PlotRank.CO_OWNER, "Utiliser les commandes vanilla");
+	public static final PlotPerm MANAGE_HOLOS = new PlotPerm(PlotRank.CO_OWNER, "Gérer les hologrammes", OcPermissions.USE_HOLOGRAMS);
 	
-	public static final PlotPerm USE_WE = new PlotPerm(PlotRank.TRUSTED, "Utiliser WorldEdit", PermissionsList.USE_WORLD_EDIT);
-	public static final PlotPerm DEFINE_MUSIC = new PlotPerm(PlotRank.TRUSTED, "Définir la musique", PermissionsList.USE_PLOT_MUSIC);
+	public static final PlotPerm USE_WE = new PlotPerm(PlotRank.TRUSTED, "Utiliser WorldEdit", OcPermissions.USE_WORLD_EDIT);
+	public static final PlotPerm DEFINE_MUSIC = new PlotPerm(PlotRank.TRUSTED, "Définir la musique", OcPermissions.USE_PLOT_MUSIC);
 	public static final PlotPerm KICK_VISITOR = new PlotPerm(PlotRank.TRUSTED, "Ejecter un visiteur");
 	public static final PlotPerm USE_STOPLAG = new PlotPerm(PlotRank.TRUSTED, "Gérer l'état de stoplag de la parcelle (/stoplag)");
 
@@ -40,6 +41,8 @@ public class PlotPerm {
 	public static final PlotPerm CHANGE_GAMEMODE = new PlotPerm(PlotRank.MEMBER, "Gérer votre gamemode avec /gm");
 	public static final PlotPerm DROP_ITEM = new PlotPerm(PlotRank.MEMBER, null);
 	public static final PlotPerm DEFINE_OWN_FLY_SPEED = new PlotPerm(PlotRank.MEMBER, null);
+	
+	
 	
 	private PlotRank minRank;
 	private String description;

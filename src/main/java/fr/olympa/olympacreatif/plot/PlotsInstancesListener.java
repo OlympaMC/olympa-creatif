@@ -19,6 +19,7 @@ import org.bukkit.block.Hopper;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -856,13 +857,17 @@ public class PlotsInstancesListener implements Listener{
 			ex.printStackTrace();
 		}*/
 		
-		if (id == null)
-			plugin.getLogger().info("§cEntity " + e.getEntity() + " removed without birth plot!");
-		
 		if (plot != null)
 			plot.removeEntityInPlot(e.getEntity(), false);
 		/*else
 			e.getEntity().remove();*/
+		
+		/*if (id == null)*/
+			plugin.getLogger().info("§eEntity " + e.getEntity() + " removed.");
+
+		if (((CraftEntity)e.getEntity()).getHandle().dead)
+			plugin.getLogger().info("§cEntity " + e.getEntity() + " killed.");
+		
 	}
 	
 	@EventHandler //cancel entity pathfind of entity try to go outside of the plot

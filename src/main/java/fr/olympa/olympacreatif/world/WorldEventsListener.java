@@ -56,7 +56,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
@@ -156,7 +156,7 @@ public class WorldEventsListener implements Listener{
 		if (e.getCurrentItem() == null)
 			return;
 		
-		if (!PermissionsList.USE_COLORED_TEXT.hasPermission(e.getWhoClicked().getUniqueId()))
+		if (!OcPermissions.USE_COLORED_TEXT.hasPermission(e.getWhoClicked().getUniqueId()))
 			return;
 		
 		if (e.getCurrentItem() != null && e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().hasDisplayName())
@@ -210,7 +210,7 @@ public class WorldEventsListener implements Listener{
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
 		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
 		
-		if (PermissionsList.USE_COLORED_TEXT.hasPermission(p))
+		if (OcPermissions.USE_COLORED_TEXT.hasPermission(p))
 			e.setMessage(ChatColor.translateAlternateColorCodes('&', e.getMessage()));
 		
 		boolean invertTarget = false;
@@ -231,7 +231,7 @@ public class WorldEventsListener implements Listener{
 	
 	@EventHandler //color sur pancartes
 	public void onSignColor(SignChangeEvent e) {
-		if (!PermissionsList.USE_COLORED_TEXT.hasPermission(e.getPlayer().getUniqueId()))
+		if (!OcPermissions.USE_COLORED_TEXT.hasPermission(e.getPlayer().getUniqueId()))
 			return;
 		
 		int i = 0;

@@ -14,7 +14,7 @@ import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
@@ -23,7 +23,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 public class OcaCmd extends AbstractCmd {
 
 	public OcaCmd(OlympaCreatifMain plugin) {
-		super(plugin, "oca", PermissionsList.STAFF_OCA_CMD, "Panel de gestion pour le staff.");
+		super(plugin, "oca", OcPermissions.STAFF_OCA_CMD, "Panel de gestion pour le staff.");
 
 		addArgumentParser("STAFF_PERM", StaffPerm.class);
 		addArgumentParser("SERVER_COMPONENT", ComponentCreatif.class);
@@ -237,7 +237,7 @@ public class OcaCmd extends AbstractCmd {
 	
 	@Cmd(syntax = "Gérer l'argent d'un joueur", args = {"PLAYERS", "info|give|withdraw", "INTEGER", }, min = 2)
 	public void money(CommandContext cmd) {
-		if (getOlympaPlayer() != null && !PermissionsList.STAFF_MANAGE_MONEY.hasPermissionWithMsg(getOlympaPlayer()))
+		if (getOlympaPlayer() != null && !OcPermissions.STAFF_MANAGE_MONEY.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
 		OlympaPlayerCreatif target = AccountProvider.get(((Player)cmd.getArgument(0)).getUniqueId());

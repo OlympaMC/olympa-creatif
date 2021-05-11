@@ -140,6 +140,7 @@ public class OCmsg {
 	public static final OCmsg WE_FAIL_RESTORING_PLOT = new OCmsg();
 	public static final OCmsg WE_COMPLETE_RESTORING_PLOT = new OCmsg();
 	public static final OCmsg WE_START_RESTORING_PLOT = new OCmsg();
+	public static final OCmsg PLOT_UNKNOWN_HOLO = new OCmsg();
 	
 	
 	
@@ -181,7 +182,7 @@ public class OCmsg {
 	@SuppressWarnings("deprecation")
 	private static final Map<String, BiFunction<OlympaPlayerCreatif, PlotPerm, String>> plotPermissionPlaceHolders = ImmutableMap.<String, BiFunction<OlympaPlayerCreatif, PlotPerm,String>>builder()
 			.put("%plotPermDesc", (pc, perm) -> {return perm.getDesc() == null ? "" : perm.getDesc();})
-			.put("%plotPermMinGroup", (pc, perm) -> {return perm.getPerm() == null ? "aucun" : pc == null ? perm.getPerm().getMinGroup().getName() : perm.getPerm().getMinGroup().getName(pc.getGender());})
+			.put("%plotPermMinGroup", (pc, perm) -> {return perm.getPerm() == null ? "§7aucun" : pc == null ? perm.getPerm().getMinGroup().getName() : perm.getPerm().getMinGroup().getName(pc.getGender());})
 			.put("%plotPermMinPlotRank", (pc, perm) -> {return perm.getRank().getRankName();})
 			.build();
 

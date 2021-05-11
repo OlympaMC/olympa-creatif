@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import fr.olympa.api.command.essentials.BackCommand;
 import fr.olympa.api.command.essentials.tp.TpaHandler;
 import fr.olympa.api.groups.OlympaGroup;
+import fr.olympa.api.holograms.Hologram;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
@@ -34,8 +35,9 @@ import fr.olympa.olympacreatif.commands.SpeedCommand;
 import fr.olympa.olympacreatif.commands.StoplagCommand;
 import fr.olympa.olympacreatif.commands.TpfCommand;
 import fr.olympa.olympacreatif.data.DataManager;
+import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
 import fr.olympa.olympacreatif.data.PermissionsManager;
 import fr.olympa.olympacreatif.data.ReportReasonsList;
 import fr.olympa.olympacreatif.perks.PerksManager;
@@ -91,7 +93,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
 
-		OlympaPermission.registerPermissions(PermissionsList.class);
+		OlympaPermission.registerPermissions(OcPermissions.class);
 		ReportReason.registerReason(ReportReasonsList.class);
 
 		//new BackCommand(plugin, null);
@@ -125,7 +127,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			
 			if (pc == null)
 				return false;
-			else if (PermissionsList.STAFF_OCA_CMD.hasPermission(pc))
+			else if (OcPermissions.STAFF_OCA_CMD.hasPermission(pc))
 				return true;
 			
 			Plot plot = getPlotsManager().getPlot(pc.getPlayer().getLocation());
@@ -136,7 +138,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 				return true;
 		});
 		
-		getServer().getPluginManager().registerEvents(new TpaHandler(this, PermissionsList.CREA_TPA_COMMAND, 0), plugin);
+		getServer().getPluginManager().registerEvents(new TpaHandler(this, OcPermissions.CREA_TPA_COMMAND, 0), plugin);
 		
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);
@@ -151,35 +153,80 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			weManager = new OcFastAsyncWorldEdit(this);
 		else if (getServer().getPluginManager().getPlugin("WorldEdit") != null && getServer().getPluginManager().getPlugin("AsyncWorldEdit") != null)
 			weManager = new OcWorldEdit(this);
-
-		//OlympaCorePermissions.GROUP_COMMAND.allowGroup(OlympaGroup.DEV);
-
-		//get luckperms api provider
-		/*
-		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-		if (provider != null)
-			luckperms = provider.getProvider();*/
-
-		//hook into worldedit & asyncworldedit
-
-		/*
-		we = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
-		awe = (IAsyncWorldEdit) getServer().getPluginManager().getPlugin("AsyncWorldEdit");
 		
-		if (we != null) {
-			we.getWorldEdit().getEventBus().register(new WorldEditListener(this));
+		//gestion particulière des hologrammes
+		OlympaAPIPermissions.COMMAND_HOLOGRAMS_MANAGE.setMinGroup(OcPermissions.USE_HOLOGRAMS.getMinGroup());
+		OlympaCore.getInstance().getHologramsManager().setTempHoloCreationMode(true);
+		OlympaCore.getInstance().getHologramsManager().setHoloControlSupplier((sender, holo, action) -> {
+			if (!(sender instanceof Player))
+				return true;
+			
+			OlympaPlayerCreatif pc = AccountProvider.get(((Player)sender).getUniqueId());
+			
+			switch(action) {
+			case COMMAND:
+				return pc.getCurrentPlot().getCbData().containsHolo(holo);
 
-			if (awe == null) {
-				Bukkit.getPluginManager().disablePlugin(we);
-				Bukkit.getLogger().log(Level.WARNING, getPrefixConsole() + "WorldEdit disabled because AsyncWorldEdit wasn't found.");
+				
+			case CREATE_PREPROCESS:
+				if (!canEditHoloWithMsg(pc, holo, false))
+					return false;
+				return true;
+				
+			case CREATED:
+				if (!canEditHoloWithMsg(pc, holo, false))
+					return false;
+				pc.getCurrentPlot().getCbData().addHolo(holo);
+				return true;
+				
+			case EDIT:
+				if (!canEditHoloWithMsg(pc, holo, true))
+					return false;
+				return true;
+				
+			case MOVE:
+				if (!canEditHoloWithMsg(pc, holo, true))
+					return false;
+				return true;
+				
+			case REMOVE:
+				if (!canEditHoloWithMsg(pc, holo, true))
+					return false;
+				pc.getCurrentPlot().getCbData().removeHolo(holo);
+				return true;
+				
+			case TELEPORT:
+				if (!canEditHoloWithMsg(pc, holo, true))
+					return false;
+				return true;
+				
+			case VISIBILITY:
+				return false;
+				
+			default:
+				getLogger().warning("§cAn unexpected action on hologram " + holo.getID() + " has been detected : " + action);
+				return false;
+			
 			}
-		}
-
-		if (awe != null) {
-			awe.getProgressDisplayManager().registerProgressDisplay(new AWEProgressBar());
-			Bukkit.getLogger().log(Level.FINE, getPrefixConsole() + "Successfully loaded WorldEdit and AWE custom progressbar.");
-			weEnabled = true;
-		}   */
+			
+		});
+	}
+	
+	private boolean canEditHoloWithMsg(OlympaPlayerCreatif pc, Hologram holo, boolean checkHoloExistence) {
+		if (pc.getCurrentPlot() == null) {
+			OCmsg.NULL_CURRENT_PLOT.send(pc);
+			return false;
+			
+		}else if (!PlotPerm.MANAGE_HOLOS.has(pc.getCurrentPlot(), pc)) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.MANAGE_HOLOS);
+			return false;
+			
+		}else if (checkHoloExistence && !pc.getCurrentPlot().getCbData().containsHolo(holo)) {
+			OCmsg.PLOT_UNKNOWN_HOLO.send(pc, holo.getID() + "");
+			return false;
+			
+		}else 
+			return true;
 	}
 
 	@Override

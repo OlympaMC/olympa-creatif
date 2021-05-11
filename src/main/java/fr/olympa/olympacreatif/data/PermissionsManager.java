@@ -133,7 +133,7 @@ public class PermissionsManager implements Listener {
 		PermissionAttachment att = weAttachements.get(p.getUniqueId());
 		
 		wePerms.forEach(perm -> {
-			if (PermissionsList.USE_WORLD_EDIT.hasPermission(p) && ComponentCreatif.WORLDEDIT.isActivated())
+			if (OcPermissions.USE_WORLD_EDIT.hasPermission(p) && ComponentCreatif.WORLDEDIT.isActivated())
 				att.setPermission(perm, true); 
 			else
 				att.unsetPermission(perm);

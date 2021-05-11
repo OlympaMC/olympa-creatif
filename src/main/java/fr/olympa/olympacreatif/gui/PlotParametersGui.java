@@ -23,7 +23,7 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
@@ -34,7 +34,7 @@ public class PlotParametersGui extends IGui {
 	
 	private String[] clickToChange = null;
 	
-	private int timeToAdd = 6000;
+	private int timeToAdd = 6;
 	
 	private String clearWeather = "§eMétéo actuelle : ensoleillée";
 	private String rainyWeather = "§eMétéo actuelle : pluvieuse";
@@ -87,7 +87,7 @@ public class PlotParametersGui extends IGui {
 
 		//1 : Heure du plot
 		it = ItemUtils.item(Material.CLOCK, "§6Heure de la parcelle");
-		it = ItemUtils.lore(it, "§eHeure actuelle : " + ((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd) % 25000) + "h");
+		it = ItemUtils.lore(it, "§eHeure actuelle : " + (((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd) / 1000) % 25) + "h");
 		
 		it = ItemUtils.loreAdd(it, clickToChange);
 		
@@ -97,7 +97,7 @@ public class PlotParametersGui extends IGui {
 			
 			PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
 			ItemStack item2 = ItemUtils.lore(item.clone(), "§eHeure actuelle : " + 
-			((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + timeToAdd) % 25000) + "h");
+			((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) / 1000 + timeToAdd) % 25) + "h");
 			
 			item2 = ItemUtils.loreAdd(item2, clickToChange);
 			changeItem(item, item2);
@@ -170,7 +170,7 @@ public class PlotParametersGui extends IGui {
 		else
 			ItemUtils.loreAdd(it, "§aMusique actuelle : §d" + plot.getParameters().getParameter(PlotParamType.SONG));
 		
-		ItemUtils.loreAdd(it, " ", "§7Le grade " + PermissionsList.USE_PLOT_MUSIC.getMinGroup().getPrefix(p.getGender()) + "§7 est nécessaire", "§7pour utiliser cette fonctionnalité.");
+		ItemUtils.loreAdd(it, " ", "§7Le grade " + OcPermissions.USE_PLOT_MUSIC.getMinGroup().getPrefix(p.getGender()) + "§7 est nécessaire", "§7pour utiliser cette fonctionnalité.");
 		
 		ItemUtils.loreAdd(it, clickToChange);
 		

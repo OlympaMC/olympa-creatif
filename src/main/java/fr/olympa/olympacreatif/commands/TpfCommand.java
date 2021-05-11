@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.PermissionsList;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.ShopGui;
 
@@ -20,7 +20,7 @@ public class TpfCommand extends OlympaCommand {
 	private OlympaCreatifMain plugin;
 	
 	public TpfCommand(OlympaCreatifMain plugin) {
-		super(plugin, "tpf", "Se téléporter à un joueur", PermissionsList.CREA_TPF_COMMAND, new String[] {});
+		super(plugin, "tpf", "Se téléporter à un joueur", OcPermissions.CREA_TPF_COMMAND, new String[] {});
 		this.plugin = plugin;
 		allowConsole = false;
 	}

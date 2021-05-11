@@ -338,11 +338,11 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 	}
 	
 	public enum StaffPerm{
-		BYPASS_KICK_BAN(PermissionsList.STAFF_BYPASS_PLOT_KICK_AND_BAN),
-		GHOST_MODE(PermissionsList.STAFF_BYPASS_VANILLA_COMMANDS),
-		WORLDEDIT(PermissionsList.STAFF_BYPASS_WORLDEDIT),
-		BUILD_ROADS(PermissionsList.STAFF_BUILD_ROADS),
-		OWNER_EVERYWHERE(PermissionsList.STAFF_PLOT_FAKE_OWNER);
+		BYPASS_KICK_BAN(OcPermissions.STAFF_BYPASS_PLOT_KICK_AND_BAN),
+		GHOST_MODE(OcPermissions.STAFF_BYPASS_VANILLA_COMMANDS),
+		WORLDEDIT(OcPermissions.STAFF_BYPASS_WORLDEDIT),
+		BUILD_ROADS(OcPermissions.STAFF_BUILD_ROADS),
+		OWNER_EVERYWHERE(OcPermissions.STAFF_PLOT_FAKE_OWNER);
 		
 		OlympaPermission corePerm;
 		
