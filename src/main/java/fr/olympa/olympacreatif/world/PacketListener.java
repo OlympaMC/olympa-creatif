@@ -39,8 +39,10 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PacketPlayInBEdit;
+import net.minecraft.server.v1_16_R3.PacketPlayInEntityNBTQuery;
 import net.minecraft.server.v1_16_R3.PacketPlayInJigsawGenerate;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCommandBlock;
+import net.minecraft.server.v1_16_R3.PacketPlayInSetCommandMinecart;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCreativeSlot;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetJigsaw;
 import net.minecraft.server.v1_16_R3.PacketPlayInStruct;
@@ -136,7 +138,6 @@ public class PacketListener implements Listener {
               			OCmsg.BOOK_TOO_LONG.send(p);
               			return;
               		}
-              		 
             	}
                 
             	if (handledPacket instanceof PacketPlayInSetCreativeSlot) {
@@ -163,7 +164,22 @@ public class PacketListener implements Listener {
                 		if (packet.getItemStack().getTag() != null)
                     		packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag()));
             		}
-            	}            	
+            	}  
+            	
+            	if (handledPacket instanceof PacketPlayInEntityNBTQuery) {
+             		 System.out.println("PacketPlayInEntityNBTQuery detected from " + p.getName() + ", cancelled.");
+            		return;
+            	}
+            	
+            	if (handledPacket instanceof PacketPlayInSetCommandMinecart) {         
+            		 System.out.println("§cPacketPlayInSetCommandMinecart detected from " + p.getName() + ", cancelled.");
+            		 return;
+            	}
+            	
+            	if (handledPacket instanceof PacketPlayInStruct) {         
+            		 System.out.println("§cPacketPlayInStruct detected from " + p.getName() + ", cancelled.");
+            		 return;
+            	}          	
             	
             	super.channelRead(channelHandlerContext, handledPacket);
             }
