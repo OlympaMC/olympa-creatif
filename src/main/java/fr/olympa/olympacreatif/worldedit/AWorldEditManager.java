@@ -55,6 +55,11 @@ public abstract class AWorldEditManager {
 	}
 	
 	public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {
+		OCmsg.WE_DISABLED.send(requester);
+		return false;
+	}
+	
+	/*public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {
 		if (isReseting(plot))
 			return false;
 		
@@ -162,7 +167,7 @@ public abstract class AWorldEditManager {
 			});
 		});
 		
-	}
+	}*/
 	
 	/*
 	public void resetChunk(Chunk ch) {

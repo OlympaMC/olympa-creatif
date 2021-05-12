@@ -423,11 +423,12 @@ public class PlotsInstancesListener implements Listener{
 			cb.update();
 		}*/
 		
-		
-		if (e.getMaterial().isSolid())
+
+		plot = plugin.getPlotsManager().getPlot(OtherUtils.getFacingLoc(clickedBlock.getLocation(), e.getBlockFace()));
+		/*if (e.getMaterial().isSolid())
 			plot = plugin.getPlotsManager().getPlot(OtherUtils.getFacingLoc(clickedBlock.getLocation(), e.getBlockFace()));
 		else
-			plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
+			plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());*/
 		
 		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS) && plot == null)
 			return;

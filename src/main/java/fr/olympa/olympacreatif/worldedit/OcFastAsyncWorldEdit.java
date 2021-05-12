@@ -300,6 +300,10 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		        }
 		        
 		        private <T extends BlockStateHolder<T>> boolean isBlockAllowed(int x, int y, int z, T block) {
+		        	//System.out.println("Can place block at " + x + ", " + y + ", " + z + " : " + !(plot == null || !PlotPerm.USE_WE.has(plot, pc)));
+		        	if ((plot == null || !PlotPerm.USE_WE.has(plot, pc)))
+		        		return false;
+		        	
 		        	Material mat = BukkitAdapter.adapt(block.getBlockType());
 		        	KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);
 		        	

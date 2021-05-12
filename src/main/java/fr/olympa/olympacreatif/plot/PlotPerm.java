@@ -16,7 +16,7 @@ import fr.olympa.olympacreatif.data.OcPermissions;
 
 public class PlotPerm {
 
-	public static final PlotPerm EXPORT_PLOT = new PlotPerm(PlotRank.OWNER, "Exporter la parcelle", OcPermissions.USE_PLOT_EXPORTATION);
+	public static final PlotPerm EXPORT_PLOT = new PlotPerm(PlotRank.OWNER, "Exporter/restaurer la parcelle", OcPermissions.USE_PLOT_EXPORTATION);
 	public static final PlotPerm RESET_PLOT = new PlotPerm(PlotRank.OWNER, "Réinitialiser la parcelle", OcPermissions.USE_PLOT_RESET);
 	public static final PlotPerm INVITE_MEMBER = new PlotPerm(PlotRank.OWNER, "Inviter des membres");
 	public static final PlotPerm SET_PLOT_SPAWN = new PlotPerm(PlotRank.CO_OWNER, "Définir le spawn parcelle");
