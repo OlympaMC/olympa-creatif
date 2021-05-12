@@ -90,7 +90,8 @@ public class PlotCbData {
 	
 	private int cbTask = -1;
 	
-	private Set<Integer> holos = new HashSet<Integer>();
+	//key : real holo ID for the core // value : custom holo id which will be used for saving
+	private Map<Integer, Integer> holos = new HashMap<Integer, Integer>();
 
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -108,6 +109,7 @@ public class PlotCbData {
 		commandsLeft = OCparam.CB_MAX_CMDS_LEFT.get();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void setPlot(Plot plot) {
 		if (this.plot != null)
 			throw new UnsupportedOperationException("Plot " + this.plot + " has already been defined for this plot cb data.");
@@ -116,13 +118,14 @@ public class PlotCbData {
 
 		//load holos
 		plot.getParameters().getParameter(PlotParamType.HOLOS_DATAS).forEach((id, data) -> {
-			OlympaCore.getInstance().getHologramsManager().registerHologram(id, new Hologram(id, data.getBottom().toLoc(), false, true, true, 
+			OlympaCore.getInstance().getHologramsManager().registerHologram(id, 
+					new Hologram(id, data.getBottom().toLoc(), false, true, true, 
 					data.getLines().stream().map(s -> new FixedLine<HologramLine>(s)).collect(Collectors.toList()).toArray(FixedLine[]::new)));
 			
-			holos.add(id);
+			holos.put(id, id);
 		});
 		//System.out.println("Plot cb data " + plot + " loaded. Set holos for " + plot.getPlayers());
-		plot.getPlayers().forEach(p -> holos.forEach(holo -> OlympaCore.getInstance().getHologramsManager().getHologram(holo).show(p)));
+		plot.getPlayers().forEach(p -> holos.keySet().forEach(holo -> OlympaCore.getInstance().getHologramsManager().getHologram(holo).show(p)));
 		
 		reloadAllCommandBlocks(false);
 		setTickSpeed(plot.getParameters().getParameter(PlotParamType.TICK_SPEED));
@@ -159,12 +162,12 @@ public class PlotCbData {
 		//MAJ du param holos puis supression
 		
 		PlotParamType.HOLOS_DATAS.setValue(plot, 
-			holos.stream().map(id -> OlympaCore.getInstance().getHologramsManager().getHologram(id))
-			.collect(Collectors.toMap(holo -> holo.getID(), holo -> new HologramData(holo.getID(), 
+			holos.keySet().stream().map(id -> OlympaCore.getInstance().getHologramsManager().getHologram(id))
+			.collect(Collectors.toMap(holo -> holos.get(holo.getID()), holo -> new HologramData(holo.getID(), 
 					holo.getLines().stream().map(line ->  line.getLine() instanceof FixedLine ? ((FixedLine<HologramLine>)line.getLine()).getValue(line) : "")
 					.collect(Collectors.toList()), new Position(holo.getBottom())))));
 		
-		holos.forEach(id -> OlympaCore.getInstance().getHologramsManager().deleteHologram(id));
+		holos.keySet().forEach(id -> OlympaCore.getInstance().getHologramsManager().deleteHologram(id));
 	}
 
 
@@ -173,12 +176,12 @@ public class PlotCbData {
 	//////////////////////////////////////////////////////////////////////////////////////
 
 
-	public boolean addHolo(Hologram holo) {
+	public void addHolo(Hologram holo) {
 		if (holo == null)
-			return false;
-		
+			return;
+
+		holos.put(holo.getID(), getRealHoloIdFromHoloPlotId(holo.getID()));
 		plot.getPlayers().forEach(p -> holo.show(p));
-		return holos.add(holo.getID());
 	}
 
 	public boolean removeHolo(Hologram holo) {
@@ -188,15 +191,23 @@ public class PlotCbData {
 		if (containsHolo(holo))
 			plot.getPlayers().forEach(p -> holo.hide(p));
 		
-		return holos.remove(holo.getID());
+		return holos.remove(holo.getID()) != null;
 	}
 	
 	public boolean containsHolo(Hologram holo) {
-		return holos.contains(holo.getID());
+		return holos.containsKey(holo.getID());
 	}
 	
 	public Set<Integer> getHolos() {
-		return holos;
+		return holos.keySet();
+	}
+	
+	private int getRealHoloIdFromHoloPlotId(int i) {
+		int id = plot.getId().getId() * 1000 + 1;
+		while (holos.containsValue(id) && id < plot.getId().getId() * 1000 + OCparam.MAX_HOLOS_PER_PLOT.get())
+			id++;
+		
+		return id;
 	}
 	
 	

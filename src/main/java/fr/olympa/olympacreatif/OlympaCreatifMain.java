@@ -166,7 +166,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			
 			switch(action) {
 			case COMMAND:
-				return pc.getCurrentPlot().getCbData().containsHolo(holo);
+				return pc.getCurrentPlot() == null ? false : pc.getCurrentPlot().getCbData().containsHolo(holo);
 
 				
 			case CREATE_PREPROCESS:
