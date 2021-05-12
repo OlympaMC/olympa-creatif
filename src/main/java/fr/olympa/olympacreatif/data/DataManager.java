@@ -83,7 +83,7 @@ public class DataManager implements Listener {
 					"`server_id` INT NOT NULL," +
 					"`plot_id` INT NOT NULL," +
 					"`plot_creation_date` DATETIME NOT NULL DEFAULT NOW()," +
-					"`plot_parameters` VARCHAR(8192) NOT NULL DEFAULT '', " +
+					"`plot_parameters` TEXT NOT NULL DEFAULT '', " +
 					"PRIMARY KEY (`server_id`, `plot_Id`));";
 
 	private final String osTableCreatePlotMembers =

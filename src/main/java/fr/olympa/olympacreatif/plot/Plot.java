@@ -112,7 +112,7 @@ public class Plot {
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
 				if (canEnter(p))
-					executeEntryActions(p, null);
+					executeEntryActions(p, p.getLocation());
 				else
 					teleportOut(p);
 		

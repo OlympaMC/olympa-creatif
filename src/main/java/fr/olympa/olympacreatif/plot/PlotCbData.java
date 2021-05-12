@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,17 +14,14 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.CommandBlock;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -33,7 +29,9 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import fr.olympa.api.holograms.Hologram;
-import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.holograms.Hologram.HologramLine;
+import fr.olympa.api.lines.FixedLine;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
@@ -42,27 +40,15 @@ import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
-import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
+import fr.olympa.olympacreatif.data.Position;
+import fr.olympa.olympacreatif.plot.PlotParamType.HologramData;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.TileEntityCommand;
-import net.minecraft.server.v1_16_R3.TileEntityTypes;
 
 public class PlotCbData {
 	
 	private static final NamespacedKey cbAutoKey = NamespacedKey.minecraft("cb_is_auto");
-	
-	
-	/*private static double nextChunkLoad = 1;
-	
-	public static void addChunkToCbLoadList(final Plot plot, final Chunk ch) {
-		nextChunkLoad += 0.5;
-		
-		OlympaCreatifMain.getInstance().getTask().runTaskLater(() -> {
-			plot.getCbData().registerCommandBlocks(ch);
-			nextChunkLoad-= 0.5;
-		}, (int) nextChunkLoad);
-	}*/
 	
 	public static BiConsumer<org.bukkit.block.CommandBlock, Boolean> setCbAuto = (cb, isAuto) -> {
 		cb.getPersistentDataContainer().set(cbAutoKey, PersistentDataType.BYTE, isAuto ? (byte) 1 : (byte) 0);
@@ -79,13 +65,6 @@ public class PlotCbData {
 			return false;
 		}
 	};
-	
-	/*
-	private static final Set<Material> commandBlocksTypes = ImmutableSet.<Material>builder()
-			.add(Material.COMMAND_BLOCK)
-			.add(Material.CHAIN_COMMAND_BLOCK)
-			.add(Material.REPEATING_COMMAND_BLOCK)
-			.build();*/
 	
 	private OlympaCreatifMain plugin;
 	private Plot plot;
@@ -134,13 +113,25 @@ public class PlotCbData {
 			throw new UnsupportedOperationException("Plot " + this.plot + " has already been defined for this plot cb data.");
 
 		this.plot = plot;
+
+		//load holos
+		plot.getParameters().getParameter(PlotParamType.HOLOS_DATAS).forEach((id, data) -> {
+			OlympaCore.getInstance().getHologramsManager().registerHologram(id, new Hologram(id, data.getBottom().toLoc(), false, true, true, 
+					data.getLines().stream().map(s -> new FixedLine<HologramLine>(s)).collect(Collectors.toList()).toArray(FixedLine[]::new)));
+			
+			holos.add(id);
+		});
+		//System.out.println("Plot cb data " + plot + " loaded. Set holos for " + plot.getPlayers());
+		plot.getPlayers().forEach(p -> holos.forEach(holo -> OlympaCore.getInstance().getHologramsManager().getHologram(holo).show(p)));
 		
-		//registerAllCommandBlocks(false);
+		reloadAllCommandBlocks(false);
+		setTickSpeed(plot.getParameters().getParameter(PlotParamType.TICK_SPEED));
+		
 		//délai nécessaire car sinon le plot est null et la commande ne peut pas se générer
-		plugin.getTask().runTaskLater(() -> {
+		/*plugin.getTask().runTaskLater(() -> {
 			reloadAllCommandBlocks(false);
 			setTickSpeed(plot.getParameters().getParameter(PlotParamType.TICK_SPEED));
-		}, 1);
+		}, 1);*/
 	}
 	
 	public void unload() {
@@ -163,6 +154,17 @@ public class PlotCbData {
 			teams.clear();
 		if (bossbars != null)
 			bossbars.clear();
+		
+		
+		//MAJ du param holos puis supression
+		
+		PlotParamType.HOLOS_DATAS.setValue(plot, 
+			holos.stream().map(id -> OlympaCore.getInstance().getHologramsManager().getHologram(id))
+			.collect(Collectors.toMap(holo -> holo.getID(), holo -> new HologramData(holo.getID(), 
+					holo.getLines().stream().map(line ->  line.getLine() instanceof FixedLine ? ((FixedLine<HologramLine>)line.getLine()).getValue(line) : "")
+					.collect(Collectors.toList()), new Position(holo.getBottom())))));
+		
+		holos.forEach(id -> OlympaCore.getInstance().getHologramsManager().deleteHologram(id));
 	}
 
 

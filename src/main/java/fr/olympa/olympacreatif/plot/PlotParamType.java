@@ -52,6 +52,8 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	public static PlotParamType<Boolean> RESET_VISITOR_FLY_SPEED = new PlotParamType<Boolean>("RESET_VISITOR_FLY_SPEED", false);
 
 	public static PlotParamType<Integer> TICK_SPEED = new PlotParamType<Integer>("TICK_SPEED", 4);
+
+	public static PlotParamType<Map<Integer, HologramData>> HOLOS_DATAS = new PlotParamType<Map<Integer,HologramData>>("HOLOS_DATAS", new HashMap<Integer, HologramData>(), new TypeToken<HashMap<Integer, HologramData>>(){}.getType());
 	
 	
 	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();
@@ -174,4 +176,38 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		
 		return list;
 	}*/
+	
+	/**
+	 * Class used to save holos datas in database
+	 *
+	 */
+	public static class HologramData {
+		private int id;
+		private List<String> lines;
+		private Position bottom;
+		
+		public HologramData(int id, List<String> lines, Position bottom) {
+			this.id = id;
+			this.lines = lines;
+			this.bottom = bottom;
+		}
+		public int getId() {
+			return id;
+		}
+		/*public void setId(int id) {
+			this.id = id;
+		}*/
+		public List<String> getLines() {
+			return lines;
+		}
+		public Position getBottom() {
+			return bottom;
+		}
+		/*public void setLines(List<String> lines) {
+			this.lines = lines;
+		}*/
+		
+		
+		
+	}
 }

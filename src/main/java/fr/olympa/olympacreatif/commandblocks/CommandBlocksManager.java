@@ -66,7 +66,8 @@ public class CommandBlocksManager {
 		}
 		
 		//show holos
-		toPlot.getCbData().getHolos().forEach(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i).show(p));
+		plugin.getTask().runTaskLater(() -> 
+			toPlot.getCbData().getHolos().forEach(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i).show(p)), 10);
 	}
 	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
