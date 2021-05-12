@@ -144,6 +144,9 @@ public class OCmsg {
 	public static final OCmsg PLOT_UNKNOWN_HOLO = new OCmsg();
 	public static final OCmsg PLOT_TOO_MUCH_HOLOS = new OCmsg();
 	public static final OCmsg PLOT_TOO_MUCH_LINES_ON_HOLO = new OCmsg();
+
+	public static final OCmsg WE_TOO_LONG_NBT = new OCmsg(3);
+	public static final OCmsg BOOK_TOO_LONG = new OCmsg();
 	
 	
 	
@@ -257,7 +260,7 @@ public class OCmsg {
 	
 	private String getValue(OlympaPlayerCreatif pc, Object... args) {
 		if (message == null)
-			return "§cMessage manquant, veuillez vérifier les logs.";
+			return "§cMessage manquant, veuillez alerter un membre du staff.";
 		
 		//ajoute le plot actuel du joueur si aucun n'a été fourni
 		/*boolean setPlayerPlot = true;
@@ -375,12 +378,7 @@ public class OCmsg {
 			
 			OlympaCreatifMain.getInstance()
 			.getTask()
-			.runTaskLater(() -> 
-			delayedMessages
-			.get(pc
-					.getPlayer())
-			.remove(msg)
-			, 20 * delay);
+			.runTaskLater(() -> {if (pc.getPlayer() != null) delayedMessages.get(pc.getPlayer()).remove(msg);}, 20 * delay);
 		}
 		
 		pc.getPlayer().sendMessage(getValue(pc, objs));

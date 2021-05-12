@@ -52,6 +52,10 @@ public class OCparam<T> {
 
 	public static final OCparam<Integer> MAX_HOLOS_PER_PLOT = new OCparam<Integer>(60);
 	public static final OCparam<Integer> MAX_LINES_PER_HOLO = new OCparam<Integer>(15);
+	
+	public static final OCparam<Integer> WE_MAX_NBT_SIZE = new OCparam<Integer>(10000);
+	
+	
 	//public static final OCparam<Integer> MAX_CB_PER_PLOT = new OCparam<Integer>(1000);
 	
 	private T value;

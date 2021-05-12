@@ -20,8 +20,8 @@ import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.boydti.fawe.regions.general.RegionFilter;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
-
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 
 import com.sk89q.worldedit.LocalConfiguration;
@@ -285,7 +285,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				
 		        @Override
 		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
-		        	//System.out.println("SET BLOCK POS " + block.getBlockType());
+		        	//System.out.println("SET BLOCK POS " + block.getNbtData().toString());
 		        	
 		        	return isBlockAllowed(pos.getX(), pos.getY(), pos.getZ(), block) ? 
 		        			super.setBlock(pos, block) : false;
@@ -293,16 +293,28 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		        
 		        @Override
 		        public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) {
-		        	//System.out.println("SET BLOCK LOCATIONS " + block.getBlockType());
-
+		        	//System.out.println("SET BLOCK LOCATIONS " + block.getNbtData().toString());
+		        	
 		        	return isBlockAllowed(x, y, z, block) ? 
 		        			super.setBlock(x, y, z, block) : false;
+		        }
+		        
+		        @Override
+		        public boolean setTile(int x, int y, int z, CompoundTag tile) {
+		        	//System.out.println("Set tile with FAWE : " + tile.getValue() + " (cancelled)");
+		        	return false;//super.setTile(x, y, z, tile);
 		        }
 		        
 		        private <T extends BlockStateHolder<T>> boolean isBlockAllowed(int x, int y, int z, T block) {
 		        	//System.out.println("Can place block at " + x + ", " + y + ", " + z + " : " + !(plot == null || !PlotPerm.USE_WE.has(plot, pc)));
 		        	if ((plot == null || !PlotPerm.USE_WE.has(plot, pc)))
 		        		return false;
+		        	
+		        	if (block.hasNbtData() && block.getNbtData().toString().length() > OCparam.WE_MAX_NBT_SIZE.get()) {
+		        		OCmsg.WE_TOO_LONG_NBT.send(pc);
+		        		return false;
+		        	}
+		        	
 		        	
 		        	Material mat = BukkitAdapter.adapt(block.getBlockType());
 		        	KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);

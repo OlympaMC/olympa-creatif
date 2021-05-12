@@ -25,6 +25,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
@@ -37,6 +38,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.PacketPlayInBEdit;
 import net.minecraft.server.v1_16_R3.PacketPlayInJigsawGenerate;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCommandBlock;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCreativeSlot;
@@ -121,6 +123,20 @@ public class PacketListener implements Listener {
             	if (handledPacket instanceof PacketPlayInSetCommandBlock) {            			
                		 handleCbPacket(p, (PacketPlayInSetCommandBlock) handledPacket);
             		 return;
+            	}
+            	
+            	if (handledPacket instanceof PacketPlayInBEdit) {
+            		PacketPlayInBEdit packet = (PacketPlayInBEdit) handledPacket;
+              		if (!packet.b().hasTag())
+              			return;
+              		 
+              		 //System.out.println("Set packet book length : " + packet.b().getTag().asString().length());
+              		 
+              		if (packet.b().getTag().asString().length() > 1000) {
+              			OCmsg.BOOK_TOO_LONG.send(p);
+              			return;
+              		}
+              		 
             	}
                 
             	if (handledPacket instanceof PacketPlayInSetCreativeSlot) {
