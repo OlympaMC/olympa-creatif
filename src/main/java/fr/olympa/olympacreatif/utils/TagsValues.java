@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagDouble;
 import net.minecraft.server.v1_16_R3.NBTTagFloat;
 import net.minecraft.server.v1_16_R3.NBTTagInt;
 import net.minecraft.server.v1_16_R3.NBTTagLong;
@@ -72,11 +73,11 @@ public class TagsValues {
 			case "NBTTagCompound":
 				nbt = NBTTagCompound.class;
 				break;
-				/*
+				
 			case "NBTTagDouble":
 				nbt = NBTTagDouble.class;
 				break;
-			case "NBTTagList":
+				/*case "NBTTagList":
 				nbt = NBTTagList.class;
 				break;
 			case "NBTTagByte":
@@ -110,6 +111,9 @@ public class TagsValues {
 				break;
 			case "NBT_FLOAT":
 				listType = NBT.TAG_FLOAT;
+				break;
+			case "NBT_DOUBLE":
+				listType = NBT.TAG_DOUBLE;
 				break;
 			case "NBT_BYTE":
 				listType = NBT.TAG_BYTE;
@@ -146,7 +150,10 @@ public class TagsValues {
 		public Class getTagNbtClass() {
 			return nbtClass;
 		}
-		
+
+		public String getName() {
+			return tagName;
+		}
 		public int getMin() {
 			return min;
 		}
@@ -158,7 +165,7 @@ public class TagsValues {
 		}
 		@Override
 		public String toString() {
-			return "--------- Params "+ tagName + " ---------\nNbtClass:" + nbtClass.getName() + ", min:" + min + ", max:" + max + ", ListType:" + listType + "\n---------";
+			return "--------- Params "+ tagName + " ---------\nNbtClass:" + nbtClass.getSimpleName() + ", min:" + min + ", max:" + max + ", ListType:" + listType + "\n---------";
 		}
 	}
 }

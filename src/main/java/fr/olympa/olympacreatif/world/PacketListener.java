@@ -162,7 +162,7 @@ public class PacketListener implements Listener {
                 		}
                 		
                 		if (packet.getItemStack().getTag() != null)
-                    		packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag()));
+                    		packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag(), p.getPlayer()));
             		}
             	}  
             	

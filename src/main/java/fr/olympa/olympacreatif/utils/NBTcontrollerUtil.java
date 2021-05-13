@@ -1,24 +1,15 @@
 package fr.olympa.olympacreatif.utils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashSet;
 
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
-import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.utils.TagsValues.TagParams;
-import net.minecraft.server.v1_16_R3.ChatDeserializer;
-import net.minecraft.server.v1_16_R3.MojangsonParser;
 import net.minecraft.server.v1_16_R3.NBTBase;
 import net.minecraft.server.v1_16_R3.NBTTagByte;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -57,7 +48,7 @@ public abstract class NBTcontrollerUtil {
 	}*/
 
 	public static NBTTagCompound getValidTags(String string, Player requester) {
-		return getValidTags(new OcMojangsonParser(string.replace("minecraft:", "")).parse(requester));
+		return getValidTags(new OcMojangsonParser(string.replace("minecraft:", "")).parse(requester), requester);
 	}
 	
 	public static NBTTagCompound getValidTags(String string) {
@@ -71,11 +62,11 @@ public abstract class NBTcontrollerUtil {
 		}*/
 	}
 	 
-	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
-		return getValidTags(tag, 0);
+	public static NBTTagCompound getValidTags(NBTTagCompound tag, Player requester) {
+		return getValidTags(tag, 0, requester);
 	}
 	
-	private static NBTTagCompound getValidTags(NBTTagCompound tag, int recurIndex) {
+	private static NBTTagCompound getValidTags(NBTTagCompound tag, int recurIndex, Player requester) {
 		
 		//Bukkit.broadcastMessage("Tag étudié : " + tag.asString());
 		if (tag == null)
@@ -90,7 +81,7 @@ public abstract class NBTcontrollerUtil {
 					continue;
 				else
 					if (recurIndex < recurIndexMax)
-						tag.set(key, getValidTags(tag.getCompound(key), recurIndex + 1));
+						tag.set(key, getValidTags(tag.getCompound(key), recurIndex + 1, requester));
 					else
 						return new NBTTagCompound();
 			
@@ -101,11 +92,15 @@ public abstract class NBTcontrollerUtil {
 				
 				if (params == null) {
 					tag.remove(key);
+					if (requester != null)
+						OCmsg.TAG_CHECKER_UNAUTHORIZED_TAG.send(requester, key);
 					continue;
 				}
 				//remove tag "id" si c'est un oeuf (pas possible de le faire dans la liste, le tag id est utilisé pour d'autres choses...)
 				if (key.equals("id") && EnumUtils.isValidEnum(EntityType.class, CbCommand.getUndomainedString(tag.getString(key)))) {
 					tag.remove(key);
+					if (requester != null)
+						OCmsg.TAG_CHECKER_UNAUTHORIZED_TAG.send(requester, key);
 					continue;
 				}
 				
@@ -117,21 +112,25 @@ public abstract class NBTcontrollerUtil {
 					NBTTagList oldList = tag.getList(key, params.getListType());
 					NBTTagList newList = new NBTTagList();
 					
-					//System.out.println("LIST : " + oldList.asString());
+					System.out.println("LIST : " + oldList.asString());
 					
 					//pour chaque élément de la liste, vérification
-					for (int i = 0 ; i < Math.min(oldList.size(), maxListSize) ; i++) 
+					for (int i = 0 ; i < Math.min(oldList.size(), maxListSize) ; i++) {
 
 						if (params.getListType() == NBT.TAG_COMPOUND) {
 							//Bukkit.broadcastMessage("tag liste : " + oldList.getCompound(i).asString() + " - " + getValidTags(oldList.getCompound(i)).asString());
-							newList.add(getValidTags(oldList.getCompound(i), recurIndex + 1));	
+							newList.add(getValidTags(oldList.getCompound(i), recurIndex + 1, requester));	
 						}else {
-							//System.out.println("list contains : " + oldList.get(i).asString() + " ----- is valid : " + isValueValid(params, oldList.get(i)));
+							//System.out.println("list contains : " + oldList.get(i).asString() + " ----- parameter : " + params + " ----- is valid : " + isValueValid(params, oldList.get(i)));
 							if (isValueValid(params, oldList.get(i)))
 								newList.add(oldList.get(i));
+							else
+								if (requester != null)
+									OCmsg.TAG_CHECKER_UNAUTHORIZED_VALUE.send(requester, params);
+						}
+					}
 					
 					tag.set(key, newList);
-					}						
 				}else {
 					//transformation du tag si c'est un entier mais d'un mauvais type
 					

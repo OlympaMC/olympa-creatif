@@ -41,6 +41,7 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
+import fr.olympa.olympacreatif.utils.TagsValues.TagParams;
 
 
 
@@ -137,7 +138,7 @@ public class OCmsg {
 	public static final OCmsg WAIT_BEFORE_REEXECUTE_COMMAND = new OCmsg();
 	//public static final OCmsg WE_PLOT_RESTAURATION_FAILED = new OCmsg();
 	public static final OCmsg WE_NO_PLOT_SCHEM_FOUND = new OCmsg();
-	//public static final OCmsg WE_FAIL_RESTORING_PLOT = new OCmsg();
+	public static final OCmsg WE_FAIL_RESTORING_PLOT = new OCmsg();
 	public static final OCmsg WE_COMPLETE_RESTORING_PLOT = new OCmsg();
 	public static final OCmsg WE_START_RESTORING_PLOT = new OCmsg();
 
@@ -147,6 +148,9 @@ public class OCmsg {
 
 	public static final OCmsg WE_TOO_LONG_NBT = new OCmsg(3);
 	public static final OCmsg BOOK_TOO_LONG = new OCmsg();
+
+	public static final OCmsg TAG_CHECKER_UNAUTHORIZED_TAG = new OCmsg(1);
+	public static final OCmsg TAG_CHECKER_UNAUTHORIZED_VALUE = new OCmsg(1);
 	
 	
 	
@@ -238,12 +242,19 @@ public class OCmsg {
 	private static final Map<String, Function<String, String>> stringPlaceHolders = ImmutableMap.<String, Function<String,String>>builder()
 			.put("%s", s -> s)
 			.build();
-	
+
 	
 	private static final Map<String, Supplier<String>> fixedPlaceHolders = ImmutableMap.<String, Supplier<String>>builder()
 			.put("%incomeAsAfk", () -> OCparam.INCOME_AFK.get() + "")
 			.put("%incomeAsNotAfk", () -> OCparam.INCOME_NOT_AFK.get() + "")
 			.put("%serverIndex", () -> (OlympaCreatifMain.getInstance() == null || OlympaCreatifMain.getInstance().getDataManager() == null) ? "???" : OlympaCreatifMain.getInstance().getDataManager().getServerIndex() + "")
+			.build();
+	
+	
+	private static final Map<String, Function<TagParams, String>> nbtTagPlaceHolders = ImmutableMap.<String, Function<TagParams, String>>builder()
+			.put("%tagId", param -> param.getName())
+			.put("%tagMin", param -> param.getMin() + "")
+			.put("%tagMax", param -> param.getMax() + "")
 			.build();
 	
 	
@@ -331,6 +342,10 @@ public class OCmsg {
 			else if (o instanceof KitType)
 				for (Entry<String, Function<KitType, String>> e : kitPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((KitType) o));
+
+			else if (o instanceof TagParams)
+				for (Entry<String, Function<TagParams, String>> e : nbtTagPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((TagParams) o));
 		
 		
 		

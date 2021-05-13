@@ -15,6 +15,8 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagDouble;
+import net.minecraft.server.v1_16_R3.NBTTagList;
 
 public class CmdSummon extends CbCommand {
 
@@ -122,15 +124,13 @@ public class CmdSummon extends CbCommand {
 	public CmdSummon(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
 		super(CommandType.summon, sender, loc, plugin, plot, args);
 
+		if (args.length < 1)
+			return;
 		
-		if (args.length >= 4) {
+		if (args.length >= 4) 
 			spawnLoc = parseLocation(args[1], args[2], args[3]);
-			
-			if (spawnLoc != null)
-				sendingLoc = spawnLoc;
-			else
-				return;
-		}
+		else
+			spawnLoc = sendingLoc;
 		
 		if (args.length >= 5) 			
 			tag = NBTcontrollerUtil.getValidTags(args[4], getSender() instanceof Player ? (Player) getSender() : null);
@@ -156,11 +156,19 @@ public class CmdSummon extends CbCommand {
 		if (spawnLoc == null || type == null)
 			return 0;
 		
-		Entity e = plugin.getWorldManager().getWorld().spawnEntity(sendingLoc, type);
+		Entity e = plugin.getWorldManager().getWorld().spawnEntity(spawnLoc, type);
 		
 		//application du tag
 		if (tag != null) {
+			NBTTagList list = new NBTTagList();
+			list.add(NBTTagDouble.a(e.getLocation().getX()));
+			list.add(NBTTagDouble.a(e.getLocation().getY()));
+			list.add(NBTTagDouble.a(e.getLocation().getZ()));
+			tag.set("Pos", list);
 			((CraftEntity)e).getHandle().load(tag);
+			/*NBTTagCompound tag2 = new NBTTagCompound();
+			((CraftEntity)e).getHandle().save(tag2);
+			System.out.println("TAG of " + e.getType() + " : " + tag2.asString());*/
 			/*if (tag.hasKey("Rotation")) {
 				net.minecraft.server.v1_16_R3.Entity ent = ((CraftEntity)e).getHandle();
 				
@@ -169,7 +177,7 @@ public class CmdSummon extends CbCommand {
 					ent.setPositionRotation(ent.locX(), ent.locY(), ent.locZ(), 0f, 0f);
 			}*/
 			
-			e.teleport(sendingLoc);
+			//e.teleport(sendingLoc);
 		}
 		
 		return 1;
