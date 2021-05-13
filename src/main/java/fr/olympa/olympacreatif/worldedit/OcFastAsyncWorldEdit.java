@@ -277,6 +277,8 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				private Map<Long, Integer> commandBlocksCount = new HashMap<Long, Integer>();
 				private boolean pasteCommandBlocks = true;
 				
+				private int pastedTilesCount = 0;
+				
 				public OcExtent(Extent extent, OlympaPlayerCreatif pc, Plot plot) {
 					super(extent);
 					this.pc = pc;
@@ -286,6 +288,8 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		        @Override
 		        public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
 		        	//System.out.println("SET BLOCK POS " + block.getNbtData().toString());
+		        	/*if (block.hasNbtData())
+		        		System.out.println(block.getNbtData().toString());*/
 		        	
 		        	return isBlockAllowed(pos.getX(), pos.getY(), pos.getZ(), block) ? 
 		        			super.setBlock(pos, block) : false;
@@ -294,6 +298,8 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		        @Override
 		        public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) {
 		        	//System.out.println("SET BLOCK LOCATIONS " + block.getNbtData().toString());
+		        	/*if (block.hasNbtData())
+		        		System.out.println(block.getNbtData().toString());*/
 		        	
 		        	return isBlockAllowed(x, y, z, block) ? 
 		        			super.setBlock(x, y, z, block) : false;
@@ -315,6 +321,10 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		        		return false;
 		        	}
 		        	
+		        	if (block.hasNbtData() && plot.getTilesCount() + pastedTilesCount++ > OCparam.MAX_TILE_PER_PLOT.get()) {
+		        		OCmsg.WE_TOO_MUCH_TILES.send(pc, OCparam.MAX_TILE_PER_PLOT.get() + "");
+		        		return false;
+		        	}
 		        	
 		        	Material mat = BukkitAdapter.adapt(block.getBlockType());
 		        	KitType kit = plugin.getPerksManager().getKitsManager().getKitOf(mat);

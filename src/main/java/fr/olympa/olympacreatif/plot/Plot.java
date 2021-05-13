@@ -174,9 +174,22 @@ public class Plot {
 		return set;
 	}
 	
-	public long getCommandBlocksCount() {
+	/*public long getCommandBlocksCount() {
 		return getLoadedChunks().stream().mapToLong(ch -> ((CraftChunk)ch).getHandle().getTileEntities().values()
 				.stream().filter(tile -> tile.getTileType().equals(TileEntityTypes.COMMAND_BLOCK)).count()).sum();
+	}*/
+
+	private int nextAllowedTilesCheckup = 0;
+	private int tilesCount = 0;
+	
+	public int getTilesCount() {
+		if (nextAllowedTilesCheckup >= Bukkit.getCurrentTick())
+			return tilesCount;
+		
+		nextAllowedTilesCheckup = Bukkit.getCurrentTick() + 5;
+		tilesCount = getLoadedChunks().stream().mapToInt(ch -> ((CraftChunk)ch).getHandle().tileEntities.size()).sum();
+		
+		return tilesCount;
 	}
 	
 	public PlotParameters getParameters() {

@@ -240,7 +240,7 @@ public class DataManager implements Listener {
 	@EventHandler
 	public void onJoinAsync(AsyncPlayerPreLoginEvent e) {
 		if (serverIndex == -1)
-			e.disallow(Result.KICK_OTHER, "§cGénérateur de monde non chargé. Réessayez dans quelques instants...");
+			e.disallow(Result.KICK_OTHER, "§cIndex du serveur encore inconnu. Réessayez dans quelques instants...");
 	}
 
 	@EventHandler //charge les plots des joueurs se connectant
@@ -251,38 +251,40 @@ public class DataManager implements Listener {
 		}
 		
 		//get player plots
-		try (PreparedStatement getPlayerPlots = osSelectPlayerPlots.createStatement()) {
-			getPlayerPlots.setLong(1, serverIndex);
-			getPlayerPlots.setLong(2, e.getOlympaPlayer().getId());
-			ResultSet getPlayerPlotsResult = osSelectPlayerPlots.executeQuery(getPlayerPlots);
-			
-			while (getPlayerPlotsResult.next()) {
-				PlotId id = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
+		plugin.getTask().runTaskAsynchronously(() -> {
+			try (PreparedStatement getPlayerPlots = osSelectPlayerPlots.createStatement()) {
+				getPlayerPlots.setLong(1, serverIndex);
+				getPlayerPlots.setLong(2, e.getOlympaPlayer().getId());
+				ResultSet getPlayerPlotsResult = osSelectPlayerPlots.executeQuery(getPlayerPlots);
 				
-				//update player name in members table
-				if (!e.getPlayer().getName().equals(getPlayerPlotsResult.getString("player_name")) && !getPlayerPlotsResult.getString("player_name").equals("Spawn")) {
-					try (PreparedStatement updPlayerMember = osUpdatePlayerPlotRank.createStatement()) {
-						updPlayerMember.setInt(1, serverIndex);
-						updPlayerMember.setInt(2, id.getId());
-						updPlayerMember.setLong(3, e.getOlympaPlayer().getId());
-						updPlayerMember.setString(4, e.getPlayer().getName());
-						updPlayerMember.setString(5, e.getOlympaPlayer().getUniqueId().toString());
-						updPlayerMember.setInt(6, getPlayerPlotsResult.getInt("player_plot_level"));
-						
-						osUpdatePlayerPlotRank.executeUpdate(updPlayerMember);
-						updPlayerMember.close();
+				while (getPlayerPlotsResult.next()) {
+					PlotId id = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
+					
+					//update player name in members table
+					if (!e.getPlayer().getName().equals(getPlayerPlotsResult.getString("player_name")) && !getPlayerPlotsResult.getString("player_name").equals("Spawn")) {
+						try (PreparedStatement updPlayerMember = osUpdatePlayerPlotRank.createStatement()) {
+							updPlayerMember.setInt(1, serverIndex);
+							updPlayerMember.setInt(2, id.getId());
+							updPlayerMember.setLong(3, e.getOlympaPlayer().getId());
+							updPlayerMember.setString(4, e.getPlayer().getName());
+							updPlayerMember.setString(5, e.getOlympaPlayer().getUniqueId().toString());
+							updPlayerMember.setInt(6, getPlayerPlotsResult.getInt("player_plot_level"));
+							
+							osUpdatePlayerPlotRank.executeUpdate(updPlayerMember);
+							updPlayerMember.close();
+						}
 					}
+					
+					//add plot to load task
+					addPlotToLoadQueue(id, false);
 				}
 				
-				//add plot to load task
-				addPlotToLoadQueue(id, false);
+				getPlayerPlots.close();
+				getPlayerPlotsResult.close();
+			}catch (SQLException ex) {
+				ex.printStackTrace();
 			}
-			
-			getPlayerPlots.close();
-			getPlayerPlotsResult.close();
-		}catch (SQLException ex) {
-			ex.printStackTrace();
-		}
+		});
 	}
 
 	private synchronized void loadPlot(PlotId plotId) {

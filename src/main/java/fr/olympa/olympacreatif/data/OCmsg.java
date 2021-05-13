@@ -126,7 +126,7 @@ public class OCmsg {
 	public static final OCmsg PLOT_ENTER_STOPLAG_ACTIVATED = new OCmsg();
 	public static final OCmsg COMMANDBLOCK_COMMAND_SET = new OCmsg();
 	
-	public static final OCmsg PLOT_LOAD_TOO_MUCH_CB_CHUNK = new OCmsg(3);
+	public static final OCmsg PLOT_LOAD_TOO_MUCH_CB_CHUNK = new OCmsg(6);
 	//public static final OCmsg PLOT_LOAD_TOO_MUCH_CB_PLOT = new OCmsg(3);
 	
 	public static final OCmsg CB_SET_TICK_SPEED = new OCmsg();
@@ -151,6 +151,7 @@ public class OCmsg {
 
 	public static final OCmsg TAG_CHECKER_UNAUTHORIZED_TAG = new OCmsg(1);
 	public static final OCmsg TAG_CHECKER_UNAUTHORIZED_VALUE = new OCmsg(1);
+	public static final OCmsg WE_TOO_MUCH_TILES = new OCmsg(4);
 	
 	
 	
