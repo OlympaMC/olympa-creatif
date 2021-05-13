@@ -50,7 +50,7 @@ public class OCparam<T> {
 
 	public static final OCparam<Integer> MAX_CB_PER_CHUNK = new OCparam<Integer>(100);
 	
-	public static final OCparam<Integer> MAX_TILE_PER_PLOT = new OCparam<Integer>(4000);
+	public static final OCparam<Integer> MAX_TILE_PER_PLOT = new OCparam<Integer>(6000);
 
 	public static final OCparam<Integer> MAX_HOLOS_PER_PLOT = new OCparam<Integer>(60);
 	public static final OCparam<Integer> MAX_LINES_PER_HOLO = new OCparam<Integer>(15);

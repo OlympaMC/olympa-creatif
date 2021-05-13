@@ -17,6 +17,7 @@ import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.player.Gender;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
@@ -407,6 +408,8 @@ public class ShopGui extends IGui{
 				if (p.getGameMoney().withdraw(price)) {
 					p.addGroup((OlympaGroup)toBuy);
 					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(p);
+					
+					p.updateGroups();
 					
 					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));	
 				}

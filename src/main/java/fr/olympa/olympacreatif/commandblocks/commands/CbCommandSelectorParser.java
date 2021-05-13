@@ -145,7 +145,7 @@ public abstract class CbCommandSelectorParser {
 			.put("type", (plot, loc, stream, param) ->
 				getNonString(param) == null ?
 				stream.filter(e -> e.getType() == EntityType.fromName(param.toUpperCase())) :
-				stream.filter(e -> e.getType() == EntityType.fromName(getNonString(param.toUpperCase()))))
+				stream.filter(e -> e.getType() != EntityType.fromName(getNonString(param.toUpperCase()))))
 			
 			.put("name", (plot, loc, stream, param) -> 
 				getNonString(param) == null ? 
