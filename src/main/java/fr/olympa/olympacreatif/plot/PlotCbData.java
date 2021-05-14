@@ -463,9 +463,11 @@ public class PlotCbData {
 	
 	private void registerCommandBlocks(final Chunk ch) {
 		//System.out.println("[DEBUG] SET COMMANDS FOR CHUNK " + ch);
+		if (!ch.isLoaded())
+			throw new UnsupportedOperationException("Trying to load commandblock on unloaded chunk " + ch.getX() + ", " + ch.getZ() + "!");
 		
 		Map<BlockPosition, TileEntity> tiles = new HashMap<BlockPosition, TileEntity>(((CraftChunk)ch).getHandle().tileEntities);
-		ch.setForceLoaded(true);
+		//ch.setForceLoaded(true);
 		final World w = plugin.getWorldManager().getWorld();
 		
 		plugin.getTask().runTaskAsynchronously(() -> {
@@ -482,7 +484,7 @@ public class PlotCbData {
 						Map<Location, OcCommandBlockData> map = getCbMap(loc.getBlock().getType());
 						map.put(loc, new OcCommandBlockData((org.bukkit.block.CommandBlock) loc.getBlock().getState()));
 					});
-				ch.setForceLoaded(false);
+				//ch.setForceLoaded(false);
 			});
 		});
 	}
