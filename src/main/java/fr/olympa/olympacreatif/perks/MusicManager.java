@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -20,6 +21,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.xxmicloxx.NoteBlockAPI.event.SongEndEvent;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
@@ -54,7 +56,7 @@ public class MusicManager implements Listener {
 	private Map<String, Song> songsName = new HashMap<String, Song>();
 	private Map<ItemStack, Entry<String, Song>> songsItem = new LinkedHashMap<ItemStack, Map.Entry<String,Song>>();
 	
-	private Map<Player, RadioSongPlayer> radios = new HashMap<Player, RadioSongPlayer>();
+	private Map<UUID, RadioSongPlayer> radios = new HashMap<UUID, RadioSongPlayer>();
 	
 	public MusicManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -130,7 +132,7 @@ public class MusicManager implements Listener {
 		rsp.addPlayer(p);
 		rsp.setPlaying(true);
 		
-		radios.put(p, rsp);
+		radios.put(p.getUniqueId(), rsp);
 	}
 	
 	/**
@@ -138,7 +140,7 @@ public class MusicManager implements Listener {
 	 * @param p
 	 */
 	public void stopSong(Player p) {
-		RadioSongPlayer rsp = radios.get(p);
+		RadioSongPlayer rsp = radios.get(p.getUniqueId());
 		if (rsp == null)
 			return;
 		
@@ -157,9 +159,14 @@ public class MusicManager implements Listener {
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
-		RadioSongPlayer radio = radios.remove(e.getPlayer());
+		RadioSongPlayer radio = radios.remove(e.getPlayer().getUniqueId());
 		if (radio != null)
 			radio.destroy();
+	}
+	
+	@EventHandler
+	public void onSongStop(SongEndEvent e) {
+		e.getSongPlayer().getPlayerUUIDs().forEach(p -> startSong(Bukkit.getPlayer(p), e.getSongPlayer().getSong()));
 	}
 
 	public class MusicGui extends PagedGUI<ItemStack> {

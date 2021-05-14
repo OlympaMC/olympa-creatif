@@ -165,7 +165,11 @@ public class CmdSummon extends CbCommand {
 			list.add(NBTTagDouble.a(e.getLocation().getY()));
 			list.add(NBTTagDouble.a(e.getLocation().getZ()));
 			tag.set("Pos", list);
-			((CraftEntity)e).getHandle().load(tag);
+			try {
+				((CraftEntity)e).getHandle().load(tag);	
+			} catch(Exception ex) {
+				plugin.getLogger().warning("Error while trying to set entity data to the following: " + tag.asString() + ". \nError message: " + ex.getMessage());;				
+			}
 			/*NBTTagCompound tag2 = new NBTTagCompound();
 			((CraftEntity)e).getHandle().save(tag2);
 			System.out.println("TAG of " + e.getType() + " : " + tag2.asString());*/

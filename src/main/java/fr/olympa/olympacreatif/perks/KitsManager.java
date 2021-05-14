@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
@@ -86,10 +88,10 @@ public class KitsManager {
 		list.add(Material.STRUCTURE_BLOCK);
 		list.add(Material.LINGERING_POTION);
 		list.add(Material.SHULKER_SHELL);
-		for (Material mat : Material.values())
-			if (mat.toString().contains("SHULKER_BOX"))
-				list.add(mat);
-		
+		list.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("SHULKER_BOX")).collect(Collectors.toList()));
+		list.add(Material.NETHER_PORTAL);
+		list.add(Material.END_GATEWAY);
+		list.add(Material.END_PORTAL);
 		list.forEach(mat -> builder.put(mat, KitType.ADMIN));
 		list.clear();
 		

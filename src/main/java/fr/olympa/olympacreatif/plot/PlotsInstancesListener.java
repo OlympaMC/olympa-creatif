@@ -423,8 +423,10 @@ public class PlotsInstancesListener implements Listener{
 			cb.update();
 		}*/
 		
-
-		plot = plugin.getPlotsManager().getPlot(OtherUtils.getFacingLoc(clickedBlock.getLocation(), e.getBlockFace()));
+		if (e.getItem() != null && e.getItem().getType().isBlock())
+			plot = plugin.getPlotsManager().getPlot(OtherUtils.getFacingLoc(clickedBlock.getLocation(), e.getBlockFace()));
+		else
+			plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
 		/*if (e.getMaterial().isSolid())
 			plot = plugin.getPlotsManager().getPlot(OtherUtils.getFacingLoc(clickedBlock.getLocation(), e.getBlockFace()));
 		else
