@@ -21,9 +21,11 @@ import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
+import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 
 
 
@@ -410,6 +412,8 @@ public class ShopGui extends IGui{
 					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(p);
 					
 					p.updateGroups();
+					if (OcPermissions.USE_WORLD_EDIT.getMinGroup() == toBuy) 
+						OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(p);
 					
 					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGui(gui).create(p.getPlayer()));	
 				}

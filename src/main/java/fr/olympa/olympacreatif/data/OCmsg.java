@@ -395,7 +395,13 @@ public class OCmsg {
 			
 			OlympaCreatifMain.getInstance()
 			.getTask()
-			.runTaskLater(() -> {if (pc.getPlayer() != null) delayedMessages.get(pc.getPlayer()).remove(msg);}, 20 * delay);
+			.runTaskLater(() -> {
+				if (pc != null && 
+						pc.getPlayer() != null) 
+				delayedMessages.get(pc
+						.getPlayer())
+						.remove(msg);
+				}, 20 * delay);
 		}
 		
 		pc.getPlayer().sendMessage(getValue(pc, objs));

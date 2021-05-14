@@ -51,7 +51,8 @@ public abstract class AWorldEditManager {
 	//private static Set<PlotId> resetingPlots = new HashSet<PlotId>();
 	
 	public final boolean isReseting(Plot plot) {
-		return resetingPlots.containsKey(plot.getId());
+		//return resetingPlots.containsKey(plot.getId());
+		return false;
 	}
 	
 	public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {

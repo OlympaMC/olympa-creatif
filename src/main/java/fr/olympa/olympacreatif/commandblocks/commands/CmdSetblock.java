@@ -43,7 +43,8 @@ public class CmdSetblock extends CbCommand {
 		placingLoc = parseLocation(args[0], args[1], args[2]);
 		item = getItemFromString(args[3]);
 
-		kit = plugin.getPerksManager().getKitsManager().getKitOf(item.getType());
+		if (item != null)
+			kit = plugin.getPerksManager().getKitsManager().getKitOf(item.getType());
 	}
 
 	@Override

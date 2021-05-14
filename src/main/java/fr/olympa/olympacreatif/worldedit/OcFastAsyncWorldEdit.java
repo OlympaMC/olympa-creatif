@@ -124,9 +124,10 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			}
 
 			//Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s est terminée !", plot);
-
+			
+			plot.getCbData().reloadAllCommandBlocks(true);
 			OCmsg.PLOT_RESET_END.send(requester, plot);
-			plugin.getTask().runTaskLater(() -> resetingPlots.remove(plot.getId()), 20 * 60);
+			plugin.getTask().runTaskLater(() -> resetingPlots.remove(plot.getId()), 20 * 60 * 60);
 		});
 		return true;
 	}

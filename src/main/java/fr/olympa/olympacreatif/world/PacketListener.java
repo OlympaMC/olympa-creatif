@@ -40,6 +40,7 @@ import io.netty.channel.ChannelPromise;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PacketPlayInBEdit;
 import net.minecraft.server.v1_16_R3.PacketPlayInEntityNBTQuery;
+import net.minecraft.server.v1_16_R3.PacketPlayInItemName;
 import net.minecraft.server.v1_16_R3.PacketPlayInJigsawGenerate;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCommandBlock;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCommandMinecart;
@@ -114,6 +115,8 @@ public class PacketListener implements Listener {
                 /*if (packetsLimiter.get(player.getUniqueId())[0]++ > maxPacketsPerPeriod)
                 	return;*/
                 
+                //System.out.println("DEBUG incoming packet : " + handledPacket);
+                
             	if (player.isOp() && !OcPermissions.STAFF_BYPASS_OP_CHECK.hasPermission(p)) {
             		if (blockedPlayers.add(player.getUniqueId())) {
             			player.sendMessage("§2Very interesting!! §aHow did you get operator permissions? §bAnyway, you won't be able to do anything §l§4>=D \n§6Don't forget to have fun on Olympa!\n§7If you think that's an error (but I think it isn't), please contact a server administrator.\n§a");
@@ -121,6 +124,11 @@ public class PacketListener implements Listener {
             		}
             		return;
             	}
+            	
+            	//cancxel packet renommage item avec un nom trop long
+            	if (handledPacket instanceof PacketPlayInItemName && ((PacketPlayInItemName)handledPacket).b().length() > 100)
+            		return;
+            	
             	
             	if (handledPacket instanceof PacketPlayInSetCommandBlock) {            			
                		 handleCbPacket(p, (PacketPlayInSetCommandBlock) handledPacket);

@@ -48,8 +48,10 @@ public class SchematicCreator {
 	    if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 	    	OCmsg.WE_DISABLED.send(p);
 	    	return;
-	    }else if (exportingPlotsCache.contains(plot.getId()))
-	    	return;
+	    }else if (exportingPlotsCache.contains(plot.getId())) {
+	    	OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(p, plot);
+	    	return;	
+	    }
 
 		OCmsg.WE_START_GENERATING_PLOT_SCHEM.send(p, plot);
 		exportingPlotsCache.add(plot.getId());
@@ -93,7 +95,7 @@ public class SchematicCreator {
 			
 			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
 			OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.send(p, plot);
-			exportingPlotsCache.remove(plot.getId());
+	    	plugin.getTask().runTaskLater(() -> exportingPlotsCache.remove(plot.getId()), 20 * 60 * 60);
 	    });
 		//return "§4La fonctionnalité d'export de la parcelle est indisponible pendant la bêta, désolé ¯\\_༼ ಥ ‿ ಥ ༽_/¯";
 	}
@@ -102,8 +104,10 @@ public class SchematicCreator {
 	    if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 	    	OCmsg.WE_DISABLED.send(p);
 	    	return;
-	    }else if (restoringPlotCache.contains(plot.getId()))
-	    	return;
+	    }else if (restoringPlotCache.contains(plot.getId())) {
+	    	OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(p, plot);
+	    	return;	
+	    }
 
 		OCmsg.WE_START_RESTORING_PLOT.send(p, plot);
 	    restoringPlotCache.add(plot.getId());
@@ -138,7 +142,7 @@ public class SchematicCreator {
 				e.printStackTrace();
 			}
 	    	
-	    	restoringPlotCache.remove(plot.getId());
+	    	plugin.getTask().runTaskLater(() -> restoringPlotCache.remove(plot.getId()), 20 * 60 * 60);
 	    });
 	}
 	

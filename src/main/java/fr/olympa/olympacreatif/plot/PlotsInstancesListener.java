@@ -689,17 +689,20 @@ public class PlotsInstancesListener implements Listener{
 	//                      DAMAGE EVENTS                     //
 	////////////////////////////////////////////////////////////
 	
-	@EventHandler(priority = EventPriority.LOW) //gestion autorisation pvp & fake player death
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW) //gestion autorisation pvp & fake player death
 	public void onDamageByEntity(EntityDamageByEntityEvent e) {
-		if (e.isCancelled())
-			return;
-		
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		
 		if (plot == null) {
 			e.setCancelled(true);
 			return;	
 		}
+		
+		if (e.getEntity() instanceof Player)
+			if (FakePlayerDeathEvent.fireFakeDeath(plugin, (Player) e.getEntity(), e.getDamager(), e.getFinalDamage(), plot)) {
+				e.setCancelled(true);	
+				return;
+			}
 		
 		if (e.getDamager().getType() == EntityType.PLAYER && PlotPerm.BUILD.has(plot, (OlympaPlayerCreatif)AccountProvider.get(e.getDamager().getUniqueId())))
 			return;
@@ -713,18 +716,17 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-		
-		if (e.getEntity().getType() == EntityType.PLAYER)
-			if (FakePlayerDeathEvent.fireFakeDeath(plugin, (Player) e.getEntity(), e.getDamager(), e.getFinalDamage(), plot))
-				e.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.LOW) //gestion autorisation dégâts environementaux
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW) //gestion autorisation dégâts environementaux
 	public void onGeneralDamage(EntityDamageEvent e) {
 		if (e instanceof EntityDamageByEntityEvent || e.getEntityType() != EntityType.PLAYER)
 			return;
 		
 		plot = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
+		
+		if (FakePlayerDeathEvent.fireFakeDeath(plugin, (Player) e.getEntity(), null, e.getFinalDamage(), plot))
+			e.setCancelled(true);
 		
 		if (plot == null) {
 			e.setCancelled(true);
@@ -735,10 +737,6 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-		
-		if (e.getEntity().getType() == EntityType.PLAYER)
-			if (FakePlayerDeathEvent.fireFakeDeath(plugin, (Player) e.getEntity(), null, e.getFinalDamage(), plot))
-				e.setCancelled(true);
 	}
 
 	////////////////////////////////////////////////////////////
