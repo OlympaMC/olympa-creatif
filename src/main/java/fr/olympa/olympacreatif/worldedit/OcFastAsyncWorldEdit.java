@@ -277,7 +277,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				private Map<Long, Integer> commandBlocksCount = new HashMap<Long, Integer>();
 				private boolean pasteCommandBlocks = true;
 				
-				private int pastedTilesCount = 0;
+				private int tilesCount = plot.getTilesCount();
 				
 				public OcExtent(Extent extent, OlympaPlayerCreatif pc, Plot plot) {
 					super(extent);
@@ -321,7 +321,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		        		return false;
 		        	}
 		        	
-		        	if (block.hasNbtData() && plot.getTilesCount() + pastedTilesCount++ > OCparam.MAX_TILE_PER_PLOT.get()) {
+		        	if (block.hasNbtData() && tilesCount++ > OCparam.MAX_TILE_PER_PLOT.get()) {
 		        		OCmsg.WE_TOO_MUCH_TILES.send(pc, OCparam.MAX_TILE_PER_PLOT.get() + "");
 		        		return false;
 		        	}
@@ -363,8 +363,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		        				OCmsg.PLOT_LOAD_TOO_MUCH_CB_CHUNK.send(pc, plot, ch.getX() + ", " + ch.getZ());
 		        				return false;
 		        			}
-		        		}
-		        		else
+		        		}else
 		        			return false;
 		        			        	
 		        	return true;

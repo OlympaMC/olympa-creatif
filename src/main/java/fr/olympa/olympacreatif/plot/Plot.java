@@ -258,6 +258,7 @@ public class Plot {
 		return new ArrayList<Entity>(entitiesInPlot);
 	}
 	
+	/*
 	public long getLoadedTileEntitiesCount() {
 		long tiles = 0;
 		
@@ -267,7 +268,7 @@ public class Plot {
 					tiles += plugin.getWorldManager().getNmsWorld().getChunkAt(x / 16, z / 16).getTileEntities().size();
 	
 		return tiles;
-	}
+	}*/
 	
 	
 	public boolean hasLiquidFlow() {

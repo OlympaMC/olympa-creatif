@@ -49,12 +49,12 @@ public class DataManager implements Listener {
 
 	private OlympaCreatifMain plugin;
 
-	private Vector<PlotId> plotsToLoad = new Vector<>();
-	private Vector<Plot> plotsToSave = new Vector<>();
+	//private Vector<PlotId> plotsToLoad = new Vector<>();
+	//private Vector<Plot> plotsToSave = new Vector<>();
 
 	private int serverIndex = -1;
 	
-	private int nextPlotInitTick;
+	private int nextPlotInitTick = 1;
 
 	//statements de création des tables
 	private final String osTableCreateMessages =
@@ -165,8 +165,6 @@ public class DataManager implements Listener {
 
 	public DataManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-
-		nextPlotInitTick = MinecraftServer.currentTick + 10;
 		
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		//register redis
@@ -204,7 +202,7 @@ public class DataManager implements Listener {
 		}
 
 		//load plot task
-		new BukkitRunnable() {
+		/*new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (serverIndex > -1 && !plotsToLoad.isEmpty())
@@ -219,21 +217,21 @@ public class DataManager implements Listener {
 				if (!plotsToSave.isEmpty() && serverIndex > -1)
 					savePlotToBddSync(plotsToSave.remove(0));
 			}
-		}.runTaskTimer(plugin, 20, 1);
+		}.runTaskTimer(plugin, 20, 1);*/
 	}
 
 	public synchronized void addPlotToLoadQueue(PlotId id, boolean syncLoad) {
 		if (!syncLoad)
-			plugin.getTask().runTaskAsynchronously(() -> plotsToLoad.add(id));
+			plugin.getTask().runTaskAsynchronously(() -> loadPlot(id));
 		else
 			loadPlot(id);
 	}
 
 	public synchronized void addPlotToSaveQueue(Plot plot, boolean syncSave) {
 		if (!syncSave)
-			plugin.getTask().runTaskAsynchronously(() -> plotsToSave.add(plot));
+			plugin.getTask().runTaskAsynchronously(() -> savePlot(plot));
 		else
-			savePlotToBddSync(plot);
+			savePlot(plot);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -276,7 +274,8 @@ public class DataManager implements Listener {
 					}
 					
 					//add plot to load task
-					addPlotToLoadQueue(id, false);
+					int i = 1;
+					plugin.getTask().runTaskLater(() -> addPlotToLoadQueue(id, false), i++);
 				}
 				
 				getPlayerPlots.close();
@@ -354,8 +353,12 @@ public class DataManager implements Listener {
 
 			AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData,
 					getPlotOwnerDatasResult.getBoolean(KitType.FLUIDS.getBddKey()));
-
-			plugin.getTask().runTaskLater(() -> plugin.getPlotsManager().loadPlot(plot), nextPlotInitTick++);
+			
+			nextPlotInitTick += 5;
+			plugin.getTask().runTaskLater(() -> {
+				plugin.getPlotsManager().loadPlot(plot);
+				nextPlotInitTick -= 5;
+			}, nextPlotInitTick);
 			
 			getPlotOwnerResult.close();
 			getPlotOwner.close();
@@ -378,7 +381,7 @@ public class DataManager implements Listener {
 			savePlotToBddSync(plot);
 	}*/
 
-	private synchronized void savePlotToBddSync(Plot plot) {
+	private synchronized void savePlot(Plot plot) {
 		if (serverIndex == -1) {
 			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de sauvegarder une parcelle !");
 			return;

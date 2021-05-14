@@ -172,11 +172,11 @@ public class OcaCmd extends AbstractCmd {
 			break;
 			
 		case "tile_entities":
-			topScores = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingLong(plot -> -plot.getLoadedTileEntitiesCount())).collect(Collectors.toCollection(() -> new ArrayList<Plot>()));
+			topScores = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingLong(plot -> -plot.getTilesCount())).collect(Collectors.toCollection(() -> new ArrayList<Plot>()));
 
 			sendMessage(Prefix.INFO, "§6>>> TOP tile entities chargées Créatif " + plugin.getDataManager().getServerIndex());
 			for (int i = 0 ; i < Math.min(9, topScores.size()) ; i++)
-				sendHoverAndCommand(Prefix.INFO, "§e" + (i+1) + ". : parcelle §c" + getPlotIdOnFixedLength(topScores.get(i)) + " §eavec un score de " + topScores.get(i).getLoadedTileEntitiesCount(),
+				sendHoverAndCommand(Prefix.INFO, "§e" + (i+1) + ". : parcelle §c" + getPlotIdOnFixedLength(topScores.get(i)) + " §eavec un score de " + topScores.get(i).getTilesCount(),
 						"§7Se téléporter à la parcelle " + topScores.get(i), "/oc visit " + topScores.get(i));
 			break;
 			
