@@ -168,7 +168,7 @@ public class CmdSummon extends CbCommand {
 			try {
 				((CraftEntity)e).getHandle().load(tag);	
 			} catch(Exception ex) {
-				plugin.getLogger().warning("Error while trying to set entity data to the following: " + tag.asString() + ". \nError message: " + ex.getMessage());;				
+				plugin.getLogger().warning("Error while trying to set entity data to the following: " + tag.asString() + ". Error message: " + ex.getMessage() + "Error cause: " + ex.getCause().getMessage());				
 			}
 			/*NBTTagCompound tag2 = new NBTTagCompound();
 			((CraftEntity)e).getHandle().save(tag2);
