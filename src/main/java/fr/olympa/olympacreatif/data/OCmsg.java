@@ -107,7 +107,7 @@ public class OCmsg {
     
     public static final OCmsg PLOT_LEAVED = new OCmsg();
     
-	public static final OCmsg NULL_CURRENT_PLOT = new OCmsg();
+	public static final OCmsg NULL_CURRENT_PLOT = new OCmsg(3);
 
 	public static final OCmsg PLOT_PRE_RESET = new OCmsg();
 	public static final OCmsg PLOT_RESET_START = new OCmsg();
@@ -152,6 +152,7 @@ public class OCmsg {
 	public static final OCmsg TAG_CHECKER_UNAUTHORIZED_TAG = new OCmsg(1);
 	public static final OCmsg TAG_CHECKER_UNAUTHORIZED_VALUE = new OCmsg(1);
 	public static final OCmsg WE_TOO_MUCH_TILES = new OCmsg(4);
+	public static final OCmsg CI_COMMAND = new OCmsg();
 	
 	
 	

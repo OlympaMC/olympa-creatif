@@ -84,10 +84,12 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
 	
 	@Override
-	public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {
-		if (resetingPlots.containsKey(plot.getId()))
-			return false;
-	
+	public boolean resetPlot(OlympaPlayerCreatif requester, final Plot plot) {
+		if (resetingPlots.containsKey(plot.getId())) {
+			OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(requester, "/oco reset");
+			return false;	
+		}
+
 		resetingPlots.put(plot.getId(), 0);
 		plugin.getTask().runTaskAsynchronously(() -> {
 	
@@ -97,8 +99,8 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			int zMax = zMin + OCparam.PLOT_SIZE.get() - 1;
 
 			try (EditSession session = new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld())))) {
-				Prefix.DEFAULT.sendMessage(requester.getPlayer(), "§dLa réinitialisation de la parcelle %s a commencé.", plot);
-	
+				OCmsg.PLOT_RESET_START.send(requester, plot);
+				
 				for (int x = xMin ; x <= xMax ; x++)
 					for (int z = zMin ; z <= zMax ; z++)
 						session.setBlock(x, 0, z, BlockTypes.BEDROCK);
@@ -122,8 +124,9 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			}
 
 			//Prefix.DEFAULT.sendMessage(requester, "§dLa réinitialisation de la parcelle %s est terminée !", plot);
-	
-			resetingPlots.remove(plot.getId());
+
+			OCmsg.PLOT_RESET_END.send(requester, plot);
+			plugin.getTask().runTaskLater(() -> resetingPlots.remove(plot.getId()), 20 * 60);
 		});
 		return true;
 	}
@@ -239,7 +242,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 					System.out.println("Selection : " + session.getSelection(session.getSelectionWorld()).getMinimumPoint() +  " TO " + session.getSelection(session.getSelectionWorld()).getMaximumPoint());
 			}*/
 			
-			@Subscribe //NOT WORKING AT ALL TY INTELLECTUAL SITES, GG / or maybe.. yes ?
+			@Subscribe 
 			public void onEditSession(EditSessionEvent e) {
 				
 				//e.setExtent(new AbstractDelegateExtent(null));
@@ -277,12 +280,15 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				private Map<Long, Integer> commandBlocksCount = new HashMap<Long, Integer>();
 				private boolean pasteCommandBlocks = true;
 				
-				private int tilesCount = plot.getTilesCount();
+				private int tilesCount = 0;
 				
 				public OcExtent(Extent extent, OlympaPlayerCreatif pc, Plot plot) {
 					super(extent);
 					this.pc = pc;
 					this.plot = plot;
+					
+					if (plot != null)
+						tilesCount = plot.getTilesCount();
 				}
 				
 		        @Override
@@ -313,8 +319,10 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 		        
 		        private <T extends BlockStateHolder<T>> boolean isBlockAllowed(int x, int y, int z, T block) {
 		        	//System.out.println("Can place block at " + x + ", " + y + ", " + z + " : " + !(plot == null || !PlotPerm.USE_WE.has(plot, pc)));
-		        	if ((plot == null || !PlotPerm.USE_WE.has(plot, pc)))
-		        		return false;
+		        	if (plot == null || !PlotPerm.USE_WE.has(plot, pc)) {
+		        		OCmsg.NULL_CURRENT_PLOT.send(pc);
+		        		return false;	
+		        	}
 		        	
 		        	if (block.hasNbtData() && block.getNbtData().toString().length() > OCparam.WE_MAX_NBT_SIZE.get()) {
 		        		OCmsg.WE_TOO_LONG_NBT.send(pc);

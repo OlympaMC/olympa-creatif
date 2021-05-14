@@ -21,6 +21,7 @@ import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.api.server.OlympaServer;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
+import fr.olympa.olympacreatif.commands.CiCommand;
 import fr.olympa.olympacreatif.commands.CmdsLogic;
 import fr.olympa.olympacreatif.commands.HatCommand;
 import fr.olympa.olympacreatif.commands.MenuCommand;
@@ -111,6 +112,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new ShopCommand(this).register();
 		new StoplagCommand(this).register();
 		new TpfCommand(this).register();
+		new CiCommand(this).register();
 		
 		new BackCommand(this, null).register();
 		new HatCommand(this).register();

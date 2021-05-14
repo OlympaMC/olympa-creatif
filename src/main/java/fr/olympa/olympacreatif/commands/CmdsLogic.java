@@ -331,7 +331,7 @@ public class CmdsLogic {
 			for (int i = 0 ; i < 6 ; i++) check += (char) (plugin.random.nextInt(26) + 'a');
 			
 			plotsResetVerifCode.put(plot.getId(), check);
-			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetplot " + plot + " " + check);
+			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco reset " + plot + " " + check);
 			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dVeuillez saisir la commande /oca resetplot %s %s pour réinitialiser la parcelle %s (%s). \n§cAttention cette action est irréversible !!", plot.getPlotId(), check, plot.getPlotId(), plot.getMembers().getOwner().getName());
 			
 			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getId()), 600);
@@ -341,12 +341,12 @@ public class CmdsLogic {
 			
 		}else {		
 			if (!plotsResetVerifCode.get(plot.getId()).equals(code)) {
-				OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco resetp " + plot + " " + plotsResetVerifCode.get(plot.getId()));
+				OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco reset " + plot + " " + plotsResetVerifCode.get(plot.getId()));
 				return;
 			}
 
 			plotsResetVerifCode.remove(plot.getId());
-			OCmsg.PLOT_RESET_START.send(pc, plot);
+			//OCmsg.PLOT_RESET_START.send(pc, plot);
 			plugin.getWEManager().resetPlot(pc, plot);
 			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());
 		}

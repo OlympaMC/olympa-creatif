@@ -51,13 +51,12 @@ public class PermissionsManager implements Listener {
 	private List<String> cbPerms;
 
 	private Map<UUID, PermissionAttachment> weAttachements = new HashMap<UUID, PermissionAttachment>();
-	private Map<UUID, PermissionAttachment> weAdminAttachements = new HashMap<UUID, PermissionAttachment>();
+	//private Map<UUID, PermissionAttachment> weAdminAttachements = new HashMap<UUID, PermissionAttachment>();
 	private Map<UUID, PermissionAttachment> cbAttachements = new HashMap<UUID, PermissionAttachment>();
 	
 	public PermissionsManager(OlympaCreatifMain plugin) {
 		
 		this.plugin = plugin;
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		
 		//chargement des tags depuis le fichier config
         File file = new File(plugin.getDataFolder(), "permissions.yml");
@@ -80,6 +79,8 @@ public class PermissionsManager implements Listener {
 		cbPerms = config.getStringList("cb_perms");
 		wePerms = config.getStringList("we_perms");
 		wePermsAdmin = config.getStringList("we_perms_admin");
+
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		
 		//cbPerms.forEach(OlympaGroup.PLAYER::setRuntimePermission);
 		//wePerms.forEach(PermissionsList.USE_WORLD_EDIT.getMinGroup()::setRuntimePermission);
