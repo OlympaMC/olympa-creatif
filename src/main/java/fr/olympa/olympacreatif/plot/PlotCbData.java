@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -463,29 +464,36 @@ public class PlotCbData {
 	
 	private void registerCommandBlocks(final Chunk ch) {
 		//System.out.println("[DEBUG] SET COMMANDS FOR CHUNK " + ch);
-		if (!ch.isLoaded())
-			throw new UnsupportedOperationException("Trying to load commandblock on unloaded chunk " + ch.getX() + ", " + ch.getZ() + "!");
+		/*if (!ch.isLoaded())
+			throw new UnsupportedOperationException("Trying to load commandblock on unloaded chunk " + ch.getX() + ", " + ch.getZ() + "!");*/
 		
-		Map<BlockPosition, TileEntity> tiles = new HashMap<BlockPosition, TileEntity>(((CraftChunk)ch).getHandle().tileEntities);
-		//ch.setForceLoaded(true);
-		final World w = plugin.getWorldManager().getWorld();
-		
-		plugin.getTask().runTaskAsynchronously(() -> {
-			Set<Location> locs = tiles.entrySet().stream().filter(e -> e.getValue() instanceof TileEntityCommand).map(e -> new Location(w, e.getKey().getX(), e.getKey().getY(), e.getKey().getZ())).collect(Collectors.toSet());
-			
-			plugin.getTask().runTask(() -> {
-				if (locs.size() > OCparam.MAX_CB_PER_CHUNK.get()) {
-					plot.getMembers().getList().entrySet().stream().filter(e -> PlotPerm.COMMAND_BLOCK.has(e.getValue()))
-					.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_CHUNK.send(p, plot, "[" + ch.getX() + "," + ch.getZ() + "]"));
+		ch.getWorld().getChunkAtAsync(ch.getX(), ch.getZ(), new Consumer<Chunk>() {
+
+			@Override
+			public void accept(Chunk chunk) {
+				
+				Map<BlockPosition, TileEntity> tiles = new HashMap<BlockPosition, TileEntity>(((CraftChunk)chunk).getHandle().tileEntities);
+				chunk.setForceLoaded(true);
+				final World w = plugin.getWorldManager().getWorld();
+				
+				plugin.getTask().runTaskAsynchronously(() -> {
+					Set<Location> locs = tiles.entrySet().stream().filter(e -> e.getValue() instanceof TileEntityCommand).map(e -> new Location(w, e.getKey().getX(), e.getKey().getY(), e.getKey().getZ())).collect(Collectors.toSet());
 					
-					//System.out.println("CANCELLED CB LOADING for " + ch);	
-				}else 
-					locs.forEach(loc -> {
-						Map<Location, OcCommandBlockData> map = getCbMap(loc.getBlock().getType());
-						map.put(loc, new OcCommandBlockData((org.bukkit.block.CommandBlock) loc.getBlock().getState()));
+					plugin.getTask().runTask(() -> {
+						if (locs.size() > OCparam.MAX_CB_PER_CHUNK.get()) {
+							plot.getMembers().getList().entrySet().stream().filter(e -> PlotPerm.COMMAND_BLOCK.has(e.getValue()))
+							.map(e -> Bukkit.getPlayer(e.getKey().getUUID())).filter(p -> p != null).forEach(p -> OCmsg.PLOT_LOAD_TOO_MUCH_CB_CHUNK.send(p, plot, "[" + chunk.getX() + "," + chunk.getZ() + "]"));
+							
+							//System.out.println("CANCELLED CB LOADING for " + ch);	
+						}else 
+							locs.forEach(loc -> {
+								Map<Location, OcCommandBlockData> map = getCbMap(loc.getBlock().getType());
+								map.put(loc, new OcCommandBlockData((org.bukkit.block.CommandBlock) loc.getBlock().getState()));
+							});
+						chunk.setForceLoaded(false);
 					});
-				//ch.setForceLoaded(false);
-			});
+				});
+			}
 		});
 	}
 

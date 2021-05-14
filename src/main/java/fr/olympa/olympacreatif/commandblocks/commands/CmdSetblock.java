@@ -6,11 +6,16 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.OtherUtils;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -21,6 +26,8 @@ public class CmdSetblock extends CbCommand {
 
 	Location placingLoc;
 	ItemStack item;
+	OlympaPlayerCreatif pc = null;
+	KitType kit  = null;
 	
 	public CmdSetblock(Entity sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
@@ -30,9 +37,13 @@ public class CmdSetblock extends CbCommand {
 		if (args.length < 4)
 			return;
 		
+		if (sender instanceof Player)
+			pc = AccountProvider.get(sender.getUniqueId());
+		
 		placingLoc = parseLocation(args[0], args[1], args[2]);
 		item = getItemFromString(args[3]);
-		
+
+		kit = plugin.getPerksManager().getKitsManager().getKitOf(item.getType());
 	}
 
 	@Override
@@ -48,9 +59,19 @@ public class CmdSetblock extends CbCommand {
 		/*if (OtherUtils.isCommandBlock(item) && OtherUtils.getCbCount(placingLoc.getChunk()) > OCparam.MAX_CB_PER_CHUNK.get())
 			return 0;*/
 		
+		if (kit == KitType.ADMIN || kit == KitType.COMMANDBLOCK) {
+			return 0;
+		}
+		
+		if (pc != null && kit != null && !pc.hasKit(kit)) {
+			OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, kit);
+			return 0;
+		}
+		
 		Block block = plugin.getWorldManager().getWorld().getBlockAt(placingLoc);
-		block.setType(item.getType());
 		plot.getCbData().removeCommandBlock(block);
+		
+		block.setType(item.getType());
 		
 		net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 		
