@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,6 +24,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.spigot.SpigotUtils;
+import fr.olympa.core.spigot.chat.CancerListener;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
@@ -47,6 +49,7 @@ import net.minecraft.server.v1_16_R3.PacketPlayInSetCommandMinecart;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetCreativeSlot;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetJigsaw;
 import net.minecraft.server.v1_16_R3.PacketPlayInStruct;
+import net.minecraft.server.v1_16_R3.PacketPlayInUpdateSign;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.TileEntityCommand.Type;
 
@@ -147,6 +150,13 @@ public class PacketListener implements Listener {
               			return;
               		}
             	}
+            	
+            	if (handledPacket instanceof PacketPlayInUpdateSign) {
+            		if (Stream.of(((PacketPlayInUpdateSign)handledPacket).c()).anyMatch(s -> CancerListener.matchNoWord.matcher(s).find())) {
+            			OCmsg.SIGN_UNAUTHORIZED_CHARACTER.send(p);
+            			return;
+            		}
+            	}
                 
             	if (handledPacket instanceof PacketPlayInSetCreativeSlot) {
             		PacketPlayInSetCreativeSlot packet = ((PacketPlayInSetCreativeSlot) handledPacket);
@@ -170,7 +180,8 @@ public class PacketListener implements Listener {
                 		}
                 		
                 		if (packet.getItemStack().getTag() != null)
-                    		packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag(), p.getPlayer()));
+                    		//packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag(), p.getPlayer()));
+                			packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag()));
             		}
             	}  
             	

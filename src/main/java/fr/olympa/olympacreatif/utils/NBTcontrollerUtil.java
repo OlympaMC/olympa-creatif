@@ -62,6 +62,10 @@ public abstract class NBTcontrollerUtil {
 		}*/
 	}
 	 
+	public static NBTTagCompound getValidTags(NBTTagCompound tag) {
+		return getValidTags(tag, null);
+	}
+	 
 	public static NBTTagCompound getValidTags(NBTTagCompound tag, Player requester) {
 		return getValidTags(tag, 0, requester);
 	}

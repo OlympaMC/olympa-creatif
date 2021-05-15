@@ -153,6 +153,7 @@ public class OCmsg {
 	public static final OCmsg TAG_CHECKER_UNAUTHORIZED_VALUE = new OCmsg(1);
 	public static final OCmsg WE_TOO_MUCH_TILES = new OCmsg(4);
 	public static final OCmsg CI_COMMAND = new OCmsg();
+	public static final OCmsg SIGN_UNAUTHORIZED_CHARACTER = new OCmsg(1);
 	
 	
 	
@@ -396,8 +397,7 @@ public class OCmsg {
 			OlympaCreatifMain.getInstance()
 			.getTask()
 			.runTaskLater(() -> {
-				if (pc != null && 
-						pc.getPlayer() != null) 
+				if (delayedMessages.containsKey(pc.getPlayer())) 
 				delayedMessages.get(pc
 						.getPlayer())
 						.remove(msg);
