@@ -22,7 +22,7 @@ public class CmdSay extends CbCommand {
 	@Override
 	public int execute() {
 		plot.getPlayers().forEach(p -> p.sendMessage(ChatColor.translateAlternateColorCodes('&', message)));
-		return targetEntities.size();
+		return plot.getPlayers().size();
 	}
 
 }

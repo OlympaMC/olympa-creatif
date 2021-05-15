@@ -50,6 +50,7 @@ import net.minecraft.server.v1_16_R3.PacketPlayInSetCreativeSlot;
 import net.minecraft.server.v1_16_R3.PacketPlayInSetJigsaw;
 import net.minecraft.server.v1_16_R3.PacketPlayInStruct;
 import net.minecraft.server.v1_16_R3.PacketPlayInUpdateSign;
+import net.minecraft.server.v1_16_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.TileEntityCommand.Type;
 
@@ -61,18 +62,26 @@ public class PacketListener implements Listener {
 	//private final int maxPacketsPerPeriod = 100;
 	private Map<UUID, Long[]> packetsLimiter = new HashMap<UUID, Long[]>();
 
-	private Field packetSetInSlotSlot;
+	//private Field packetSetInSlotSlot;
 	private Field packetSetInCreativeSlotItem;
+	private Field packetMapChunkX;
+	private Field packetMapChunkZ;
+	
+	
 	
 	//private static final ItemStack airItem = CraftItemStack.asNMSCopy(new org.bukkit.inventory.ItemStack(Material.AIR)); 
 	
 	public PacketListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		try {
-			packetSetInSlotSlot = PacketPlayInSetCreativeSlot.class.getDeclaredField("slot");
-			packetSetInSlotSlot.setAccessible(true);
+			/*packetSetInSlotSlot = PacketPlayInSetCreativeSlot.class.getDeclaredField("slot");
+			packetSetInSlotSlot.setAccessible(true);*/
 			packetSetInCreativeSlotItem = PacketPlayInSetCreativeSlot.class.getDeclaredField("b");
 			packetSetInCreativeSlotItem.setAccessible(true);
+			packetMapChunkX = PacketPlayOutMapChunk.class.getDeclaredField("a");
+			packetMapChunkZ = PacketPlayOutMapChunk.class.getDeclaredField("b");
+			packetMapChunkX.setAccessible(true);
+			packetMapChunkZ.setAccessible(true);
 		} catch (NoSuchFieldException | SecurityException e) {
 			plugin.getLogger().warning("Failed to reflect class PacketPlayInSetCreativeSlot!");
 			e.printStackTrace();
@@ -198,13 +207,13 @@ public class PacketListener implements Listener {
             	if (handledPacket instanceof PacketPlayInStruct) {         
             		 System.out.println("§cPacketPlayInStruct detected from " + p.getName() + ", cancelled.");
             		 return;
-            	}          	
+            	}  
             	
             	super.channelRead(channelHandlerContext, handledPacket);
             }
 
             @Override
-            public void write(ChannelHandlerContext channelHandlerContext, Object packetObject, ChannelPromise channelPromise) throws Exception {
+            public void write(ChannelHandlerContext channelHandlerContext, Object handledPacket, ChannelPromise channelPromise) throws Exception {
             	/*if (packetObject instanceof PacketPlayOutTileEntityData && !(packetObject instanceof OcCommandBlockPacket)) 
             		return;
             	
@@ -214,7 +223,22 @@ public class PacketListener implements Listener {
             		f.setAccessible(true);
                 	System.out.println("§cSent packet : " + ((NBTTagCompound)f.get(packet)).asString());	
             	}*/
-                super.write(channelHandlerContext, packetObject, channelPromise);
+            	
+            	if (handledPacket instanceof PacketPlayOutMapChunk) {
+            		final PacketPlayOutMapChunk packet = (PacketPlayOutMapChunk) handledPacket;
+            		plugin.getTask().runTaskLater(() -> {
+            			if (p.getCurrentPlot() != null)
+							try {
+								p.getCurrentPlot().getCbData().getHolosOf((int) packetMapChunkX.get(packet), (int) packetMapChunkZ.get(packet))
+										.forEach(holo -> holo.show(p.getPlayer()));
+							} catch (IllegalArgumentException | IllegalAccessException e) {
+								plugin.getLogger().warning("Failed to send holos datas to " + p.getName());
+								e.printStackTrace();
+							}
+            		}, 20);
+            	}
+            	
+                super.write(channelHandlerContext, handledPacket, channelPromise);
             }
         };
 

@@ -44,6 +44,7 @@ import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.Position;
 import fr.olympa.olympacreatif.plot.PlotParamType.HologramData;
 import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.TileEntityCommand;
 
@@ -92,7 +93,10 @@ public class PlotCbData {
 	private int cbTask = -1;
 	
 	//key : real holo ID for the core // value : custom holo id which will be used for saving
-	private Map<Integer, Integer> holos = new HashMap<Integer, Integer>();
+	private Map<Integer, Integer> holosIds = new HashMap<Integer, Integer>();
+	
+	//key : real holo ID // value : loc of the holo
+	//private Map<Integer, Location> holosLocs = new HashMap<Integer, Location>();
 
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -123,10 +127,10 @@ public class PlotCbData {
 					new Hologram(id, data.getBottom().toLoc(), false, true, true, 
 					data.getLines().stream().map(s -> new FixedLine<HologramLine>(s)).collect(Collectors.toList()).toArray(FixedLine[]::new)));
 			
-			holos.put(id, id);
+			holosIds.put(id, id);
 		});
 		//System.out.println("Plot cb data " + plot + " loaded. Set holos for " + plot.getPlayers());
-		plot.getPlayers().forEach(p -> holos.keySet().forEach(holo -> OlympaCore.getInstance().getHologramsManager().getHologram(holo).show(p)));
+		plot.getPlayers().forEach(p -> holosIds.keySet().forEach(holo -> OlympaCore.getInstance().getHologramsManager().getHologram(holo).show(p)));
 		
 		reloadAllCommandBlocks(false);
 		setTickSpeed(plot.getParameters().getParameter(PlotParamType.TICK_SPEED));
@@ -163,12 +167,12 @@ public class PlotCbData {
 		//MAJ du param holos puis supression
 		
 		PlotParamType.HOLOS_DATAS.setValue(plot, 
-			holos.keySet().stream().map(id -> OlympaCore.getInstance().getHologramsManager().getHologram(id))
-			.collect(Collectors.toMap(holo -> holos.get(holo.getID()), holo -> new HologramData(holos.get(holo.getID()), 
+			holosIds.keySet().stream().map(id -> OlympaCore.getInstance().getHologramsManager().getHologram(id))
+			.collect(Collectors.toMap(holo -> holosIds.get(holo.getID()), holo -> new HologramData(holosIds.get(holo.getID()), 
 					holo.getLines().stream().map(line ->  line.getLine() instanceof FixedLine ? ((FixedLine<HologramLine>)line.getLine()).getValue(line) : "")
 					.collect(Collectors.toList()), new Position(holo.getBottom())))));
 		
-		holos.keySet().forEach(id -> OlympaCore.getInstance().getHologramsManager().deleteHologram(id));
+		holosIds.keySet().forEach(id -> OlympaCore.getInstance().getHologramsManager().deleteHologram(id));
 	}
 
 
@@ -181,7 +185,9 @@ public class PlotCbData {
 		if (holo == null)
 			return;
 
-		holos.put(holo.getID(), getRealHoloIdFromHoloPlotId(holo.getID()));
+		holosIds.put(holo.getID(), getRealHoloIdFromHoloPlotId(holo.getID()));
+		//holosLocs.put(holo.getID(), holo.getBottom());
+		
 		plot.getPlayers().forEach(p -> holo.show(p));
 	}
 
@@ -191,21 +197,29 @@ public class PlotCbData {
 		
 		if (containsHolo(holo))
 			plot.getPlayers().forEach(p -> holo.hide(p));
-		
-		return holos.remove(holo.getID()) != null;
+
+		//holosLocs.remove(holo.getID());
+		return holosIds.remove(holo.getID()) != null;
 	}
 	
 	public boolean containsHolo(Hologram holo) {
-		return holos.containsKey(holo.getID());
+		return holosIds.containsKey(holo.getID());
 	}
 	
 	public Set<Integer> getHolos() {
-		return holos.keySet();
+		return holosIds.keySet();
+	}
+	
+	public Set<Hologram> getHolosOf(int x, int z) {
+		/*return holosLocs.entrySet().stream().filter(e -> e.getValue().getChunk().getChunkKey() == ch.getChunkKey())
+				.map(e -> e.getKey()).collect(Collectors.toSet());*/
+		return holosIds.keySet().stream().map(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i))
+				.filter(holo -> holo.getBottom().getChunk().getX() == x && holo.getBottom().getChunk().getZ() == z).collect(Collectors.toSet());
 	}
 	
 	private int getRealHoloIdFromHoloPlotId(int i) {
 		int id = plot.getId().getId() * 1000 + 1;
-		while (holos.containsValue(id) && id < plot.getId().getId() * 1000 + OCparam.MAX_HOLOS_PER_PLOT.get())
+		while (holosIds.containsValue(id) && id < plot.getId().getId() * 1000 + OCparam.MAX_HOLOS_PER_PLOT.get())
 			id++;
 		
 		return id;
