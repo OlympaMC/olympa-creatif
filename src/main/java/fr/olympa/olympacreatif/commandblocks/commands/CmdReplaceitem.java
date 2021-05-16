@@ -47,7 +47,7 @@ public class CmdReplaceitem extends CbCommand {
 			}
 			
 			//définition item
-			ItemStack item = getItemFromString(args[3]);
+			ItemStack item = getItemFromString(args[3], sender instanceof Player ? (Player) sender : null);
 			
 			if (item == null || amount < 0 || amount > 64)
 				return 0;
@@ -70,7 +70,7 @@ public class CmdReplaceitem extends CbCommand {
 			
 			//définition loc block et item à set
 			Location loc = parseLocation(args[1], args[2], args[3]);
-			ItemStack item = getItemFromString(args[5]);
+			ItemStack item = getItemFromString(args[5], sender instanceof Player ? (Player) sender : null);
 			
 			//Bukkit.broadcastMessage("loc : " + loc.toString());
 			//Bukkit.broadcastMessage("item : " +item.toString());

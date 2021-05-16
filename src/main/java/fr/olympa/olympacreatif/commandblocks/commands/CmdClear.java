@@ -25,7 +25,7 @@ public class CmdClear extends CbCommand {
 		super(CommandType.clear, sender, loc, plugin, plot, args);
 
 		if (args.length >=2) {
-			ItemStack item = getItemFromString(args[1]);
+			ItemStack item = getItemFromString(args[1], sender instanceof Player ? (Player) sender : null);
 			
 			matToRemove = item.getType();
 			tagToRemove = CraftItemStack.asNMSCopy(item).getTag();

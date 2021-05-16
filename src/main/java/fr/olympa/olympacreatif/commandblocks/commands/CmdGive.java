@@ -17,7 +17,7 @@ public class CmdGive extends CbCommand {
 		super(CommandType.give, sender, loc, plugin, plot, args);
 		
 		if (args.length >= 2)
-			item = getItemFromString(args[1]);
+			item = getItemFromString(args[1], sender instanceof Player ? (Player) sender : null);
 	}
 	
 	@Override

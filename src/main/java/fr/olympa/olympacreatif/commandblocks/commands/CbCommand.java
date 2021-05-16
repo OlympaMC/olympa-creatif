@@ -5,8 +5,10 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -21,7 +23,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	}
 	
 	//get item from string, prend en compte material et tags
-	public static ItemStack getItemFromString(String s) {
+	public static ItemStack getItemFromString(String s, Player requester) {
 		if (s == null)
 			return null;
 		
@@ -38,7 +40,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		if (s.indexOf("{") == -1)  
 			return item;
 
-		NBTTagCompound tag = NBTcontrollerUtil.getValidTags(s.substring(indexOfNbt));
+		NBTTagCompound tag = NBTcontrollerUtil.getValidTags(s.substring(indexOfNbt), requester);
 		net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 		nmsItem.setTag(tag);
 		item = CraftItemStack.asBukkitCopy(nmsItem);

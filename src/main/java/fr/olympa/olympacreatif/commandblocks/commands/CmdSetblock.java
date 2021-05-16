@@ -41,7 +41,7 @@ public class CmdSetblock extends CbCommand {
 			pc = AccountProvider.get(sender.getUniqueId());
 		
 		placingLoc = parseLocation(args[0], args[1], args[2]);
-		item = getItemFromString(args[3]);
+		item = getItemFromString(args[3], sender instanceof Player ? (Player) sender : null);
 
 		if (item != null)
 			kit = plugin.getPerksManager().getKitsManager().getKitOf(item.getType());
