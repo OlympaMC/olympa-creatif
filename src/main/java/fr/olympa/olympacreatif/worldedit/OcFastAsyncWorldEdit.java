@@ -54,6 +54,7 @@ import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
@@ -85,7 +86,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 	
 	@Override
 	public boolean resetPlot(OlympaPlayerCreatif requester, final Plot plot) {
-		if (resetingPlots.containsKey(plot.getId())) {
+		if (resetingPlots.containsKey(plot.getId()) && !OcPermissions.STAFF_RESET_PLOT.hasPermission(requester)) {
 			OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(requester, "/oco reset");
 			return false;	
 		}

@@ -30,7 +30,9 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
+import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotCbData;
+import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 import io.netty.channel.Channel;
@@ -223,13 +225,23 @@ public class PacketListener implements Listener {
                 	System.out.println("§cSent packet : " + ((NBTTagCompound)f.get(packet)).asString());	
             	}*/
             	
+            	//System.out.println((handledPacket instanceof PacketPlayOutMapChunk ? "§a" : "§c") + "OUT PACKET : " + handledPacket);
+            	
             	if (handledPacket instanceof PacketPlayOutMapChunk) {
             		final PacketPlayOutMapChunk packet = (PacketPlayOutMapChunk) handledPacket;
             		plugin.getTask().runTaskLater(() -> {
             			if (p.getCurrentPlot() != null)
 							try {
-								p.getCurrentPlot().getCbData().getHolosOf((int) packetMapChunkX.get(packet), (int) packetMapChunkZ.get(packet))
-										.forEach(holo -> holo.show(p.getPlayer()));
+								//System.out.println("§2Chunk sent : " + packetMapChunkX.get(packet) + ", " + packetMapChunkZ.get(packet));
+								/*p.getCurrentPlot().getCbData().getHolosOf((int) packetMapChunkX.get(packet), (int) packetMapChunkZ.get(packet))
+										.forEach(holo -> holo.show(p.getPlayer()));*/
+								Plot plot = plugin.getPlotsManager().getPlot(PlotId.fromPosition(plugin, 
+										16 * (int) packetMapChunkX.get(packet), 16 * (int) packetMapChunkZ.get(packet)));
+								
+								if (plot != null)
+									plot.getCbData().getHolosOf((int) packetMapChunkX.get(packet), (int) packetMapChunkZ.get(packet))
+											.forEach(holo -> holo.show(p.getPlayer()));
+								
 							} catch (IllegalArgumentException | IllegalAccessException e) {
 								plugin.getLogger().warning("Failed to send holos datas to " + p.getName());
 								e.printStackTrace();

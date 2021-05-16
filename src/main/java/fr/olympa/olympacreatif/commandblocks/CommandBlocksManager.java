@@ -66,8 +66,8 @@ public class CommandBlocksManager {
 		}
 		
 		//show holos
-		plugin.getTask().runTaskLater(() -> 
-			toPlot.getCbData().getHolos().forEach(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i).show(p)), 10);
+		/*plugin.getTask().runTaskLater(() -> 
+			toPlot.getCbData().getHolos().forEach(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i).show(p)), 10);*/
 	}
 	
 	public void excecuteQuitActions(Plot fromPlot, Player p) {
@@ -88,7 +88,7 @@ public class CommandBlocksManager {
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		
 		//hide holos
-		fromPlot.getCbData().getHolos().forEach(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i).hide(p));
+		//fromPlot.getCbData().getHolos().forEach(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i).hide(p));
 	}
 
 	public void setFakeOp(Player player, boolean setFakeOp) {

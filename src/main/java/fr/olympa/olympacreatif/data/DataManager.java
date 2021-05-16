@@ -21,9 +21,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.redis.RedisAccess;
 import fr.olympa.api.redis.RedisChannel;
 import fr.olympa.api.sql.statement.OlympaStatement;
@@ -53,8 +55,8 @@ public class DataManager implements Listener {
 	//private Vector<Plot> plotsToSave = new Vector<>();
 
 	private int serverIndex = -1;
-	
-	private int nextPlotInitTick = 1;
+
+	private int nextPlotSyncInstantiateTick = 1;
 
 	//statements de création des tables
 	private final String osTableCreateMessages =
@@ -220,14 +222,14 @@ public class DataManager implements Listener {
 		}.runTaskTimer(plugin, 20, 1);*/
 	}
 
-	public synchronized void addPlotToLoadQueue(PlotId id, boolean syncLoad) {
+	public synchronized void loadPlot(PlotId id, boolean syncLoad) {
 		if (!syncLoad)
 			plugin.getTask().runTaskAsynchronously(() -> loadPlot(id));
 		else
 			loadPlot(id);
 	}
 
-	public synchronized void addPlotToSaveQueue(Plot plot, boolean syncSave) {
+	public synchronized void savePlot(Plot plot, boolean syncSave) {
 		if (!syncSave)
 			plugin.getTask().runTaskAsynchronously(() -> savePlot(plot));
 		else
@@ -242,30 +244,31 @@ public class DataManager implements Listener {
 	}
 
 	@EventHandler //charge les plots des joueurs se connectant
-	public void onJoin(OlympaPlayerLoadEvent e) {
+	public void onJoin(PlayerJoinEvent e) {
 		if (serverIndex == -1) {
 			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de charger un nouveau joueur !");
 			return;
 		}
+		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
 		
 		//get player plots
 		plugin.getTask().runTaskAsynchronously(() -> {
 			try (PreparedStatement getPlayerPlots = osSelectPlayerPlots.createStatement()) {
 				getPlayerPlots.setLong(1, serverIndex);
-				getPlayerPlots.setLong(2, e.getOlympaPlayer().getId());
+				getPlayerPlots.setLong(2, pc.getId());
 				ResultSet getPlayerPlotsResult = osSelectPlayerPlots.executeQuery(getPlayerPlots);
 				
 				while (getPlayerPlotsResult.next()) {
-					PlotId id = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
+					final PlotId id = PlotId.fromId(plugin, getPlayerPlotsResult.getInt("plot_id"));
 					
 					//update player name in members table
 					if (!e.getPlayer().getName().equals(getPlayerPlotsResult.getString("player_name")) && !getPlayerPlotsResult.getString("player_name").equals("Spawn")) {
 						try (PreparedStatement updPlayerMember = osUpdatePlayerPlotRank.createStatement()) {
 							updPlayerMember.setInt(1, serverIndex);
 							updPlayerMember.setInt(2, id.getId());
-							updPlayerMember.setLong(3, e.getOlympaPlayer().getId());
+							updPlayerMember.setLong(3, pc.getId());
 							updPlayerMember.setString(4, e.getPlayer().getName());
-							updPlayerMember.setString(5, e.getOlympaPlayer().getUniqueId().toString());
+							updPlayerMember.setString(5, pc.getUniqueId().toString());
 							updPlayerMember.setInt(6, getPlayerPlotsResult.getInt("player_plot_level"));
 							
 							osUpdatePlayerPlotRank.executeUpdate(updPlayerMember);
@@ -275,7 +278,7 @@ public class DataManager implements Listener {
 					
 					//add plot to load task
 					int i = 1;
-					plugin.getTask().runTaskLater(() -> addPlotToLoadQueue(id, false), i++);
+					plugin.getTask().runTaskLater(() -> loadPlot(id, false), i+=5);
 				}
 				
 				getPlayerPlots.close();
@@ -289,11 +292,13 @@ public class DataManager implements Listener {
 	private synchronized void loadPlot(PlotId plotId) {
 		if (plotId == null)
 			return;
-
+		
 		if (serverIndex == -1) {
 			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de charger une parcelle !");
 			return;
 		}
+
+		//System.out.println("LOADING PLOT " + plotId + " ON MAIN THREAD : " + Bukkit.isPrimaryThread());
 
 		//CREATION DU PLOT
 		try {
@@ -354,11 +359,11 @@ public class DataManager implements Listener {
 			AsyncPlot plot = new AsyncPlot(plugin, plotId, plotMembers, plotParams, cbData,
 					getPlotOwnerDatasResult.getBoolean(KitType.FLUIDS.getBddKey()));
 			
-			nextPlotInitTick += 5;
+			nextPlotSyncInstantiateTick += 10;
 			plugin.getTask().runTaskLater(() -> {
 				plugin.getPlotsManager().loadPlot(plot);
-				nextPlotInitTick -= 5;
-			}, nextPlotInitTick);
+				nextPlotSyncInstantiateTick -= 10;
+			}, nextPlotSyncInstantiateTick);
 			
 			getPlotOwnerResult.close();
 			getPlotOwner.close();
@@ -538,7 +543,7 @@ public class DataManager implements Listener {
 		}
 
 		//load plot 1
-		addPlotToLoadQueue(PlotId.fromId(plugin, 1), false);
+		loadPlot(PlotId.fromId(plugin, 1), false);
 	}
 
 	public int getServerIndex() {

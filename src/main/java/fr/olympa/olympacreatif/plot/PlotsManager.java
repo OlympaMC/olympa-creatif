@@ -88,7 +88,7 @@ public class PlotsManager {
 							}
 							if (!hasMemberOnline/* && !forceLoadedPlots.contains(plot)*/) {
 								plot.unload();
-								plugin.getDataManager().addPlotToSaveQueue(plot, false);
+								plugin.getDataManager().savePlot(plot, false);
 								loadedPlots.remove(plot.getId().getId());
 							}
 						}	
@@ -183,7 +183,7 @@ public class PlotsManager {
 			return;
 		
 		//si le plot existe mais n'est pas encore chargé, chargement depuis la bdd
-		plugin.getDataManager().addPlotToLoadQueue(id, false);
+		plugin.getDataManager().loadPlot(id, false);
 	}
 	
 	public boolean isPlotLoaded(PlotId id) {
@@ -195,7 +195,7 @@ public class PlotsManager {
 	public Plot createNewPlot(OlympaPlayerCreatif pc) {
 		Plot plot = new Plot(plugin, pc);
 		
-		plugin.getDataManager().addPlotToSaveQueue(plot, true);
+		plugin.getDataManager().savePlot(plot, true);
 		loadedPlots.put(plot.getId().getId(), plot);
 		return plot;
 	}
@@ -255,8 +255,14 @@ public class PlotsManager {
 	}*/
 	
 	public void loadPlot(AsyncPlot ap) {
-		if (!isPlotLoaded(ap.getId())) 
+		if (!isPlotLoaded(ap.getId())) {
+			long init = System.currentTimeMillis();
 			loadedPlots.put(ap.getId().getId(), new Plot(ap));
+			long end = System.currentTimeMillis() - init;
+			plugin.getLogger().info("§9Plot " + ap.getId() + " took " 
+					+ (end < 10 ? "§a" : end < 20 ? "§e" : end < 30 ? "§c" : "§4") 
+					+ end + "ms §9to load.");
+		}
 	}
 
 	public void loadHelpHolos() {

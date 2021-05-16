@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -105,7 +106,6 @@ public class Plot {
 	
 	//actions to execute, wether if the plot is a new one or loaded from an asyncplot
 	private void executeCommonInstanciationActions() {
-		
 		cbData.setPlot(this);
 		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
@@ -116,62 +116,25 @@ public class Plot {
 				else
 					teleportOut(p);
 		
-		loadInitialEntitiesOnChunks();
-		
-		//forceload 1 chunk à l'origine du plot
-		/*for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + 2 ; x++)
-			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getX() + 2 ; z++)
-				plugin.getWorldManager().getWorld().setChunkForceLoaded(x, z, true);*/
-		/*plugin.getWorldManager().getWorld().getChunkAtAsync(plotId.getLocation(), new Consumer<Chunk>() {
-
-			@Override
-			public void accept(Chunk t) {
-				plugin.getWorldManager().getWorld().setChunkForceLoaded(t.getX(), t.getZ(), true);
-			}
-			
-		});*/
-		
-		//add entities from already loaded chunks
-		for (int x = plotId.getLocation().getChunk().getX() ; x < plotId.getLocation().getChunk().getX() + OCparam.PLOT_SIZE.get() / 16 ; x++)
-			for (int z = plotId.getLocation().getChunk().getZ() ; z < plotId.getLocation().getChunk().getZ() + OCparam.PLOT_SIZE.get() / 16 ; z++)
-				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
-					
-					Arrays.asList(plugin.getWorldManager().getWorld().getChunkAt(x, z).getEntities()).forEach(e -> {	
-						if (e.getType() != EntityType.PLAYER)
-							if (plotId.equals(plugin.getPlotsManager().getBirthPlot(e)))
-								addEntityInPlot(e);
-							else 
-								e.remove();
-					});
+		getLoadedChunks(ch -> Arrays.asList(ch.getEntities())
+				.forEach(e -> {
+					if (e.getType() != EntityType.PLAYER)
+						addEntityInPlot(e);
+				}));
 	}
 	
-	private void loadInitialEntitiesOnChunks() {
-
-		//Bukkit.broadcastMessage("x min : " + initialX + " - max : " + initialX + chunksRowCount);
-		//Bukkit.broadcastMessage("z min : " + initialZ + " - max : " + initialZ + chunksRowCount);
-		
-		getLoadedChunks().forEach(chunk -> {
-			new ArrayList<Entity>(Arrays.asList(chunk.getEntities())).forEach(e -> {
-				if (e.getType() != EntityType.PLAYER)
-					addEntityInPlot(e);
-			});
-		});	
-	}
-	
-	public Set<Chunk> getLoadedChunks() {
+	public void getLoadedChunks(Consumer<Chunk> consumer) {
 
 		int initialX = plotId.getIndexX() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
 		int initialZ = plotId.getIndexZ() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
 		int chunksRowCount = Math.floorDiv(OCparam.PLOT_SIZE.get(), 16);
 		
-		Set<Chunk> set = new HashSet<Chunk>();
+		//Set<Chunk> set = new HashSet<Chunk>();
 		
 		for (int x = initialX ; x < initialX + chunksRowCount ; x++)
 			for (int z = initialZ ; z < initialZ + chunksRowCount ; z++)
 				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
-					set.add(plugin.getWorldManager().getWorld().getChunkAt(x, z));
-		
-		return set;
+					consumer.accept(plugin.getWorldManager().getWorld().getChunkAt(x, z));
 	}
 	
 	/*public long getCommandBlocksCount() {
@@ -179,15 +142,17 @@ public class Plot {
 				.stream().filter(tile -> tile.getTileType().equals(TileEntityTypes.COMMAND_BLOCK)).count()).sum();
 	}*/
 
-	private int nextAllowedTilesCheckup = 0;
+	//private int nextAllowedTilesCheckup = 0;
 	private int tilesCount = 0;
 	
 	public int getTilesCount() {
-		if (nextAllowedTilesCheckup >= Bukkit.getCurrentTick())
+		/*if (nextAllowedTilesCheckup >= Bukkit.getCurrentTick())
 			return tilesCount;
 		
-		nextAllowedTilesCheckup = Bukkit.getCurrentTick() + 5;
-		tilesCount = getLoadedChunks().stream().mapToInt(ch -> ((CraftChunk)ch).getHandle().tileEntities.size()).sum();
+		nextAllowedTilesCheckup = Bukkit.getCurrentTick() + 5;*/
+		tilesCount = 0;
+		getLoadedChunks(ch -> tilesCount += ((CraftChunk)ch).getHandle().tileEntities.size());
+		//tilesCount = getLoadedChunks().stream().mapToInt(ch -> ((CraftChunk)ch).getHandle().tileEntities.size()).sum();
 		
 		return tilesCount;
 	}

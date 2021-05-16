@@ -72,7 +72,7 @@ public class PlotCbData {
 	private Plot plot;
 	
 	private Set<Long> loadedChunks = new HashSet<Long>();
-	private int nextChunkCbLoadTick = 0;
+	private int nextChunkCbLoadTick = 1;
 	
 	private List<CbObjective> objectives = new ArrayList<CbObjective>();
 	private List<CbTeam> teams = new ArrayList<CbTeam>();
@@ -91,7 +91,8 @@ public class PlotCbData {
 	private Map<Location, OcCommandBlockData> blueCommandblocks = new HashMap<Location, OcCommandBlockData>();
 	
 	private int cbTask = -1;
-	
+
+	private Set<Hologram> toLoadHolos = new HashSet<Hologram>();
 	//key : real holo ID for the core // value : custom holo id which will be used for saving
 	private Map<Integer, Integer> holosIds = new HashMap<Integer, Integer>();
 
@@ -118,25 +119,12 @@ public class PlotCbData {
 
 		this.plot = plot;
 
-		//load holos
-		plot.getParameters().getParameter(PlotParamType.HOLOS_DATAS).forEach((id, data) -> {
-			OlympaCore.getInstance().getHologramsManager().registerHologram(id, 
-					new Hologram(id, data.getBottom().toLoc(), false, true, true, 
-					data.getLines().stream().map(s -> new FixedLine<HologramLine>(s)).collect(Collectors.toList()).toArray(FixedLine[]::new)));
-			
-			holosIds.put(id, id);
-		});
-		//System.out.println("Plot cb data " + plot + " loaded. Set holos for " + plot.getPlayers());
-		plot.getPlayers().forEach(p -> holosIds.keySet().forEach(holo -> OlympaCore.getInstance().getHologramsManager().getHologram(holo).show(p)));
-		
-		reloadAllCommandBlocks(false);
 		setTickSpeed(plot.getParameters().getParameter(PlotParamType.TICK_SPEED));
+		reloadAllCommandBlocks(false);
+
+		toLoadHolos.forEach(holo -> OlympaCore.getInstance().getHologramsManager().registerHologram(holo.getID(), holo));
 		
-		//délai nécessaire car sinon le plot est null et la commande ne peut pas se générer
-		/*plugin.getTask().runTaskLater(() -> {
-			reloadAllCommandBlocks(false);
-			setTickSpeed(plot.getParameters().getParameter(PlotParamType.TICK_SPEED));
-		}, 1);*/
+		plot.getPlayers().forEach(p -> holosIds.keySet().forEach(holo -> OlympaCore.getInstance().getHologramsManager().getHologram(holo).show(p)));
 	}
 	
 	public void unload() {
@@ -211,8 +199,6 @@ public class PlotCbData {
 	}
 	
 	public Set<Hologram> getHolosOf(int x, int z) {
-		/*return holosLocs.entrySet().stream().filter(e -> e.getValue().getChunk().getChunkKey() == ch.getChunkKey())
-				.map(e -> e.getKey()).collect(Collectors.toSet());*/
 		return holosIds.keySet().stream().map(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i))
 				.filter(holo -> holo.getBottom().getChunk().getX() == x && holo.getBottom().getChunk().getZ() == z).collect(Collectors.toSet());
 	}
@@ -223,6 +209,22 @@ public class PlotCbData {
 			id++;
 		
 		return id;
+	}
+	
+	/**
+	 * Used for async plot loading ONLY
+	 * @param plotParams
+	 */
+	@SuppressWarnings({ "unchecked" })
+	@Deprecated
+	public void setHolos(PlotParameters plotParams) {
+		//load holos
+		plotParams.getParameter(PlotParamType.HOLOS_DATAS).forEach((id, data) -> {
+			toLoadHolos.add(new Hologram(id, data.getBottom().toLoc(), false, true, true, 
+					data.getLines().stream().map(s -> new FixedLine<HologramLine>(s)).collect(Collectors.toList()).toArray(FixedLine[]::new)));
+			
+			holosIds.put(id, id);
+		});
 	}
 	
 	
@@ -460,18 +462,17 @@ public class PlotCbData {
 			loadedChunks.clear();
 		}
 		
-		nextChunkCbLoadTick = 1;
-		plot.getLoadedChunks().forEach(ch -> addChunkToLoadQueue(ch));
+		plot.getLoadedChunks(ch -> addChunkToLoadQueue(ch));
 	}
 	
 	public void addChunkToLoadQueue(final Chunk ch) {
 		if (!loadedChunks.add(ch.getChunkKey()))
 			return;
 		
-		nextChunkCbLoadTick++;
+		nextChunkCbLoadTick+=2;
 		
 		plugin.getTask().runTaskLater(() -> {
-			nextChunkCbLoadTick--;
+			nextChunkCbLoadTick-=2;
 			registerCommandBlocks(ch);
 		}, nextChunkCbLoadTick);
 	}

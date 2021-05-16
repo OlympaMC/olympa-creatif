@@ -12,6 +12,7 @@ public class AsyncPlot {
 	
 	private boolean liquidFlow;
 	
+	@SuppressWarnings("deprecation")
 	public AsyncPlot(OlympaCreatifMain plugin, PlotId plotLoc, PlotMembers plotMembers, PlotParameters plotParams, PlotCbData cbData, boolean liquidFlow) {
 		this.plugin = plugin;
 		this.id = plotLoc;
@@ -19,6 +20,8 @@ public class AsyncPlot {
 		this.params = plotParams;
 		this.cbData = cbData;
 		this.liquidFlow = liquidFlow;
+		
+		cbData.setHolos(plotParams);
 	}
 	
 	public OlympaCreatifMain getPlugin() {
