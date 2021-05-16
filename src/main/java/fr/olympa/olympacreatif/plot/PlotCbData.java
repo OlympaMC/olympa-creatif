@@ -124,7 +124,7 @@ public class PlotCbData {
 
 		toLoadHolos.forEach(holo -> OlympaCore.getInstance().getHologramsManager().registerHologram(holo.getID(), holo));
 		
-		plot.getPlayers().forEach(p -> holosIds.keySet().forEach(holo -> OlympaCore.getInstance().getHologramsManager().getHologram(holo).show(p)));
+		plot.getPlayers().forEach(p -> holosIds.keySet().forEach(holo -> OlympaCore.getInstance().getHologramsManager().getHologram(holo).forceShow(p)));
 	}
 	
 	public void unload() {

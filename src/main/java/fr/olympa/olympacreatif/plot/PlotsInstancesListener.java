@@ -864,10 +864,10 @@ public class PlotsInstancesListener implements Listener{
 			e.getEntity().remove();*/
 		
 		/*if (id == null)*/
-			plugin.getLogger().info("§eEntity " + e.getEntity() + " removed.");
+		/*plugin.getLogger().info("§eEntity " + e.getEntity() + " removed.");
 
 		if (((CraftEntity)e.getEntity()).getHandle().dead)
-			plugin.getLogger().info("§cEntity " + e.getEntity() + " killed.");
+			plugin.getLogger().info("§cEntity " + e.getEntity() + " killed.");*/
 		
 	}
 	

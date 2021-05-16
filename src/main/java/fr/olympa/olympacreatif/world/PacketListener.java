@@ -240,7 +240,7 @@ public class PacketListener implements Listener {
 								
 								if (plot != null)
 									plot.getCbData().getHolosOf((int) packetMapChunkX.get(packet), (int) packetMapChunkZ.get(packet))
-											.forEach(holo -> holo.show(p.getPlayer()));
+											.forEach(holo -> holo.forceShow(p.getPlayer()));
 								
 							} catch (IllegalArgumentException | IllegalAccessException e) {
 								plugin.getLogger().warning("Failed to send holos datas to " + p.getName());

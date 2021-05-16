@@ -259,9 +259,9 @@ public class PlotsManager {
 			long init = System.currentTimeMillis();
 			loadedPlots.put(ap.getId().getId(), new Plot(ap));
 			long end = System.currentTimeMillis() - init;
-			plugin.getLogger().info("§9Plot " + ap.getId() + " took " 
-					+ (end < 10 ? "§a" : end < 20 ? "§e" : end < 30 ? "§c" : "§4") 
-					+ end + "ms §9to load.");
+			plugin.getLogger().info("§7Plot " + ap.getId() + " took " 
+					+ (end <= 5 ? "§a" : end < 10 ? "§e" : end < 20 ? "§c" : "§4") 
+					+ end + "ms §7to load.");
 		}
 	}
 
