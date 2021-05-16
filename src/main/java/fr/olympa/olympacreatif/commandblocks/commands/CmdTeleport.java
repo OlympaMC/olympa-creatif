@@ -15,10 +15,20 @@ import fr.olympa.olympacreatif.plot.Plot;
 public class CmdTeleport extends CbCommand {
 
 	private Location tpLoc = null;
-	private Supplier<List<Entity>> getEntities = null;
+	//private Supplier<List<Entity>> getEntitiesSupplier = null;
 	
-	public CmdTeleport(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, String[] args) {
+	public CmdTeleport(Entity sender, Location loc, OlympaCreatifMain plugin, Plot plot, final String[] args) {
 		super(CommandType.teleport, sender, loc, plugin, plot, args);
+	}
+	
+	private Location getLocFromSelector(String selector) {
+		List<Entity> list = parseSelector(selector, false);
+		return list.size() > 0 ? list.get(0).getLocation() : null;
+	}
+	
+	@Override
+	public int execute() {
+		targetEntities.clear();
 		
 		if (args.length == 1) {
 			if (sender instanceof Entity) {
@@ -28,7 +38,7 @@ public class CmdTeleport extends CbCommand {
 		}
 		
 		else if (args.length == 2) {
-			getEntities = () -> parseSelector(args[0], false);
+			targetEntities = parseSelector(args[0], false);
 			tpLoc = getLocFromSelector(args[1]);
 		} 
 		
@@ -40,7 +50,7 @@ public class CmdTeleport extends CbCommand {
 		}
 		
 		else if (args.length == 4) {
-			getEntities = () -> parseSelector(args[0], false);
+			targetEntities = parseSelector(args[0], false);
 			tpLoc = parseLocation(args[1], args[2], args[3]);
 		}
 		
@@ -52,25 +62,14 @@ public class CmdTeleport extends CbCommand {
 		}
 		
 		else if (args.length == 6) {
-			getEntities = () -> parseSelector(args[0], false);
+			targetEntities = parseSelector(args[0], false);
 			tpLoc = parseLocation(args[1], args[2], args[3], args[4], args[5]);
 		}
-	}
-	
-	private Location getLocFromSelector(String selector) {
-		List<Entity> list = parseSelector(selector, false);
-		return list.size() > 0 ? list.get(0).getLocation() : null;
-	}
-	
-	@Override
-	public int execute() {
+		
 		if (tpLoc == null)
 			return 0;
 		
-		if (getEntities == null)
-			targetEntities.forEach(ent -> ent.teleport(tpLoc));
-		else
-			(targetEntities = getEntities.get()).forEach(ent -> ent.teleport(tpLoc));
+		targetEntities.forEach(ent -> ent.teleport(tpLoc));
 		
 		return targetEntities.size();
 	}

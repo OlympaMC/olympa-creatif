@@ -154,6 +154,7 @@ public class OCmsg {
 	public static final OCmsg WE_TOO_MUCH_TILES = new OCmsg(4);
 	public static final OCmsg CI_COMMAND = new OCmsg();
 	public static final OCmsg SIGN_UNAUTHORIZED_CHARACTER = new OCmsg(1);
+	public static final OCmsg DEFAULT_CHAT_SET_TO = new OCmsg();
 	
 	
 	

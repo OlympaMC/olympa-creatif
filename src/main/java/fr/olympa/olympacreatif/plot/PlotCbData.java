@@ -94,9 +94,6 @@ public class PlotCbData {
 	
 	//key : real holo ID for the core // value : custom holo id which will be used for saving
 	private Map<Integer, Integer> holosIds = new HashMap<Integer, Integer>();
-	
-	//key : real holo ID // value : loc of the holo
-	//private Map<Integer, Location> holosLocs = new HashMap<Integer, Location>();
 
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -196,7 +193,10 @@ public class PlotCbData {
 			return false;
 		
 		if (containsHolo(holo))
-			plot.getPlayers().forEach(p -> holo.hide(p));
+			if (plot == null)
+				Bukkit.getOnlinePlayers().forEach(p -> holo.hide(p));
+			else
+				plot.getPlayers().forEach(p -> holo.hide(p));
 
 		//holosLocs.remove(holo.getID());
 		return holosIds.remove(holo.getID()) != null;

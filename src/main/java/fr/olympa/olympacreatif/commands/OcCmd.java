@@ -8,6 +8,7 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.Position;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.MembersGui;
 import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
@@ -49,22 +50,12 @@ public class OcCmd extends AbstractCmd {
 	}
 
 	
-	@Cmd(player = true, syntax = "Envoyer un message dans le chat parcelle", min = 1)
-	public void chat(CommandContext cmd) {
-		if (((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot() == null) {
-			OCmsg.INVALID_PLOT_ID.send(getOlympaPlayer().getPlayer());
-			return;
-		}
-
-		String concat = "";
-		List<String> argsMsg = new ArrayList<String>();
-		for (int i = 0 ; i < cmd.getArgumentsLength() ; i++)
-			argsMsg.add(cmd.getArgument(i));
+	@Cmd(player = true, syntax = "Passer du chat parcelle au chat général et inversement")
+	public void chat(CommandContext cmd) {		
+		OlympaPlayerCreatif pc = (OlympaPlayerCreatif) getOlympaPlayer();
 		
-		for (String s : argsMsg)
-			concat += s + " ";
-		
-		((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot().sendMessage(getOlympaPlayer(), concat);
+		pc.setPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT, !pc.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT));
+		OCmsg.DEFAULT_CHAT_SET_TO.send((OlympaPlayerCreatif)getOlympaPlayer(), pc.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT) ? "parcelle" : "général");
 	}
 
 	
