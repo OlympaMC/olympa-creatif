@@ -144,7 +144,7 @@ public class OcoCmd extends AbstractCmd {
 	}*/
 
 	@Cmd(player = true, syntax = "Définir la vitesse de tick des commandblocks (entre 1 et 20)", args = {"INTEGER"}, min = 1/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
-	public void tickspeed(CommandContext cmd) {
+	public void set_tickspeed(CommandContext cmd) {
 		Plot plot = ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot();
 		
 		if (plot == null) {
@@ -167,7 +167,7 @@ public class OcoCmd extends AbstractCmd {
 
 	
 	@Cmd(player = true, syntax = "Recharger tous les commandblocks de la parcelle"/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
-	public void reloadcommandblocks(CommandContext cmd) {
+	public void reload_commandblocks(CommandContext cmd) {
 		if (launchedCbRecalculation.contains(getPlayer())) {
 			OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(getPlayer(), "/oco reloadcommandblocks");
 			return;
@@ -189,6 +189,23 @@ public class OcoCmd extends AbstractCmd {
 		
 		plot.getCbData().reloadAllCommandBlocks(true);
 		OCmsg.PLOT_COMMANDBLOCKS_WILL_RELOAD.send(getPlayer());
+	}
+
+
+	@Cmd(player = true, syntax = "Ouvrir l'inventaire de manipulation des portes-armures"/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
+	public void armorstand_editor(CommandContext cmd) {
+		if (!OcPermissions.USE_ARMORSTAND_EDITOR.hasPermission((OlympaPlayerCreatif) getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_GROUP_PERMISSION.send((OlympaPlayerCreatif) getOlympaPlayer(), OcPermissions.USE_ARMORSTAND_EDITOR.getMinGroup().getName(getOlympaPlayer().getGender()));
+			return;
+		}
+		
+		if (!PlotPerm.USE_ARMORSTAND_EDITOR.has((OlympaPlayerCreatif)getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif)getOlympaPlayer());
+			return;
+		}
+			
+		plugin.getPerksManager().getArmorStandManager().listeningFor(getPlayer());
+		OCmsg.ARMORSTAND_EDITOR_SELECT_ARMORSTAND.send((OlympaPlayerCreatif) getOlympaPlayer());
 	}
 	
 	

@@ -155,6 +155,13 @@ public class OCmsg {
 	public static final OCmsg CI_COMMAND = new OCmsg();
 	public static final OCmsg SIGN_UNAUTHORIZED_CHARACTER = new OCmsg(1);
 	public static final OCmsg DEFAULT_CHAT_SET_TO = new OCmsg();
+
+	public static final OCmsg ARMORSTAND_EDITOR_SELECT_ARMORSTAND = new OCmsg();
+	public static final OCmsg ARMORSTAND_EDITOR_SELECT_ARMORSTAND_TOO_LONG = new OCmsg();
+	public static final OCmsg ARMORSTAND_EDITOR_OPEN = new OCmsg();
+	public static final OCmsg ARMORSTAND_EDITOR_EXIT = new OCmsg();
+	
+	public static final OCmsg INSUFFICIENT_GROUP_PERMISSION = new OCmsg();
 	
 	
 	

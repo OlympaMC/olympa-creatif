@@ -12,6 +12,7 @@ import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OcPermissions;
 
 public class PlotPerm {
@@ -39,6 +40,7 @@ public class PlotPerm {
 	public static final PlotPerm BYPASS_ENTRY_ACTIONS = new PlotPerm(PlotRank.MEMBER, null);
 	public static final PlotPerm BUILD = new PlotPerm(PlotRank.MEMBER, "Construire sur la parcelle");
 	public static final PlotPerm CHANGE_GAMEMODE = new PlotPerm(PlotRank.MEMBER, "Gérer votre gamemode avec /gm");
+	public static final PlotPerm USE_ARMORSTAND_EDITOR = new PlotPerm(PlotRank.MEMBER, "Utiliser l'éditeur de porte armures", OcPermissions.USE_ARMORSTAND_EDITOR);
 	public static final PlotPerm DROP_ITEM = new PlotPerm(PlotRank.MEMBER, null);
 	public static final PlotPerm DEFINE_OWN_FLY_SPEED = new PlotPerm(PlotRank.MEMBER, null);
 	
@@ -67,6 +69,10 @@ public class PlotPerm {
 		if (plot == null || (requiredPerm != null && !requiredPerm.hasPermission(p)))
 			return false;
 		
+		/*if (requiredPerm != null && !requiredPerm.hasPermission(p)) {
+			OCmsg.INSUFFICIENT_GROUP_PERMISSION.send(p, requiredPerm.getMinGroup().getName(p.getGender()));
+			return false;
+		}*/
 		return has(plot.getMembers().getPlayerRank(p));
 	}
 	

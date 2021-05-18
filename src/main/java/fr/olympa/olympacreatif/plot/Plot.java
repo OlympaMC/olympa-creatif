@@ -417,6 +417,8 @@ public class Plot {
 		
 		if (plugin.getWEManager() != null)
 			plugin.getWEManager().clearClipboard(this, p);
+		
+		plugin.getPerksManager().getArmorStandManager().closeFor(p);
 	}
 	
 	@Override

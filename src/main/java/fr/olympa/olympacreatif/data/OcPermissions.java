@@ -15,6 +15,7 @@ public class OcPermissions {
 	
 	public static final OlympaSpigotPermission USE_HOLOGRAMS = new OlympaSpigotPermission(OlympaGroup.CREA_CREATOR);
 	public static final OlympaSpigotPermission USE_COLORED_TEXT = new OlympaSpigotPermission(OlympaGroup.CREA_CREATOR);
+	public static final OlympaSpigotPermission USE_ARMORSTAND_EDITOR = new OlympaSpigotPermission(OlympaGroup.CREA_CREATOR);
 	
 	public static final OlympaSpigotPermission STAFF_BYPASS_PLOT_KICK_AND_BAN = new OlympaSpigotPermission(OlympaGroup.DEV);
 	public static final OlympaSpigotPermission STAFF_BYPASS_VANILLA_COMMANDS = new OlympaSpigotPermission(OlympaGroup.DEV);

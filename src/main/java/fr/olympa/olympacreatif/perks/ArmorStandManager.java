@@ -7,123 +7,135 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.EulerAngle;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
+import fr.olympa.olympacreatif.data.OCmsg;
 
-public class ArmorStandManager {
-
-	public final ItemStack headX = ItemUtils.skullCustom("§6Rotation selon l'axe X", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmNjNWZhZTNiNjUwZTZlZGIzMjQ1ZmE0MWU1YmUyZGE3OWIwZTE3ZjIyYzRiNGUxZTU5YjMyZjU3MzIwMmQxOCJ9fX0=");
-	public final ItemStack headY = ItemUtils.skullCustom("§6Rotation selon l'axe Y", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzY3NDc3ZjljYjVmMDM2NDM4Y2U5OGNlNjk3YjkxMzU4Y2I5NzY0MWM1ZDE1M2E3ZTM4ODhkYWUzMmUyMTUifX19");
-	public final ItemStack headZ = ItemUtils.skullCustom("§6Rotation selon l'axe Z", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2ZhNzMwYjVlYzczY2VhZjRhYWQ1MjRlMjA3ZmYzMWRmNzg1ZTdhYjZkYjFhZWIzZjFhYTRkMjQ1ZWQyZSJ9fX0=");
+public class ArmorStandManager implements Listener {
 	
-	public final static ItemStack arrowRight = ItemUtils.skullCustom("§eMouvement sur partie §adroite §edu porte armure", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQxZmY2YmM2N2E0ODEyMzJkMmU2NjllNDNjNGYwODdmOWQyMzA2NjY1YjRmODI5ZmI4Njg5MmQxM2I3MGNhIn19fQ==");
-	public final static ItemStack arrowLeft = ItemUtils.skullCustom("§eMouvement sur partie §agauche §edu porte armure", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDliMmJlZTM5YjZlZjQ3ZTE4MmQ2ZjFkY2E5ZGVhODQyZmNkNjhiZGE5YmFjYzZhNmQ2NmE4ZGNkZjNlYyJ9fX0=");
-	public final static ItemStack arrowEquals = ItemUtils.skullCustom("§eMouvement sur partie §aentière §edu porte armure", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzY2MzNhZTVlYjcxMjFmOGJkZTVhY2RmODdhMDlmNjc4MDBkN2NlZGY0MTkwZjEyOWU3OGVmZWU5ZTYzIn19fQ==");
-	
-	public final ItemStack settings = ItemUtils.skullCustom("§7Paramètres avancés", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWMyZmYyNDRkZmM5ZGQzYTJjZWY2MzExMmU3NTAyZGM2MzY3YjBkMDIxMzI5NTAzNDdiMmI0NzlhNzIzNjZkZCJ9fX0=");
-
-	//public final ItemStack cancel = ItemUtils.skullCustom("§cAnnuler", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTMzYTViZmM4YTJhM2ExNTJkNjQ2YTViZWE2OTRhNDI1YWI3OWRiNjk0YjIxNGYxNTZjMzdjNzE4M2FhIn19fQ==");
-	public final ItemStack validate = ItemUtils.skullCustom("§aValider", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjViNWZhYThlNDgxZmNiODRjYmVmMWU1YzQyMGQ2YTgxYTZlNjhmNWEwNzUwMDFhMDI4ODI1YWMyMDE4ZWJlNyJ9fX0=");
-	//public final ItemStack validate = ItemUtils.skullCustom("§aValider", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjViNWZhYThlNDgxZmNiODRjYmVmMWU1YzQyMGQ2YTgxYTZlNjhmNWEwNzUwMDFhMDI4ODI1YWMyMDE4ZWJlNyJ9fX0=");
+	public static final int modifierStep = 10;//Math.PI/12;
 	
 	public final Map<Integer, GuiItem<?>> guiItems = ImmutableMap.<Integer, GuiItem<?>>builder()
-			.put(0, new GuiItemToggle(0, "Gravité", Material.FEATHER, ent -> ent.hasGravity(), (ent, b) -> ent.setGravity(b)))
-			.put(1, new GuiItemToggle(1, "Bras visibles", Material.WOODEN_SWORD, ent -> ent.hasArms(), (ent, b) -> ent.setArms(b)))
-			.put(2, new GuiItemToggle(2, "Base visible", Material.STONE_PRESSURE_PLATE, ent -> ent.hasBasePlate(), (ent, b) -> ent.setBasePlate(b)))
-			.put(3, new GuiItemToggle(3, "Invulnérable", Material.GOLDEN_APPLE, ent -> ent.isInvulnerable(), (ent, b) -> ent.setInvulnerable(b)))
-			.put(4, new GuiItemToggle(4, "Petite", Material.WOODEN_SWORD, ent -> ent.isSmall(), (ent, b) -> ent.setSmall(b)))
-			.put(5, new GuiItemToggle(5, "Brillante", Material.GLOWSTONE_DUST, ent -> ent.isGlowing(), (ent, b) -> ent.setGlowing(b)))
-			.put(6, new GuiItemToggle(6, "Marker", Material.POTION, ent -> ent.isMarker(), (ent, b) -> ent.setMarker(b)))
+			//.put(0, new GuiItemToggle(0, "Gravité", Material.FEATHER, ent -> ent.hasGravity(), (ent, b) -> ent.setGravity(b)))
+			.put(0, new GuiItemToggle(0, "Bras visibles", Material.WOODEN_SWORD, ent -> ent.hasArms(), (ent, b) -> ent.setArms(b)))
+			.put(1, new GuiItemToggle(1, "Base visible", Material.STONE_PRESSURE_PLATE, ent -> ent.hasBasePlate(), (ent, b) -> ent.setBasePlate(b)))
+			.put(2, new GuiItemToggle(2, "Invulnérable", Material.GOLDEN_APPLE, ent -> ent.isInvulnerable(), (ent, b) -> ent.setInvulnerable(b)))
+			.put(3, new GuiItemToggle(3, "Petite", Material.OBSERVER, ent -> ent.isSmall(), (ent, b) -> ent.setSmall(b)))
+			.put(4, new GuiItemToggle(4, "Brillante", Material.GLOWSTONE_DUST, ent -> ent.isGlowing(), (ent, b) -> ent.setGlowing(b)))
+			//.put(6, new GuiItemToggle(6, "Marker", Material.POTION, ent -> ent.isMarker(), (ent, b) -> ent.setMarker(b)))
 			
 			.build();
 	
-	public final Map<Integer, TriConsumer<Player, Action, ItemStack>> invItems = ImmutableMap.<Integer, TriConsumer<Player, Action, ItemStack>>builder()
-			.put(0, (p, click, it) -> {
-				if (!players.containsKey(p))
-					return;
-
-				PlayerEditorData data = players.get(p);
+	public final Map<Integer, BiConsumer<PlayerEditorData, Action>> invItems = ImmutableMap.<Integer, BiConsumer<PlayerEditorData, Action>>builder()
+			.put(0, (pData, click) -> {				
 				List<ArmorstandPart> list = Arrays.asList(ArmorstandPart.values());
-				int index = click == Action.LEFT_CLICK_AIR ? 1 : list.size() - 1;
 				
-				data.entPart = list.get(list.indexOf(data.entPart) + index % list.size());
-				data.entSide = ArmorstandSide.ALL;
+				pData.entPart = ArmorstandPart.values()[(list.indexOf(pData.entPart) + 1) % list.size()];
 				
-				p.getInventory().setItem(0, data.entPart.item);
-				p.getInventory().setItem(1, data.entSide.item);
+				pData.p.getInventory().setItem(0, pData.entPart.item);
+				pData.menuInventory[0] = pData.entPart.item;
+				//pData.p.getInventory().setItem(1, pData.entSide.item);
+				//pData.menuInventory[1] = pData.entSide.item;
 			})
 			
-			.put(1, (p, click, it) -> {
-				if (!players.containsKey(p))
-					return;
-
-				PlayerEditorData data = players.get(p);
+			.put(1, (pData, click) -> {				
 				List<ArmorstandSide> list = Arrays.asList(ArmorstandSide.values());
-				int index = click == Action.LEFT_CLICK_AIR ? 1 : list.size() - 1;
+				
+				pData.entSide = ArmorstandSide.values()[(list.indexOf(pData.entSide) + 1) % list.size()];
 
-				data.entSide = list.get(list.indexOf(data.entSide) + index % list.size());
-
-				p.getInventory().setItem(1, data.entSide.item);
+				pData.p.getInventory().setItem(1, pData.entSide.item);
+				pData.menuInventory[1] = pData.entSide.item;
 			})
 			
-			.put(7, (p, click, it) -> {
-				if (players.containsKey(p))
-					new ArmorstandEditorGui(players.get(p).ent).create(p);
+			.put(3, (pData, click) -> {
+				pData.modifyAngle(ArmorstandAxis.X, click == Action.LEFT_CLICK_AIR ? modifierStep : -modifierStep);
 			})
 			
-			.put(8, (p, click, it) -> {
-				closeFor(p);
+			.put(4, (pData, click) -> {
+				pData.modifyAngle(ArmorstandAxis.Y, click == Action.LEFT_CLICK_AIR ? modifierStep : -modifierStep);
+			})
+			
+			.put(5, (pData, click) -> {
+				pData.modifyAngle(ArmorstandAxis.Z, click == Action.LEFT_CLICK_AIR ? modifierStep : -modifierStep);
+			})
+			
+			.put(7, (pData, click) -> {
+					new ArmorstandEditorGui(pData.ent).create(pData.p);
+			})
+			
+			.put(8, (pData, click) -> {
+				closeFor(pData.p);
 			})
 			.build();
 	
+	private static final Set<Player> waitingEntSelection = new HashSet<Player>();
 	private static final Map<Player, PlayerEditorData> players = new HashMap<Player, PlayerEditorData>();
-	private OlympaCreatifMain plugin;
+	private static OlympaCreatifMain plugin;
 	
 	ArmorStandManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 	
-	public void openFor(OlympaPlayerCreatif pc, ArmorStand ent) {
-		players.put(pc, plugin.getTask().scheduleSyncRepeatingTask(() -> {
-			if (pc.getPlayer().getInventory().getItemInMainHand() != null)
-				pc.getPlayer().sendActionBar(pc.getPlayer().getInventory().getItemInMainHand().displayName());
-			else
-				pc.getPlayer().sendActionBar(Component.text(""));
-		}, 1, 5));
+	public void listeningFor(Player p) {
+		if (waitingEntSelection.add(p))
+			plugin.getTask().runTaskLater(() -> {
+				if (waitingEntSelection.remove(p))
+					OCmsg.ARMORSTAND_EDITOR_SELECT_ARMORSTAND_TOO_LONG.send(p);
+			}, 100);
 	}
 	
 	public void closeFor(Player p) {
-		if (players.containsKey(p)) {
-			p.getPlayer().closeInventory();
-			plugin.getTask().cancelTaskById(players.remove(p));	
+		if (players.containsKey(p))
+			players.remove(p).close();
+	}
+	
+	
+	
+	
+	@EventHandler
+	public void onInterractEntity(PlayerInteractAtEntityEvent e) {
+		if (e.getRightClicked().getType() == EntityType.ARMOR_STAND && waitingEntSelection.remove(e.getPlayer())) {
+			OCmsg.ARMORSTAND_EDITOR_OPEN.send(e.getPlayer());
+			players.put(e.getPlayer(), new PlayerEditorData(e.getPlayer(), (ArmorStand) e.getRightClicked()));
+			
+			e.setCancelled(true);
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOW)
 	public void onInterract(PlayerInteractEvent e) {
-		if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK)
-			
+		PlayerEditorData data = players.get(e.getPlayer());
+		if (data == null)
+			return;
+
+		BiConsumer<PlayerEditorData, Action> consumer = invItems.get(e.getPlayer().getInventory().getHeldItemSlot());
+		if (consumer != null)
+			if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK)
+				consumer.accept(data, Action.LEFT_CLICK_AIR);
+			else if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)
+				consumer.accept(data, Action.RIGHT_CLICK_AIR);
+		
+		e.setCancelled(true);
 	}
 	
 	public class ArmorstandEditorGui extends OlympaGUI {
@@ -136,7 +148,7 @@ public class ArmorStandManager {
 			
 			guiItems.forEach((slot, item) -> inv.setItem(slot, item.get(armorstand, null)));
 			inv.setItem(7, ItemUtils.itemSeparator(DyeColor.LIGHT_GRAY));
-			inv.setItem(8, validate);
+			inv.setItem(8, ItemUtils.skullCustom("§2Valider", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjViNWZhYThlNDgxZmNiODRjYmVmMWU1YzQyMGQ2YTgxYTZlNjhmNWEwNzUwMDFhMDI4ODI1YWMyMDE4ZWJlNyJ9fX0="));
 		}
 		
 		@Override
@@ -169,9 +181,7 @@ public class ArmorStandManager {
 			this.setValue = setValue;
 		}
 		
-		public abstract ItemStack get(ArmorStand ent, ClickType click); //{
-			//return onClick.apply(ent, click);
-		//}
+		public abstract ItemStack get(ArmorStand ent, ClickType click);
 		
 		public int getSlot() {
 			return slot;
@@ -182,7 +192,7 @@ public class ArmorStandManager {
 
 		public GuiItemToggle(int slot, String paramName, Material mat, Function<ArmorStand, Boolean> getValue, 
 				BiConsumer<ArmorStand, Boolean> setValue) {
-			this(slot, paramName, new ItemStack(mat), getValue, setValue);
+			this(slot, "§6" + paramName, new ItemStack(mat), getValue, setValue);
 		}
 		
 		public GuiItemToggle(int slot, String paramName, ItemStack item, Function<ArmorStand, Boolean> getValue, 
@@ -239,21 +249,113 @@ public class ArmorStandManager {
 	
 	static class PlayerEditorData {
 		
-		private int taskId;
+		private static ItemStack[] defaultInv = new ItemStack[] {
+				ArmorstandPart.BODY.item, 
+				ArmorstandSide.ALL.item, 
+				ItemUtils.itemSeparator(DyeColor.GRAY),
+				ItemUtils.skullCustom("§6Rotation selon l'axe X §7(clic gauche = sens horaire | clic droit = sens antihoraire)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmNjNWZhZTNiNjUwZTZlZGIzMjQ1ZmE0MWU1YmUyZGE3OWIwZTE3ZjIyYzRiNGUxZTU5YjMyZjU3MzIwMmQxOCJ9fX0="),
+				ItemUtils.skullCustom("§6Rotation selon l'axe Y §7(clic gauche = sens horaire | clic droit = sens antihoraire)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzY3NDc3ZjljYjVmMDM2NDM4Y2U5OGNlNjk3YjkxMzU4Y2I5NzY0MWM1ZDE1M2E3ZTM4ODhkYWUzMmUyMTUifX19"),
+				ItemUtils.skullCustom("§6Rotation selon l'axe Z §7(clic gauche = sens horaire | clic droit = sens antihoraire)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2ZhNzMwYjVlYzczY2VhZjRhYWQ1MjRlMjA3ZmYzMWRmNzg1ZTdhYjZkYjFhZWIzZjFhYTRkMjQ1ZWQyZSJ9fX0="),
+				ItemUtils.itemSeparator(DyeColor.GRAY),
+				ItemUtils.skullCustom("§bParamètres avancés", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWMyZmYyNDRkZmM5ZGQzYTJjZWY2MzExMmU3NTAyZGM2MzY3YjBkMDIxMzI5NTAzNDdiMmI0NzlhNzIzNjZkZCJ9fX0="),
+				ItemUtils.skullCustom("§2Valider", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjViNWZhYThlNDgxZmNiODRjYmVmMWU1YzQyMGQ2YTgxYTZlNjhmNWEwNzUwMDFhMDI4ODI1YWMyMDE4ZWJlNyJ9fX0=")}; 
+		
+		private Player p;
 		private ArmorStand ent;
+		private int taskId;
+		
 		private ArmorstandPart entPart = ArmorstandPart.BODY;
 		private ArmorstandSide entSide = ArmorstandSide.ALL;
 		
+		private ItemStack[] menuInventory;
 		private ItemStack[] savedInventory;
 		
+		PlayerEditorData(Player p, ArmorStand ent) {
+			this.p = p;
+			this.ent = ent;
+			menuInventory = defaultInv.clone();
+			savedInventory = p.getInventory().getContents();
+			taskId = plugin.getTask().scheduleSyncRepeatingTask(() -> p.getInventory().setContents(menuInventory), 1, 10);
+		}
+		
+		public void close() {
+			p.closeInventory();
+			plugin.getTask().cancelTaskById(taskId);
+			p.getInventory().setContents(savedInventory);
+			OCmsg.ARMORSTAND_EDITOR_EXIT.send(p);
+		}
+		
+		public void modifyAngle(ArmorstandAxis axis, int modifier) {
+			switch(entPart) {
+			case ARMS:
+				switch (entSide) {
+				case ALL:
+					ent.setLeftArmPose(getNewAngle(ent.getLeftArmPose(), axis, modifier));
+					ent.setRightArmPose(getNewAngle(ent.getRightArmPose(), axis, modifier));
+					break;
+					
+				case LEFT:
+					ent.setLeftArmPose(getNewAngle(ent.getLeftArmPose(), axis, modifier));
+					break;
+					
+				case RIGHT:
+					ent.setRightArmPose(getNewAngle(ent.getRightArmPose(), axis, modifier));
+					break;
+				}
+				break;
+
+			case BODY:
+				ent.setRotation(Math.floorMod((int) (ent.getLocation().getYaw() + modifier), 360), ent.getLocation().getPitch());
+				break;
+				
+			case CHEST:
+				ent.setBodyPose(getNewAngle(ent.getBodyPose(), axis, modifier));
+				break;
+				
+			case HEAD:
+				ent.setHeadPose(getNewAngle(ent.getHeadPose(), axis, modifier));
+				break;
+				
+			case LEGS:
+				switch (entSide) {
+				case ALL:
+					ent.setLeftLegPose(getNewAngle(ent.getLeftLegPose(), axis, modifier));
+					ent.setRightLegPose(getNewAngle(ent.getRightLegPose(), axis, modifier));
+					break;
+					
+				case LEFT:
+					ent.setLeftLegPose(getNewAngle(ent.getLeftLegPose(), axis, modifier));
+					break;
+					
+				case RIGHT:
+					ent.setRightLegPose(getNewAngle(ent.getRightLegPose(), axis, modifier));
+					break;
+				}
+				break;
+			}
+		}
+		
+		private EulerAngle getNewAngle(EulerAngle angle, ArmorstandAxis axis, int modifier) {
+			
+			switch(axis) {
+			case X:
+				return angle.setX(Math.toRadians(Math.floorMod((int) (Math.toDegrees(angle.getX()) + modifier), 360)));
+			case Y:
+				return angle.setY(Math.toRadians(Math.floorMod((int) (Math.toDegrees(angle.getY()) + modifier), 360)));
+			case Z:
+				return angle.setZ(Math.toRadians(Math.floorMod((int) (Math.toDegrees(angle.getZ()) + modifier), 360)));
+			default:
+				return null;
+			}
+		}
 	}
 	
 	static enum ArmorstandPart {
-		BODY(ItemUtils.item(Material.ARMOR_STAND, "Rotation porte armure")),
-		HEAD(ItemUtils.item(Material.GOLDEN_HELMET, "Rotation de la tête")),
-		CHEST(ItemUtils.item(Material.GOLDEN_CHESTPLATE, "Rotation du corps")),
-		LEGGINGS(ItemUtils.item(Material.GOLDEN_LEGGINGS, "Rotation des jambes")),
-		ARMS(ItemUtils.item(Material.STICK, "Rotation des bras"))
+		BODY(ItemUtils.item(Material.ARMOR_STAND, "§aRotation porte armure §7(clic gauche pour changer)")),
+		HEAD(ItemUtils.item(Material.GOLDEN_HELMET, "§aRotation de la tête §7(clic gauche pour changer)")),
+		CHEST(ItemUtils.item(Material.GOLDEN_CHESTPLATE, "§aRotation du corps §7(clic gauche pour changer)")),
+		LEGS(ItemUtils.item(Material.GOLDEN_LEGGINGS, "§aRotation des jambes §7(clic gauche pour changer)")),
+		ARMS(ItemUtils.item(Material.GOLDEN_SWORD, "§aRotation des bras §7(clic gauche pour changer)"))
 		;
 		
 		ItemStack item;
@@ -262,15 +364,11 @@ public class ArmorStandManager {
 			this.item = item;
 		}
 	}
-
-	/*public final static ItemStack arrowRight = ItemUtils.skullCustom("§eMouvement sur partie §adroite §edu porte armure", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQxZmY2YmM2N2E0ODEyMzJkMmU2NjllNDNjNGYwODdmOWQyMzA2NjY1YjRmODI5ZmI4Njg5MmQxM2I3MGNhIn19fQ==");
-	public final static ItemStack arrowLeft = ItemUtils.skullCustom("§eMouvement sur partie §agauche §edu porte armure", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDliMmJlZTM5YjZlZjQ3ZTE4MmQ2ZjFkY2E5ZGVhODQyZmNkNjhiZGE5YmFjYzZhNmQ2NmE4ZGNkZjNlYyJ9fX0=");
-	public final static ItemStack arrowEquals = ItemUtils.skullCustom("§eMouvement sur partie §aentière §edu porte armure", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzY2MzNhZTVlYjcxMjFmOGJkZTVhY2RmODdhMDlmNjc4MDBkN2NlZGY0MTkwZjEyOWU3OGVmZWU5ZTYzIn19fQ==");*/
 	
 	static enum ArmorstandSide {
-		RIGHT(ItemUtils.skullCustom("§eMouvement sur partie §adroite §edu porte armure", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQxZmY2YmM2N2E0ODEyMzJkMmU2NjllNDNjNGYwODdmOWQyMzA2NjY1YjRmODI5ZmI4Njg5MmQxM2I3MGNhIn19fQ==")),
-		LEFT(ItemUtils.skullCustom("§eMouvement sur partie §agauche §edu porte armure", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDliMmJlZTM5YjZlZjQ3ZTE4MmQ2ZjFkY2E5ZGVhODQyZmNkNjhiZGE5YmFjYzZhNmQ2NmE4ZGNkZjNlYyJ9fX0=")),
-		ALL(ItemUtils.skullCustom("§eMouvement sur partie §aentière §edu porte armure", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzY2MzNhZTVlYjcxMjFmOGJkZTVhY2RmODdhMDlmNjc4MDBkN2NlZGY0MTkwZjEyOWU3OGVmZWU5ZTYzIn19fQ==")),
+		RIGHT(ItemUtils.skullCustom("§eMouvement sur moitiée §adroite §edu porte armure §7(clic gauche pour changer)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTQxZmY2YmM2N2E0ODEyMzJkMmU2NjllNDNjNGYwODdmOWQyMzA2NjY1YjRmODI5ZmI4Njg5MmQxM2I3MGNhIn19fQ==")),
+		LEFT(ItemUtils.skullCustom("§eMouvement sur moitiée §agauche §edu porte armure §7(clic gauche pour changer)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDliMmJlZTM5YjZlZjQ3ZTE4MmQ2ZjFkY2E5ZGVhODQyZmNkNjhiZGE5YmFjYzZhNmQ2NmE4ZGNkZjNlYyJ9fX0=")),
+		ALL(ItemUtils.skullCustom("§eMouvement sur la §atotalité §edu porte armure §7(clic gauche pour changer)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzY2MzNhZTVlYjcxMjFmOGJkZTVhY2RmODdhMDlmNjc4MDBkN2NlZGY0MTkwZjEyOWU3OGVmZWU5ZTYzIn19fQ==")),
 		;
 		
 		ItemStack item;
@@ -278,6 +376,13 @@ public class ArmorStandManager {
 		ArmorstandSide(ItemStack item) {
 			this.item = item;
 		}
+	}
+	
+	static enum ArmorstandAxis {
+		X,
+		Y,
+		Z,
+		;
 	}
 }
 

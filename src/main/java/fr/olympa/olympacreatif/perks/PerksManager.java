@@ -10,6 +10,7 @@ public class PerksManager {
 	private KitsManager kitsManager;
 	private UpgradesManager upgradesManager;
 	private MusicManager musicManager;
+	private ArmorStandManager armorstandManager;
 	
 	public PerksManager(OlympaCreatifMain olympaCreatifMain) {
 		this.plugin = olympaCreatifMain;
@@ -18,6 +19,7 @@ public class PerksManager {
 		kitsManager = new KitsManager(plugin);
 		upgradesManager = new UpgradesManager(plugin);
 		musicManager = new MusicManager(plugin);
+		armorstandManager = new ArmorStandManager(plugin);
 	}
 
 	public MicroBlocks getMicroBlocks() {
@@ -39,5 +41,8 @@ public class PerksManager {
 	public MusicManager getSongManager() {
 		return musicManager;		
 	}
-
+	
+	public ArmorStandManager getArmorStandManager() {
+		return armorstandManager;		
+	}
 }
