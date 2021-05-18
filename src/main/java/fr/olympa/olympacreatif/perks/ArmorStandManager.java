@@ -18,9 +18,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 
@@ -109,14 +112,33 @@ public class ArmorStandManager implements Listener {
 			players.remove(p).close();
 	}
 	
+
 	
+	@EventHandler
+	public void onDamage(EntityDamageByEntityEvent e) {
+		if (players.containsKey(e.getDamager()))
+			e.setCancelled(true);
+	}
 	
+	@EventHandler
+	public void onDamage(PlayerArmorStandManipulateEvent e) {
+		if (players.containsKey(e.getPlayer()))
+			e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onQuit(PlayerQuitEvent e) {
+		if (players.containsKey(e.getPlayer()))
+			players.remove(e.getPlayer()).close();
+	}
 	
 	@EventHandler
 	public void onInterractEntity(PlayerInteractAtEntityEvent e) {
 		if (e.getRightClicked().getType() == EntityType.ARMOR_STAND && waitingEntSelection.remove(e.getPlayer())) {
-			OCmsg.ARMORSTAND_EDITOR_OPEN.send(e.getPlayer());
-			players.put(e.getPlayer(), new PlayerEditorData(e.getPlayer(), (ArmorStand) e.getRightClicked()));
+			if (!players.containsKey(e.getPlayer())) {
+				players.put(e.getPlayer(), new PlayerEditorData(e.getPlayer(), (ArmorStand) e.getRightClicked()));	
+				OCmsg.ARMORSTAND_EDITOR_OPEN.send(e.getPlayer());
+			}
 			
 			e.setCancelled(true);
 		}
