@@ -395,7 +395,7 @@ public class OCmsg {
 	}
 	
 	public void send(OlympaPlayerCreatif pc, Object... objs) {
-		if (delayedMessages.get(pc.getPlayer()).contains(this) || pc.getPlayer() == null)
+		if (!delayedMessages.containsKey(pc.getPlayer()) || delayedMessages.get(pc.getPlayer()).contains(this))
 			return;
 		
 		if (delay > 0 && delayedMessages.containsKey(pc.getPlayer())) {

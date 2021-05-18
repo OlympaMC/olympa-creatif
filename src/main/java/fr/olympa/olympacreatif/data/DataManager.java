@@ -51,9 +51,6 @@ public class DataManager implements Listener {
 
 	private OlympaCreatifMain plugin;
 
-	//private Vector<PlotId> plotsToLoad = new Vector<>();
-	//private Vector<Plot> plotsToSave = new Vector<>();
-
 	private int serverIndex = -1;
 
 	private int nextPlotSyncInstantiateTick = 1;

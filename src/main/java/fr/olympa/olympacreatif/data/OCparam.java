@@ -29,8 +29,9 @@ public class OCparam<T> {
 	public static final OCparam<Integer> CB_MAX_TEAMS_PER_PLOT = new OCparam<Integer>(0);
 	public static final OCparam<Integer> CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION = new OCparam<Integer>(10000);
 	
-	public static final OCparam<Integer> MAX_ENTITIES_PER_TYPE_PER_PLOT = new OCparam<Integer>(0);
-	public static final OCparam<Integer> MAX_TOTAL_ENTITIES_PER_PLOT = new OCparam<Integer>(0);
+	public static final OCparam<Integer> MAX_ENTITIES_PER_TYPE_PER_PLOT = new OCparam<Integer>(50);
+	public static final OCparam<Integer> MAX_TOTAL_ENTITIES_PER_PLOT = new OCparam<Integer>(60);
+	//public static final OCparam<Integer> MAX_HANGINGS_PER_PLOT = new OCparam<Integer>(50);
 	
 	public static final OCparam<String> WORLD_NAME = new OCparam<String>("world");
 	public static final OCparam<Position> SPAWN_LOC = new OCparam<Position>(new Position());

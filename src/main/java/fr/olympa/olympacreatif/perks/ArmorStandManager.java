@@ -9,7 +9,10 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import javax.print.attribute.standard.PDLOverrideSupported;
+
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -19,19 +22,25 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
-
 import com.google.common.collect.ImmutableMap;
+
+import fr.olympa.api.editor.Editor;
+import fr.olympa.api.editor.TextEditor;
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
+import net.md_5.bungee.api.ChatColor;
 
 public class ArmorStandManager implements Listener {
 	
@@ -69,20 +78,58 @@ public class ArmorStandManager implements Listener {
 				pData.menuInventory[1] = pData.entSide.item;
 			})
 			
+			.put(2, (pData, click) -> {
+				pData.modifyValue(ArmorstandAxis.X, click == Action.LEFT_CLICK_AIR ? modifierStep : -modifierStep);
+			})
+			
 			.put(3, (pData, click) -> {
-				pData.modifyAngle(ArmorstandAxis.X, click == Action.LEFT_CLICK_AIR ? modifierStep : -modifierStep);
+				pData.modifyValue(ArmorstandAxis.Y, click == Action.LEFT_CLICK_AIR ? modifierStep : -modifierStep);
 			})
 			
 			.put(4, (pData, click) -> {
-				pData.modifyAngle(ArmorstandAxis.Y, click == Action.LEFT_CLICK_AIR ? modifierStep : -modifierStep);
+				pData.modifyValue(ArmorstandAxis.Z, click == Action.LEFT_CLICK_AIR ? modifierStep : -modifierStep);
 			})
 			
 			.put(5, (pData, click) -> {
-				pData.modifyAngle(ArmorstandAxis.Z, click == Action.LEFT_CLICK_AIR ? modifierStep : -modifierStep);
+				if (pData.ent.isDead()) {
+					closeFor(pData.p);
+					return;
+				}
+				
+				ArmorStand newEnt = (ArmorStand) plugin.getWorldManager().getWorld().spawnEntity(pData.p.getLocation().getBlock().getLocation().clone().add(0.5, 0, 0.5), EntityType.ARMOR_STAND);
+				
+				newEnt.setBodyPose(pData.ent.getBodyPose());
+				newEnt.setHeadPose(pData.ent.getHeadPose());
+				newEnt.setLeftArmPose(pData.ent.getLeftArmPose());
+				newEnt.setLeftLegPose(pData.ent.getLeftLegPose());
+				newEnt.setRightArmPose(pData.ent.getRightArmPose());
+				newEnt.setRightLegPose(pData.ent.getRightLegPose());
+				newEnt.setRotation(pData.ent.getLocation().getYaw(), pData.ent.getLocation().getPitch());
+
+				newEnt.setBasePlate(pData.ent.hasBasePlate());
+				newEnt.setArms(pData.ent.hasArms());
+				newEnt.setGlowing(pData.ent.isGlowing());
+				newEnt.setSmall(pData.ent.isSmall());
+				newEnt.setInvulnerable(pData.ent.isInvulnerable());
+				
+				newEnt.setCustomNameVisible(true);
+				newEnt.customName(pData.ent.customName());
+				
+				Arrays.asList(EquipmentSlot.values()).forEach(slot -> newEnt.setItem(slot, pData.ent.getItem(slot)));
+			})
+			
+			.put(6, (pData, click) -> {
+				if (!pData.ent.isDead())
+					pData.moveTo(pData.p.getLocation());
+				else
+					closeFor(pData.p);
 			})
 			
 			.put(7, (pData, click) -> {
-					new ArmorstandEditorGui(pData.ent).create(pData.p);
+				if (!pData.ent.isDead())
+					new ArmorstandEditorGui(pData).create(pData.p);
+				else
+					closeFor(pData.p);
 			})
 			
 			.put(8, (pData, click) -> {
@@ -113,6 +160,13 @@ public class ArmorStandManager implements Listener {
 	}
 	
 
+	
+	
+	@EventHandler
+	public void onEntityLaunched(ProjectileLaunchEvent e) {
+		if (players.containsKey(e.getEntity().getShooter()))
+			e.setCancelled(true);
+	}
 	
 	@EventHandler
 	public void onDamage(EntityDamageByEntityEvent e) {
@@ -162,13 +216,14 @@ public class ArmorStandManager implements Listener {
 	
 	public class ArmorstandEditorGui extends OlympaGUI {
 		
-		private ArmorStand armorstand;
+		private PlayerEditorData editor;
 		
-		public ArmorstandEditorGui(ArmorStand armorstand) {
-			super(armorstand.getCustomName() == null ? "Edition de porte-armure" : "Edition du porte-armure " + armorstand.getCustomName() , 1);
-			this.armorstand = armorstand;
+		public ArmorstandEditorGui(PlayerEditorData editor) {
+			super(editor.ent.getCustomName() == null ? "Edition de porte-armure" : "Edition du porte-armure " + editor.ent.getCustomName() , 1);
+			this.editor = editor;
 			
-			guiItems.forEach((slot, item) -> inv.setItem(slot, item.get(armorstand, null)));
+			guiItems.forEach((slot, item) -> inv.setItem(slot, item.get(editor.ent, null)));
+			inv.setItem(6, ItemUtils.item(Material.NAME_TAG, "§6Définir le nom du porte-armure", "§7Cliquez pour donner un nom", "§7spécifique au porte-armure"));
 			inv.setItem(7, ItemUtils.itemSeparator(DyeColor.LIGHT_GRAY));
 			inv.setItem(8, ItemUtils.skullCustom("§2Valider", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjViNWZhYThlNDgxZmNiODRjYmVmMWU1YzQyMGQ2YTgxYTZlNjhmNWEwNzUwMDFhMDI4ODI1YWMyMDE4ZWJlNyJ9fX0="));
 		}
@@ -176,7 +231,29 @@ public class ArmorStandManager implements Listener {
 		@Override
 		public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 			if (slot < guiItems.size())
-				inv.setItem(slot, guiItems.get(slot).get(armorstand, click));
+				inv.setItem(slot, guiItems.get(slot).get(editor.ent, click));
+			else if (slot == 6) {
+				Prefix.DEFAULT_GOOD.sendMessage(p, "§aEcrivez le nom du porte-armure, ou §7none §apour annuler :");
+				Editor.leave(p);
+				
+				new TextEditor<String>(p, s -> {
+					if (editor.ent.isDead()) {
+						closeFor(p);
+						return;
+					}
+					
+					if (!s.equals("none")) {
+						editor.ent.setCustomNameVisible(true);
+						editor.ent.setCustomName(ChatColor.translateAlternateColorCodes('&', s));
+						Prefix.DEFAULT_GOOD.sendMessage(p, "Nom du porte-armure défini à " + editor.ent.getCustomName() + ".");
+					}else {
+						editor.ent.setCustomNameVisible(false);
+						editor.ent.setCustomName(null);	
+						Prefix.DEFAULT_GOOD.sendMessage(p, "Nom du porte-armure supprimé.");
+					}
+					
+				}, null, true).enterOrLeave();
+			}
 			else if (slot == 8)
 				inv.close();
 			
@@ -274,12 +351,13 @@ public class ArmorStandManager implements Listener {
 		private static ItemStack[] defaultInv = new ItemStack[] {
 				ArmorstandPart.BODY.item, 
 				ArmorstandSide.ALL.item, 
-				ItemUtils.itemSeparator(DyeColor.GRAY),
-				ItemUtils.skullCustom("§6Rotation selon l'axe X §7(clic gauche = sens horaire | clic droit = sens antihoraire)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmNjNWZhZTNiNjUwZTZlZGIzMjQ1ZmE0MWU1YmUyZGE3OWIwZTE3ZjIyYzRiNGUxZTU5YjMyZjU3MzIwMmQxOCJ9fX0="),
-				ItemUtils.skullCustom("§6Rotation selon l'axe Y §7(clic gauche = sens horaire | clic droit = sens antihoraire)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzY3NDc3ZjljYjVmMDM2NDM4Y2U5OGNlNjk3YjkxMzU4Y2I5NzY0MWM1ZDE1M2E3ZTM4ODhkYWUzMmUyMTUifX19"),
-				ItemUtils.skullCustom("§6Rotation selon l'axe Z §7(clic gauche = sens horaire | clic droit = sens antihoraire)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2ZhNzMwYjVlYzczY2VhZjRhYWQ1MjRlMjA3ZmYzMWRmNzg1ZTdhYjZkYjFhZWIzZjFhYTRkMjQ1ZWQyZSJ9fX0="),
-				ItemUtils.itemSeparator(DyeColor.GRAY),
-				ItemUtils.skullCustom("§bParamètres avancés", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWMyZmYyNDRkZmM5ZGQzYTJjZWY2MzExMmU3NTAyZGM2MzY3YjBkMDIxMzI5NTAzNDdiMmI0NzlhNzIzNjZkZCJ9fX0="),
+				//ItemUtils.itemSeparator(DyeColor.GRAY),
+				ItemUtils.skullCustom("§6Mouvement selon X §7(clic gauche = sens horaire | clic droit = sens antihoraire)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmNjNWZhZTNiNjUwZTZlZGIzMjQ1ZmE0MWU1YmUyZGE3OWIwZTE3ZjIyYzRiNGUxZTU5YjMyZjU3MzIwMmQxOCJ9fX0="),
+				ItemUtils.skullCustom("§6Mouvement selon Y §7(clic gauche = sens horaire | clic droit = sens antihoraire)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzY3NDc3ZjljYjVmMDM2NDM4Y2U5OGNlNjk3YjkxMzU4Y2I5NzY0MWM1ZDE1M2E3ZTM4ODhkYWUzMmUyMTUifX19"),
+				ItemUtils.skullCustom("§6Mouvement selon Z §7(clic gauche = sens horaire | clic droit = sens antihoraire)", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2ZhNzMwYjVlYzczY2VhZjRhYWQ1MjRlMjA3ZmYzMWRmNzg1ZTdhYjZkYjFhZWIzZjFhYTRkMjQ1ZWQyZSJ9fX0="),
+				ItemUtils.item(Material.ENCHANTING_TABLE, "§bDupliquer le porte-armure"),
+				ItemUtils.item(Material.ENDER_PEARL, "§bTéléporter le porte-armure"),
+				ItemUtils.skullCustom("§9Paramètres avancés", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWMyZmYyNDRkZmM5ZGQzYTJjZWY2MzExMmU3NTAyZGM2MzY3YjBkMDIxMzI5NTAzNDdiMmI0NzlhNzIzNjZkZCJ9fX0="),
 				ItemUtils.skullCustom("§2Valider", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjViNWZhYThlNDgxZmNiODRjYmVmMWU1YzQyMGQ2YTgxYTZlNjhmNWEwNzUwMDFhMDI4ODI1YWMyMDE4ZWJlNyJ9fX0=")}; 
 		
 		private Player p;
@@ -301,13 +379,19 @@ public class ArmorStandManager implements Listener {
 		}
 		
 		public void close() {
+			Editor.leave(p);
 			p.closeInventory();
 			plugin.getTask().cancelTaskById(taskId);
 			p.getInventory().setContents(savedInventory);
 			OCmsg.ARMORSTAND_EDITOR_EXIT.send(p);
 		}
 		
-		public void modifyAngle(ArmorstandAxis axis, int modifier) {
+		public void modifyValue(ArmorstandAxis axis, double modifier) {
+			if (ent.isDead()) {
+				plugin.getPerksManager().getArmorStandManager().closeFor(p);
+				return;
+			}
+			
 			switch(entPart) {
 			case ARMS:
 				switch (entSide) {
@@ -327,7 +411,10 @@ public class ArmorStandManager implements Listener {
 				break;
 
 			case BODY:
-				ent.setRotation(Math.floorMod((int) (ent.getLocation().getYaw() + modifier), 360), ent.getLocation().getPitch());
+				if (axis == ArmorstandAxis.Y)
+					ent.setRotation(Math.floorMod((int) (ent.getLocation().getYaw() + modifier), 360), ent.getLocation().getPitch());
+				else
+					ent.setRotation(ent.getLocation().getYaw(), Math.floorMod((int) (ent.getLocation().getPitch() + 90 + modifier), 180) - 90);
 				break;
 				
 			case CHEST:
@@ -354,10 +441,43 @@ public class ArmorStandManager implements Listener {
 					break;
 				}
 				break;
+				
+			case POSITION:
+				modifier = modifier > 0 ? 0.1 : -0.1;
+				switch (axis) {
+				case X:
+					moveTo(ent.getLocation().add(modifier, 0, 0));
+					break;
+				case Y:
+					moveTo(ent.getLocation().add(0, modifier, 0));
+					break;
+				case Z:
+					moveTo(ent.getLocation().add(0, 0, modifier));
+					break;
+				}
+				break;
 			}
+			
 		}
 		
-		private EulerAngle getNewAngle(EulerAngle angle, ArmorstandAxis axis, int modifier) {
+		private void moveTo(Location loc) {
+			EulerAngle[] pose = new EulerAngle[] {ent.getBodyPose(), ent.getHeadPose(), ent.getLeftArmPose(), ent.getLeftLegPose(), ent.getRightArmPose(), ent.getRightLegPose()};
+			float yaw = ent.getLocation().getYaw();
+			float pitch = ent.getLocation().getPitch();
+
+			ent.teleport(loc);
+			
+			ent.setBodyPose(pose[0]);
+			ent.setHeadPose(pose[1]);
+			ent.setLeftArmPose(pose[2]);
+			ent.setLeftLegPose(pose[3]);
+			ent.setRightArmPose(pose[4]);
+			ent.setRightLegPose(pose[5]);
+			ent.setRotation(yaw, pitch);
+		}
+		
+		//modifier in degrees
+		private EulerAngle getNewAngle(EulerAngle angle, ArmorstandAxis axis, double modifier) {
 			
 			switch(axis) {
 			case X:
@@ -373,11 +493,12 @@ public class ArmorStandManager implements Listener {
 	}
 	
 	static enum ArmorstandPart {
-		BODY(ItemUtils.item(Material.ARMOR_STAND, "§aRotation porte armure §7(clic gauche pour changer)")),
+		BODY(ItemUtils.item(Material.ARMOR_STAND, "§aRotation porte-armure §7(clic gauche pour changer)")),
 		HEAD(ItemUtils.item(Material.GOLDEN_HELMET, "§aRotation de la tête §7(clic gauche pour changer)")),
 		CHEST(ItemUtils.item(Material.GOLDEN_CHESTPLATE, "§aRotation du corps §7(clic gauche pour changer)")),
 		LEGS(ItemUtils.item(Material.GOLDEN_LEGGINGS, "§aRotation des jambes §7(clic gauche pour changer)")),
-		ARMS(ItemUtils.item(Material.GOLDEN_SWORD, "§aRotation des bras §7(clic gauche pour changer)"))
+		ARMS(ItemUtils.item(Material.GOLDEN_SWORD, "§aRotation des bras §7(clic gauche pour changer)")),
+		POSITION(ItemUtils.item(Material.ENDER_EYE, "§aPosition du porte-armure §7(clic gauche pour changer)"))
 		;
 		
 		ItemStack item;

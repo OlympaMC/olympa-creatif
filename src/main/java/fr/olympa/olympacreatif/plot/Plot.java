@@ -12,6 +12,7 @@ import java.util.Vector;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,7 +24,9 @@ import org.bukkit.WeatherType;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Player;
+import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
@@ -62,6 +65,7 @@ public class Plot {
 	
 	private Set<Player> playersInPlot = new HashSet<Player>();
 	private List<Entity> entitiesInPlot = new ArrayList<Entity>();
+	//private List<Entity> hangingsInPlot = new ArrayList<Entity>();
 	
 	private boolean allowLiquidFlow = false;
 	
@@ -187,20 +191,15 @@ public class Plot {
 		if (entitiesInPlot.contains(e) || e.getType() == EntityType.PLAYER)
 			return;
 		
-		if (entitiesInPlot.size() == OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.get()) 
+		if (/*!isHanging(e) && */entitiesInPlot.size() == OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.get()) 
 			removeEntityInPlot(entitiesInPlot.get(0), true);
 		
-		int count = 0;
-		Entity toRemove = null;
+		List<Entity> list = entitiesInPlot.stream().filter(ent -> ent.getType() == e.getType()).collect(Collectors.toList());
+		long count = list.size();
+		Entity toRemove = count == 0 ? null : list.get(0);
 		
-		for (Entity ent : entitiesInPlot)
-			if (ent.getType() == e.getType()) {
-				count++;
-				if (toRemove == null)
-					toRemove = ent;
-			}
-		
-		if (count >= OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.get() && toRemove != null) {
+		if (/*isHanging(e) ? count >= OCparam.MAX_HANGINGS_PER_PLOT.get() : */count >= OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.get() 
+				&& toRemove != null) {
 			removeEntityInPlot(toRemove, true);
 		}
 			
@@ -214,12 +213,12 @@ public class Plot {
 		cbData.clearEntityDatas(e);
 	}
 	
-	public Set<Player> getPlayers(){
+	public Set<Player> getPlayers() {
 		return Collections.unmodifiableSet(playersInPlot);
 	}
 	
 	
-	public synchronized List<Entity> getEntities(){
+	public synchronized List<Entity> getEntities() {
 		return new ArrayList<Entity>(entitiesInPlot);
 	}
 	
@@ -419,6 +418,10 @@ public class Plot {
 			plugin.getWEManager().clearClipboard(this, p);
 		
 		plugin.getPerksManager().getArmorStandManager().closeFor(p);
+	}
+	
+	private boolean isHanging(Entity ent) {
+		return ent.getType() == EntityType.ARMOR_STAND || ent.getType() == EntityType.ITEM_FRAME || ent.getType() == EntityType.PAINTING;
 	}
 	
 	@Override

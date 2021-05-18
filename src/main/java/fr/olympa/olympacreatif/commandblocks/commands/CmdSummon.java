@@ -22,7 +22,6 @@ public class CmdSummon extends CbCommand {
 
 	//private static List<EntityType> allowedEntities = new ArrayList<EntityType>();
 	public static Set<EntityType> allowedEntities  = ImmutableSet.<EntityType>builder()
-			.add(EntityType.ARMOR_STAND)
 			.add(EntityType.BAT)
 			.add(EntityType.BEE)
 			.add(EntityType.BLAZE)
@@ -113,6 +112,7 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.SPLASH_POTION)
 			.add(EntityType.DROPPED_ITEM)
 
+			.add(EntityType.ARMOR_STAND)
 			.add(EntityType.ITEM_FRAME)
 			.add(EntityType.PAINTING)
 			.build();
