@@ -522,52 +522,67 @@ public class PlotCbData {
 		if ((plot == null) || (e.getNewCurrent() > 0 && e.getOldCurrent() > 0))
 			return;
 		
-		OcCommandBlockData cbData = null;
-		cbData = getCbData(e.getBlock().getType(), e.getBlock().getLocation());
+		OcCommandBlockData cbData = getCbData(e.getBlock().getType(), e.getBlock().getLocation());
 		
 		if (cbData != null) {
 			if (cbData.cmd != null && e.getBlock().getType() == Material.COMMAND_BLOCK)
-				if (!cbData.isAuto && !cbData.isPowered && e.getNewCurrent() > 0) 
-					if (removeCommandTickets(cbData.cmd.getType().getRequiredCbTickets()))
-						cbData.cmd.execute();/*((org.bukkit.block.CommandBlock)e.getBlock().getState()) */
-					else
+				if (!cbData.isAuto && !cbData.isPowered && e.getNewCurrent() > 0)
+					if (removeCommandTickets(cbData.cmd.getType().getRequiredCbTickets())) {
+						int result = cbData.cmd.execute();/*((org.bukkit.block.CommandBlock)e.getBlock().getState()) */
+						executeChainCommandblocks(cbData.direction, result);
+					}else {
 						plot.getPlayers().forEach(p -> OCmsg.CB_NO_COMMANDS_LEFT.send(p));
+						return;
+					}
 
 			cbData.isPowered = e.getNewCurrent() > 0;
 		}
 		
 	}
 	
-	private void executeTickingCommandBlocks() {
-		int lastResult = 0;
-		
+	private void executeRepeatingCommandblocks() {
 		for (Entry<Location, OcCommandBlockData> e : blueCommandblocks.entrySet()) {
 			if (!e.getValue().isExecutablePowered() || e.getValue().conditionnal)
 				continue;
-			
-			lastResult = executeCommandBlock(e.getValue(), lastResult);
-			
-			OcCommandBlockData greenData = greenCommandblocks.get(e.getValue().direction);
-			
-			while (greenData != null) {
-				if (greenData.isExecutablePowered()) {
-					lastResult = executeCommandBlock(greenData, lastResult);
-					if (lastResult == -1)
-						return;
-				}else {
-					lastResult = 0;
-					if (!removeCommandTickets(0.5)) {
-						plot.getPlayers().forEach(p -> OCmsg.CB_NO_COMMANDS_LEFT.send(p));
-						return;
-					}
-				}
-				
-				greenData = greenCommandblocks.get(greenData.direction);
-			}
+
+			int lastResult = executeCommandBlock(e.getValue());
+			if (!executeChainCommandblocks(e.getValue().direction, lastResult))
+				return;
 		}
 	}
 	
-	private int executeCommandBlock(OcCommandBlockData cb, int lastResult) {
+	// return true if and only if there is still some cb tickets after green chain execution
+	private boolean executeChainCommandblocks(Location pointingLoc, int lastResult) {
+		OcCommandBlockData greenData = greenCommandblocks.get(pointingLoc);
+		int limiter = 100;
+		while (greenData != null && limiter > 0) {
+			limiter--;
+			
+			if (greenData.isExecutablePowered() && (lastResult > 0 || !greenData.conditionnal)) {
+				lastResult = executeCommandBlock(greenData);
+				if (lastResult == -1)
+					return false;
+			}else {
+				lastResult = 0;
+				if (!removeCommandTickets(0.5)) {
+					plot.getPlayers().forEach(p -> OCmsg.CB_NO_COMMANDS_LEFT.send(p));
+					return false;
+				}
+			}
+			
+			greenData = greenCommandblocks.get(greenData.direction);
+		}
+		
+		if (limiter == 0) {
+			plugin.getLogger().warning("§cSecurity fired for commandblocks execution count on plot " + plot);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	//returning -1 means that commandblocks execution should be stopped
+	private int executeCommandBlock(OcCommandBlockData cb) {
 		if (cb.cmd != null)
 			if (removeCommandTickets(cb.cmd.getType().getRequiredCbTickets()))
 				return cb.cmd.execute();
@@ -590,7 +605,7 @@ public class PlotCbData {
 		
 		cbTask = plugin.getTask().scheduleSyncRepeatingTask(() -> {
 			if (plot != null && !plot.hasStoplag())
-				executeTickingCommandBlocks();
+				executeRepeatingCommandblocks();
 		}, ticks, ticks);
 	}
 	

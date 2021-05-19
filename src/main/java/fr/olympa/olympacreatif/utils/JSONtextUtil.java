@@ -49,7 +49,7 @@ public abstract class JSONtextUtil {
 			
 			NBTTagList mainTag = MojangsonParser.parse(component.replace("=", ":")).getList("rawText", NBT.TAG_COMPOUND);
 			
-			System.out.println("PARSED : " + mainTag.asString());
+			//System.out.println("PARSED : " + mainTag.asString());
 			
 			for (int i = 0 ; i < mainTag.size() ; i++) {
 				
@@ -72,7 +72,7 @@ public abstract class JSONtextUtil {
 						if (subString == null)
 							continue;
 						
-						System.out.println("SUB STRING : " + subString);
+						//System.out.println("SUB STRING : " + subString);
 						
 						textPart.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.translateAlternateColorCodes('&', subString.replace("{", ""))).create()));
 					}
@@ -118,16 +118,23 @@ public abstract class JSONtextUtil {
 					String name = subTag.getString("name");
 					String obj = subTag.getString("objective");
 					
+					/*System.out.println("SCORE TELLAW objective : " + obj + ", entity name : " + name 
+							+ ", entity parsed : " + cmd.parseSelector(name.replace(":", "="), false));*/
+					
 					if (name == null || obj == null)
 						continue;
 
 					List<Entity> list = cmd.parseSelector(name.replace(":", "="), false);
 
-					Object cbObj = null;
+					CbObjective cbObj = cmd.getPlot().getCbData().getObjective(obj);
 					
-					if (list.size() == 0 || cbObj == null)
+					if (cbObj == null)
 						continue;
 					
+					if (list.size() > 0)
+						textPart.addExtra(cbObj.get(list.get(0)) + "");
+					else if (!name.startsWith("@"))
+						textPart.addExtra(cbObj.get(name) + "");
 				}
 				
 				text.addExtra(textPart);
