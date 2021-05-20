@@ -112,7 +112,7 @@ public class ArmorStandManager implements Listener {
 				newEnt.setSmall(pData.ent.isSmall());
 				newEnt.setInvulnerable(pData.ent.isInvulnerable());
 				
-				newEnt.setCustomNameVisible(true);
+				newEnt.setCustomNameVisible(pData.ent.isCustomNameVisible());
 				newEnt.customName(pData.ent.customName());
 				
 				Arrays.asList(EquipmentSlot.values()).forEach(slot -> newEnt.setItem(slot, pData.ent.getItem(slot)));

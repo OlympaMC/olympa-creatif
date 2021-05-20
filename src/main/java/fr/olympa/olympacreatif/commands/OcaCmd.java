@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.commands;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -22,6 +23,8 @@ import fr.olympa.olympacreatif.plot.Plot;
 
 public class OcaCmd extends AbstractCmd {
 
+	//private static final DecimalFormat stoplagFormatter = new DecimalFormat("###,##");;
+	
 	public OcaCmd(OlympaCreatifMain plugin) {
 		super(plugin, "oca", OcPermissions.STAFF_OCA_CMD, "Panel de gestion pour le staff.");
 
@@ -181,11 +184,13 @@ public class OcaCmd extends AbstractCmd {
 			break;
 			
 		case "stoplag":
-			topScores = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingInt(plot -> -plot.getStoplagChecker().getCurrentCount())).collect(Collectors.toCollection(() -> new ArrayList<Plot>()));
+			topScores = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingDouble(plot -> -plot.getStoplagChecker().getScore())).collect(Collectors.toCollection(() -> new ArrayList<Plot>()));
 
 			sendMessage(Prefix.INFO, "§6>>> TOP scores stoplag Créatif " + plugin.getDataManager().getServerIndex());
 			for (int i = 0 ; i < Math.min(9, topScores.size()) ; i++)
-				sendHoverAndCommand(Prefix.INFO, "§e" + (i+1) + ". : parcelle §c" + getPlotIdOnFixedLength(topScores.get(i)) + " §eavec un score de " + topScores.get(i).getStoplagChecker().getCurrentCount(),
+				sendHoverAndCommand(Prefix.INFO, "§e" + (i+1) + ". : parcelle §c" + 
+						getPlotIdOnFixedLength(topScores.get(i)) + " §eavec un score de " + 
+						String.format("%,.2f", topScores.get(i).getStoplagChecker().getScore()),
 						"§7Se téléporter à la parcelle " + topScores.get(i), "/oc visit " + topScores.get(i));
 			break;
 		}
@@ -225,7 +230,7 @@ public class OcaCmd extends AbstractCmd {
 	
 	private String getPlotIdOnFixedLength(Plot plot) {
 		String s = plot.getId().toString();
-		while (s.length() < 7)
+		while (s.length() < 5)
 			s = " " + s;
 		return s;
 	}

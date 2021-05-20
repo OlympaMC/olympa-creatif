@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,6 +16,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import fr.olympa.api.holograms.Hologram;
 import fr.olympa.api.holograms.Hologram.HologramLine;
@@ -34,14 +39,22 @@ public class PlotsManager {
 	
 	private Set<Hologram> serverHolos = new HashSet<Hologram>();
 	
-	private static final int delayBetweenPlotsCheckup = 20 * 30;
 	public static final int maxPlotsPerPlayer = 36;
 	
 	private OlympaCreatifMain plugin;
 	
+	//contienty les plots chargés pour les membres du plot qui sont en ligne
 	private Map<Integer, Plot> loadedPlots = new HashMap<Integer, Plot>();
 	
+	//contient les plots chargés pour les visiteurs
+	/*private static Cache<Integer, Plot> visitorPlots = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES)
+			.removalListener(removed -> plugin.getTask().runTask(() -> {
+				if (((Plot)removed.getValue()).getPlayers().size() > 0)
+					visitorPlots.put(removed.getKey(), removed.getValue());
+			})).build();*/
 	//private Vector<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
+	
+	private static Cache<UUID, PlotId> entityBirthPlotCache = CacheBuilder.newBuilder().expireAfterAccess(31, TimeUnit.SECONDS).build();
 	
 	private int plotCount;
 	
@@ -66,7 +79,7 @@ public class PlotsManager {
 		}.runTaskTimer(plugin, 20, 1);*/
 		
 		//libère la RAM des plots non utilisés (càd aucun membre connecté et aucun joueur dessus)
-		new BukkitRunnable() {
+		/*new BukkitRunnable() {
 			
 			@Override
 			public void run() {
@@ -86,7 +99,7 @@ public class PlotsManager {
 									hasMemberOnline = true;
 								}
 							}
-							if (!hasMemberOnline/* && !forceLoadedPlots.contains(plot)*/) {
+							if (!hasMemberOnline) {
 								plot.unload();
 								plugin.getDataManager().savePlot(plot, false);
 								loadedPlots.remove(plot.getId().getId());
@@ -95,11 +108,11 @@ public class PlotsManager {
 					}
 				}
 			}
-		}.runTaskTimer(plugin, delayBetweenPlotsCheckup, delayBetweenPlotsCheckup);
+		}.runTaskTimer(plugin, delayBetweenPlotsCheckup, delayBetweenPlotsCheckup);*/
 		
 		
 		//kill les entités en dehors de leur plot attitré
-		new BukkitRunnable() {
+		/*new BukkitRunnable() {
 			
 			@Override
 			public void run() {
@@ -125,7 +138,7 @@ public class PlotsManager {
 						}
 					});
 			}
-		}.runTaskTimer(plugin, 10, 300);
+		}.runTaskTimer(plugin, 10, 300);*/
 	}
 	
 	/**
@@ -137,21 +150,24 @@ public class PlotsManager {
 		if (e.getType() == EntityType.PLAYER)
 			return null;
 		
-		net.minecraft.server.v1_16_R3.Entity ent = ((CraftEntity)e).getHandle();
+		PlotId id = entityBirthPlotCache.getIfPresent(e.getUniqueId());
+		
+		if (id != null)
+			return id;
+		
 		NBTTagCompound tag = new NBTTagCompound();
-		ent.save(tag);
+		((CraftEntity)e).getHandle().save(tag);
 		
-		//Bukkit.broadcastMessage("birth plot of "  + e + " " + tag.asString() + " : " + tag.getList("Tags", NBT.TAG_STRING).getString(0));
+		//System.out.println("birth plot of "  + e + " " + tag.asString() + " : " + tag.getList("Tags", NBT.TAG_STRING).getString(0));
 		
-		if (tag == null || !tag.hasKey("Tags"))
-			return null;
+		if (tag != null && tag.hasKey("Tags")) {
+			NBTTagList list = tag.getList("Tags", NBT.TAG_STRING);
+			if (list != null && list.size() > 0)
+				id = PlotId.fromString(plugin, list.getString(0));
+		}
 		
-		NBTTagList list = tag.getList("Tags", NBT.TAG_STRING);
-		
-		if (list == null || list.size() == 0)
-			return null;
-		
-		return PlotId.fromString(plugin, list.getString(0));
+		entityBirthPlotCache.put(e.getUniqueId(), id);
+		return id;
 	}
 	
 	public void setBirthPlot(PlotId plot, Entity e) {
@@ -176,10 +192,7 @@ public class PlotsManager {
 
 	
 	public void loadExistingPlot(PlotId id) {
-		if (id == null)
-			return;
-		
-		if (isPlotLoaded(id))
+		if (id == null || isPlotLoaded(id))
 			return;
 		
 		//si le plot existe mais n'est pas encore chargé, chargement depuis la bdd
@@ -187,7 +200,6 @@ public class PlotsManager {
 	}
 	
 	public boolean isPlotLoaded(PlotId id) {
-		//Bukkit.broadcastMessage("Plots list : " + loadedPlots.keySet() + ", trying to load " + id);
 		return loadedPlots.containsKey(id.getId());
 	}
 	
@@ -210,6 +222,11 @@ public class PlotsManager {
 
 		PlotId id = PlotId.fromLoc(plugin, loc);
 		return id == null ? null : loadedPlots.get(id.getId());
+	}
+	
+	public void unloadPlot(Plot plot) {
+		plot.unload();
+		plugin.getDataManager().savePlot(plot, false);
 	}
 
 	/*

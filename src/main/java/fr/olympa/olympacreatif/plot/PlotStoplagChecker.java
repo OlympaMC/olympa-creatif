@@ -84,16 +84,16 @@ public class PlotStoplagChecker {
 		}
 	}
 	
-	public int getCurrentCount() {
-		return detectionsCount;
+	public double getScore() {
+		return detections.entrySet().stream().mapToDouble(e -> ((double) e.getValue() / (double) e.getKey().max) / StopLagDetect.values().length).sum() * 100;
 	}
 
 	public enum StopLagDetect{
 		PISTON(150, "pistons"),
-		LAMP(100, "lampes de redstone"),
+		LAMP(150, "lampes de redstone"),
 		LIQUID(500, "liquides fluides"),
 		ENTITY(150, "spawn entités"),
-		WIRE(5000, "systèmes de redstone"),
+		WIRE(15000, "systèmes de redstone"),
 		;
 		
 		int max;

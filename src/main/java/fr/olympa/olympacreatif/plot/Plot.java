@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +56,9 @@ import net.minecraft.server.v1_16_R3.TileEntityTypes;
 public class Plot {
 	
 	private OlympaCreatifMain plugin;
+
+	private int destroyScheduler;
+	private int entitiesCheckupScheduler;
 	
 	private PlotMembers members;
 	private PlotParameters parameters;
@@ -110,6 +114,20 @@ public class Plot {
 	
 	//actions to execute, wether if the plot is a new one or loaded from an asyncplot
 	private void executeCommonInstanciationActions() {
+		destroyScheduler = plugin.getTask().scheduleSyncRepeatingTask(() -> {
+			if (getPlayers().size() > 0 || Bukkit.getOnlinePlayers().stream().anyMatch(p -> getMembers().getPlayerRank(p) != PlotRank.VISITOR))
+				plugin.getPlotsManager().unloadPlot(this);
+		}, 20 * 60 * 5, 20 * 60 * 5);
+		
+		entitiesCheckupScheduler = plugin.getTask().scheduleSyncRepeatingTask(() -> {
+			Iterator<Entity> entIterator = getEntities().iterator();
+			while (entIterator.hasNext()) {
+				Entity ent = entIterator.next();
+				if (!plotId.isInPlot(ent.getLocation()))
+					removeEntityInPlot(ent, true);
+			}
+		}, 20 * 20, 20 * 20);
+		
 		cbData.setPlot(this);
 		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
@@ -255,9 +273,8 @@ public class Plot {
 
 	public void unload() {
 		cbData.unload();
-		
-		//unload du forced loaded chunk
-		//plugin.getWorldManager().getWorld().setChunkForceLoaded(plotId.getLocation().getChunk().getX(), plotId.getLocation().getChunk().getX(), false);
+		plugin.getTask().cancelTaskById(destroyScheduler);
+		plugin.getTask().cancelTaskById(entitiesCheckupScheduler);
 	}
 
 	public PlotId getId() {
