@@ -39,15 +39,14 @@ public abstract class JSONtextUtil {
 			component = "{rawText:[" + component + "]}";
 		else
 			component = "{rawText:" + component + "}";
-
-		
-		//System.out.println("basic string tag : " + component);
 		
 		try {
 			
 			//Bukkit.broadcastMessage("try to parse : " + component);
-			
-			NBTTagList mainTag = MojangsonParser.parse(component.replace("=", ":")).getList("rawText", NBT.TAG_COMPOUND);
+			 
+			NBTTagList mainTag = new OcMojangsonParser(component.replace("=", ":"))
+					.parse(cmd != null ? cmd.getSender() instanceof Player ? (Player) cmd.getSender() : null : null)
+					.getList("rawText", NBT.TAG_COMPOUND);
 			
 			//System.out.println("PARSED : " + mainTag.asString());
 			
