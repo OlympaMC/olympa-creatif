@@ -104,7 +104,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.JUNGLE_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.SPRUCE_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.WARPED_FENCE_GATE);
-		blocksWithInteractionsList.add(Material.CRIMSON_FENCE);
+		blocksWithInteractionsList.add(Material.CRIMSON_FENCE_GATE);
 
 		blocksWithInteractionsList.add(Material.OAK_DOOR);
 		blocksWithInteractionsList.add(Material.ACACIA_DOOR);

@@ -1,6 +1,7 @@
 package fr.olympa.olympacreatif.perks;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.xxmicloxx.NoteBlockAPI.NoteBlockAPI;
 import com.xxmicloxx.NoteBlockAPI.event.SongEndEvent;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
@@ -30,6 +32,7 @@ import fr.olympa.api.gui.templates.PagedGUI;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.gui.IGui;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.PlotParametersGui;
@@ -56,7 +59,7 @@ public class MusicManager implements Listener {
 	private Map<String, Song> songsName = new HashMap<String, Song>();
 	private Map<ItemStack, Entry<String, Song>> songsItem = new LinkedHashMap<ItemStack, Map.Entry<String,Song>>();
 	
-	private Map<UUID, RadioSongPlayer> radios = new HashMap<UUID, RadioSongPlayer>();
+	//private Map<UUID, RadioSongPlayer> radios = new HashMap<UUID, RadioSongPlayer>();
 	
 	public MusicManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -64,9 +67,18 @@ public class MusicManager implements Listener {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		
 		if (plugin.getServer().getPluginManager().getPlugin("NoteBlockAPI") == null) {
-			Bukkit.getLogger().warning("NoteBlockAPI wasn't loaded successfully. Music perks may not work.");
+			plugin.getLogger().warning("NoteBlockAPI wasn't loaded successfully. Music perks may not work.");
 			return;	
 		}
+		
+		/*try {
+			Field api = NoteBlockAPI.class.getDeclaredField("plugin");
+			api.setAccessible(true);
+			api.set(null, plugin.getServer().getPluginManager().getPlugin("NoteBlockAPI"));
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}*/
 		
 		//get all songs from config and parse them for later use
 		File path = new File(plugin.getDataFolder() + "/songs/");
@@ -100,9 +112,6 @@ public class MusicManager implements Listener {
 			songsItem.put(it, new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue()));
 		}
 		
-		songsName.forEach((songName, song) -> {
-		});
-		
 		plugin.getLogger().info("§aLoaded " + songsName.size() + " songs.");
 	}
 
@@ -114,17 +123,24 @@ public class MusicManager implements Listener {
 	 * @return true if music started, false if the sound wasn't found
 	 */
 	public void startSong(Player p, String songName) {
-		
-		//Bukkit.broadcastMessage("STARTED TEXT " + songName + " for " + p);
-		
 		if (songsName.containsKey(songName))
 			startSong(p, songsName.get(songName));
 	}
 	
 	public void startSong(Player p, Song song) {
-		stopSong(p);
+		//stopSong(p);
 		
-		//Bukkit.broadcastMessage("STARTED SONG " + song + " for " + p);
+		if (song == null) {
+			try {
+				throw new UnsupportedOperationException("Trying to play a null song on plot " + ((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getCurrentPlot());
+			}catch (UnsupportedOperationException ex) {
+				ex.printStackTrace();
+				return;
+			}
+		}
+
+		/*plugin.getLogger().info("Starting song " + song.getTitle() + " for " + p.getName());
+		plugin.getLogger().info("NoteblockAPI : " + Bukkit.getPluginManager().getPlugin("NoteBlockAPI"));*/
 		
 		RadioSongPlayer rsp = new RadioSongPlayer(song);
 		rsp.setVolume((byte)80);
@@ -132,7 +148,7 @@ public class MusicManager implements Listener {
 		rsp.addPlayer(p);
 		rsp.setPlaying(true);
 		
-		radios.put(p.getUniqueId(), rsp);
+		//radios.put(p.getUniqueId(), rsp);
 	}
 	
 	/**
@@ -140,11 +156,7 @@ public class MusicManager implements Listener {
 	 * @param p
 	 */
 	public void stopSong(Player p) {
-		RadioSongPlayer rsp = radios.get(p.getUniqueId());
-		if (rsp == null)
-			return;
-		
-		rsp.removePlayer(p);
+		NoteBlockAPI.stopPlaying(p);
 	}
 	
 	
@@ -159,9 +171,10 @@ public class MusicManager implements Listener {
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
-		RadioSongPlayer radio = radios.remove(e.getPlayer().getUniqueId());
+		/*RadioSongPlayer radio = radios.remove(e.getPlayer().getUniqueId());
 		if (radio != null)
-			radio.destroy();
+			radio.destroy();*/
+		NoteBlockAPI.stopPlaying(e.getPlayer());
 	}
 	
 	@EventHandler
@@ -170,14 +183,12 @@ public class MusicManager implements Listener {
 	}
 
 	public class MusicGui extends PagedGUI<ItemStack> {
-	
+
 		private Map<ItemStack, Consumer<Player>> items = new HashMap<ItemStack, Consumer<Player>>();
 		
 		protected MusicGui(OlympaCreatifMain plugin, Plot plot, Player p0, Map<ItemStack, Entry<String, Song>> songsMap) {
 			super("Musiques disponibles", DyeColor.GREEN, new ArrayList<ItemStack>(songsMap.keySet()), 6);
-			//this.plot = plot;
 
-			//building music discs
 			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProvider.get(p0.getUniqueId())))
 				songsMap.forEach((it, song) -> items.put(it, p -> {					
 					PlotParamType.SONG.setValue(plot, song.getKey());

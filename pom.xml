@@ -103,6 +103,7 @@
 		    <groupId>com.github.koca2000</groupId>
 		    <artifactId>NoteBlockAPI</artifactId>
 		    <version>-SNAPSHOT</version>
+            <scope>provided</scope>
 		</dependency>
 	</dependencies>
 
