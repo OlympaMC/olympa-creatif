@@ -22,7 +22,8 @@ public class CmdOp extends CbCommand {
 
 	@Override
 	public int execute() {
-		sender.sendMessage("§i§7[Serveur : " + sender.getName() + " est maintenant opérateur du serveur]");
+		if (sender != null)
+			sender.sendMessage("§i§7[Serveur : " + sender.getName() + " est maintenant opérateur du serveur]");
 		return 1;
 	}
 }

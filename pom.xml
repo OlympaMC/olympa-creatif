@@ -124,6 +124,7 @@
 					<minimizeJar>true</minimizeJar>
 					<finalName>OlympaCreatif</finalName>
 					<outputDirectory>target</outputDirectory>
+					<complianceLevel>1.16</complianceLevel>
 				</configuration>
 				<executions>
 					<execution>
