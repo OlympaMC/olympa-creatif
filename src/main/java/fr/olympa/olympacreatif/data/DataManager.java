@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -25,6 +26,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.customevents.OlympaPlayerLoadEvent;
+import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.redis.RedisAccess;
 import fr.olympa.api.redis.RedisChannel;
@@ -39,6 +41,7 @@ import fr.olympa.olympacreatif.plot.PlotCbData;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
+import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotParameters;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
@@ -220,10 +223,65 @@ public class DataManager implements Listener {
 	}
 
 	public synchronized void loadPlot(PlotId id, boolean syncLoad) {
+		loadPlot(id, syncLoad, null);
+	}
+
+	public synchronized void loadPlot(PlotId id, boolean syncLoad, Consumer<Plot> callback) {
 		if (!syncLoad)
-			plugin.getTask().runTaskAsynchronously(() -> loadPlot(id));
+			plugin.getTask().runTaskAsynchronously(() -> loadPlot(id, callback));
 		else
-			loadPlot(id);
+			loadPlot(id, callback);
+	}
+
+	public synchronized void loadPlot(final OlympaPlayerCreatif requester, final String player, final int plotId, final Consumer<Plot> callback) {
+		plugin.getTask().runTaskAsynchronously(() -> {
+			try {
+				OlympaPlayerInformations playerInformations = AccountProvider.getPlayerInformations(player);
+				if (playerInformations == null) {
+					callback.accept(null);
+					return;
+				}
+				
+				PreparedStatement statement = osSelectPlayerPlots.createStatement();
+				statement.setInt(1, serverIndex);
+				statement.setLong(2, playerInformations.getId());
+				ResultSet result = statement.executeQuery();
+				
+				PlotId id = PlotId.fromId(plugin, plotId); 
+				
+				int currentIndex = 0;
+				while (result.next()) {
+					if (plotId == ++currentIndex) {
+						loadPlot(PlotId.fromId(plugin, result.getInt("plot_id")), false, callback);
+						currentIndex = -1;
+						break;
+						/*final int taskId = plugin.getTask().scheduleSyncRepeatingTask(() -> {
+							Plot plot = plugin.getPlotsManager().getPlot(id);
+								
+							if (plot != null && requester.isConnected())
+								callback.accept(plot);
+								
+						}, 5, 5);
+						
+						plugin.getTask().runTaskLater(() -> {
+							if (plugin.getPlotsManager().getPlot(id) == null)
+								OCmsg.UNKNOWN_PLOT_INDEX.send(requester);
+							plugin.getTask().cancelTaskById(taskId);
+						}, 80);
+						break;*/
+					}
+				}
+				
+				if (currentIndex != -1)
+					callback.accept(null);
+				
+				statement.close();
+				result.close();
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	public synchronized void savePlot(Plot plot, boolean syncSave) {
@@ -233,7 +291,6 @@ public class DataManager implements Listener {
 			savePlot(plot);
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onJoinAsync(AsyncPlayerPreLoginEvent e) {
 		if (serverIndex == -1)
@@ -286,7 +343,7 @@ public class DataManager implements Listener {
 		});
 	}
 
-	private synchronized void loadPlot(PlotId plotId) {
+	private synchronized void loadPlot(PlotId plotId, Consumer<Plot> callback) {
 		if (plotId == null)
 			return;
 		
@@ -339,7 +396,7 @@ public class DataManager implements Listener {
 			ResultSet getPlotPlayersResult = osSelectPlotPlayers.executeQuery(getPlotMembers);
 
 			while (getPlotPlayersResult.next()) {
-				MemberInformations member = plotMembers.new MemberInformations(
+				MemberInformations member = new MemberInformations(
 						getPlotPlayersResult.getLong("player_id"),
 						getPlotPlayersResult.getString("player_name"),
 						UUID.fromString(getPlotPlayersResult.getString("player_uuid")));
@@ -358,7 +415,7 @@ public class DataManager implements Listener {
 			
 			nextPlotSyncInstantiateTick += 10;
 			plugin.getTask().runTaskLater(() -> {
-				plugin.getPlotsManager().loadPlot(plot);
+				plugin.getPlotsManager().loadPlot(plot, callback);
 				nextPlotSyncInstantiateTick -= 10;
 			}, nextPlotSyncInstantiateTick);
 			
@@ -540,7 +597,7 @@ public class DataManager implements Listener {
 		}
 
 		//load plot 1
-		loadPlot(PlotId.fromId(plugin, 1), false);
+		//loadPlot(PlotId.fromId(plugin, 1), false);
 	}
 
 	public int getServerIndex() {

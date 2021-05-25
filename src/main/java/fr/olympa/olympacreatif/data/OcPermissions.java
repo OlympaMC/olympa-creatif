@@ -25,7 +25,6 @@ public class OcPermissions {
 	public static final OlympaSpigotPermission STAFF_OCA_CMD = new OlympaSpigotPermission(OlympaGroup.DEV);
 
 	public static final OlympaSpigotPermission STAFF_MANAGE_COMPONENT = new OlympaSpigotPermission(OlympaGroup.DEV);
-	//public static final OlympaSpigotPermission STAFF_DEACTIVATE_WORLD_EDIT = new OlympaSpigotPermission(OlympaGroup.DEV);
 
 	public static final OlympaSpigotPermission CREA_TPA_COMMAND = new OlympaSpigotPermission(OlympaGroup.PLAYER);
 	public static final OlympaSpigotPermission CREA_TPF_COMMAND = new OlympaSpigotPermission(OlympaGroup.DEV);
@@ -34,7 +33,8 @@ public class OcPermissions {
 
 	public static final OlympaSpigotPermission STAFF_BYPASS_OP_CHECK = new OlympaSpigotPermission(OlympaGroup.DEV);
 	public static final OlympaSpigotPermission STAFF_BUILD_ROADS = new OlympaSpigotPermission(OlympaGroup.DEV);
-
+	
+	public static final OlympaSpigotPermission STAFF_SET_PLOT_OWNER = new OlympaSpigotPermission(OlympaGroup.MODP);
 	
 	
 	 

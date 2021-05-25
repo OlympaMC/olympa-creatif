@@ -266,16 +266,30 @@ public class CmdsLogic {
 		OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc, id);
 	}
 
-	public void visitPlotOf(OlympaPlayerCreatif pc, Player target, int id) {
-		List<Plot> plots = ((OlympaPlayerCreatif)AccountProvider.get(target.getUniqueId())).getPlots(true);
+	public void visitPlotOf(OlympaPlayerCreatif pc, String p, int id) {
+		Player target = Bukkit.getPlayerExact(p);
 		
-		id -= 1;
-		
-		if (id >= 0 && id < plots.size()) {
-			plots.get(id).getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
-			OCmsg.TELEPORT_IN_PROGRESS.send(pc, plots.get(id).getId() + "");
-		}else
-			OCmsg.INVALID_PLOT_ID.send(pc);
+		if (target != null) {
+			List<Plot> plots = ((OlympaPlayerCreatif)AccountProvider.get(target.getUniqueId())).getPlots(true);
+			
+			id -= 1;
+			
+			if (id >= 0 && id < plots.size()) {
+				plots.get(id).getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
+				OCmsg.TELEPORT_IN_PROGRESS.send(pc, plots.get(id).getId() + "");
+			}else
+				OCmsg.INVALID_PLOT_ID.send(pc);
+		}else {
+			OCmsg.PLOT_LOADING_IN_PROGRESS.send(pc);
+			plugin.getDataManager().loadPlot(pc, p, id, plot -> {
+				if (plot == null) {
+					OCmsg.INVALID_PLOT_ID.send(pc);
+				}else {
+					plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
+					OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc, plot);
+				}
+			});
+		}
 	}
 	
 	
@@ -309,12 +323,8 @@ public class CmdsLogic {
 	
 	private Map<PlotId, String> plotsResetVerifCode = new HashMap<PlotId, String>();
 	
-	public void resetPlot(OlympaPlayerCreatif pc, Integer plotId, String code) {		
-		/*if (!PermissionsList.STAFF_RESET_PLOT.hasPermissionWithMsg(pc))
-			return;*/
-		
+	public void resetPlot(OlympaPlayerCreatif pc, Integer plotId, String code) {
 		Plot plot = plotId == null ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, plotId));
-		//plugin.getWEManager().resetPlot(pc, plot);
 		
 		 if (plot == null) {
 			OCmsg.NULL_CURRENT_PLOT.send(pc);

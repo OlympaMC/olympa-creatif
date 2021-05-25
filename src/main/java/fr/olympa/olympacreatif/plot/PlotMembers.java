@@ -1,5 +1,7 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.lang.reflect.Member;
+import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +11,7 @@ import javax.swing.text.StyledEditorKit.BoldAction;
 
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -163,8 +166,17 @@ public class PlotMembers{
 				return e.getKey();
 		return null;
 	}
+
+	/**
+	 * Permet de redéfinir le propriétaire d'une parcelle. Cette action réinitialsise la liste des membres actuels.
+	 * @param player
+	 */
+	public void setOwner(MemberInformations player) {
+		members.keySet().forEach(p -> members.put(p, PlotRank.VISITOR));
+		set(player, PlotRank.OWNER);
+	}
 	
-	public class MemberInformations{
+	public static class MemberInformations{
 
 		private long id;
 		private String name;
@@ -217,4 +229,5 @@ public class PlotMembers{
 			return new PlotMembers(maxMembers);
 		}
 	}
+
 }

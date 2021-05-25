@@ -160,8 +160,9 @@ public class OCmsg {
 	public static final OCmsg ARMORSTAND_EDITOR_SELECT_ARMORSTAND_TOO_LONG = new OCmsg();
 	public static final OCmsg ARMORSTAND_EDITOR_OPEN = new OCmsg();
 	public static final OCmsg ARMORSTAND_EDITOR_EXIT = new OCmsg();
-	
+
 	public static final OCmsg INSUFFICIENT_GROUP_PERMISSION = new OCmsg();
+	public static final OCmsg PLOT_LOADING_IN_PROGRESS = new OCmsg();
 	
 	
 	

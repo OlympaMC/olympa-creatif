@@ -1,11 +1,12 @@
 package fr.olympa.olympacreatif.commands;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
@@ -20,6 +21,7 @@ import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 
 public class OcaCmd extends AbstractCmd {
 
@@ -30,6 +32,22 @@ public class OcaCmd extends AbstractCmd {
 
 		addArgumentParser("STAFF_PERM", StaffPerm.class);
 		addArgumentParser("SERVER_COMPONENT", ComponentCreatif.class);
+		addArgumentParser("PLOT_OWNER", (sender, str) -> {
+			List<String> players = Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).collect(Collectors.toList());
+			players.add("spawn");
+			players.add("system");
+			return players.stream().filter(s -> s.toLowerCase().startsWith(str.toLowerCase())).collect(Collectors.toList());
+		}, str -> {
+			Player p = Bukkit.getPlayerExact(str);
+			if (p != null)
+				return new MemberInformations(AccountProvider.get(p.getUniqueId()).getInformation());
+			else if (str.equalsIgnoreCase("system"))
+				return new MemberInformations(28l, "System", UUID.fromString("1f2993c6-5c5f-3968-b8dc-b0f3ef15f7f0"));
+			else if (str.equalsIgnoreCase("spawn"))
+				return new MemberInformations(28l, "Spawn", UUID.fromString("1f2993c6-5c5f-3968-b8dc-b0f3ef15f7f0"));
+			else
+				return null;
+		}, s -> "§4%s §cn'est pas valide, vous devez utiliser un nom de joueur, §4SYSTEM§c ou §4SPAWN§c.");
 	}
 
 	
@@ -193,37 +211,7 @@ public class OcaCmd extends AbstractCmd {
 						String.format("%,.2f", topScores.get(i).getStoplagChecker().getScore()),
 						"§7Se téléporter à la parcelle " + topScores.get(i), "/oc visit " + topScores.get(i));
 			break;
-		}
-/*
-		List<Plot> mostEntities = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingInt(plot -> -plot.getEntities().size())).collect(Collectors.toList());
-		List<Plot> mostTileEntities = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingLong(plot -> -plot.getLoadedTileEntitiesCount())).collect(Collectors.toList());
-		List<Plot> mostStoplagDetect = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingInt(plot -> -plot.getStoplagChecker().getCurrentCount())).collect(Collectors.toList());
-
-		sendMessage(Prefix.INFO, "§6Informations parcelles les moins performantes");
-			sendMessage(Prefix.INFO, "§ePERF TYPE________ENTITIES__________TILES________STOPLAG");
-		for (int i = 0 ; i < Math.min(plugin.getPlotsManager().getPlots().size(), 9) ; i++)
-			sendMessage(Prefix.INFO, "§e____NUM " + (i + 1) + 
-					getPlotIdOnFixedLength(mostEntities.get(i), 15) + 
-					getPlotIdOnFixedLength(mostTileEntities.get(i), 15) + 
-					getPlotIdOnFixedLength(mostStoplagDetect.get(i), 15));
-		
-
-		for (int i = 0 ; i < Math.min(3, mostEntities.size()) ; i++)
-			sendHoverAndCommand(Prefix.INFO, "§eLe plus d'entités §4n°" + (i+1) + " §e: " +
-					mostEntities.get(i) + " §7(" + mostEntities.get(i).getEntities().size() + ")", 
-					"§7Se téléporter à la parcelle " + mostEntities.get(i), "/oc visit " + mostEntities.get(i));
-		
-		for (int i = 0 ; i < Math.min(3, mostTileEntities.size()) ; i++)
-			sendHoverAndCommand(Prefix.INFO, "§eLe plus de tiles entities §4n°" + (i+1) + " §e: " +
-					mostTileEntities.get(i) + " §7(" + mostTileEntities.get(i).getLoadedTileEntitiesCount() + ")", 
-					"§7Se téléporter à la parcelle " + mostTileEntities.get(i), "/oc visit " + mostTileEntities.get(i));
-		
-		for (int i = 0 ; i < Math.min(3, mostStoplagDetect.size()) ; i++)
-			sendHoverAndCommand(Prefix.INFO, "§eLe plus haut score stoplag §4n°" + (i+1) + " §e: " +
-					mostStoplagDetect.get(i) + " §7(" + mostStoplagDetect.get(i).getStoplagChecker().getCurrentCount() + ")",  
-					"§7Se téléporter à la parcelle " + mostStoplagDetect.get(i), "/oc visit " + mostStoplagDetect.get(i));*/
-		
-		
+		}		
 	}
 	
 	
@@ -289,7 +277,21 @@ public class OcaCmd extends AbstractCmd {
 	public void openmenuas(CommandContext cmd) {
 		MainGui.getMainGuiForStaff(AccountProvider.get(((Player)cmd.getArgument(0)).getUniqueId()), getOlympaPlayer()).create(getPlayer());
 	}
-	
-	
-	
+
+	@Cmd(player = true, syntax = "Définir le propriétaire d'une parcelle", args = {"PLOT_OWNER"}, min = 1)
+	public void setowner(CommandContext cmd) {
+		if (!OcPermissions.STAFF_SET_PLOT_OWNER.hasPermissionWithMsg((OlympaPlayerCreatif)getOlympaPlayer()))
+			return;
+		
+		OlympaPlayerCreatif pc = getOlympaPlayer();
+		
+		if (pc.getCurrentPlot() == null) {
+			OCmsg.NULL_CURRENT_PLOT.send(pc);
+			return;
+		}
+		
+		pc.getCurrentPlot().getMembers().setOwner(cmd.getArgument(0));
+		sendMessage(Prefix.DEFAULT_GOOD, "Le propriétaire de la parcelle " + pc.getCurrentPlot() + 
+				" est désormais " + ((MemberInformations)cmd.getArgument(0)).getName() + ".");
+	}
 }

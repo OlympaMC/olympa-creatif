@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -271,15 +272,22 @@ public class PlotsManager {
 			}
 	}*/
 	
-	public void loadPlot(AsyncPlot ap) {
+	public void loadPlot(AsyncPlot ap, Consumer<Plot> callback) {
 		if (!isPlotLoaded(ap.getId())) {
 			long init = System.currentTimeMillis();
-			loadedPlots.put(ap.getId().getId(), new Plot(ap));
+			
+			Plot plot = new Plot(ap);
+			loadedPlots.put(ap.getId().getId(), plot);
+			
 			long end = System.currentTimeMillis() - init;
 			plugin.getLogger().info("§7Plot " + ap.getId() + " took " 
 					+ (end <= 5 ? "§a" : end < 10 ? "§e" : end < 20 ? "§c" : "§4") 
 					+ end + "ms §7to load.");
-		}
+
+			if (callback != null)
+				plugin.getTask().runTaskLater(() -> callback.accept(plot), 2);
+		}else if (callback != null)
+			plugin.getTask().runTaskLater(() -> callback.accept(getPlot(ap.getId())), 2);
 	}
 
 	public void loadHelpHolos() {

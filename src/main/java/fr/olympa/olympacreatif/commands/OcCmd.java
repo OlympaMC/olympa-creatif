@@ -2,6 +2,10 @@ package fr.olympa.olympacreatif.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.bukkit.Bukkit;
+
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -23,6 +27,9 @@ public class OcCmd extends AbstractCmd {
 
 	public OcCmd(OlympaCreatifMain plugin) {
 		super(plugin, "oc", null, "Commandes principales du Créatif d'Olympa", "plot");
+		addArgumentParser("FREE_OWNER", (sender, str) -> {
+			return Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).filter(p -> p.toLowerCase().startsWith(str.toLowerCase())).collect(Collectors.toList());
+		}, s -> s, s -> s);
 	}
 
 
@@ -89,7 +96,7 @@ public class OcCmd extends AbstractCmd {
 		plugin.getCmdLogic().visitPlot(getOlympaPlayer(),PlotId.fromId(plugin, cmd.getArgument(0)));
 	}
 	
-	@Cmd(player = true, syntax = "Visiter la parcelle d'un joueur", args = {"PLAYERS", "INTEGER"}, min = 1)
+	@Cmd(player = true, syntax = "Visiter la parcelle d'un joueur", args = {"FREE_OWNER", "INTEGER"}, min = 1)
 	public void visitp(CommandContext cmd) {
 		if (cmd.getArgumentsLength() >= 2)
 			plugin.getCmdLogic().visitPlotOf(getOlympaPlayer(), cmd.getArgument(0), cmd.getArgument(1));
