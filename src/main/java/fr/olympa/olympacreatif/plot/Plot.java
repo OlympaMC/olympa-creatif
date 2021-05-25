@@ -138,11 +138,13 @@ public class Plot {
 				else
 					teleportOut(p);
 		
-		getLoadedChunks(ch -> Arrays.asList(ch.getEntities())
-				.forEach(e -> {
-					if (e.getType() != EntityType.PLAYER)
-						addEntityInPlot(e);
-				}));
+		int i = 1;
+		for (Chunk ch : getLoadedChunks())
+			plugin.getTask().runTaskLater(() -> Arrays.asList(ch.getEntities())
+					.forEach(e -> {
+						if (e.getType() != EntityType.PLAYER)
+							addEntityInPlot(e);
+					}), i+= 2);
 	}
 	
 	public void getLoadedChunks(Consumer<Chunk> consumer) {
@@ -157,6 +159,18 @@ public class Plot {
 			for (int z = initialZ ; z < initialZ + chunksRowCount ; z++)
 				if (plugin.getWorldManager().getWorld().isChunkLoaded(x, z))
 					consumer.accept(plugin.getWorldManager().getWorld().getChunkAt(x, z));
+	}
+	
+	public List<Chunk> getLoadedChunks() {
+		int initialX = plotId.getIndexX() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
+		int initialZ = plotId.getIndexZ() * (Math.floorDiv(OCparam.PLOT_SIZE.get() + WorldManager.roadSize, 16));
+		int chunksRowCount = Math.floorDiv(OCparam.PLOT_SIZE.get(), 16);
+		
+		return Stream.of(plugin.getWorldManager().getWorld().getLoadedChunks()).filter(ch -> 
+		ch.getX() >= initialX &&
+		ch.getX() < initialX + chunksRowCount && 
+		ch.getZ() >= initialZ &&
+		ch.getZ() < initialZ + chunksRowCount).collect(Collectors.toList());
 	}
 	
 	/*public long getCommandBlocksCount() {
