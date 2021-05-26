@@ -4,3 +4,4 @@
 
 rootProject.name = 'olympa-creatif'
 includeBuild '../olympa-api'
+includeBuild '../olympa-core'
