@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -55,7 +57,7 @@ public class PlotsManager {
 			})).build();*/
 	//private Vector<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
 	
-	private static Cache<UUID, PlotId> entityBirthPlotCache = CacheBuilder.newBuilder().expireAfterAccess(31, TimeUnit.SECONDS).build();
+	private static Cache<UUID, Optional<PlotId>> entityBirthPlotCache = CacheBuilder.newBuilder().expireAfterAccess(31, TimeUnit.SECONDS).build();
 	
 	private int plotCount;
 	
@@ -151,11 +153,11 @@ public class PlotsManager {
 		if (e.getType() == EntityType.PLAYER)
 			return null;
 		
-		PlotId id = entityBirthPlotCache.getIfPresent(e.getUniqueId());
+		/*PlotId id = entityBirthPlotCache.getIfPresent(e.getUniqueId());
 		
 		if (id != null)
 			return id;
-		
+
 		NBTTagCompound tag = new NBTTagCompound();
 		((CraftEntity)e).getHandle().save(tag);
 		
@@ -165,10 +167,26 @@ public class PlotsManager {
 			NBTTagList list = tag.getList("Tags", NBT.TAG_STRING);
 			if (list != null && list.size() > 0)
 				id = PlotId.fromString(plugin, list.getString(0));
-		}
+		}*/
 		
-		entityBirthPlotCache.put(e.getUniqueId(), id);
-		return id;
+		try {
+			return entityBirthPlotCache.get(e.getUniqueId(), () -> {
+				NBTTagCompound tag = new NBTTagCompound();
+				((CraftEntity)e).getHandle().save(tag);
+				
+				//System.out.println("birth plot of "  + e + " " + tag.asString() + " : " + tag.getList("Tags", NBT.TAG_STRING).getString(0));
+				
+				if (tag != null && tag.hasKey("Tags")) {
+					NBTTagList list = tag.getList("Tags", NBT.TAG_STRING);
+					if (list != null && list.size() > 0)
+						return Optional.ofNullable(PlotId.fromString(plugin, list.getString(0)));
+				}
+				
+				return Optional.ofNullable(null);
+			}).get();
+		} catch (ExecutionException e1) {
+			return null;
+		}
 	}
 	
 	public void setBirthPlot(PlotId plot, Entity e) {

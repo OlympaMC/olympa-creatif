@@ -198,9 +198,10 @@ public class PlotCbData {
 		return holosIds.keySet();
 	}
 	
-	public Set<Hologram> getHolosOf(int x, int z) {
+	public Set<Hologram> getHolosOf(int chunkX, int chunkZ) {
 		return holosIds.keySet().stream().map(i -> OlympaCore.getInstance().getHologramsManager().getHologram(i))
-				.filter(holo -> holo.getBottom().getChunk().getX() == x && holo.getBottom().getChunk().getZ() == z).collect(Collectors.toSet());
+				.filter(holo -> holo != null && holo.getBottom().getChunk().getX() == chunkX && holo.getBottom().getChunk().getZ() == chunkZ)
+				.collect(Collectors.toSet());
 	}
 	
 	private int getRealHoloIdFromHoloPlotId(int i) {

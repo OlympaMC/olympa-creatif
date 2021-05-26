@@ -101,7 +101,7 @@ public abstract class NBTcontrollerUtil {
 					continue;
 				}
 				//remove tag "id" si c'est un oeuf (pas possible de le faire dans la liste, le tag id est utilisé pour d'autres choses...)
-				if (key.equals("id") && EnumUtils.isValidEnum(EntityType.class, CbCommand.getUndomainedString(tag.getString(key)))) {
+				if (key.equals("id") && EnumUtils.isValidEnum(EntityType.class, CbCommand.getUndomainedString(tag.getString(key))) && key.toLowerCase().contains("potion")) {
 					tag.remove(key);
 					if (requester != null)
 						OCmsg.TAG_CHECKER_UNAUTHORIZED_TAG.send(requester, key);
