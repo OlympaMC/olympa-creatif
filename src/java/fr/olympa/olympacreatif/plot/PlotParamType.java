@@ -3,20 +3,15 @@ package fr.olympa.olympacreatif.plot;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
-import org.bukkit.block.Biome;
 
 import com.google.gson.reflect.TypeToken;
 
-import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.Position;
 
 public class PlotParamType<T extends Object> implements Cloneable {

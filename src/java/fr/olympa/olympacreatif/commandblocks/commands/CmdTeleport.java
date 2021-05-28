@@ -1,15 +1,11 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CmdTeleport extends CbCommand {

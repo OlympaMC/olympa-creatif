@@ -1,11 +1,9 @@
 package fr.olympa.olympacreatif.plot;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.Position;
 import fr.olympa.olympacreatif.world.WorldManager;

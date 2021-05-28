@@ -12,8 +12,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 import java.util.UUID;
+import java.util.function.Consumer;
+
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;

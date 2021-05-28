@@ -2,8 +2,6 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
-import org.bukkit.WeatherType;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 

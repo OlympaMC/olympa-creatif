@@ -1,7 +1,6 @@
 package fr.olympa.olympacreatif.perks;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,7 +17,6 @@ import com.google.common.collect.ImmutableMap.Builder;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 
 public class KitsManager {
 

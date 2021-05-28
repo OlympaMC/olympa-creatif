@@ -5,14 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import fr.olympa.api.customevents.AsyncOlympaPlayerChangeGroupEvent;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class UpgradesManager {

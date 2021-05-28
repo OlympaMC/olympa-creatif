@@ -3,8 +3,6 @@ package fr.olympa.olympacreatif.data;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;

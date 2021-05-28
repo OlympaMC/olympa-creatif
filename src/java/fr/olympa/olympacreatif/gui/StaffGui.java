@@ -1,65 +1,19 @@
 package fr.olympa.olympacreatif.gui;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-
-import javax.swing.text.DefaultEditorKit.PasteAction;
 
 import org.apache.logging.log4j.util.TriConsumer;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.BlockVector;
-import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
-import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacer;
-import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacerListener;
-import org.primesoft.asyncworldedit.api.blockPlacer.IJobEntryListener;
-import org.primesoft.asyncworldedit.api.blockPlacer.entries.IJobEntry;
-import org.primesoft.asyncworldedit.api.blockPlacer.entries.JobStatus;
-import org.primesoft.asyncworldedit.api.playerManager.IPlayerEntry;
-import org.primesoft.asyncworldedit.api.utils.IFuncParamEx;
-import org.primesoft.asyncworldedit.api.worldedit.IAsyncEditSessionFactory;
-import org.primesoft.asyncworldedit.api.worldedit.ICancelabeEditSession;
-import org.primesoft.asyncworldedit.api.worldedit.IEditSession;
-import org.primesoft.asyncworldedit.api.worldedit.IThreadSafeEditSession;
-
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.EditSession.Stage;
-import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.permission.OlympaPermission;
-import fr.olympa.api.region.tracking.BypassCommand;
 import fr.olympa.olympacreatif.data.OcPermissions;
-import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotId;
-import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
-import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
-import fr.olympa.olympacreatif.world.WorldManager;
+import fr.olympa.olympacreatif.plot.PlotId;
 
 @Deprecated(forRemoval = true)
 public class StaffGui extends IGui {

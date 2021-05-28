@@ -1,7 +1,6 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;

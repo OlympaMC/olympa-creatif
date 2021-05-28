@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.gui;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+
 import com.google.common.collect.HashMultimap;
 
 import fr.olympa.api.gui.OlympaGUI;

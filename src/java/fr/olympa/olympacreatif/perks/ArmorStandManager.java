@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import javax.print.attribute.standard.PDLOverrideSupported;
-
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +29,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
+
 import com.google.common.collect.ImmutableMap;
 
 import fr.olympa.api.editor.Editor;

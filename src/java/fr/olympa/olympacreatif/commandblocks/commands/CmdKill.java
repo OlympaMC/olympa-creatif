@@ -1,17 +1,12 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotId;
-import fr.olympa.olympacreatif.plot.PlotsInstancesListener;
 
 public class CmdKill extends CbCommand {
 

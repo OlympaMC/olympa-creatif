@@ -3,7 +3,7 @@ package fr.olympa.olympacreatif.utils;
 import org.bukkit.entity.Player;
 
 import com.mojang.brigadier.StringReader;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+
 import net.minecraft.server.v1_16_R3.MojangsonParser;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 

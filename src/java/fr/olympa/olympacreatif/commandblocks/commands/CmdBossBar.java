@@ -9,18 +9,13 @@ import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import com.google.gson.stream.JsonReader;
-
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbBossBar;
-import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.JSONtextUtil;
-import fr.olympa.olympacreatif.utils.OcMojangsonParser;
 
 public class CmdBossBar extends CbCommand {
 	

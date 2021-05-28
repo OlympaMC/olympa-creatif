@@ -12,8 +12,6 @@ import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OcPermissions;
-import fr.olympa.olympacreatif.gui.MainGui;
-import fr.olympa.olympacreatif.gui.ShopGui;
 
 public class TpfCommand extends OlympaCommand {
 

@@ -5,13 +5,9 @@ import java.util.List;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.event.EventPriority;
 
-import fr.olympa.api.afk.AfkPlayer;
 import fr.olympa.api.player.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.scoreboard.tab.INametagApi.NametagHandler;
-import fr.olympa.api.scoreboard.tab.Nametag;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;

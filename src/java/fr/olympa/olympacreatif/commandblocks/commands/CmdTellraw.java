@@ -1,10 +1,9 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.utils.JSONtextUtil;

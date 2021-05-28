@@ -25,15 +25,11 @@ import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.api.sql.SQLColumn;
-import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
-import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
-
-
 import fr.olympa.olympacreatif.plot.PlotsManager;
 
 public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlayerInterface {

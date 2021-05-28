@@ -3,7 +3,6 @@ package fr.olympa.olympacreatif.commandblocks;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,14 +16,12 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
+
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbObjective.ObjType;
-import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
-import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
 import fr.olympa.olympacreatif.plot.Plot;
 
 public class CbObjectivesListener implements Listener {

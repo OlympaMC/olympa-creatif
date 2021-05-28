@@ -1,5 +1,7 @@
+// Olympa Créatif
+
 plugins {
-    id 'java-library'
+    id 'java'
 }
 
 repositories {
@@ -16,37 +18,42 @@ repositories {
     	url = uri("https://mvn.intellectualsites.com/content/repositories/releases/") 
     }// FAWE
     
-    maven { 
+    /*maven { 
     	url = uri("https://raw.githubusercontent.com/SBPrime/AsyncWorldEdit/maven-artifact/") 
-    }// AWE
+    }// AWE*/
 
     maven {
         url = uri('https://jitpack.io')
         content{
        		includeGroup "com.github.koca2000"
+       		//includeGroup "com.github.SBPrime"
         }
     }
 }
 
-/*configurations {
-    priority
-    sourceSets.main.compileClasspath = configurations.priority + sourceSets.main.compileClasspath
-}*/
-
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute module("fr.olympa:olympa-api") with project(':olympa-api')
-        substitute module("fr.olympa:olympa-core") with project(':olympa-core')
+configurations {
+	all {
+		resolutionStrategy.dependencySubstitution {
+        	substitute module("fr.olympa:olympa-api") with project(':olympa-api')
+        	substitute module("fr.olympa:olympa-core") with project(':olympa-core')
+		}
+	}
+	priority {
+  	  	extendsFrom compileOnly
+  	  	sourceSets.main.compileClasspath = configurations.priority + sourceSets.main.compileClasspath
     }
 }
 
 dependencies {
+    /*compileOnly project(':olympa-api')
+    compileOnly project(':olympa-core')*/
+    priority 'fr.olympa:olympa-core:0.0.1-SNAPSHOT'
     compileOnly 'fr.olympa:olympa-api:0.0.1-SNAPSHOT'
-    compileOnly 'fr.olympa:olympa-core:0.0.1-SNAPSHOT'
     compileOnly 'com.intellectualsites.fawe:FAWE-Bukkit:1.16-687'
     compileOnly 'com.intellectualsites.fawe:FAWE-Core:1.16-687'
     compileOnly 'com.github.koca2000:NoteBlockAPI:-SNAPSHOT'
-    //compileOnly 'org.primesoft.asyncworldedit:AsyncWorldEdit-API:2.2.0-rc-05'
+    //compileOnly 'com.github.SBPrime:AsyncWorldEdit:3.8.4'
+    compileOnly 'org.primesoft.asyncworldedit:AsyncWorldEdit:3.8.4'
 }
 
 def getCheckedOutGitCommitHash() {

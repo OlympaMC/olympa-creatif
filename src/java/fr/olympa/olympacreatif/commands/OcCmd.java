@@ -1,7 +1,5 @@
 package fr.olympa.olympacreatif.commands;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -11,8 +9,8 @@ import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
-import fr.olympa.olympacreatif.data.Position;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
+import fr.olympa.olympacreatif.data.Position;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.MembersGui;
 import fr.olympa.olympacreatif.gui.PlayerPlotsGui;

@@ -7,7 +7,6 @@ import org.bukkit.command.CommandSender;
 
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.gui.MainGui;
 
 public class MenuCommand extends OlympaCommand {
