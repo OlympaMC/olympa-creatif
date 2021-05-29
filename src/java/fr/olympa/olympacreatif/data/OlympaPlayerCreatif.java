@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import fr.olympa.api.economy.MoneyPlayerInterface;
 import fr.olympa.api.economy.OlympaMoney;
 import fr.olympa.api.groups.OlympaGroup;
-import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.permission.OlympaSpigotPermission;
 import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.api.sql.SQLColumn;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -340,14 +340,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		BUILD_ROADS(OcPermissions.STAFF_BUILD_ROADS),
 		OWNER_EVERYWHERE(OcPermissions.STAFF_PLOT_FAKE_OWNER);
 		
-		OlympaPermission corePerm;
+		OlympaSpigotPermission corePerm;
 		
-		StaffPerm(OlympaPermission perm){
+		StaffPerm(OlympaSpigotPermission perm) {
 			corePerm = perm;
 			
 		}
 		
-		public OlympaPermission getOlympaPerm() {
+		public OlympaSpigotPermission getOlympaPerm() {
 			return corePerm;
 		}
 	}

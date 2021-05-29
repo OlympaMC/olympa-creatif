@@ -11,8 +11,8 @@ import fr.olympa.api.holograms.Hologram;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
-import fr.olympa.api.permission.OlympaAPIPermissions;
 import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.permission.list.OlympaAPIPermissionsSpigot;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.report.ReportReason;
@@ -118,8 +118,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new HatCommand(this).register();
 		
 		//set restrictions to /gm command
-		OlympaAPIPermissions.GAMEMODE_COMMAND.setMinGroup(OlympaGroup.PLAYER);
-		OlympaAPIPermissions.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.PLAYER);
+		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND.setMinGroup(OlympaGroup.PLAYER);
+		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.PLAYER);
 		
 		OlympaCore.getInstance().gamemodeCommand.setCanExecuteFunction((sender, target) -> {
 			
@@ -158,7 +158,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			weManager = new OcWorldEdit(this);
 		
 		//gestion particulière des hologrammes
-		OlympaAPIPermissions.COMMAND_HOLOGRAMS_MANAGE.setMinGroup(OcPermissions.USE_HOLOGRAMS.getMinGroup());
+		OlympaAPIPermissionsSpigot.COMMAND_HOLOGRAMS_MANAGE.setMinGroup(OcPermissions.USE_HOLOGRAMS.getMinGroup());
 		OlympaCore.getInstance().getHologramsManager().setTempHoloCreationMode(true);
 		OlympaCore.getInstance().getHologramsManager().setHoloControlSupplier((sender, holo, action) -> {
 			if (!(sender instanceof Player))

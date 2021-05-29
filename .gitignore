@@ -3,5 +3,5 @@ bin
 target
 .project
 .classpath
-/.gradle/
+.gradle
 /build/
