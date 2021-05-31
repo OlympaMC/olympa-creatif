@@ -15,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.ChunkGenerator;
 
+import fr.olympa.api.utils.spigot.Schematic;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCparam;
 
@@ -32,27 +33,35 @@ public class OCChunkGenerator extends ChunkGenerator {
     	plotSize = OCparam.PLOT_SIZE.get();
     	roadSize = WorldManager.roadSize;
     	worldLevel = WorldManager.worldLevel;
+
+		File fileX = new File("plugins/OlympaCreatif/schematics/" + OCparam.ROAD_SCHEM_NAME_X.get());
+		File fileZ = new File("plugins/OlympaCreatif/schematics/" + OCparam.ROAD_SCHEM_NAME_Z.get());
     	
 		try {
-			File fileX = File.createTempFile("creatif_schematic_X_creatif" + plugin.getDataManager().getServerIndex(), ".schem");
+			/*File fileX = File.createTempFile("creatif_schematic_X_creatif" + plugin.getDataManager().getServerIndex(), ".schem");
 			File fileZ = File.createTempFile("creatif_schematic_Z_creatif" + plugin.getDataManager().getServerIndex(), ".schem");
-
-			copyResource("schematics/" + OCparam.ROAD_SCHEM_NAME_X.get(), fileX.getAbsolutePath());
-			copyResource("schematics/" + OCparam.ROAD_SCHEM_NAME_Z.get(), fileZ.getAbsolutePath());
 			
-			roadXschem = Schematic.load(new FileInputStream(fileX));
-			roadZschem = Schematic.load(new FileInputStream(fileZ));
+			//copyResource("schematics/" + OCparam.ROAD_SCHEM_NAME_X.get(), fileX.getAbsolutePath());
+			copyResource("schematics/" + OCparam.ROAD_SCHEM_NAME_Z.get(), fileZ.getAbsolutePath());
+			copyResource("./OlympaCreatif/schematics/" + OCparam.ROAD_SCHEM_NAME_X.get(), fileX.getAbsolutePath());*/
+			
+			roadXschem = Schematic.load(fileX);
+			roadZschem = Schematic.load(fileZ);
 			plugin.getLogger().info("Les fichier " + OCparam.ROAD_SCHEM_NAME_X.get() + 
 					" et " + OCparam.ROAD_SCHEM_NAME_Z.get() + " se sont chargés correctement.");
-		} catch (IOException e) {
-			plugin.getLogger().severe("Attention : L'un des fichiers route n'a pas été trouvé dans le dossier 'resources'. Veuillez le(s) renseigner pour créer des routes personnalisées et vérifier que les nom paramétrés dans la table creatif_server_params sont corrects.");
+		} catch (Exception e) {
+			plugin.getLogger().severe("Attention : L'un des fichiers suivants : \n" + 
+					fileX + "\n" + 
+					fileZ + "\n" +
+					"Veuillez le(s) renseigner. Arrêt du serveur.");
 			e.printStackTrace();
+			Bukkit.shutdown();
 		}
 	}
     
     
 	public void copyResource(String res, String dest) throws IOException {
-        InputStream src = getClass().getClassLoader().getResourceAsStream(res);        
+        InputStream src = getClass().getClassLoader().getResourceAsStream(res);
         Files.copy(src, Paths.get(dest), StandardCopyOption.REPLACE_EXISTING);
     }
     

@@ -152,6 +152,7 @@ public class PlotCbData {
 		
 		PlotParamType.HOLOS_DATAS.setValue(plot, 
 			holosIds.keySet().stream().map(id -> OlympaCore.getInstance().getHologramsManager().getHologram(id))
+			.filter(holo -> holo != null)
 			.collect(Collectors.toMap(holo -> holosIds.get(holo.getID()), holo -> new HologramData(holosIds.get(holo.getID()), 
 					holo.getLines().stream().map(line ->  line.getLine() instanceof FixedLine ? ((FixedLine<HologramLine>)line.getLine()).getValue(line) : "")
 					.collect(Collectors.toList()), new Position(holo.getBottom())))));

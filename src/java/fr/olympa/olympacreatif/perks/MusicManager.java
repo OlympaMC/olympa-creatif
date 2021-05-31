@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
@@ -58,7 +59,7 @@ public class MusicManager implements Listener {
 	private Map<String, Song> songsName = new HashMap<String, Song>();
 	private Map<ItemStack, Entry<String, Song>> songsItem = new LinkedHashMap<ItemStack, Map.Entry<String,Song>>();
 	
-	//private Map<UUID, RadioSongPlayer> radios = new HashMap<UUID, RadioSongPlayer>();
+	private Map<UUID, RadioSongPlayer> radios = new HashMap<UUID, RadioSongPlayer>();
 	
 	public MusicManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -127,7 +128,7 @@ public class MusicManager implements Listener {
 	}
 	
 	public void startSong(Player p, Song song) {
-		//stopSong(p);
+		stopSong(p);
 		
 		if (song == null) {
 			try {
@@ -147,7 +148,7 @@ public class MusicManager implements Listener {
 		rsp.addPlayer(p);
 		rsp.setPlaying(true);
 		
-		//radios.put(p.getUniqueId(), rsp);
+		radios.put(p.getUniqueId(), rsp);
 	}
 	
 	/**
@@ -155,7 +156,10 @@ public class MusicManager implements Listener {
 	 * @param p
 	 */
 	public void stopSong(Player p) {
-		NoteBlockAPI.stopPlaying(p);
+		RadioSongPlayer rsp = radios.remove(p.getUniqueId());
+		if (rsp == null)
+			return;
+		rsp.destroy();
 	}
 	
 	
@@ -189,11 +193,11 @@ public class MusicManager implements Listener {
 			super("Musiques disponibles", DyeColor.GREEN, new ArrayList<ItemStack>(songsMap.keySet()), 6);
 
 			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProvider.get(p0.getUniqueId())))
-				songsMap.forEach((it, song) -> items.put(it, p -> {					
-					PlotParamType.SONG.setValue(plot, song.getKey());
-					ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §a" + song.getValue().getTitle());
+				songsMap.forEach((it, songEntry) -> items.put(it, p -> {					
+					PlotParamType.SONG.setValue(plot, songEntry.getKey());
+					ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §a" + songEntry.getKey());
 					
-					plot.getPlayers().forEach(player -> startSong(player, song.getValue()));
+					plot.getPlayers().forEach(player -> startSong(player, songEntry.getValue()));
 				}));
 			
 			//set current selected music

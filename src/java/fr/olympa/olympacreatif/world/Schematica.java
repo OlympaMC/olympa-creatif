@@ -22,14 +22,14 @@ import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.NBTTagList;
 import net.minecraft.server.v1_16_R3.TileEntity;
 
-public class Schematic {
+public class Schematica {
 
 	public String name;
 	public EmptyBuildBlock[][][] blocks;
 
 	public short width, height, length;
 
-	private Schematic(short width, short height, short length) {
+	private Schematica(short width, short height, short length) {
 		this.width = width;
 		this.height = height;
 		this.length = length;
@@ -48,7 +48,7 @@ public class Schematic {
 		}
 	}
 
-	public static Schematic load(FileInputStream file) throws IOException {
+	public static Schematica loade(FileInputStream file) throws IOException {
 		//if (!file.exists()) throw new FileNotFoundException("File not found");
 
 		FileInputStream fis = file;//new FileInputStream(file);
@@ -58,7 +58,7 @@ public class Schematic {
 		short width = nbt.getShort("Width");
 		short height = nbt.getShort("Height");
 		short length = nbt.getShort("Length");
-
+		
 		byte[] blockData = nbt.getByteArray("BlockData");
 		Map<Integer, BlockData> blocks = new HashMap<>();
 
@@ -70,7 +70,7 @@ public class Schematic {
 			blocks.put(id, blockData2);
 		});
 
-		Schematic out = new Schematic(width, height, length);
+		Schematica out = new Schematica(width, height, length);
 
 		for (int x = 0; x < width; ++x) {
 			for (int y = 0; y < height; ++y) {
