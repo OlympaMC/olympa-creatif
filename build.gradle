@@ -1,0 +1,103 @@
+// Olympa Créatif
+
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/')
+    }
+
+    maven {
+        url = uri('https://papermc.io/repo/repository/maven-public/')
+    }
+    
+    maven { 
+    	url = uri("https://mvn.intellectualsites.com/content/repositories/releases/") 
+    }// FAWE
+    
+    /*maven { 
+    	url = uri("https://raw.githubusercontent.com/SBPrime/AsyncWorldEdit/maven-artifact/") 
+    }// AWE*/
+
+    maven {
+        url = uri('https://jitpack.io')
+        content{
+       		includeGroup "com.github.koca2000"
+        }
+    }
+}
+
+configurations {
+	all {
+		resolutionStrategy.dependencySubstitution {
+        	substitute module("fr.olympa:olympa-api") with project(':olympa-api')
+        	substitute module("fr.olympa:olympa-core") with project(':olympa-core')
+		}
+	}
+	/*priority {
+  	  	extendsFrom compileOnly
+  	  	sourceSets.main.compileClasspath = configurations.priority + sourceSets.main.compileClasspath
+    }*/
+}
+
+dependencies {
+    compileOnly 'fr.olympa:olympa-core:0.0.1-SNAPSHOT'
+    compileOnly 'com.intellectualsites.fawe:FAWE-Bukkit:1.16-687'
+    compileOnly 'com.intellectualsites.fawe:FAWE-Core:1.16-687'
+    compileOnly 'com.github.koca2000:NoteBlockAPI:-SNAPSHOT'
+    compileOnly 'org.primesoft.asyncworldedit:AsyncWorldEdit:3.8.4'
+}
+
+def getCheckedOutGitCommitHash() {
+    def gitFolder = "$projectDir/.git/"
+    def takeFromHash = 8
+    /*
+     * '.git/HEAD' contains either
+     *      in case of detached head: the currently checked out commit hash
+     *      otherwise: a reference to a file containing the current commit hash
+     */
+    def head = new File(gitFolder + "HEAD").text.split(":") // .git/HEAD
+    def isCommit = head.length == 1 // e5a7c79edabbf7dd39888442df081b1c9d8e88fd
+    // def isRef = head.length > 1     // ref: refs/heads/master
+
+    if(isCommit) return head[0].trim().take(takeFromHash) // e5a7c79edabb
+
+    def refHead = new File(gitFolder + head[1].trim()) // .git/refs/heads/master
+    refHead.text.trim().take takeFromHash
+}
+
+group = 'fr.olympa'
+version = '0.0.1-SNAPSHOT'
+description = 'olympa-creatif'
+java.sourceCompatibility = JavaVersion.VERSION_11
+
+def fullVersion = description + '-' + version + '-' + getCheckedOutGitCommitHash()
+
+jar {
+	archiveFileName = 'OlympaCreatif.jar'
+	destinationDirectory = file('build')
+}
+
+processResources {
+    filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+       "plugin_version": fullVersion
+    ]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/java']
+        }
+        resources {
+            srcDirs = ['src/resources']
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
