@@ -24,11 +24,11 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.olympa.api.player.OlympaPlayerInformations;
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.redis.RedisAccess;
-import fr.olympa.api.redis.RedisChannel;
-import fr.olympa.api.sql.statement.OlympaStatement;
+import fr.olympa.api.common.player.OlympaPlayerInformations;
+import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.redis.RedisAccess;
+import fr.olympa.api.common.redis.RedisChannel;
+import fr.olympa.api.common.sql.statement.OlympaStatement;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;

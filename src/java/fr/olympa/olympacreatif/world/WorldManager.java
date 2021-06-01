@@ -21,8 +21,8 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.olympa.api.economy.OlympaMoney;
-import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.spigot.economy.OlympaMoney;
+import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;

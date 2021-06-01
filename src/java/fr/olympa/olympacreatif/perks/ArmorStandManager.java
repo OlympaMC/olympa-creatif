@@ -32,10 +32,10 @@ import org.bukkit.util.EulerAngle;
 
 import com.google.common.collect.ImmutableMap;
 
-import fr.olympa.api.editor.Editor;
-import fr.olympa.api.editor.TextEditor;
-import fr.olympa.api.gui.OlympaGUI;
-import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.spigot.editor.Editor;
+import fr.olympa.api.spigot.editor.TextEditor;
+import fr.olympa.api.spigot.gui.OlympaGUI;
+import fr.olympa.api.spigot.item.ItemUtils;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;

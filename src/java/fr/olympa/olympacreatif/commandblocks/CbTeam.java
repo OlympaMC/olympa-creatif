@@ -6,8 +6,8 @@ import java.util.List;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-import fr.olympa.api.player.OlympaPlayer;
-import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.common.player.OlympaPlayer;
+import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;

@@ -22,8 +22,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.utils.spigot.SpigotUtils;
+import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.spigot.utils.SpigotUtils;
 import fr.olympa.core.spigot.chat.CancerListener;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;

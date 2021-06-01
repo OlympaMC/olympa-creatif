@@ -22,9 +22,9 @@ import org.bukkit.entity.Player;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import fr.olympa.api.holograms.Hologram;
-import fr.olympa.api.holograms.Hologram.HologramLine;
-import fr.olympa.api.lines.FixedLine;
+import fr.olympa.api.spigot.holograms.Hologram;
+import fr.olympa.api.spigot.holograms.Hologram.HologramLine;
+import fr.olympa.api.spigot.lines.FixedLine;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCparam;

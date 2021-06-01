@@ -28,9 +28,9 @@ import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 
-import fr.olympa.api.gui.templates.PagedGUI;
-import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.spigot.gui.templates.PagedGUI;
+import fr.olympa.api.spigot.item.ItemUtils;
+import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.gui.IGui;

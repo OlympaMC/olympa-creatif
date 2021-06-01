@@ -9,8 +9,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
-import fr.olympa.api.command.OlympaCommand;
-import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.spigot.command.OlympaCommand;
+import fr.olympa.api.spigot.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OcPermissions;

@@ -6,7 +6,7 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;
 
-import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.spigot.item.ItemUtils;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.plot.Plot;
 

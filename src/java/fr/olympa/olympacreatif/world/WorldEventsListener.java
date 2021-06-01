@@ -46,9 +46,9 @@ import org.bukkit.potion.PotionEffect;
 
 import com.google.common.collect.ImmutableSet;
 
-import fr.olympa.api.customevents.AsyncPlayerAfkEvent;
-import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.spigot.customevents.AsyncPlayerAfkEvent;
+import fr.olympa.api.spigot.item.ItemUtils;
+import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OcPermissions;

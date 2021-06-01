@@ -9,8 +9,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import fr.olympa.api.groups.OlympaGroup;
-import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.common.groups.OlympaGroup;
+import fr.olympa.api.spigot.item.ItemUtils;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;

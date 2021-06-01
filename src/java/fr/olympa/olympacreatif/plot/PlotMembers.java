@@ -11,8 +11,8 @@ import org.bukkit.entity.Player;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import fr.olympa.api.player.OlympaPlayerInformations;
-import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.common.player.OlympaPlayerInformations;
+import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;

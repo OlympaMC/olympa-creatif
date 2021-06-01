@@ -2,7 +2,7 @@ package fr.olympa.olympacreatif.gui;
 
 import org.bukkit.Material;
 
-import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.spigot.item.ItemUtils;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
 
 

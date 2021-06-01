@@ -23,8 +23,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.google.common.collect.ImmutableMap;
 
-import fr.olympa.api.permission.OlympaPermission;
-import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.common.permission.OlympaPermission;
+import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbCommandListener.CbCmdResult;
 import fr.olympa.olympacreatif.gui.ShopGui.MarketItemData;

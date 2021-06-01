@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.bukkit.Material;
 
-import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.common.permission.OlympaPermission;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;

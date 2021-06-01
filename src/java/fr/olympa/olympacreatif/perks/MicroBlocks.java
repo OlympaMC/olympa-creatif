@@ -30,8 +30,8 @@ import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import fr.olympa.api.gui.templates.PagedGUI;
-import fr.olympa.api.item.ItemUtils;
+import fr.olympa.api.spigot.gui.templates.PagedGUI;
+import fr.olympa.api.spigot.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
 public class MicroBlocks {

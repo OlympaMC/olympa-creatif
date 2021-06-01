@@ -8,8 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
-import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.spigot.item.ItemUtils;
+import fr.olympa.api.common.permission.OlympaPermission;
 import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;

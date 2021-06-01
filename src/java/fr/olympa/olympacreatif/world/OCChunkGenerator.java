@@ -15,7 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.ChunkGenerator;
 
-import fr.olympa.api.utils.spigot.Schematic;
+import fr.olympa.api.spigot.utils.Schematic;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCparam;
 
