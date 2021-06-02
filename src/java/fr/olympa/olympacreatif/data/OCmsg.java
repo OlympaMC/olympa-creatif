@@ -27,7 +27,7 @@ import fr.olympa.api.common.permission.OlympaPermission;
 import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbCommandListener.CbCmdResult;
-import fr.olympa.olympacreatif.gui.ShopGui.MarketItemData;
+import fr.olympa.olympacreatif.gui.ShopGuiPourApresLaBeta.MarketItemData;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;

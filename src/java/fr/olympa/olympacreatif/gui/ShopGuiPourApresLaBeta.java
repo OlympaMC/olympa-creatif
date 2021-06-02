@@ -327,8 +327,8 @@ public class ShopGuiPourApresLaBeta extends IGui{
 					isBuyableOwned = false;	
 				}
 
-				int oldValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy));
-				int newValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1);
+				int oldValue = ((UpgradeType)toBuy).getOf(p.getUpgradeLevel((UpgradeType)toBuy));
+				int newValue = ((UpgradeType)toBuy).getOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1);
 
 				if (toBuy == UpgradeType.CB_LEVEL) {
 					oldValue *= 20;

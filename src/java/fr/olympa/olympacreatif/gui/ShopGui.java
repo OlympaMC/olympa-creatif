@@ -21,6 +21,11 @@ import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 public class ShopGui extends IGui {
 
+	public ShopGui(IGui gui) {
+		super(gui, "§4Veuillez signaler cette erreur au staff.", 1, null);
+		// TODO Constructeur par défaut car supression du shop sous cette forme
+	}
+/*
 	//init têtes
 	private static final ItemStack ranksRowHead = ItemUtils.skullCustom("§6Grades",
 			"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI1NzViNTU3N2NjYjMyZTQyZDU0MzA0YTFlZjVmMjNhZDZiYWQ1YTM0NTYzNDBhNDkxMmE2MmIzNzk3YmI1In19fQ==");
@@ -233,9 +238,6 @@ public class ShopGui extends IGui {
 		}
 	}
 
-	/**
-	 * Set the buy process indicator to deny for 2 seconds
-	 */
 	private void startBuyDenyTimer(MarketItemData data) {
 
 		setItem(buyProcessItemSlot, ItemUtils.item(data.getHolder().getType(), "§6Achat : " + data.getHolder().getItemMeta().getDisplayName()), null);
@@ -400,7 +402,7 @@ public class ShopGui extends IGui {
 					p.addGroup((OlympaGroup) toBuy);
 					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(p);
 
-					p.updateGroups();
+					//p.updateGroups();
 					if (OcPermissions.USE_WORLD_EDIT.getMinGroup() == toBuy)
 						OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(p);
 
@@ -430,5 +432,5 @@ public class ShopGui extends IGui {
 
 			//new AccountProvider(p.getUniqueId()).saveToDb(p);
 		}
-	}
+	}*/
 }

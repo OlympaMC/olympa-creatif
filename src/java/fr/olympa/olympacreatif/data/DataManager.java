@@ -164,9 +164,18 @@ public class DataManager implements Listener {
 	public DataManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
+		if (!plugin.getConfig().isInt("server_index") || plugin.getConfig().getInt("server_index") == -1) {
+			plugin.getLogger().severe("§4L'index du serveur n'a pas été défini. Veuillez le renseigner dans le fichier config.yml.");
+			plugin.getConfig().set("server_index", -1);
+			plugin.saveConfig();
+			Bukkit.shutdown();
+			return;
+		}else
+			updateWithServerIndex(plugin.getConfig().getInt("server_index"));
+		
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		//register redis
-		OlympaCore.getInstance().registerRedisSub(RedisAccess.INSTANCE.connect(), new OCRedisListener(plugin), RedisChannel.BUNGEE_ASK_SEND_SERVERNAME.name());
+		//OlympaCore.getInstance().registerRedisSub(RedisAccess.INSTANCE.connect(), new OCRedisListener(plugin), RedisChannel.BUNGEE_ASK_SEND_SERVERNAME.name());
 
 		//création tables
 		try {
@@ -383,8 +392,8 @@ public class DataManager implements Listener {
 			getPlotOwnerDatasResult.next();
 
 			//création plotMembers
-			PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(
-					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())));
+			PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getOf(
+					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())).value);
 
 			PreparedStatement getPlotMembers = osSelectPlotPlayers.createStatement();
 			getPlotMembers.setInt(1, serverIndex);
@@ -402,7 +411,7 @@ public class DataManager implements Listener {
 
 			//création plotCbData
 			PlotCbData cbData = new PlotCbData(plugin,  
-					UpgradeType.CB_LEVEL.getValueOf(getPlotOwnerDatasResult.getInt(UpgradeType.CB_LEVEL.getBddKey())),
+					UpgradeType.CB_LEVEL.getOf(getPlotOwnerDatasResult.getInt(UpgradeType.CB_LEVEL.getBddKey())).value,
 					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()) && getPlotOwnerDatasResult.getBoolean(KitType.PEACEFUL_MOBS.getBddKey()),
 					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()));
 
@@ -494,8 +503,8 @@ public class DataManager implements Listener {
 			PreparedStatement ps2 = osCountPlots2.createStatement();
 			ps2.setInt(1, serverIndex);
 			ResultSet result2 = osCountPlots2.executeQuery(ps2);
-			result2.next(); // what ?
-
+			
+			result2.next(); // what ? -> sert à récupérer le nombre de lignes de la bdd (regarde la requête)
 			int finalResult = result.getInt(1);
 			
 			result.close();
@@ -562,15 +571,34 @@ public class DataManager implements Listener {
 
 	public void updateWithServerIndex(int i) {
 		serverIndex = i;
+
+		this.getPlotsCount();
+		if (plugin.getDataManager().getPlotsCount() == -1) {
+			Bukkit.getServer().shutdown();
+			throw new UnsupportedOperationException("§4ATTENTION problème dans la table creatif_plotsdata : nombre d'entrées différent de l'indice du plot maximal !! §cArrêt du serveur.");
+		}
+
+		//actions exécutées à la fin du chargement du serveur
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				plugin.getWorldManager().defineWorldParams();	
+				plugin.getWorldManager().loadCustomWorldGenerator();
+				plugin.getPlotsManager().loadHelpHolos();
+			}
+		}.runTask(plugin);
+		
+		
 		try {
 			PreparedStatement ps = osSelectServerParams.createStatement();
 			ps.setInt(1, serverIndex);
 
 			ResultSet result = osSelectServerParams.executeQuery(ps);
 
-			if (result.next())
-				OCparam.fromJson(result.getString("server_params"));
-			else {
+			if (result.next()) {
+				OCparam.initFromJson(result.getString("server_params"));
+				plugin.getLogger().info("§aParamètres chargés pour le serveur créatif " + serverIndex);
+			}else {
 				plugin.getLogger().warning("§ePas de paramètres existant pour le serveur " + serverIndex + ". Création des paramètres par défaut. Le serveur va s'arrêter.");
 				new BukkitRunnable() {
 					@Override

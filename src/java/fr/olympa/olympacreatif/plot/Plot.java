@@ -67,12 +67,12 @@ public class Plot {
 		plotId = PlotId.createNew(plugin);
 		
 		parameters = new PlotParameters(plugin, plotId);
-		members = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)));
+		members = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getOf(p.getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)).value);
 		
 		members.set(p, PlotRank.OWNER);
 		
 		cbData = new PlotCbData(plugin, 
-				UpgradeType.CB_LEVEL.getValueOf(p.getUpgradeLevel(UpgradeType.CB_LEVEL)), 
+				UpgradeType.CB_LEVEL.getOf(p.getUpgradeLevel(UpgradeType.CB_LEVEL)).value, 
 				p.hasKit(KitType.HOSTILE_MOBS) && p.hasKit(KitType.PEACEFUL_MOBS), p.hasKit(KitType.HOSTILE_MOBS));
 		
 		stoplagChecker = new PlotStoplagChecker(plugin, this);

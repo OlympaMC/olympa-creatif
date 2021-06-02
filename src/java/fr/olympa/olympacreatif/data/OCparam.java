@@ -4,10 +4,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -18,6 +21,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeData;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 
 
@@ -53,8 +58,14 @@ public class OCparam<T> {
 
 	public static final OCparam<Integer> MAX_HOLOS_PER_PLOT = new OCparam<Integer>(60);
 	public static final OCparam<Integer> MAX_LINES_PER_HOLO = new OCparam<Integer>(15);
+
+	public static final OCparam<Integer> WE_MAX_NBT_SIZE = new OCparam<Integer>(8000);
 	
-	public static final OCparam<Integer> WE_MAX_NBT_SIZE = new OCparam<Integer>(10000);
+	public static final OCparam<Map<UpgradeType, List<UpgradeData>>> SHOP_DATA = 
+			new OCparam<Map<UpgradeType, List<UpgradeData>>>(
+			//la valeur par défaut est un peu longue mais trql
+			Stream.of(UpgradeType.values()).collect(Collectors.toMap(type -> type, type -> Arrays.asList(new UpgradeData[]{new UpgradeData(0, UpgradeType.BONUS_PLOTS_LEVEL, "0 €", 0), new UpgradeData(1, UpgradeType.BONUS_PLOTS_LEVEL, "42 €", 1)}))), 
+			new TypeToken<HashMap<UpgradeType, UpgradeData>>() {}.getType());
 	
 	
 	//public static final OCparam<Integer> MAX_CB_PER_PLOT = new OCparam<Integer>(1000);
@@ -113,7 +124,7 @@ public class OCparam<T> {
 	 * Set values of all public static fields according to provided json data
 	 * @param jsonText
 	 */
-	public static void fromJson(String jsonText) {
+	public static void initFromJson(String jsonText) {
 		try {
 			JSONObject json = (JSONObject) new JSONParser().parse(jsonText);
 			Gson gson = new GsonBuilder().serializeNulls().create();

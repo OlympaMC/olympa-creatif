@@ -41,7 +41,7 @@ public class OCRedisListener extends JedisPubSub {
 			return;
 		}
 			
-		plugin.getPlotsManager().setTotalPlotCount(plotsCount);
+		//plugin.getPlotsManager().setTotalPlotCount(plotsCount);
 		
 		
 		new BukkitRunnable() {
@@ -54,7 +54,7 @@ public class OCRedisListener extends JedisPubSub {
 		}.runTask(plugin);
 
 		//create default scoreboard
-		plugin.createScoreboard(serverIndex);
+		//plugin.createScoreboard(serverIndex);
 		
 		plugin.getLogger().info("§aINDEX DU SERVEUR CREATIF : " + serverIndex + "§7 - Nombre de parcelles : " + plotsCount + " - Taille parcelles : " + OCparam.PLOT_SIZE.get() + "*" + OCparam.PLOT_SIZE.get());
 		
