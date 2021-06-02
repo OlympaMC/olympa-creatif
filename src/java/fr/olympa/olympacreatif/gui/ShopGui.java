@@ -21,7 +21,7 @@ import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 public class ShopGui extends IGui {
 
-	//init têtes
+	//init têtes 
 	private static final ItemStack ranksRowHead = ItemUtils.skullCustom("§6Grades",
 			"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI1NzViNTU3N2NjYjMyZTQyZDU0MzA0YTFlZjVmMjNhZDZiYWQ1YTM0NTYzNDBhNDkxMmE2MmIzNzk3YmI1In19fQ==");
 	private static final ItemStack kitsRowHead = ItemUtils.skullCustom("§6Kits",
