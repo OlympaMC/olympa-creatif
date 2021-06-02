@@ -100,6 +100,9 @@ public class UpgradesManager {
 	}
 	
 	public static class UpgradeData {
+		/**
+		 * Niveau de l'amélioration. Par défaut, tous les joueurs ont le niveau 0. Les indices DOIVENT se suivre de 1 en 1 depuis 0
+		 */
 		public final int level;
 		public final UpgradeType type;
 		/**

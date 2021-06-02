@@ -264,7 +264,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		if (!onlyOwnedPlots)
 			return PlotsManager.maxPlotsPerPlayer;
 		
-		int count = UpgradeType.BONUS_PLOTS_LEVEL.getOf(upgrades.get(UpgradeType.BONUS_PLOTS_LEVEL));
+		int count = UpgradeType.BONUS_PLOTS_LEVEL.getOf(upgrades.get(UpgradeType.BONUS_PLOTS_LEVEL)).value;
 
 		if (getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR))
 			count += 1;
