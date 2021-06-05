@@ -50,8 +50,8 @@ public class UpgradesManager {
 	public UpgradesManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
-		OCparam.SHOP_DATA.get().forEach((type, values) ->
-			values.forEach(value -> type.values.put(value.level, value))
+		OCparam.SHOP_DATA.get().forEach((type, upgradess) ->
+			upgradess.forEach(upgrade -> type.values.put(upgrade.level, upgrade))
 		);
 		//plugin.getServer().getPluginManager().registerEvents(new PlayerChangeRankListener(), plugin);
 	}
@@ -108,7 +108,7 @@ public class UpgradesManager {
 		/**
 		 * Prix en euros de ce niveau d'upgrade. Uniquement à titre informatif
 		 */
-		public final String price; //
+		public final String price;
 		/**
 		 * Valeur de l'upgrade (par exemple 2 pour 2 parcelles suplémentaires)
 		 */
