@@ -183,7 +183,7 @@ public class PlotsManager {
 				}
 				
 				return Optional.ofNullable(null);
-			}).orElseGet(null);
+			}).orElseGet(() -> null);
 		} catch (ExecutionException e1) {
 			return null;
 		}

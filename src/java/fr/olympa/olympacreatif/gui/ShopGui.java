@@ -19,6 +19,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
+@Deprecated
 public class ShopGui extends IGui {
 
 	public ShopGui(IGui gui) {

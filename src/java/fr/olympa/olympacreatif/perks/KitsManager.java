@@ -180,7 +180,7 @@ public class KitsManager {
 		list.add(Material.PARROT_SPAWN_EGG);
 		list.add(Material.PIG_SPAWN_EGG);
 		list.add(Material.RABBIT_SPAWN_EGG);
-		list.add(Material.SALMON);
+		list.add(Material.SALMON_SPAWN_EGG);
 		list.add(Material.SHEEP_SPAWN_EGG);
 		list.add(Material.SQUID_SPAWN_EGG);
 		list.add(Material.TROPICAL_FISH_SPAWN_EGG);

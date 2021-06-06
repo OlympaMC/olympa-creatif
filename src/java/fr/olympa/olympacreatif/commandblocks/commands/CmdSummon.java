@@ -71,7 +71,6 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.TROPICAL_FISH)
 			.add(EntityType.TURTLE)
 			.add(EntityType.VEX)
-			.add(EntityType.VILLAGER)
 			.add(EntityType.VINDICATOR)
 			.add(EntityType.WANDERING_TRADER)
 			.add(EntityType.WITCH)
@@ -89,8 +88,6 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.MINECART_HOPPER)
 			
 			.add(EntityType.BOAT)
-
-			.add(EntityType.ZOMBIE_VILLAGER)
 			
 			.add(EntityType.PIGLIN)
 			.add(EntityType.PIGLIN_BRUTE)
