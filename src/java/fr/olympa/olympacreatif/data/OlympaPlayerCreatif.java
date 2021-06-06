@@ -19,12 +19,12 @@ import org.bukkit.ChatColor;
 
 import com.google.common.collect.ImmutableMap;
 
-import fr.olympa.api.spigot.economy.MoneyPlayerInterface;
-import fr.olympa.api.spigot.economy.OlympaMoney;
 import fr.olympa.api.common.groups.OlympaGroup;
 import fr.olympa.api.common.permission.OlympaSpigotPermission;
+import fr.olympa.api.common.provider.OlympaPlayerObject;
 import fr.olympa.api.common.sql.SQLColumn;
-import fr.olympa.api.commun.provider.OlympaPlayerObject;
+import fr.olympa.api.spigot.economy.MoneyPlayerInterface;
+import fr.olympa.api.spigot.economy.OlympaMoney;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
