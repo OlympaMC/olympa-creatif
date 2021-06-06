@@ -57,19 +57,25 @@ public class UpgradesManager {
 	}
 	
 	public enum UpgradeType {
-		CB_LEVEL("upgrade_level_command_block"),
-		BONUS_PLOTS_LEVEL("upgrade_level_bonus_plots"),
-		BONUS_MEMBERS_LEVEL("upgrade_level_bonus_members"); 
+		CB_LEVEL("upgrade_level_command_block", "augmentation des commandes par secondes pour les commandblocks"),
+		BONUS_PLOTS_LEVEL("upgrade_level_bonus_plots", "augmentation du nombre de membres par parcelle"),
+		BONUS_MEMBERS_LEVEL("upgrade_level_bonus_members", "augmentation de votre nombre de parcelles"); 
 		
 		private String bddKey;
+		private String name;
 		private Map<Integer, UpgradeData> values = new HashMap<Integer, UpgradeData>();
 		
-		UpgradeType(String bddKey) {
+		UpgradeType(String bddKey, String name) {
 			this.bddKey = bddKey;
+			this.name = name;
 		}
 		
 		public String getBddKey() {
 			return bddKey;
+		}
+		
+		public String getName() {
+			return name;
 		}
 		
 		/*public List<Integer> getValues() {
@@ -81,7 +87,7 @@ public class UpgradesManager {
 		}
 		
 		
-		public UpgradeData getOf(int level) {
+		public UpgradeData getDataOf(int level) {
 			if (level < 0)
 				return values.get(0);
 			else if (level >= values.size())
@@ -98,6 +104,7 @@ public class UpgradesManager {
 			return values.get(getValueOf(level));
 		}*/
 	}
+	
 	
 	public static class UpgradeData {
 		/**
@@ -119,16 +126,7 @@ public class UpgradesManager {
 			this.type = type;
 			this.price = price;
 			this.value = value;
-		}
-		
-		/*static UpgradeData fromJson(String json) {
-			return new Gson().fromJson(json, UpgradeData.class);
-		}
-		
-		public String serialize() {
-			return new Gson().toJson(this);
-		}*/
-		
+		}		
 	}
 }
 

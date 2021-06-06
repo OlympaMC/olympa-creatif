@@ -233,7 +233,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		//changement du cpt des plots du joueur
 		if (upg == UpgradeType.CB_LEVEL)
 			for (Plot plot : getPlots(true))
-				plot.getCbData().setCommandsPerSecond(UpgradeType.CB_LEVEL.getOf(upgrades.get(UpgradeType.CB_LEVEL)));
+				plot.getCbData().setCommandsPerSecond(UpgradeType.CB_LEVEL.getDataOf(upgrades.get(UpgradeType.CB_LEVEL)));
 		
 		upgradesColumns.get(upg).updateAsync(this, getUpgradeLevel(upg), null, null);
 	}
@@ -264,7 +264,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		if (!onlyOwnedPlots)
 			return PlotsManager.maxPlotsPerPlayer;
 		
-		int count = UpgradeType.BONUS_PLOTS_LEVEL.getOf(upgrades.get(UpgradeType.BONUS_PLOTS_LEVEL)).value;
+		int count = UpgradeType.BONUS_PLOTS_LEVEL.getDataOf(upgrades.get(UpgradeType.BONUS_PLOTS_LEVEL)).value;
 
 		if (getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR))
 			count += 1;

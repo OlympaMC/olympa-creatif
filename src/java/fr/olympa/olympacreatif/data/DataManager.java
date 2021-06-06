@@ -392,7 +392,7 @@ public class DataManager implements Listener {
 			getPlotOwnerDatasResult.next();
 
 			//création plotMembers
-			PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getOf(
+			PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getDataOf(
 					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())).value);
 
 			PreparedStatement getPlotMembers = osSelectPlotPlayers.createStatement();
@@ -411,7 +411,7 @@ public class DataManager implements Listener {
 
 			//création plotCbData
 			PlotCbData cbData = new PlotCbData(plugin,  
-					UpgradeType.CB_LEVEL.getOf(getPlotOwnerDatasResult.getInt(UpgradeType.CB_LEVEL.getBddKey())).value,
+					UpgradeType.CB_LEVEL.getDataOf(getPlotOwnerDatasResult.getInt(UpgradeType.CB_LEVEL.getBddKey())).value,
 					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()) && getPlotOwnerDatasResult.getBoolean(KitType.PEACEFUL_MOBS.getBddKey()),
 					getPlotOwnerDatasResult.getBoolean(KitType.HOSTILE_MOBS.getBddKey()));
 
