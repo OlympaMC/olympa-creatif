@@ -1,51 +1,42 @@
  package fr.olympa.olympacreatif.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
 import fr.olympa.api.common.groups.OlympaGroup;
 import fr.olympa.api.spigot.item.ItemUtils;
-import fr.olympa.core.spigot.OlympaCore;
-import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.OcPermissions;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 
 
-public class ShopGuiPourApresLaBeta extends IGui{
+public class ShopGuiPourApresLaBeta extends IGui {
 	
 	//init têtes
 	private static final ItemStack ranksRowHead = ItemUtils.skullCustom("§6Grades", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWI1NzViNTU3N2NjYjMyZTQyZDU0MzA0YTFlZjVmMjNhZDZiYWQ1YTM0NTYzNDBhNDkxMmE2MmIzNzk3YmI1In19fQ==");
 	private static final ItemStack kitsRowHead = ItemUtils.skullCustom("§6Kits", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg4MjRkY2Y0YmEzMTc1MzNiZjI5ZGNhMThjZTdjNGZkMzI4YjQyNjgwZTZjMzIyZjVmNGZmMWEzOTRhODg3In19fQ==");
 	private static final ItemStack upgradesRowHead = ItemUtils.skullCustom("§6Améliorations", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODA3M2FlNTQ3ZTZkYWE5ZDJkYzhjYjkwZTc4ZGQxYzcxY2RmYWRiNzQwMWRjMTY3ZDE2ODE5YjE3MzI4M2M1MSJ9fX0=");
+
+	private int rankIndex = 0;
+	private int kitIndex = 9;
+	private int upgradeIndex = 18;
 	
-	private static final ItemStack buyProcessNullItem = ItemUtils.item(Material.BEDROCK, "§7Sélectionnez un objet à acheter");
-	private static final ItemStack buyProcessArrow = ItemUtils.skullCustom(" ", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19");
-	private static final ItemStack buyProcessQuestion = ItemUtils.skullCustom("§7En attente...", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19");
-	private static final ItemStack buyProcessAccept = ItemUtils.skullCustom("§aCliquez §2§lICI §r§apour acheter", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQwNjNiYTViMTZiNzAzMGEyMGNlNmYwZWE5NmRjZDI0YjA2NDgzNmY1NzA0NTZjZGJmYzllODYxYTc1ODVhNSJ9fX0=");
-	private static final ItemStack buyProcessDenyItem = ItemUtils.skullCustom("§cAchat impossible", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzIwZWYwNmRkNjA0OTk3NjZhYzhjZTE1ZDJiZWE0MWQyODEzZmU1NTcxODg2NGI1MmRjNDFjYmFhZTFlYTkxMyJ9fX0=");
-
-	private List<MarketItemData> ranks = new ArrayList<MarketItemData>();
-	private List<MarketItemData> kits = new ArrayList<MarketItemData>();
-	private List<MarketItemData> upgrades = new ArrayList<MarketItemData>();
-
-	int buyProcessItemSlot;
-	int buyProcessStateSlot;
 	
 	public ShopGuiPourApresLaBeta(IGui gui) {
-		super(gui, "Magasin (monnaie : " + gui.getPlayer().getGameMoney().getFormatted() + ")", 4, gui.staffPlayer);
+		super(gui, "Magasin", 3, gui.staffPlayer);
+
+		inv.setItem(0, ranksRowHead);
+		inv.setItem(9, kitsRowHead);
+		inv.setItem(18, upgradesRowHead);
+		
+		setItem(8, ItemUtils.item(Material.GOLD_INGOT, "§6Ouvrir la boutique", "§7Cliquez ici pour ouvrir", "§7la boutique sur le site"), 
+				(it, click, slot) -> sendBuyMessage("Cliquez ici pour ouvrir la boutique.", "olympa.fr"));
 		
 		//init rangs
-		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CONSTRUCTOR, 1, ItemUtils.item(Material.IRON_AXE, "§6Grade " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()), 
+		addRank(OlympaGroup.CREA_CONSTRUCTOR, ItemUtils.item(Material.IRON_AXE, "§6Grade " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()), 
 				"§2Ce grade donne accès à :", 
 				" ",
 				"§aPréfixe " + OlympaGroup.CREA_CONSTRUCTOR.getPrefix(p.getGender()) + p.getPlayer().getName(),  
@@ -53,9 +44,10 @@ public class ShopGuiPourApresLaBeta extends IGui{
 				"§aAccès aux microblocks et aux têtes (/mb, /skull)", 
 				"§aAccès à la réinitialisation de vos parcelles (/oco reset)",
 				"§aAccès aux chapeaux (/hat)"
-				)));
+				
+				), "olympa.fr", "1 €");
 		
-		ranks.add(new MarketItemData(p, OlympaGroup.CREA_ARCHITECT, 1, ItemUtils.item(Material.GOLDEN_AXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), 
+		addRank(OlympaGroup.CREA_ARCHITECT, ItemUtils.item(Material.GOLDEN_AXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), 
 				"§2En plus des avantages du niveau précédent,",
 				"§2ce grade donne accès à :",
 				" ",
@@ -63,12 +55,13 @@ public class ShopGuiPourApresLaBeta extends IGui{
 				"§a+2 parcelles (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 2) + ")",
 				"§aAccès aux commandes WorldEdit et goBrush",
 				"§aExport de vos parcelles en .schematic (/oco export)",
-				//"§aRestauration de vos parcelles vers le dernier schématic généré (/oco restore)",
 				"§aRestauration de vos parcelles (/oco restore)",
 				" ",
-				"§7Le niveau précédent est requis pour acheter ce grade.")));
+				"§7Le niveau précédent est requis pour acheter ce grade."
+				
+				), "olympa.fr", "2 €");
 		
-		ranks.add(new MarketItemData(p, OlympaGroup.CREA_CREATOR, 1, ItemUtils.item(Material.DIAMOND_AXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), 
+		addRank(OlympaGroup.CREA_CREATOR, ItemUtils.item(Material.DIAMOND_AXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), 
 				"§2En plus des avantages du niveau précédent,",
 				"§2ce grade donne accès à :",
 				" ",
@@ -82,11 +75,13 @@ public class ShopGuiPourApresLaBeta extends IGui{
 				"§6Mais avant tout, nous vous remercions",
 				"§6chaleureusement du soutien que vous nous apportez !",
 				"§6En espérant vous voir encore longtemps parmis nous,",
-				"§cL'équipe dévouée d'Olympa")));
+				"§cL'équipe dévouée d'Olympa"
+				
+				), "olympa.fr", "3 €");
 
 		
 		
-		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks", 
+		addKit(KitType.COMMANDBLOCK, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks", 
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'§eutiliser les",
@@ -99,9 +94,11 @@ public class ShopGuiPourApresLaBeta extends IGui{
 				"§7Si vous avez besoin de plus de CPS",
 				"§7achetez l'amélioration correspondante.",
 				" ",
-				"§7Pour voir votre consommation de CPS : /oco debug")));
+				"§7Pour voir votre consommation de CPS : /oco debug"
+				
+				), "olympa.fr", "4 €");
 		
-		kits.add(new MarketItemData(p, KitType.REDSTONE, 1, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone",
+		addKit(KitType.REDSTONE, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone",
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'utiliser",
@@ -111,9 +108,11 @@ public class ShopGuiPourApresLaBeta extends IGui{
 				" ",
 				"§7Les machines à lag sont interdites. ", 
 				"§7En cas d'abus, les courants de redstone",
-				"§7se bloqueront sur la parcelle.")));
+				"§7se bloqueront sur la parcelle."
+				
+				), "olympa.fr", "5 €");
 		
-		kits.add(new MarketItemData(p, KitType.FLUIDS, 1, ItemUtils.item(Material.WATER_BUCKET, "§6Kit fluides",
+		addKit(KitType.FLUIDS, ItemUtils.item(Material.WATER_BUCKET, "§6Kit fluides",
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit permet à l'§eeau et à la lave", 
@@ -122,9 +121,11 @@ public class ShopGuiPourApresLaBeta extends IGui{
 				" ",
 				"§7Les machines à lag sont interdites. ", 
 				"§7En cas d'abus, les fluides arrêteront",
-				"§7de couler sur la parcelle.")));
+				"§7de couler sur la parcelle."
+				
+				), "olympa.fr", "6 €");
 		
-		kits.add(new MarketItemData(p, KitType.PEACEFUL_MOBS, 1, ItemUtils.item(Material.PIG_SPAWN_EGG, "§6Kit animaux",
+		addKit(KitType.PEACEFUL_MOBS, ItemUtils.item(Material.PIG_SPAWN_EGG, "§6Kit animaux",
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'utiliser tous les ",
@@ -136,9 +137,11 @@ public class ShopGuiPourApresLaBeta extends IGui{
 				" ",
 				"§7Les machines à lag sont interdites. ", 
 				"§7En cas d'abus, les entités",
-				"§7n'apparaîtront plus sur la parcelle.")));
+				"§7n'apparaîtront plus sur la parcelle."
+				
+				), "olympa.fr", "7 €");
 		
-		kits.add(new MarketItemData(p, KitType.HOSTILE_MOBS, 1, ItemUtils.item(Material.CREEPER_SPAWN_EGG, "§6Kit monstres",
+		addKit(KitType.HOSTILE_MOBS, ItemUtils.item(Material.CREEPER_SPAWN_EGG, "§6Kit monstres",
 				"§2Caractéristiques :",
 				" ",
 				"§aCe kit vous permet d'utiliser tous les ",
@@ -150,287 +153,100 @@ public class ShopGuiPourApresLaBeta extends IGui{
 				" ",
 				"§7Les machines à lag sont interdites. ", 
 				"§7En cas d'abus, les entités",
-				"§7n'apparaîtront plus sur la parcelle.")));
-
-		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_PLOTS_LEVEL, 0, ItemUtils.item(Material.GRASS_BLOCK, "§6Augmentation du nombre de parcelles",
+				"§7n'apparaîtront plus sur la parcelle."
+				
+				), "olympa.fr", "8 €");
+		
+		addUpgrade(UpgradeType.BONUS_PLOTS_LEVEL, ItemUtils.item(Material.GRASS_BLOCK, "§6Augmentation du nombre de parcelles",
 				"§2Contenu :",
 				" ",
 				"§aCette amélioration augmente le",
 				"§anombre de parcelles sur lesquelles",
-				"§avous êtes propriétaire.")));
-		
-		upgrades.add(new MarketItemData(p, UpgradeType.BONUS_MEMBERS_LEVEL, 0, ItemUtils.item(Material.ACACIA_DOOR, "§6Augmentation nombre membres par parcelle",
+				"§avous êtes propriétaire."
+				
+				), "olympa.fr");
+
+		addUpgrade(UpgradeType.BONUS_MEMBERS_LEVEL, ItemUtils.item(Material.ACACIA_DOOR, "§6Augmentation du nombre de parcelles",
 				"§2Contenu :",
 				" ",
 				"§aCette amélioration augmente le", 
 				"§anombre de membres que vous pouvez",
-				"§arecruter sur vos parcelles.")));
-		
-		upgrades.add(new MarketItemData(p, UpgradeType.CB_LEVEL, 0, ItemUtils.item(Material.REPEATING_COMMAND_BLOCK, "§6Augmentation CPS commandblocks",
+				"§arecruter sur vos parcelles."
+				
+				), "olympa.fr");
+
+		addUpgrade(UpgradeType.CB_LEVEL, ItemUtils.item(Material.REPEATING_COMMAND_BLOCK, "§6Augmentation du nombre de parcelles",
 				"§2Contenu :",
 				" ",
-				"§aCette amélioration augmente le",
-				"§anombre de commandblocks s'exécutant",
-				"§achaque seconde sur vos parcelles.",
-				" ",
-				"§7Attention : cette amélioration est inutile si",
-				"§7vous n'avez pas acheté le §6kit commandblocks §7!")));
-		
-		//CREATION GUI
-		
-		buyProcessItemSlot = inv.getSize() - 5;
-		buyProcessStateSlot = inv.getSize() - 3;
-		
-		setItem(buyProcessItemSlot, buyProcessNullItem, null);
-		setItem(inv.getSize() - 4, buyProcessArrow, null);
-		setItem(buyProcessStateSlot, buyProcessQuestion, null);
-		
-		//ajout grades
-		int i = 0;
-		
-		setItem(i, ranksRowHead, null);
-		for (MarketItemData e : ranks) {
-			i++;
-			setItem(i, e.getHolder(), (it, c, s) -> {
-				//si l'objet est achetable, lancement timer d'achat, sinon maj de l'indicateur d'achat
-				if (e.isBuyable())
-					startBuyAcceptTimer(e);
-				else
-					startBuyDenyTimer(e);
-			});
-		}
-		
-		//ajout kits
-		i = 9;
-		
-		setItem(i, kitsRowHead, null);
-		for (MarketItemData e : kits) {
-			i++;
-			setItem(i, e.getHolder(), (it, c, s) -> {
-				//si l'objet est achetable, lancement timer d'achat, sinon maj de l'indicateur d'achat
-				if (e.isBuyable())
-					startBuyAcceptTimer(e);
-				else
-					startBuyDenyTimer(e);
-			});
-		}
-		
-		//ajout upgrades
-		i = 18;
-		
-		setItem(i, upgradesRowHead, null);
-		for (MarketItemData e : upgrades) {
-			i++;
-			setItem(i, e.getHolder(), (it, c, s) -> {
-				//si l'objet est achetable, lancement timer d'achat, sinon maj de l'indicateur d'achat
-				if (e.isBuyable())
-					startBuyAcceptTimer(e);
-				else
-					startBuyDenyTimer(e);
-			});
-		}
-	}
+				"§aCette amélioration augmente le nombre",
+				"§ade commandblocks pouvant s'exécuter",
+				"§achaque seconde sur vos parcelles."
+				
+				), "olympa.fr");
 
-	/**
-	 * Set the buy process indicator to deny for 2 seconds
-	 */
-	private void startBuyDenyTimer(MarketItemData data) {
-		
-		setItem(buyProcessItemSlot, ItemUtils.item(data.getHolder().getType(), "§6Achat : " + data.getHolder().getItemMeta().getDisplayName()), null);
-		setItem(buyProcessStateSlot, buyProcessDenyItem, null);
-		
-		plugin.getTask().runTaskLater(() -> {
-			if (buyProcessDenyItem.equals(inv.getItem(buyProcessStateSlot))) {
-				setItem(buyProcessItemSlot, buyProcessNullItem, null);
-				setItem(buyProcessStateSlot, buyProcessQuestion, null);	
-			}
-		}, 40);
 	}
 	
 	
-	private void startBuyAcceptTimer(MarketItemData data) {
-		if (isOpenByStaff) //cancel buying if gui is open by a staff
-			return;
+	private void addRank(final OlympaGroup group, ItemStack item, final String url, String price) {
+		rankIndex++;
 		
-		useBuyAcceptTimer(data, 2, 2, 15, 
-				ItemUtils.item(data.getHolder().getType(), "§6Achat : " + data.getHolder().getItemMeta().getDisplayName()));
+		OlympaGroup previousGroup = group == OlympaGroup.CREA_CONSTRUCTOR ? OlympaGroup.PLAYER :
+									group == OlympaGroup.CREA_ARCHITECT ? OlympaGroup.CREA_CONSTRUCTOR :
+									OlympaGroup.CREA_ARCHITECT;
+		
+		if (p.getGroups().containsKey(group))
+			setItem(rankIndex, ItemUtils.loreAdd(item, " ", "§9Grade déjà possédé"), null);
+		
+		else if (p.getGroups().containsKey(previousGroup)) 
+			setItem(rankIndex, 
+					ItemUtils.loreAdd(item, " ", "§bAchetable", "§bPrix : " + price),
+					(it, click, slot) -> sendBuyMessage("Cliquez ici pour acheter le grade " + group.getName(p.getGender()) + " !", url));
+		
+		else
+			setItem(rankIndex, ItemUtils.loreAdd(item, " ", "§cCet achat nécessite le grade précédent"), null);
+		
+		
 	}
 	
-	private void useBuyAcceptTimer(MarketItemData data, int buyStep, int initBuyStep, int tickInterval, final ItemStack cartItem) {
+	private void addKit(KitType kit, ItemStack item, String url, String price) {
+		kitIndex++;
 		
-		//cancel achat si le joueur a cliqué sur un autre item
-		if (buyStep < 0 || (buyStep != initBuyStep && cartItem != null && !inv.getItem(buyProcessItemSlot).equals(cartItem)))
-			return;
+		if (p.hasKit(kit))
+			setItem(kitIndex, ItemUtils.loreAdd(item, " ", "§9Kit déjà possédé"), null);
 		
-		if (buyStep == initBuyStep)
-			setItem(buyProcessItemSlot, cartItem, null);
-		
-		
-		if (buyStep > 0) {
-			ItemStack it = ItemUtils.item(Material.WHITE_STAINED_GLASS_PANE, "§7" + buyStep + "...", "§7L'achat sera possible après la fin du timer.");
-			it.setAmount(buyStep);
-			setItem(buyProcessStateSlot, it, null);
-		}
-			
-		if (buyStep == 0)
-			setItem(buyProcessStateSlot, buyProcessAccept, (it, c, s) -> {
-				data.tryToBuy(this);
-			});
-		
-		plugin.getTask().runTaskLater(() -> useBuyAcceptTimer(data, buyStep - 1, initBuyStep, tickInterval, cartItem), tickInterval);
+		else 
+			setItem(kitIndex, 
+					ItemUtils.loreAdd(item, " ", "§bAchetable", "§bPrix : " + price),
+					(it, click, slot) -> sendBuyMessage("Cliquez ici pour acheter le kit " + kit.getName() + " !", url));
 	}
-
-	public static class MarketItemData{
+	
+	private void addUpgrade(UpgradeType upgrade, ItemStack item, String url) {
+		upgradeIndex++;
+		int level = p.getUpgradeLevel(upgrade);
 		
-		private OlympaPlayerCreatif p;
-		private Object toBuy;
-		private ItemStack itemHolder;
-		private int price;
+		if (upgrade == UpgradeType.CB_LEVEL && !p.hasKit(KitType.COMMANDBLOCK))
+			setItem(upgradeIndex, ItemUtils.loreAdd(item, " ", "§7Le kit commandblock est nécessaire", "§7pour effectuer cet achat"), null);
 		
-		private boolean isBuyable = true;
-		private boolean isBuyableOwned = true;
-		private boolean isBuyableMoney = true;
-		private boolean isBuyableRequirements = true;
+		else if (level < upgrade.getMaxLevel())
+			setItem(upgradeIndex, ItemUtils.loreAdd(item, " ", 
+					"§eAmélioration : " + upgrade.getDataOf(level).value + " ➔ " + upgrade.getDataOf(level + 1).value, 
+					" ", "§bAchetable", "§bPrix : " + upgrade.getDataOf(level + 1).price), 
+					(it, click, slot) -> sendBuyMessage("Cliquez ici pour acheter l'amélioration " + upgrade.getName() + " !", url));
 		
-		public MarketItemData(OlympaPlayerCreatif p, Object toBuy, int defaultPrice, ItemStack holder){
-			this.p = p;
-			this.toBuy = toBuy;
-			this.itemHolder = holder;
-			this.price = defaultPrice;
+		else
+			setItem(upgradeIndex, ItemUtils.loreAdd(item, " ", "§8Niveau maximum atteint"), null);
 			
-			//Repère les objets non achetables (déjà achetés ou prérequis non validés)
-			if (toBuy instanceof OlympaGroup) {
-				if (p.getGroups().containsKey((OlympaGroup)toBuy)) {
-					itemHolder = addInvisibleEnchant(itemHolder);
-					isBuyableOwned = false;
-				}
-				
-				//détection prérequis des grades
-				if ((OlympaGroup)toBuy == OlympaGroup.CREA_ARCHITECT && !p.getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR))
-					isBuyableRequirements = false;
-				else if ((OlympaGroup)toBuy == OlympaGroup.CREA_CREATOR && !p.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT))
-					isBuyableRequirements = false;
-					
-			}else if (toBuy instanceof KitType) {
-				if (p.hasKit((KitType) toBuy)) {
-					itemHolder = addInvisibleEnchant(itemHolder);
-					isBuyableOwned = false;	
-				}
-				
-			//détecte le prochain niveau d'upgrade dispo
-			}else if (toBuy instanceof UpgradeType) {
-				
-				if (((UpgradeType)toBuy).getMaxLevel() > p.getUpgradeLevel((UpgradeType)toBuy))
-					this.price = ((UpgradeType)toBuy).getPriceOf(p.getUpgradeLevel((UpgradeType)toBuy));
-				else {
-					itemHolder = addInvisibleEnchant(itemHolder);
-					isBuyableOwned = false;	
-				}
-
-				int oldValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy));
-				int newValue = ((UpgradeType)toBuy).getValueOf(p.getUpgradeLevel((UpgradeType)toBuy) + 1);
-
-				if (toBuy == UpgradeType.CB_LEVEL) {
-					oldValue *= 20;
-					newValue *= 20;
-				}
-
-				String oldV = Integer.toString(oldValue);
-				String newV = Integer.toString(newValue);
-				
-				if (oldValue == newValue)
-					newV = "maximum atteint";
-				
-				itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§eAmélioration : " + oldV + " ➔ " + newV);
-				
-				if (toBuy == UpgradeType.CB_LEVEL && !p.hasKit(KitType.COMMANDBLOCK))
-					isBuyableRequirements = false;
-			}
-
-			this.isBuyableMoney = p.getGameMoney().has(price);
-
-			itemHolder = ItemUtils.loreAdd(itemHolder, " ", "§ePrix : " + price);
-			
-			isBuyable = isBuyableMoney && isBuyableOwned && isBuyableRequirements;
-
-			if (!isBuyableOwned)
-				itemHolder = ItemUtils.loreAdd(itemHolder, "§7Objet déjà possédé");
-			else if (!isBuyableRequirements)
-				itemHolder = ItemUtils.loreAdd(itemHolder, "§ePrérequis non rempli");
-			else if (!isBuyableMoney)
-				itemHolder = ItemUtils.loreAdd(itemHolder, "§cPas assez de fonds");
-			else
-				itemHolder = ItemUtils.loreAdd(itemHolder, "§aAchat possible");
-				
-		}
+	}
+	
+	private void sendBuyMessage(String text, String url) {
+		p.getPlayer().closeInventory();
 		
-		private ItemStack addInvisibleEnchant(ItemStack item) {
-			ItemMeta meta = item.getItemMeta();
-			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			meta.addEnchant(Enchantment.DURABILITY, 1, true);
-			item.setItemMeta(meta);
-			return item;
-		}
+		TextComponent component = Component.text()
+				.append(Component.text("Olympa ").color(NamedTextColor.GOLD))
+				.append(Component.text("➤ ").color(NamedTextColor.GRAY))
+				.append(Component.text(text).color(NamedTextColor.AQUA))
+				.clickEvent(ClickEvent.openUrl(url)).build();
 		
-		public Object getItem() {
-			return toBuy;
-		}
-		
-		public ItemStack getHolder() {
-			return itemHolder;
-		}
-		
-		public Integer getPrice() {
-			return price;
-		}
-		
-		public boolean isBuyable() {
-			return isBuyable;
-		}
-		
-		public void tryToBuy(ShopGuiPourApresLaBeta gui) {
-			if (!isBuyable || !p.getGameMoney().has(price))
-				return;
-			
-			if (toBuy instanceof OlympaGroup) {
-				if (p.getGroups().containsKey(toBuy))
-					return;
-				
-				if (p.getGameMoney().withdraw(price)) {
-					p.addGroup((OlympaGroup)toBuy);
-					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(p);
-					
-					p.updateGroups();
-					if (OcPermissions.USE_WORLD_EDIT.getMinGroup() == toBuy) 
-						OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(p);
-					
-					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGuiPourApresLaBeta(gui).create(p.getPlayer()));	
-				}
-				
-				
-
-			}else if (toBuy instanceof KitType) {
-				if (p.hasKit((KitType)toBuy))
-					return;
-				
-				if (p.getGameMoney().withdraw(price)) {
-					p.addKit((KitType)toBuy);
-					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGuiPourApresLaBeta(gui).create(p.getPlayer()));
-				}
-				
-			}else if (toBuy instanceof UpgradeType) {
-				if (p.getUpgradeLevel((UpgradeType)toBuy) >= ((UpgradeType)toBuy).getMaxLevel())
-					return;
-
-				if (p.getGameMoney().withdraw(price)) {
-					p.incrementUpgradeLevel((UpgradeType)toBuy);
-					OlympaCreatifMain.getInstance().getTask().runTask(() -> new ShopGuiPourApresLaBeta(gui).create(p.getPlayer()));
-				}
-			}
-			
-			OCmsg.SHOP_BUY_SUCCESS.send(p, this);
-			
-			//new AccountProvider(p.getUniqueId()).saveToDb(p);
-		}
+		p.getPlayer().sendMessage(component);
 	}
 }

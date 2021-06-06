@@ -57,11 +57,13 @@ public class PlotsManager {
 	
 	private static Cache<UUID, Optional<PlotId>> entityBirthPlotCache = CacheBuilder.newBuilder().expireAfterAccess(31, TimeUnit.SECONDS).build();
 	
-	private int plotCount;
+	private int plotsCount;
 	
 	public PlotsManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 
+		plotsCount = plugin.getDataManager().getPlotsCount();
+		
 		plugin.getServer().getPluginManager().registerEvents(new PlotsManagerListener(plugin), plugin);
 		plugin.getServer().getPluginManager().registerEvents(new PlotsInstancesListener(plugin), plugin);
 		
@@ -269,15 +271,11 @@ public class PlotsManager {
 	
 	
 	public void incrementTotalPlotCount() {
-		plotCount++;
+		plotsCount++;
 	}
 	
 	public int getTotalPlotCount() {
-		return plotCount;
-	}
-
-	public void setTotalPlotCount(int plotsCount) {
-		this.plotCount = plotsCount;
+		return plotsCount;
 	}
 	
 	/*

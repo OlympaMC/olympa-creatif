@@ -9,6 +9,7 @@ import fr.olympa.api.spigot.command.OlympaCommand;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.ShopGui;
+import fr.olympa.olympacreatif.gui.ShopGuiPourApresLaBeta;
 
 public class ShopCommand extends OlympaCommand {
 
@@ -22,7 +23,7 @@ public class ShopCommand extends OlympaCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		new ShopGui(MainGui.getMainGui(getOlympaPlayer())).create(getPlayer());
+		new ShopGuiPourApresLaBeta(MainGui.getMainGui(getOlympaPlayer())).create(getPlayer());
 		return false;		
 	}
 

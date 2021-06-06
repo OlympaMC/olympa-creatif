@@ -1,18 +1,26 @@
 package fr.olympa.olympacreatif.perks;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.data.OCparam;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 public class UpgradesManager {
 
-	OlympaCreatifMain plugin;
+	private OlympaCreatifMain plugin;
 	
+	/*
 	private static Map<Integer, Integer> cbLevels = ImmutableMap.<Integer, Integer>builder()
 			.put(1, 1) //valeur de l'upgrade, prix de l'upgrade
 			.put(2, 1)
@@ -39,53 +47,93 @@ public class UpgradesManager {
 			.put(7, 1)
 			.put(8, 1)
 			.put(9, 1)
-			.build();
+			.build();*/
 	
 	public UpgradesManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
+		OCparam.SHOP_DATA.get().forEach((type, upgradess) ->
+			upgradess.forEach(upgrade -> type.values.put(upgrade.level, upgrade))
+		);
 		//plugin.getServer().getPluginManager().registerEvents(new PlayerChangeRankListener(), plugin);
 	}
 	
-	public enum UpgradeType{
-		CB_LEVEL("upgradeLevelCommandBlock", cbLevels),
-		BONUS_PLOTS_LEVEL("upgradeLevelBonusPlots", plotLevels),
-		BONUS_MEMBERS_LEVEL("upgradeLevelBonusMembers", membersLevels); 
+	public enum UpgradeType {
+		CB_LEVEL("upgrade_level_command_block", "augmentation des commandes par secondes pour les commandblocks"),
+		BONUS_PLOTS_LEVEL("upgrade_level_bonus_plots", "augmentation du nombre de membres par parcelle"),
+		BONUS_MEMBERS_LEVEL("upgrade_level_bonus_members", "augmentation de votre nombre de parcelles"); 
 		
 		private String bddKey;
-		private Map<Integer, Integer> values;
+		private String name;
+		private Map<Integer, UpgradeData> values = new HashMap<Integer, UpgradeData>();
 		
-		UpgradeType(String bddKey, Map<Integer, Integer> values){
+		UpgradeType(String bddKey, String name) {
 			this.bddKey = bddKey;
-			this.values = values;
+			this.name = name;
 		}
 		
 		public String getBddKey() {
 			return bddKey;
 		}
 		
-		public List<Integer> getValues(){
-			return new ArrayList<Integer>(Arrays.asList(values.keySet().toArray(new Integer[values.keySet().size()])));
+		public String getName() {
+			return name;
 		}
+		
+		/*public List<Integer> getValues() {
+			return new ArrayList<Integer>(Arrays.asList(values.keySet().toArray(new Integer[values.keySet().size()])));
+		}*/
 		
 		public int getMaxLevel() {
 			return values.size() - 1;
 		}
 		
-		public int getValueOf(int level) {
+		
+		public UpgradeData getDataOf(int level) {
 			if (level < 0)
-				return getValues().get(0);
+				return values.get(0);
 			else if (level >= values.size())
-				return getValues().get(values.size() - 1);
+				return values.get(values.size() - 1);
 			else
-				return getValues().get(level);
+				return values.get(level);
 		}
 		
+		public UpgradeData getDataOf(OlympaPlayerCreatif pc) {
+			return UpgradeType.BONUS_MEMBERS_LEVEL.getDataOf(pc.getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL));
+		}
+		
+		/*
 		public int getPriceOf(int level) {
 			if (level < 0 || level >= values.size())
 				return 0;
 			
 			return values.get(getValueOf(level));
-		}
+		}*/
+	}
+	
+	
+	public static class UpgradeData {
+		/**
+		 * Niveau de l'amélioration. Par défaut, tous les joueurs ont le niveau 0. Les indices DOIVENT se suivre de 1 en 1 depuis 0
+		 */
+		public final int level;
+		public final UpgradeType type;
+		/**
+		 * Prix en euros de ce niveau d'upgrade. Uniquement à titre informatif
+		 */
+		public final String price;
+		/**
+		 * Valeur de l'upgrade (par exemple 2 pour 2 parcelles suplémentaires)
+		 */
+		public final int value;
+		
+		public UpgradeData(int level, UpgradeType type, String price, int value) {
+			this.level = level;
+			this.type = type;
+			this.price = price;
+			this.value = value;
+		}		
 	}
 }
+
+

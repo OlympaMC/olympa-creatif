@@ -149,6 +149,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		plotsManager = new PlotsManager(this);
 		cbManager = new CommandBlocksManager(this);
 		permsManager = new PermissionsManager(this);
+		
+		createScoreboard(dataManager.getServerIndex());
 
 		cmdLogic = new CmdsLogic(this);
 
@@ -261,7 +263,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	//crée le scoreboard du joueur avec des lignes dynamiques, pour afficher le scoreboard custom du plot si besoin
 	@SuppressWarnings("unchecked")
-	public void createScoreboard(int serverIndex) {
+	private void createScoreboard(int serverIndex) {
 		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
 
 		//initialisation lignes scoreboard
@@ -298,7 +300,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			if (plot == null)
 				return "§7Proprio : §eaucun";
 			else
-				return "§7Proprio : §e" + plot.getMembers().getOwner().getName();
+				return "§7Proprio : §e" + plot
+						.getMembers()
+						.getOwner()
+						.getName();
 
 		case 3:
 			return "§2";

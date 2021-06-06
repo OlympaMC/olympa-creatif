@@ -62,7 +62,7 @@ public class MainGui extends IGui {
 				(it, c, s) -> new PlayerPlotsGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
 		
 		setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", clickToOpenMenu), 
-				(it, c, s) -> new ShopGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
+				(it, c, s) -> new ShopGuiPourApresLaBeta(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
 		
 		if (plot != null) {
 			setItem(21, ItemUtils.item(Material.PAINTING, "§6Membres parcelle", "§eNombre de membres : " + plot.getMembers().getCount(), clickToOpenMenu), 
