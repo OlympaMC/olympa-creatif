@@ -300,7 +300,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			if (plot == null)
 				return "§7Proprio : §eaucun";
 			else
-				return "§7Proprio : §e" + plot.getMembers().getOwner().getName();
+				return "§7Proprio : §e" + plot
+						.getMembers()
+						.getOwner()
+						.getName();
 
 		case 3:
 			return "§2";

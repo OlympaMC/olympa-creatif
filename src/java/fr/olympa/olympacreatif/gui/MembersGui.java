@@ -22,7 +22,7 @@ public class MembersGui extends IGui {
 	
 	public MembersGui(IGui gui) {
 		super(gui, "Membres parcelle " + gui.getPlot().getId() + " (" + gui.getPlot().getMembers().getCount() + "/" + 
-				UpgradeType.BONUS_MEMBERS_LEVEL.getDataOf(gui.getPlayer().getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL)) + ")", 3, gui.staffPlayer);
+				UpgradeType.BONUS_MEMBERS_LEVEL.getDataOf(gui.p).value + ")", 3, gui.staffPlayer);
 		
 		//affichage des perms par rang
 		int i = inv.getSize() - 1 - PlotRank.values().length;

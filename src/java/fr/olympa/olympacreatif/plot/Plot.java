@@ -100,9 +100,10 @@ public class Plot {
 	//actions to execute, wether if the plot is a new one or loaded from an asyncplot
 	private void executeCommonInstanciationActions() {
 		destroyScheduler = plugin.getTask().scheduleSyncRepeatingTask(() -> {
-			if (getPlayers().size() > 0 || Bukkit.getOnlinePlayers().stream().anyMatch(p -> getMembers().getPlayerRank(p) != PlotRank.VISITOR))
+			if (getPlayers().size() == 0 && !Bukkit.getOnlinePlayers().stream().anyMatch(p -> getMembers().getPlayerRank(p) != PlotRank.VISITOR))
 				plugin.getPlotsManager().unloadPlot(this);
-		}, 20 * 60 * 5, 20 * 60 * 5);
+			
+		}, 20 * 5 * 60, 20 * 5 * 60);
 		
 		entitiesCheckupScheduler = plugin.getTask().scheduleSyncRepeatingTask(() -> {
 			Iterator<Entity> entIterator = getEntities().iterator();
@@ -436,9 +437,9 @@ public class Plot {
 		plugin.getPerksManager().getArmorStandManager().closeFor(p);
 	}
 	
-	private boolean isHanging(Entity ent) {
+	/*private boolean isHanging(Entity ent) {
 		return ent.getType() == EntityType.ARMOR_STAND || ent.getType() == EntityType.ITEM_FRAME || ent.getType() == EntityType.PAINTING;
-	}
+	}*/
 	
 	@Override
 	public boolean equals(Object o) {

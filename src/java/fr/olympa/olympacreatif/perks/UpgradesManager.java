@@ -13,6 +13,8 @@ import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCparam;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 
 public class UpgradesManager {
 
@@ -94,6 +96,10 @@ public class UpgradesManager {
 				return values.get(values.size() - 1);
 			else
 				return values.get(level);
+		}
+		
+		public UpgradeData getDataOf(OlympaPlayerCreatif pc) {
+			return UpgradeType.BONUS_MEMBERS_LEVEL.getDataOf(pc.getUpgradeLevel(UpgradeType.BONUS_MEMBERS_LEVEL));
 		}
 		
 		/*

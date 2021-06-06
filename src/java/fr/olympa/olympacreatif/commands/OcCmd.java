@@ -15,6 +15,7 @@ import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.MembersGui;
 import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
 import fr.olympa.olympacreatif.gui.ShopGui;
+import fr.olympa.olympacreatif.gui.ShopGuiPourApresLaBeta;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
@@ -190,7 +191,7 @@ public class OcCmd extends AbstractCmd {
 
 	@Cmd(player = true, syntax = "Afficher le magasin du Créatif")
 	public void shop(CommandContext cmd) {
-		new ShopGui(MainGui.getMainGui(getOlympaPlayer())).create(getPlayer());
+		new ShopGuiPourApresLaBeta(MainGui.getMainGui(getOlympaPlayer())).create(getPlayer());
 	}
 
 	@Cmd(player = true, syntax = "Redevenir simple visiteur sur la parcelle actuelle")

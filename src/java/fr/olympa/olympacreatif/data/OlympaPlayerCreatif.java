@@ -43,9 +43,9 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_COMMANDBLOCK_KIT = new SQLColumn<OlympaPlayerCreatif>("hasCommandblockKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_ADMIN_KIT = new SQLColumn<OlympaPlayerCreatif>("hasAdminKit", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	
-	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_COMMANDBLOCK = new SQLColumn<OlympaPlayerCreatif>("upgradeLevelCommandBlock", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
-	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_BONUSPLOTS = new SQLColumn<OlympaPlayerCreatif>("upgradeLevelBonusPlots", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
-	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_BONUSMEMBERS = new SQLColumn<OlympaPlayerCreatif>("upgradeLevelBonusMembers", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_COMMANDBLOCK = new SQLColumn<OlympaPlayerCreatif>(UpgradeType.CB_LEVEL.getBddKey(), "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_BONUSPLOTS = new SQLColumn<OlympaPlayerCreatif>(UpgradeType.BONUS_PLOTS_LEVEL.getBddKey(), "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_UPGRADE_BONUSMEMBERS = new SQLColumn<OlympaPlayerCreatif>(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey(), "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_DEFAULT_PLOT_CHAT = new SQLColumn<OlympaPlayerCreatif>("playerParamDefaultPlotChat", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_MENU_ON_SNEAK = new SQLColumn<OlympaPlayerCreatif>("playerParamOpenMenuOnSneak", "TINYINT(1) NOT NULL DEFAULT 1", Types.TINYINT).setUpdatable();

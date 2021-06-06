@@ -49,9 +49,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 public class DataManager implements Listener {
 
 	private OlympaCreatifMain plugin;
-
 	private int serverIndex = -1;
-
 	private int nextPlotSyncInstantiateTick = 1;
 
 	//statements de création des tables
@@ -163,6 +161,7 @@ public class DataManager implements Listener {
 
 	public DataManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
+		plugin.saveDefaultConfig();
 		
 		if (!plugin.getConfig().isInt("server_index") || plugin.getConfig().getInt("server_index") == -1) {
 			plugin.getLogger().severe("§4L'index du serveur n'a pas été défini. Veuillez le renseigner dans le fichier config.yml.");
@@ -391,6 +390,9 @@ public class DataManager implements Listener {
 			ResultSet getPlotOwnerDatasResult = osSelectPlayerDatas.executeQuery(getPlayerDatas);
 			getPlotOwnerDatasResult.next();
 
+			System.out.println("Plot " + plotId + " owner bonus members level : " + UpgradeType.BONUS_MEMBERS_LEVEL.getDataOf(
+					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())).value);
+			
 			//création plotMembers
 			PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getDataOf(
 					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())).value);
@@ -573,7 +575,7 @@ public class DataManager implements Listener {
 		serverIndex = i;
 
 		this.getPlotsCount();
-		if (plugin.getDataManager().getPlotsCount() == -1) {
+		if (getPlotsCount() == -1) {
 			Bukkit.getServer().shutdown();
 			throw new UnsupportedOperationException("§4ATTENTION problème dans la table creatif_plotsdata : nombre d'entrées différent de l'indice du plot maximal !! §cArrêt du serveur.");
 		}
@@ -615,6 +617,9 @@ public class DataManager implements Listener {
 			ps2.setString(2, OCparam.toJson());
 			osUpdateServerParams.executeUpdate(ps2);
 			ps2.close();
+
+
+			plugin.getLogger().info("§aINDEX DU SERVEUR CREATIF : " + serverIndex + "§7 - Nombre de parcelles : " + getPlotsCount() + " - Taille parcelles : " + OCparam.PLOT_SIZE.get() + "*" + OCparam.PLOT_SIZE.get());
 
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -1,36 +1,15 @@
  package fr.olympa.olympacreatif.gui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import fr.olympa.api.LinkSpigotBungee;
-import fr.olympa.api.common.chat.Gradient;
 import fr.olympa.api.common.groups.OlympaGroup;
 import fr.olympa.api.spigot.item.ItemUtils;
-import fr.olympa.api.utils.Prefix;
-import fr.olympa.core.spigot.OlympaCore;
-import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.OcPermissions;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.util.HSVLike;
-import net.kyori.adventure.util.RGBLike;
 
 
 
@@ -220,9 +199,9 @@ public class ShopGuiPourApresLaBeta extends IGui {
 		
 		else if (p.getGroups().containsKey(previousGroup)) 
 			setItem(rankIndex, 
-					ItemUtils.loreAdd(item, " ", "§aAchetable", "§aPrix : " + price, " ", "§7Cliquez ici pour ouvrir la boutique"),
-					(it, click, slot) -> sendBuyMessage("Cliques ici pour acheter le grade " + group.getName(p.getGender()) + " !", url));
-					
+					ItemUtils.loreAdd(item, " ", "§bAchetable", "§bPrix : " + price),
+					(it, click, slot) -> sendBuyMessage("Cliquez ici pour acheter le grade " + group.getName(p.getGender()) + " !", url));
+		
 		else
 			setItem(rankIndex, ItemUtils.loreAdd(item, " ", "§cCet achat nécessite le grade précédent"), null);
 		
@@ -237,8 +216,8 @@ public class ShopGuiPourApresLaBeta extends IGui {
 		
 		else 
 			setItem(kitIndex, 
-					ItemUtils.loreAdd(item, " ", "§aAchetable", "§aPrix : " + price, " ", "§7Cliquez ici pour ouvrir la boutique"),
-					(it, click, slot) -> sendBuyMessage("Cliques ici pour acheter le kit " + kit.getName() + " !", url));
+					ItemUtils.loreAdd(item, " ", "§bAchetable", "§bPrix : " + price),
+					(it, click, slot) -> sendBuyMessage("Cliquez ici pour acheter le kit " + kit.getName() + " !", url));
 	}
 	
 	private void addUpgrade(UpgradeType upgrade, ItemStack item, String url) {
@@ -251,11 +230,11 @@ public class ShopGuiPourApresLaBeta extends IGui {
 		else if (level < upgrade.getMaxLevel())
 			setItem(upgradeIndex, ItemUtils.loreAdd(item, " ", 
 					"§eAmélioration : " + upgrade.getDataOf(level).value + " ➔ " + upgrade.getDataOf(level + 1).value, 
-					" ", "§aAchetable", "§aPrix : " + upgrade.getDataOf(level + 1), " ", "§7Cliquez ici pour ouvrir la boutique"), 
-					(it, click, slot) -> sendBuyMessage("Cliques ici pour acheter l'amélioration " + upgrade.getName() + " !", url));
+					" ", "§bAchetable", "§bPrix : " + upgrade.getDataOf(level + 1).price), 
+					(it, click, slot) -> sendBuyMessage("Cliquez ici pour acheter l'amélioration " + upgrade.getName() + " !", url));
 		
 		else
-			setItem(upgradeIndex, ItemUtils.loreAdd(item, " ", "§9Niveau maximum atteint"), null);
+			setItem(upgradeIndex, ItemUtils.loreAdd(item, " ", "§8Niveau maximum atteint"), null);
 			
 	}
 	
@@ -263,12 +242,9 @@ public class ShopGuiPourApresLaBeta extends IGui {
 		p.getPlayer().closeInventory();
 		
 		TextComponent component = Component.text()
-				.color(NamedTextColor.GOLD)
-				.append(Component.text("Olympa "))
-				.color(NamedTextColor.GRAY)
-				.append(Component.text("➤ "))
-				.color(NamedTextColor.GREEN)
-				.append(Component.text(text))
+				.append(Component.text("Olympa ").color(NamedTextColor.GOLD))
+				.append(Component.text("➤ ").color(NamedTextColor.GRAY))
+				.append(Component.text(text).color(NamedTextColor.AQUA))
 				.clickEvent(ClickEvent.openUrl(url)).build();
 		
 		p.getPlayer().sendMessage(component);
