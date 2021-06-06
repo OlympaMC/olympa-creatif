@@ -233,7 +233,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		//changement du cpt des plots du joueur
 		if (upg == UpgradeType.CB_LEVEL)
 			for (Plot plot : getPlots(true))
-				plot.getCbData().setCommandsPerSecond(UpgradeType.CB_LEVEL.getDataOf(upgrades.get(UpgradeType.CB_LEVEL)));
+				plot.getCbData().setCommandsPerSecond(UpgradeType.CB_LEVEL.getDataOf(upgrades.get(UpgradeType.CB_LEVEL)).value);
 		
 		upgradesColumns.get(upg).updateAsync(this, getUpgradeLevel(upg), null, null);
 	}

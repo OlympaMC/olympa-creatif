@@ -27,7 +27,6 @@ import fr.olympa.api.common.permission.OlympaPermission;
 import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbCommandListener.CbCmdResult;
-import fr.olympa.olympacreatif.gui.ShopGuiPourApresLaBeta.MarketItemData;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -212,10 +211,10 @@ public class OCmsg {
 			.build();
 
 
-	private static final Map<String, Function<MarketItemData, String>> shopPlaceHolders = ImmutableMap.<String, Function<MarketItemData,String>>builder()
+	/*private static final Map<String, Function<MarketItemData, String>> shopPlaceHolders = ImmutableMap.<String, Function<MarketItemData,String>>builder()
 			.put("%shopItemName", item -> {return item.getHolder().getItemMeta() == null ? item.getItem().toString() : item.getHolder().getItemMeta().getDisplayName();})
 			.put("%shopItemPrice", item -> {return item.getPrice() + "";})
-			.build();
+			.build();*/
 
 	
 	private static final Map<String, BiFunction<OlympaPlayerCreatif, Plot, String>> plotPlaceHolders = ImmutableMap.<String, BiFunction<OlympaPlayerCreatif, Plot,String>>builder()
@@ -322,9 +321,9 @@ public class OCmsg {
 				for (Entry<String, Function<PlotRank, String>> e : plotRankPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((PlotRank) o));
 
-			else if (o instanceof MarketItemData)
+			/*else if (o instanceof MarketItemData)
 				for (Entry<String, Function<MarketItemData, String>> e : shopPlaceHolders.entrySet())
-					msg = msg.replace(e.getKey(), e.getValue().apply((MarketItemData) o));
+					msg = msg.replace(e.getKey(), e.getValue().apply((MarketItemData) o));*/
 
 			else if (o instanceof PlotId)
 				for (Entry<String, Function<PlotId, String>> e : plotIdPlaceHolders.entrySet())
