@@ -384,7 +384,7 @@ public class OCmsg {
 	}
 	
 	public void send(Player p, Object... objs) {
-		send((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()), objs);
+		send((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId()), objs);
 	}
 	
 	public void send(OlympaPlayerCreatif pc, Object... objs) {

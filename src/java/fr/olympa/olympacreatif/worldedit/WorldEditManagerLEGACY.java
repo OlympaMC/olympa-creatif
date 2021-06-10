@@ -84,7 +84,7 @@ public class WorldEditManagerLEGACY extends EventHandler implements Listener {
 		if (e.getActor() == null || e.getActor().getUniqueId() == null)
 			return;
 		
-		OlympaPlayerCreatif p = AccountProvider.get(e.getActor().getUniqueId());
+		OlympaPlayerCreatif p = AccountProvider.getter().get(e.getActor().getUniqueId());
 		
 		Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 
@@ -212,7 +212,7 @@ public class WorldEditManagerLEGACY extends EventHandler implements Listener {
 	    @Override
 	    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
 	    	
-	    	final OlympaPlayerCreatif p = AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId());
+	    	final OlympaPlayerCreatif p = AccountProvider.getter().get(BukkitAdapter.adapt(wePlayer).getUniqueId());
 	    	final Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
 	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p)) {
@@ -256,7 +256,7 @@ public class WorldEditManagerLEGACY extends EventHandler implements Listener {
 	/*@org.bukkit.event.EventHandler //cancel copy si joueur essaie de copier dans un plot qui n'est pas à lui
 	public void onCopyCmd(PlayerCommandPreprocessEvent e) {
 		
-		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.get(e.getPlayer().getUniqueId()));
+		OlympaPlayerCreatif p = ((OlympaPlayerCreatif)AccountProvider.getter().get(e.getPlayer().getUniqueId()));
 		
 		if (p == null || !p.hasStaffPerm(StaffPerm.BYPASS_WORLDEDIT) && e.getMessage().contains("/schem")) {
 			p.getPlayer().sendMessage(Message.WE_ERR_SCHEM_CMD_DISABLED.getValue());
@@ -293,7 +293,7 @@ public class WorldEditManagerLEGACY extends EventHandler implements Listener {
 		public OlympaCreatifFaweExtent(Extent ex, Actor act) {
 			super(ex);
 			Bukkit.broadcastMessage("CREATION OF EXTENT");
-			p = (BukkitAdapter.adapt(act) instanceof Player) ? AccountProvider.get(((Player) BukkitAdapter.adapt(act)).getUniqueId()) : null;
+			p = (BukkitAdapter.adapt(act) instanceof Player) ? AccountProvider.getter().get(((Player) BukkitAdapter.adapt(act)).getUniqueId()) : null;
 		}
 
         @Override

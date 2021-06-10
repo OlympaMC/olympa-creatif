@@ -45,7 +45,7 @@ public class CommandBlocksManager {
 	public void executeEntryActions(Plot toPlot, Player p) {
 		p.setExp(0);
 		
-		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+		OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
 		
 		//maj belowName si un objectif y est positionné
 		Scoreboard scb = toPlot.getCbData().getScoreboard();
@@ -83,7 +83,7 @@ public class CommandBlocksManager {
 		for (CbObjective obj : fromPlot.getCbData().getObjectives())
 			obj.set(p, null);
 		
-		((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).clearCustomSidebar();
+		((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId())).clearCustomSidebar();
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		
 		//hide holos

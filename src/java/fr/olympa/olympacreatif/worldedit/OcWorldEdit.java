@@ -64,7 +64,7 @@ public class OcWorldEdit extends AWorldEditManager {
 		
 		if (weSession != null) {
 			//clear clipboard si le joueur n'en est pas le proprio
-			if (PlotPerm.BYPASS_EXIT_CLIPBOARD_CLEAR.has(plot, AccountProvider.get(p.getUniqueId())))
+			if (PlotPerm.BYPASS_EXIT_CLIPBOARD_CLEAR.has(plot, AccountProvider.getter().get(p.getUniqueId())))
 				weSession.setClipboard(null);
 			
 			World world = weSession.getSelectionWorld();
@@ -205,7 +205,7 @@ public class OcWorldEdit extends AWorldEditManager {
 				if (e.getActor() == null || e.getActor().getUniqueId() == null)
 					return;
 				
-				OlympaPlayerCreatif p = AccountProvider.get(e.getActor().getUniqueId());
+				OlympaPlayerCreatif p = AccountProvider.getter().get(e.getActor().getUniqueId());
 				
 				Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 

@@ -38,7 +38,7 @@ public class PlotMembers{
 	
 	//return false si le nombre de membres max est dépassé
 	public boolean set(Player p, PlotRank rank) {
-		return set(AccountProvider.get(p.getUniqueId()).getInformation(), rank);
+		return set(AccountProvider.getter().get(p.getUniqueId()).getInformation(), rank);
 	}
 	
 	public boolean set(OlympaPlayerCreatif p, PlotRank rank) {
@@ -79,7 +79,7 @@ public class PlotMembers{
 		if (p == null)
 			return PlotRank.VISITOR;
 		
-		return getPlayerRank((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
+		return getPlayerRank((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId()));
 	}
 	
 	public PlotRank getPlayerRank(OlympaPlayerCreatif p) {

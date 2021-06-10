@@ -34,7 +34,7 @@ public class CmdSetblock extends CbCommand {
 			return;
 		
 		if (sender instanceof Player)
-			pc = AccountProvider.get(sender.getUniqueId());
+			pc = AccountProvider.getter().get(sender.getUniqueId());
 		
 		placingLoc = parseLocation(args[0], args[1], args[2]);
 		item = getItemFromString(args[3], sender instanceof Player ? (Player) sender : null);

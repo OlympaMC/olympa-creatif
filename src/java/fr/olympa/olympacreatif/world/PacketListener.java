@@ -114,7 +114,7 @@ public class PacketListener implements Listener {
 
     private void handlePlayerPackets(Player player) {
     	
-    	final OlympaPlayerCreatif p = AccountProvider.get(player.getUniqueId());
+    	final OlympaPlayerCreatif p = AccountProvider.getter().get(player.getUniqueId());
     	
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
         	

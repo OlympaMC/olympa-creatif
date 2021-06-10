@@ -60,7 +60,7 @@ public class WorldManager {
 				currentPeriod = currentPeriod % 10;
 				
 				Bukkit.getOnlinePlayers().forEach(p -> {
-					OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+					OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
 
 					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? OCparam.INCOME_AFK.get() : OCparam.INCOME_NOT_AFK.get();
 					pc.getGameMoney().give(income);

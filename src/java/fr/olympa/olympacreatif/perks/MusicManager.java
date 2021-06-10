@@ -132,7 +132,7 @@ public class MusicManager implements Listener {
 		
 		if (song == null) {
 			try {
-				throw new UnsupportedOperationException("Trying to play a null song on plot " + ((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).getCurrentPlot());
+				throw new UnsupportedOperationException("Trying to play a null song on plot " + ((OlympaPlayerCreatif)AccountProvider.getter().get(p.getUniqueId())).getCurrentPlot());
 			}catch (UnsupportedOperationException ex) {
 				ex.printStackTrace();
 				return;
@@ -192,7 +192,7 @@ public class MusicManager implements Listener {
 		protected MusicGui(OlympaCreatifMain plugin, Plot plot, Player p0, Map<ItemStack, Entry<String, Song>> songsMap) {
 			super("Musiques disponibles", DyeColor.GREEN, new ArrayList<ItemStack>(songsMap.keySet()), 6);
 
-			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProvider.get(p0.getUniqueId())))
+			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProvider.getter().get(p0.getUniqueId())))
 				songsMap.forEach((it, songEntry) -> items.put(it, p -> {					
 					PlotParamType.SONG.setValue(plot, songEntry.getKey());
 					ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §a" + songEntry.getKey());
@@ -211,7 +211,7 @@ public class MusicManager implements Listener {
 			//create remove music item
 			getInventory().setItem(26, it = ItemUtils.item(Material.RED_WOOL, "§cSupprimer la musique actuelle"));
 			
-			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProvider.get(p0.getUniqueId())))
+			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProvider.getter().get(p0.getUniqueId())))
 				items.put(it, p -> {
 					PlotParamType.SONG.setValue(plot, "");
 					getInventory().setItem(17, ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §caucune"));
@@ -221,7 +221,7 @@ public class MusicManager implements Listener {
 			//add back item
 			getInventory().setItem(44, it = IGui.getBackItem());
 			items.put(it, p -> {
-				new PlotParametersGui(MainGui.getMainGui(AccountProvider.get(p.getUniqueId()), plot)).create(p);
+				new PlotParametersGui(MainGui.getMainGui(AccountProvider.getter().get(p.getUniqueId()), plot)).create(p);
 			});
 		}
 
