@@ -305,7 +305,7 @@ public class Plot {
 	}
 	
 	public boolean canEnter(Player p ) {
-		return canEnter((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()));
+		return canEnter((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId()));
 	}
 	
 	public boolean canEnter(OlympaPlayerCreatif pc) {
@@ -330,7 +330,7 @@ public class Plot {
 	 * @return true si le joueur est autorisé à entrer, false sinon
 	 */
 	public void executeEntryActions(Player p, Location tpLoc) {
-		executeEntryActions((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId()), tpLoc);
+		executeEntryActions((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId()), tpLoc);
 	}
 		
 	/**
@@ -409,7 +409,7 @@ public class Plot {
 	 */
 	public void executeExitActions(Player p) {
 
-		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+		OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
 		
 		pc.setCurrentPlot(null);
 		removePlayerInPlot(p);

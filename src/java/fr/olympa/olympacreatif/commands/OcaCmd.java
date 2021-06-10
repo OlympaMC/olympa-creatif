@@ -41,7 +41,7 @@ public class OcaCmd extends AbstractCmd {
 		}, str -> {
 			Player p = Bukkit.getPlayerExact(str);
 			if (p != null)
-				return new MemberInformations(AccountProvider.get(p.getUniqueId()).getInformation());
+				return new MemberInformations(AccountProvider.getter().get(p.getUniqueId()).getInformation());
 			else if (str.equalsIgnoreCase("system"))
 				return new MemberInformations(28l, "System", UUID.fromString("1f2993c6-5c5f-3968-b8dc-b0f3ef15f7f0"));
 			else if (str.equalsIgnoreCase("spawn"))
@@ -234,7 +234,7 @@ public class OcaCmd extends AbstractCmd {
 		if (getOlympaPlayer() != null && !OcPermissions.STAFF_MANAGE_MONEY.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
-		OlympaPlayerCreatif target = AccountProvider.get(((Player)cmd.getArgument(0)).getUniqueId());
+		OlympaPlayerCreatif target = AccountProvider.getter().get(((Player)cmd.getArgument(0)).getUniqueId());
 		
 		int money = cmd.getArgumentsLength() == 3 ? cmd.getArgument(2) : 0;
 		
@@ -276,7 +276,7 @@ public class OcaCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Ouvrir l'interface des parcelles d'un joueur", args = {"PLAYERS"}, min = 1)
 	public void openmenuas(CommandContext cmd) {
-		MainGui.getMainGuiForStaff(AccountProvider.get(((Player)cmd.getArgument(0)).getUniqueId()), getOlympaPlayer()).create(getPlayer());
+		MainGui.getMainGuiForStaff(AccountProvider.getter().get(((Player)cmd.getArgument(0)).getUniqueId()), getOlympaPlayer()).create(getPlayer());
 	}
 
 	@Cmd(player = true, syntax = "Définir le propriétaire d'une parcelle", args = {"PLOT_OWNER"}, min = 1)

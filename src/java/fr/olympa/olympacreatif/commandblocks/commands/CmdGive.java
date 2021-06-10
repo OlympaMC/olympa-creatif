@@ -54,7 +54,7 @@ public class CmdGive extends CbCommand {
 		item.setAmount(amount);
 		
 		for (Entity e : targetEntities)
-			if (plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(AccountProvider.get(e.getUniqueId()), item.getType()))
+			if (plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(AccountProvider.getter().get(e.getUniqueId()), item.getType()))
 				((Player) e).getInventory().addItem(item);
 			else
 				((Player) e).getInventory().addItem(plugin.getPerksManager().getKitsManager().getNoKitPermItem(item.getType()));

@@ -38,7 +38,7 @@ public class WorldEditEventHandlerLEGACY {
 		
 		Bukkit.broadcastMessage("vec 1 : " + vecMin + " --- " + vecMax);
 		
-		OlympaPlayerCreatif p = AccountProvider.get(e.getActor().getUniqueId());
+		OlympaPlayerCreatif p = AccountProvider.getter().get(e.getActor().getUniqueId());
 		Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 
 		/*Material mat = BukkitAdapter.adapt(e.getExtent().getBlock(BlockVector3.at(x, y, z)).getBlockType());

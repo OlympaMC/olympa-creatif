@@ -46,11 +46,11 @@ public class CbTeam {
 			teamName = JSONtextUtil.getJsonText(newTeamName).toLegacyText();
 		
 		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
-		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.get(p.getUniqueId())));
+		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.getter().get(p.getUniqueId())));
 		
 		for (Entity e : members)
 			if (plotPlayers.stream().filter(p -> p.getUniqueId().equals(e.getUniqueId())).count() > 1)
-				OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.get(e.getUniqueId()), plotPlayers);
+				OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.getter().get(e.getUniqueId()), plotPlayers);
 	}
 	
 	public Plot getPlot() {
@@ -68,10 +68,10 @@ public class CbTeam {
 		members.add(e);
 		
 		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
-		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.get(p.getUniqueId())));
+		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.getter().get(p.getUniqueId())));
 		
 		if (e.getType() == EntityType.PLAYER)
-			OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.get(e.getUniqueId()), plotPlayers);
+			OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.getter().get(e.getUniqueId()), plotPlayers);
 		
 		
 		return true;
@@ -81,10 +81,10 @@ public class CbTeam {
 		members.remove(e);
 		
 		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
-		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.get(p.getUniqueId())));
+		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.getter().get(p.getUniqueId())));
 		
 		if (e.getType() == EntityType.PLAYER)
-			OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.get(e.getUniqueId()), plotPlayers);
+			OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.getter().get(e.getUniqueId()), plotPlayers);
 	}
 
 	public List<Entity> getMembers(){
@@ -166,11 +166,11 @@ public class CbTeam {
 	
 	public void executeDeletionActions() {
 		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
-		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.get(p.getUniqueId())));
+		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProvider.getter().get(p.getUniqueId())));
 		
 		for (Entity e : members)
 			if (e.getType() == EntityType.PLAYER)		
 				if (e.getType() == EntityType.PLAYER)
-					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.get(e.getUniqueId()), plotPlayers);
+					OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProvider.getter().get(e.getUniqueId()), plotPlayers);
 	}	
 }

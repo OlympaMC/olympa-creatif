@@ -93,7 +93,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		plugin = this;
 		OlympaCore.getInstance().setOlympaServer(OlympaServer.CREATIF);
 
-		AccountProvider.setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
+		AccountProvider.getter().setPlayerProvider(OlympaPlayerCreatif.class, OlympaPlayerCreatif::new, "creatif", OlympaPlayerCreatif.COLUMNS);
 
 		OlympaPermission.registerPermissions(OcPermissions.class);
 		ReportReason.registerReason(ReportReasonsList.class);
@@ -126,7 +126,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			if (!(sender instanceof Player))
 				return false;
 			
-			OlympaPlayerCreatif pc = AccountProvider.get(((Player)sender).getUniqueId());
+			OlympaPlayerCreatif pc = AccountProvider.getter().get(((Player)sender).getUniqueId());
 			
 			if (pc == null)
 				return false;
@@ -166,7 +166,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			if (!(sender instanceof Player))
 				return true;
 			
-			OlympaPlayerCreatif pc = AccountProvider.get(((Player)sender).getUniqueId());
+			OlympaPlayerCreatif pc = AccountProvider.getter().get(((Player)sender).getUniqueId());
 			
 			switch(action) {
 			case COMMAND:

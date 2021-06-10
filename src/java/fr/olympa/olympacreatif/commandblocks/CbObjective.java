@@ -170,7 +170,7 @@ public class CbObjective {
 			
 			if (displaySlot == DisplaySlot.SIDEBAR)
 				for (Player p : plot.getPlayers())
-					((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(newObjName, getValues(true));
+					((OlympaPlayerCreatif)AccountProvider.getter().get(p.getUniqueId())).setCustomScoreboardLines(newObjName, getValues(true));
 		}
 		
 		objName = newObjName;
@@ -232,7 +232,7 @@ public class CbObjective {
 			LinkedHashMap<String, Integer> values = getValues(true);
 			
 			for (Player p : plot.getPlayers()) 
-				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);
+				((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);
 			
 			//Bukkit.broadcastMessage("SCORES " + objId + " : " + values);	
 		}
@@ -267,7 +267,7 @@ public class CbObjective {
 			LinkedHashMap<String, Integer> values = getValues(true);
 			
 			for (Player p : plot.getPlayers()) 
-				((OlympaPlayerCreatif) AccountProvider.get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);	
+				((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);	
 		}
 	}
 	
@@ -312,7 +312,7 @@ public class CbObjective {
 			LinkedHashMap<String, Integer> scores = getValues(true);
 			
 			for (Player p : plot.getPlayers()) {
-				OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+				OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
 				
 				//pc.setCustomScoreboardTitle(getName());
 				pc.setCustomScoreboardLines(getName(), scores);
@@ -324,7 +324,7 @@ public class CbObjective {
 	public void clearDisplaySlot() {
 		if (displaySlot == DisplaySlot.SIDEBAR)
 			for (Player p : plot.getPlayers())
-				((OlympaPlayerCreatif)AccountProvider.get(p.getUniqueId())).clearCustomSidebar();
+				((OlympaPlayerCreatif)AccountProvider.getter().get(p.getUniqueId())).clearCustomSidebar();
 
 		if (displaySlot == DisplaySlot.BELOW_NAME)
 			plot.getCbData().clearBelowName();

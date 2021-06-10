@@ -121,7 +121,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
 	@Override
 	public void clearClipboard(Plot plot, Player p) {
-		OlympaPlayerCreatif pc = AccountProvider.get(p.getUniqueId());
+		OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
 		if (pc.hasStaffPerm(StaffPerm.WORLDEDIT))
 			return;
 
@@ -155,7 +155,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 	    @Override
 	    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayerSuper, MaskType typeSuper) {
 	    	
-	    	final OlympaPlayerCreatif p = AccountProvider.get(BukkitAdapter.adapt(wePlayerSuper).getUniqueId());
+	    	final OlympaPlayerCreatif p = AccountProvider.getter().get(BukkitAdapter.adapt(wePlayerSuper).getUniqueId());
 	    	final Plot plot = plugin.getPlotsManager().getPlot(p.getPlayer().getLocation());
 	    	
 	    	if (plot == null || p == null || !PlotPerm.USE_WE.has(plot, p) || !ComponentCreatif.WORLDEDIT.isActivated() || isReseting(plot)) {
@@ -180,7 +180,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
                 	}*/
                 	
                 	
-                	return PlotPerm.USE_WE.has(plot, AccountProvider.get(BukkitAdapter.adapt(wePlayer).getUniqueId())) && !isReseting(plot);
+                	return PlotPerm.USE_WE.has(plot, AccountProvider.getter().get(BukkitAdapter.adapt(wePlayer).getUniqueId())) && !isReseting(plot);
                 }
             };
 	    }
@@ -238,7 +238,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				if (e.getActor() == null || e.getActor().getUniqueId() == null)
 					return;
 				
-				OlympaPlayerCreatif p = AccountProvider.get(e.getActor().getUniqueId());
+				OlympaPlayerCreatif p = AccountProvider.getter().get(e.getActor().getUniqueId());
 
 				if (p.hasStaffPerm(StaffPerm.WORLDEDIT))
 					return;

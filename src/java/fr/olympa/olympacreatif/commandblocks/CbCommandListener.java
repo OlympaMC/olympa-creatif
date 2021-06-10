@@ -107,7 +107,7 @@ public class CbCommandListener implements Listener {
 		if (!ComponentCreatif.COMMANDBLOCKS.isActivated())
 			return;
 		
-		OlympaPlayerCreatif p = AccountProvider.get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif p = AccountProvider.getter().get(e.getPlayer().getUniqueId());
 		
 		CbCommand cmd = CbCommand.getCommand(plugin, e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
 		

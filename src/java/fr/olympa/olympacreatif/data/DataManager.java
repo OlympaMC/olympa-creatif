@@ -240,7 +240,7 @@ public class DataManager implements Listener {
 	public synchronized void loadPlot(final OlympaPlayerCreatif requester, final String player, final int plotId, final Consumer<Plot> callback) {
 		plugin.getTask().runTaskAsynchronously(() -> {
 			try {
-				OlympaPlayerInformations playerInformations = AccountProvider.getPlayerInformations(player);
+				OlympaPlayerInformations playerInformations = AccountProvider.getter().getPlayerInformations(player);
 				if (playerInformations == null) {
 					callback.accept(null);
 					return;
@@ -307,7 +307,7 @@ public class DataManager implements Listener {
 			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de charger un nouveau joueur !");
 			return;
 		}
-		OlympaPlayerCreatif pc = AccountProvider.get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif pc = AccountProvider.getter().get(e.getPlayer().getUniqueId());
 		
 		//get player plots
 		plugin.getTask().runTaskAsynchronously(() -> {

@@ -132,7 +132,7 @@ public class CmdsLogic {
 		else if (plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR || !plot.getPlayers().contains(target))
 			OCmsg.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.send(pc, target.getName());
 
-		else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
+		else if (((OlympaPlayerCreatif) AccountProvider.getter().get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
 			OCmsg.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.send(pc, target.getName());
 
 		else {
@@ -160,12 +160,12 @@ public class CmdsLogic {
 		else if (!plot.getPlayers().contains(target) || plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR)
 			OCmsg.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.send(pc, target.getName());
 
-		else if (((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
+		else if (((OlympaPlayerCreatif) AccountProvider.getter().get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
 			OCmsg.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.send(pc, target.getName());
 
 		else {
 			//exécution du ban
-			plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).add(AccountProvider.get(target.getUniqueId()).getId());
+			plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).add(AccountProvider.getter().get(target.getUniqueId()).getId());
 
 			plot.teleportOut(target);
 
@@ -188,7 +188,7 @@ public class CmdsLogic {
 		else if (!PlotPerm.BAN_VISITOR.has(plot, pc))
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.BAN_VISITOR);
 
-		else if (plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).remove(AccountProvider.get(target.getUniqueId()).getId()))
+		else if (plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).remove(AccountProvider.getter().get(target.getUniqueId()).getId()))
 			OCmsg.PLOT_UNBAN_PLAYER.send(pc, target.getName());
 		else
 			OCmsg.PLOT_CANT_UNBAN_PLAYER.send(pc, target.getName());
@@ -201,7 +201,7 @@ public class CmdsLogic {
 		ComponentBuilder component = new ComponentBuilder(Prefix.DEFAULT.toString() + "§eJoueurs bannis de la parcelle " + plot + " : ");
 
 		for (int i = 0; i < list.size(); i++) {
-			String target = AccountProvider.getPlayerInformations(list.get(i)).getName();
+			String target = AccountProvider.getter().getPlayerInformations(list.get(i)).getName();
 			component.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/oc unban " + target));
 			component.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("§7Débannir " + target)));
 			component.append(target);
@@ -257,7 +257,7 @@ public class CmdsLogic {
 		Player target = Bukkit.getPlayerExact(p);
 
 		if (target != null) {
-			List<Plot> plots = ((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).getPlots(true);
+			List<Plot> plots = ((OlympaPlayerCreatif) AccountProvider.getter().get(target.getUniqueId())).getPlots(true);
 
 			id -= 1;
 
@@ -286,7 +286,7 @@ public class CmdsLogic {
 		if (target == null)
 			plots.addAll(plugin.getPlotsManager().getPlots());
 		else
-			plots.addAll(((OlympaPlayerCreatif) AccountProvider.get(target.getUniqueId())).getPlots(true));
+			plots.addAll(((OlympaPlayerCreatif) AccountProvider.getter().get(target.getUniqueId())).getPlots(true));
 
 		Collections.sort(plots, (o1, o2) -> o1.getId().getId() - o2.getId().getId());
 
