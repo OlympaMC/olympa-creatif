@@ -116,7 +116,7 @@ public abstract class NBTcontrollerUtil {
 					NBTTagList oldList = tag.getList(key, params.getListType());
 					NBTTagList newList = new NBTTagList();
 					
-					System.out.println("LIST : " + oldList.asString());
+					//System.out.println("LIST : " + oldList.asString());
 					
 					//pour chaque élément de la liste, vérification
 					for (int i = 0 ; i < Math.min(oldList.size(), maxListSize) ; i++) {

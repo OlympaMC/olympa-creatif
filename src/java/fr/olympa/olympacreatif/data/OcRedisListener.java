@@ -8,11 +8,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import redis.clients.jedis.JedisPubSub;
 
-public class OCRedisListener extends JedisPubSub {
+public class OcRedisListener extends JedisPubSub {
 
 	private OlympaCreatifMain plugin;
 	
-	public OCRedisListener(OlympaCreatifMain plugin) {
+	public OcRedisListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		plugin.getLogger().log(Level.INFO, "Redis listener chargé.");
 	}

@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
+import fr.olympa.api.common.groups.OlympaGroup;
 import fr.olympa.api.spigot.economy.OlympaMoney;
 import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
@@ -21,6 +22,8 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.gui.MainGui;
+import fr.olympa.olympacreatif.perks.KitsManager.KitType;
+import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 
@@ -33,6 +36,10 @@ public class OcaCmd extends AbstractCmd {
 
 		addArgumentParser("STAFF_PERM", StaffPerm.class);
 		addArgumentParser("SERVER_COMPONENT", ComponentCreatif.class);
+		
+		addArgumentParser("UPGRADE_TYPE", UpgradeType.class);
+		addArgumentParser("KIT_TYPE", KitType.class);
+		
 		addArgumentParser("PLOT_OWNER", (sender, str) -> {
 			List<String> players = Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).collect(Collectors.toList());
 			players.add("spawn");
@@ -295,4 +302,21 @@ public class OcaCmd extends AbstractCmd {
 		sendMessage(Prefix.DEFAULT_GOOD, "Le propriétaire de la parcelle " + pc.getCurrentPlot() + 
 				" est désormais " + ((MemberInformations)cmd.getArgument(0)).getName() + ".");
 	}
+
+	@Cmd(syntax = "Accéder aux informations VIP d'un joueur", args = {"info|set", "PLAYERS", "KIT_TYPE|UPGRADE_TYPE", "INTEGER"}, min = 2)
+	public void shop(CommandContext cmd) {
+		
+		OlympaPlayerCreatif pc = AccountProvider.getter().get(((Player)cmd.getArgument(1)).getUniqueId());
+		
+		if (cmd.getArgument(0).equals("info")) {
+			sendMessage(Prefix.DEFAULT, "§6Elements VIP du joueur " + ((Player)cmd.getArgument(1)).getName());
+			sendMessage(Prefix.DEFAULT, "   §eGrades : ");
+			sendMessage(Prefix.DEFAULT, "      " + OlympaGroup.CREA_CONSTRUCTOR.getPrefix() + "§r : " + (pc.getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR) ? "§aOUI" : "§cNON"));
+			sendMessage(Prefix.DEFAULT, "      " + OlympaGroup.CREA_ARCHITECT.getPrefix() + "§r : " + (pc.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) ? "§aOUI" : "§cNON"));
+			sendMessage(Prefix.DEFAULT, "      " + OlympaGroup.CREA_CREATOR.getPrefix() + "§r : " + (pc.getGroups().containsKey(OlympaGroup.CREA_CREATOR) ? "§aOUI" : "§cNON"));
+		}
+			
+	}
+	
+	
 }
