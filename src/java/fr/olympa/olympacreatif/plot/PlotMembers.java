@@ -1,10 +1,14 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.entity.Player;
 
@@ -59,8 +63,8 @@ public class PlotMembers{
 		if (getPlayerRank(p) == PlotRank.OWNER)
 			return true;
 			
-		if (rank == PlotRank.VISITOR || getCount() < maxMembers) {
-			members.put(p, rank);			
+		if (rank == PlotRank.VISITOR || members.size() < maxMembers) {
+			members.put(p, rank);
 			return true;
 		}
 		
@@ -125,20 +129,26 @@ public class PlotMembers{
 	
 	
 	
-	public Map<MemberInformations, PlotRank> getMembers(){
-		Map<MemberInformations, PlotRank> map = new TreeMap<MemberInformations, PlotRank>(new Comparator<MemberInformations>() {
+	public Map<MemberInformations, PlotRank> getMembers() {
+		Map<MemberInformations, PlotRank> map = new LinkedHashMap<PlotMembers.MemberInformations, PlotPerm.PlotRank>();
+		/*Map<MemberInformations, PlotRank> map = new TreeMap<MemberInformations, PlotRank>(new Comparator<MemberInformations>() {
 
 			@Override
 			public int compare(MemberInformations o1, MemberInformations o2) {
 				return members.get(o2).compare(members.get(o1));
 			}
-		});
+		});*/
 		
 		for (Entry<MemberInformations, PlotRank> e : members.entrySet())
 			if (e.getValue() != PlotRank.VISITOR)
 				map.put(e.getKey(), e.getValue());
 		
-		return map;
+		return map.entrySet().stream().sorted(new Comparator<Entry<MemberInformations, PlotRank>>() {
+			@Override
+			public int compare(Entry<MemberInformations, PlotRank> o1, Entry<MemberInformations, PlotRank> o2) {
+				return o2.getValue().getLevel() - o1.getValue().getLevel();
+			}
+		}).collect(Collectors.toMap(e -> e.getKey(), e-> e.getValue(), (oldV, newV) -> newV, () -> new LinkedHashMap<PlotMembers.MemberInformations, PlotPerm.PlotRank>()));
 	}
 
 	public Map<MemberInformations, PlotRank> getList(){
@@ -161,8 +171,14 @@ public class PlotMembers{
 	 * Permet de redéfinir le propriétaire d'une parcelle. Cette action réinitialsise la liste des membres actuels.
 	 * @param player
 	 */
-	public void setOwner(MemberInformations player) {
-		members.keySet().forEach(p -> members.put(p, PlotRank.VISITOR));
+	public void setOwner(MemberInformations player, boolean resetExisting) {
+		if (resetExisting)
+			members.keySet().forEach(p -> members.put(p, PlotRank.VISITOR));
+		
+		members.keySet().forEach(p -> {
+			if (getPlayerRank(p) == PlotRank.OWNER)
+				members.put(p, PlotRank.CO_OWNER);
+		});
 		set(player, PlotRank.OWNER);
 	}
 	

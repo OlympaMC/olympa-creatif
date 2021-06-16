@@ -298,7 +298,7 @@ public class OcaCmd extends AbstractCmd {
 			return;
 		}
 		
-		pc.getCurrentPlot().getMembers().setOwner(cmd.getArgument(0));
+		pc.getCurrentPlot().getMembers().setOwner(cmd.getArgument(0), true);
 		sendMessage(Prefix.DEFAULT_GOOD, "Le propriétaire de la parcelle " + pc.getCurrentPlot() + 
 				" est désormais " + ((MemberInformations)cmd.getArgument(0)).getName() + ".");
 	}

@@ -56,7 +56,7 @@ public class PlotsManager {
 			})).build();*/
 	//private Vector<AsyncPlot> asyncPlots = new Vector<AsyncPlot>();
 	
-	private static Cache<UUID, Optional<PlotId>> entityBirthPlotCache = CacheBuilder.newBuilder().expireAfterAccess(31, TimeUnit.SECONDS).build();
+	private static Cache<UUID, Optional<PlotId>> entityBirthPlotCache = CacheBuilder.newBuilder().expireAfterAccess(30, TimeUnit.SECONDS).build();
 	
 	private int plotsCount;
 	

@@ -389,20 +389,19 @@ public class DataManager implements Listener {
 			getPlayerDatas.setLong(1, getPlotOwnerResult.getLong("player_id"));
 			ResultSet getPlotOwnerDatasResult = osSelectPlayerDatas.executeQuery(getPlayerDatas);
 			getPlotOwnerDatasResult.next();
-
-			System.out.println("Plot " + plotId + " owner bonus members level : " + UpgradeType.BONUS_MEMBERS_LEVEL.getDataOf(
-					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())).value);
 			
 			//création plotMembers
 			PlotMembers plotMembers = new PlotMembers(UpgradeType.BONUS_MEMBERS_LEVEL.getDataOf(
 					getPlotOwnerDatasResult.getInt(UpgradeType.BONUS_MEMBERS_LEVEL.getBddKey())).value);
 
+			//System.out.println("Plot " + plotId + " max members : " + plotMembers.getMaxMembers());
+			
 			PreparedStatement getPlotMembers = osSelectPlotPlayers.createStatement();
 			getPlotMembers.setInt(1, serverIndex);
 			getPlotMembers.setInt(2, plotId.getId());
 			ResultSet getPlotPlayersResult = osSelectPlotPlayers.executeQuery(getPlotMembers);
-
-			while (getPlotPlayersResult.next()) {
+			
+			while (getPlotPlayersResult.next()) {				
 				MemberInformations member = new MemberInformations(
 						getPlotPlayersResult.getLong("player_id"),
 						getPlotPlayersResult.getString("player_name"),
