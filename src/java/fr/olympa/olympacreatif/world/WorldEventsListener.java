@@ -102,14 +102,18 @@ public class WorldEventsListener implements Listener{
 	@EventHandler(priority = EventPriority.LOW) //n'autorise que certaines sources de spawn de créatures 
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
 		//System.out.println("Tryng to spawn " + e.getEntity() + " with reason " + e.getSpawnReason() + " is allowed : " + allowedSpawnReasons.contains(e.getSpawnReason()));
+
+		System.out.println("Creature Spawn Event : " + e.getEntityType() + " because " + e.getSpawnReason());
 		
 		if (plugin.getPlotsManager().getPlot(e.getLocation()) == null) {
 			e.setCancelled(true);
 			return;
 		}
-
-		if (!allowedSpawnReasons.contains(e.getSpawnReason()) && e.getEntityType() != EntityType.ARMOR_STAND)
-			e.setCancelled(true);
+		
+		if (!allowedSpawnReasons.contains(e.getSpawnReason()) && e.getEntityType() != EntityType.ARMOR_STAND) {
+			System.out.println("DEBUG : cancelled " + e.getEntityType() + " spawn with reason " + e.getSpawnReason());
+			e.setCancelled(true);	
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST) //cancel spawn if outside of the creative world

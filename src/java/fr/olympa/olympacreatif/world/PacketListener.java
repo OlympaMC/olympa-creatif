@@ -23,7 +23,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.olympa.api.common.provider.AccountProvider;
-import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.spigot.utils.SpigotUtils;
 import fr.olympa.core.spigot.chat.CancerListener;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -325,62 +324,4 @@ public class PacketListener implements Listener {
         	 }
     	});
     }
-    
-    /*public void handleCbPacket(PacketPlayInSetCommandBlock packet) {
-    	
-    	System.out.println("Commandblock packed is being used to setup commandblock...");
-    	
-       WorldServer world = ((CraftWorld)plugin.getWorldManager().getWorld()).getHandle();
-   	
-       CommandBlockListenerAbstract commandblocklistenerabstract = null;
-       TileEntityCommand tileentitycommand = null;
-       BlockPosition blockposition = packet.b();
-       TileEntity tileentity = world.getTileEntity(blockposition);
-		
-       if (tileentity instanceof TileEntityCommand) {
-           tileentitycommand = (TileEntityCommand) tileentity;
-           commandblocklistenerabstract = tileentitycommand.getCommandBlock();
-       }
-		
-       String s = packet.c();
-       boolean flag = packet.d();
-		
-       if (commandblocklistenerabstract != null) {
-           IBlockData iblockdata;
-           TileEntityCommand.Type tileentitycommand_type = tileentitycommand.m();
-           EnumDirection enumdirection = (EnumDirection) world.getType(blockposition).get(BlockCommand.a);
-			
-           switch (packet.g()) {
-               case SEQUENCE:
-                   iblockdata = Blocks.CHAIN_COMMAND_BLOCK.getBlockData();
-                   world.setTypeAndData(blockposition, (IBlockData)((IBlockData) iblockdata.set(BlockCommand.a, enumdirection)).set(BlockCommand.b, Boolean.valueOf(packet.e())), 2);
-                   break;
-               case AUTO:
-                   iblockdata = Blocks.REPEATING_COMMAND_BLOCK.getBlockData();
-                   world.setTypeAndData(blockposition, (IBlockData)((IBlockData) iblockdata.set(BlockCommand.a, enumdirection)).set(BlockCommand.b, Boolean.valueOf(packet.e())), 2);
-                   break;
-               default:
-                   iblockdata = Blocks.COMMAND_BLOCK.getBlockData();
-                   world.setTypeAndData(blockposition, (IBlockData)((IBlockData) iblockdata.set(BlockCommand.a, enumdirection)).set(BlockCommand.b, Boolean.valueOf(packet.e())), 2);
-                   break;
-           }
-           tileentity.r();
-           world.setTileEntity(blockposition, tileentity);
-			
-           commandblocklistenerabstract.setCommand(s);
-           commandblocklistenerabstract.a(flag);
-			
-           //if (!flag) 
-				//commandblocklistenerabstract.b(null);
-				
-           tileentitycommand.b(packet.f());
-			
-           if (tileentitycommand_type != packet.g()) 
-				tileentitycommand.h();
-				
-           commandblocklistenerabstract.e();
-			
-           //if (!UtilColor.b(s)) this.player.sendMessage(new ChatMessage("advMode.setCommand.success", new Object[] {s}), SystemUtils.b);
-       }
-    }*/
 }

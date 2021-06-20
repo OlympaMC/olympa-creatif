@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.ExperienceOrb.SpawnReason;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,7 +38,6 @@ public class MembersGui extends IGui {
 				it = ItemUtils.lore(it, "§7Permissions de " + r.getDowngrade().getRankName() + "§7, et :", " ");
 			
 			//Bukkit.broadcastMessage(r + " : " + r.getPermsDescs());
-			
 			for (String s : r.getPermsDescs())
 				it = ItemUtils.loreAdd(it, "§7- " + s);
 			

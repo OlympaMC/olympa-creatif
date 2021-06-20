@@ -311,10 +311,57 @@ public class OcaCmd extends AbstractCmd {
 		if (cmd.getArgument(0).equals("info")) {
 			sendMessage(Prefix.DEFAULT, "§6Elements VIP du joueur " + ((Player)cmd.getArgument(1)).getName());
 			sendMessage(Prefix.DEFAULT, "   §eGrades : ");
-			sendMessage(Prefix.DEFAULT, "      " + OlympaGroup.CREA_CONSTRUCTOR.getPrefix() + "§r : " + (pc.getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR) ? "§aOUI" : "§cNON"));
-			sendMessage(Prefix.DEFAULT, "      " + OlympaGroup.CREA_ARCHITECT.getPrefix() + "§r : " + (pc.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) ? "§aOUI" : "§cNON"));
-			sendMessage(Prefix.DEFAULT, "      " + OlympaGroup.CREA_CREATOR.getPrefix() + "§r : " + (pc.getGroups().containsKey(OlympaGroup.CREA_CREATOR) ? "§aOUI" : "§cNON"));
-		}
+			
+			//System.out.println(String.format("      §a" + OlympaGroup.CREA_CONSTRUCTOR.getPrefix() + "§r : %s", pc.getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR) ? "§aOUI" : "§cNON"));
+			
+			sendMessage(Prefix.DEFAULT, "      §a" + OlympaGroup.CREA_CONSTRUCTOR.getName(pc.getGender()) + "§r : %s", pc.getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR) ? "§aOUI" : "§cNON");
+			sendMessage(Prefix.DEFAULT, "      §a" + OlympaGroup.CREA_ARCHITECT.getName(pc.getGender()) + "§r : %s", pc.getGroups().containsKey(OlympaGroup.CREA_ARCHITECT) ? "§aOUI" : "§cNON");
+			sendMessage(Prefix.DEFAULT, "      §a" + OlympaGroup.CREA_CREATOR.getName(pc.getGender()) + "§r : %s", pc.getGroups().containsKey(OlympaGroup.CREA_CREATOR) ? "§aOUI" : "§cNON");
+
+			sendMessage(Prefix.DEFAULT, "   §eKits : ");
+			for (KitType kit : KitType.values())
+				if (kit != KitType.ADMIN)
+					sendMessage(Prefix.DEFAULT, "      §aKit " + kit.getName() + "§r : %s", pc.hasKit(kit) ? "§aOUI" : "§cNON");
+
+			sendMessage(Prefix.DEFAULT, "   §eAméliorations : ");
+			for (UpgradeType upg : UpgradeType.values())
+				sendMessage(Prefix.DEFAULT, "      §aKit " + upg.toString().toLowerCase() + " : %s", "§7niveau " + upg.getDataOf(pc).level + ", valeur " + upg.getDataOf(pc).value);
+				
+		}else if (cmd.getArgumentsLength() == 4) {
+			if (cmd.getArgument(2) instanceof KitType) {
+				KitType kit = cmd.getArgument(2);
+				
+				if (pc.hasKit(kit) && (int) cmd.getArgument(3) == 1) {
+					sendMessage(Prefix.BAD, "Le joueur " + pc.getName() + " possède déjà le kit " + kit.getName() + ".");
+				}else if (pc.hasKit(kit) && (int) cmd.getArgument(3) == 0) {
+					sendMessage(Prefix.DEFAULT_GOOD, "Le kit " + kit.getName() + " a été retiré à " + pc.getName() + ".");
+					pc.removeKit(kit);
+					
+				}else if (!pc.hasKit(kit) && (int) cmd.getArgument(3) == 1) {
+					sendMessage(Prefix.DEFAULT_GOOD, "Le kit " + kit.getName() + " a été donné à " + pc.getName() + ".");
+					pc.addKit(kit);
+				}else if (!pc.hasKit(kit) && (int) cmd.getArgument(3) == 0) {
+						sendMessage(Prefix.BAD, "Le joueur " + pc.getName() + " ne possède déjà pas le kit " + kit.getName() + ".");
+				}else
+					sendIncorrectSyntax("Vous devez spécifier 1 pour ajouter le kit ou 0 pour le retirer.");
+				
+			} else if (cmd.getArgument(2) instanceof UpgradeType) {
+				UpgradeType upg = cmd.getArgument(2);
+				int level = (int) cmd.getArgument(3);
+				
+				if (upg.getDataOf(pc).level == level)
+					sendMessage(Prefix.BAD, "Le joueur " + pc.getName() + " possède déjà l'amélioration " + upg.toString().toLowerCase() + " au niveau " + upg.getDataOf(pc).level + ".");
+				else if (level < 0 || level > upg.getMaxLevel())
+					sendMessage(Prefix.BAD, "Le niveau de l'amélioration " + upg.toString().toLowerCase() + " doit être compris entre 0 et " + upg.getMaxLevel() + ".");
+				else {
+					pc.incrementUpgradeLevel(upg, level - upg.getDataOf(pc).level);
+					sendMessage(Prefix.DEFAULT_GOOD, "L'amélioration " + upg.toString().toLowerCase() + " du joueur " + pc.getName() + " est maintenant au niveau " + upg.getDataOf(pc).level + ".");
+				}
+			}
+			
+			
+		}else
+			sendIncorrectSyntax();
 			
 	}
 	

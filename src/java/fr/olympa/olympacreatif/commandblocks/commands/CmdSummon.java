@@ -112,6 +112,7 @@ public class CmdSummon extends CbCommand {
 			.add(EntityType.ARMOR_STAND)
 			.add(EntityType.ITEM_FRAME)
 			.add(EntityType.PAINTING)
+			.add(EntityType.ENDER_CRYSTAL)
 			.build();
 
 	private NBTTagCompound tag = null;

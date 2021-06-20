@@ -223,19 +223,40 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		kitsColumns.get(kit).updateAsync(this, 1, null, null);
 	}
 	
+	public void removeKit(KitType kit) {
+		kits.remove(kit);
+		kitsColumns.get(kit).updateAsync(this, 0, null, null);
+	}
+	
+	
+	@Deprecated
+	/**
+	 * Prefer usage of UpgradeType.getDataOf(OlympaPlayerCreatif)
+	 */
 	public int getUpgradeLevel(UpgradeType upg) {
 		return upgrades.get(upg);
 	}
 	
-	public void incrementUpgradeLevel(UpgradeType upg) {
-		upgrades.put(upg, upgrades.get(upg) + 1);
+	/**
+	 * 
+	 * @param upg
+	 * @param levels may be negative
+	 * @return true if change is possible, false if the new upgrade level is out of range
+	 */
+	public boolean incrementUpgradeLevel(UpgradeType upg, int levels) {
+		if (upgrades.get(upg) + levels < 0 || upgrades.get(upg) + levels > upg.getMaxLevel())
+			return false;
+		
+		upgrades.put(upg, upgrades.get(upg) + levels);
 		
 		//changement du cpt des plots du joueur
 		if (upg == UpgradeType.CB_LEVEL)
 			for (Plot plot : getPlots(true))
 				plot.getCbData().setCommandsPerSecond(UpgradeType.CB_LEVEL.getDataOf(upgrades.get(UpgradeType.CB_LEVEL)).value);
 		
-		upgradesColumns.get(upg).updateAsync(this, getUpgradeLevel(upg), null, null);
+		upgradesColumns.get(upg).updateAsync(this, upgrades.get(upg), null, null);
+		
+		return true;
 	}
 	
 	//renvoie la liste des plots où le joueur est membre

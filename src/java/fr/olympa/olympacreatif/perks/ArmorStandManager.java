@@ -203,14 +203,14 @@ public class ArmorStandManager implements Listener {
 		if (data == null)
 			return;
 
+		e.setCancelled(true);
+
 		BiConsumer<PlayerEditorData, Action> consumer = invItems.get(e.getPlayer().getInventory().getHeldItemSlot());
 		if (consumer != null)
 			if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK)
 				consumer.accept(data, Action.LEFT_CLICK_AIR);
 			else if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)
-				consumer.accept(data, Action.RIGHT_CLICK_AIR);
-		
-		e.setCancelled(true);
+				consumer.accept(data, Action.RIGHT_CLICK_AIR);		
 	}
 	
 	public class ArmorstandEditorGui extends OlympaGUI {
@@ -306,44 +306,6 @@ public class ArmorStandManager implements Listener {
 			return ItemUtils.name(item.clone(), paramName + (getValue.apply(ent) ? " : §aoui" : " : §cnon"));
 		}
 	}
-	
-	/*static class GuiItemInteger extends GuiItem<Integer> {
-
-		public GuiItemInteger(int slot, String paramName, Material mat, Function<ArmorStand, Integer> getValue,
-				BiConsumer<ArmorStand, Integer> setValue) {
-			this(slot, paramName, new ItemStack(mat), getValue, setValue);
-		}
-		
-		public GuiItemInteger(int slot, String paramName, ItemStack item, Function<ArmorStand, Integer> getValue,
-				BiConsumer<ArmorStand, Integer> setValue) {
-			super(slot, paramName, item, getValue, setValue);
-			ItemUtils.lore(super.item, "§7Clic gauche : §aaugmente §7la valeur de 1", "§7Clic droit : §cdiminue §7la valeur de 1", 
-					" ", "§7Appuyez sur shift pour utiliser un pas de 10");
-		}
-
-		@Override
-		public ItemStack get(ArmorStand ent, ClickType click) {
-			int modifier = 0;
-			
-			switch (click) {
-			case RIGHT:
-				modifier+=2;
-				break;
-			case LEFT:
-				modifier+=2;
-				break;
-			case SHIFT_RIGHT:
-				modifier+=10;
-				break;
-			case SHIFT_LEFT:
-				modifier-=10;
-				break;
-			}
-			
-			setValue.accept(ent, getValue.apply(ent) + modifier);
-			return ItemUtils.name(item.clone(), paramName + " : §e" + getValue.apply(ent));
-		}
-	}*/
 	
 	static class PlayerEditorData {
 		

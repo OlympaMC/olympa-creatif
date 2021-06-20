@@ -222,7 +222,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 	
 	private void addUpgrade(UpgradeType upgrade, ItemStack item, String url) {
 		upgradeIndex++;
-		int level = p.getUpgradeLevel(upgrade);
+		int level = upgrade.getDataOf(p).level;
 		
 		if (upgrade == UpgradeType.CB_LEVEL && !p.hasKit(KitType.COMMANDBLOCK))
 			setItem(upgradeIndex, ItemUtils.loreAdd(item, " ", "§7Le kit commandblock est nécessaire", "§7pour effectuer cet achat"), null);
