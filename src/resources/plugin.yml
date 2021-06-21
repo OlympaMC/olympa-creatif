@@ -1,5 +1,5 @@
 name: OlympaCreatif
-version: 0.1
+version: @plugin_version@
 author: Bullobily
 
 main: fr.olympa.olympacreatif.OlympaCreatifMain
