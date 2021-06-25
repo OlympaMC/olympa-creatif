@@ -631,22 +631,8 @@ public class PlotsInstancesListener implements Listener{
 		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
 		Plot plotTo = plugin.getPlotsManager().getPlot(e.getTo());
 		
-		//((OlympaPlayerCreatif)AccountProvider.getter().get(e.getPlayer().getUniqueId())).setCurrentPlot(plotTo);
-		
-		if (plotFrom == plotTo)
-			return;
-		
-		if (plotTo != null) {
-			if (plotTo.canEnter(e.getPlayer())) {
-				if (plotFrom != null)
-					plotFrom.executeExitActions(e.getPlayer());
-				
-				plotTo.executeEntryActions(e.getPlayer(), e.getTo());	
-			}else
-				e.setCancelled(true);
-			
-		}else if (plotFrom != null) 
-			plotFrom.executeExitActions(e.getPlayer());
+		if (plotFrom != plotTo && !((OlympaPlayerCreatif)AccountProvider.getter().get(e.getPlayer().getUniqueId())).setPlot(plotTo))
+			e.setCancelled(true);
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST) //actions à effectuer lors de la sortie/entrée d'un joueur
@@ -664,6 +650,10 @@ public class PlotsInstancesListener implements Listener{
 		if (plotTo == plotFrom)
 			return;
 		
+		if (plotFrom != plotTo && !((OlympaPlayerCreatif)AccountProvider.getter().get(e.getPlayer().getUniqueId())).setPlot(plotTo))
+			e.setCancelled(true);
+		
+		/*
 		if (plotTo != null) {
 			if (plotTo.canEnter(e.getPlayer())) {
 				if (plotFrom != null)
@@ -674,7 +664,7 @@ public class PlotsInstancesListener implements Listener{
 				e.setCancelled(true);
 			
 		}else if (plotFrom != null) 
-			plotFrom.executeExitActions(e.getPlayer());
+			plotFrom.executeExitActions(e.getPlayer());*/
 	}
 
 	////////////////////////////////////////////////////////////

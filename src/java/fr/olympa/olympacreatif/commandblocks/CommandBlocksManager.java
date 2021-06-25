@@ -56,7 +56,6 @@ public class CommandBlocksManager {
 		
 		//maj sidebar si on objectif y est positionné
 		for (CbObjective obj : toPlot.getCbData().getObjectives()) {
-			
 			if (obj.getDisplaySlot() == DisplaySlot.SIDEBAR) {
 				
 				//pc.setCustomScoreboardTitle(obj.getName());
@@ -83,7 +82,7 @@ public class CommandBlocksManager {
 		for (CbObjective obj : fromPlot.getCbData().getObjectives())
 			obj.set(p, null);
 		
-		((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId())).clearCustomSidebar();
+		//((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId())).clearCustomSidebar();
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		
 		//hide holos

@@ -7,9 +7,12 @@ import org.bukkit.entity.Player;
 import fr.olympa.api.spigot.command.essentials.BackCommand;
 import fr.olympa.api.spigot.command.essentials.tp.TpaHandler;
 import fr.olympa.api.common.groups.OlympaGroup;
+import fr.olympa.api.common.observable.ObservableValue;
 import fr.olympa.api.spigot.holograms.Hologram;
 import fr.olympa.api.spigot.lines.CyclingLine;
+import fr.olympa.api.spigot.lines.DynamicLine;
 import fr.olympa.api.spigot.lines.FixedLine;
+import fr.olympa.api.spigot.lines.PlayerObservableLine;
 import fr.olympa.api.spigot.lines.TimerLine;
 import fr.olympa.api.common.permission.OlympaPermission;
 import fr.olympa.api.common.permission.list.OlympaAPIPermissionsSpigot;
@@ -150,7 +153,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		cbManager = new CommandBlocksManager(this);
 		permsManager = new PermissionsManager(this);
 		
-		createScoreboard(dataManager.getServerIndex());
+		createScoreboard2(dataManager.getServerIndex());
 
 		cmdLogic = new CmdsLogic(this);
 
@@ -262,7 +265,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	}
 
 	//crée le scoreboard du joueur avec des lignes dynamiques, pour afficher le scoreboard custom du plot si besoin
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	private void createScoreboard(int serverIndex) {
 		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
 
@@ -274,10 +277,28 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 					new TimerLine<Scoreboard<OlympaPlayerCreatif>>(p -> {
 						return getLine(p.getOlympaPlayer(), line);
 					}, plugin, 20));
+			
+			//new DynamicLine<Scoreboard<OlympaPlayerCreatif>>(p -> p.getName(), null);
+		}
+		scm.addFooters(FixedLine.EMPTY_LINE, CyclingLine.olympaAnimation());
+	}*/
+	
+	@SuppressWarnings("unchecked")
+	private void createScoreboard2(int serverIndex) {
+		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
+
+		//initialisation lignes scoreboard
+		for (int i = 0; i < OlympaPlayerCreatif.maxSidebarRows; i++) {
+			final int line = i;
+			scm.addLines(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(
+					holder -> holder.getOlympaPlayer().getSidebarRow(line).get(), 
+					holder -> holder.getOlympaPlayer().getSidebarRow(line)));
 		}
 		scm.addFooters(FixedLine.EMPTY_LINE, CyclingLine.olympaAnimation());
 	}
-
+	
+	
+/*
 	public String getLine(OlympaPlayerCreatif p, int i) {
 
 		//Bukkit.broadcastMessage(message)
@@ -313,24 +334,24 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		case 5:
 			if (plot == null)
-				return "§7Rang : " + PlotRank.VISITOR.getRankName();
+				return "§7Visiteurs : 0";
 			else
-				return "§7Rang : " + plot.getMembers().getPlayerRank(p).getRankName();
+				return "§7Visiteurs : " + plot.getPlayers().size();
 
 		case 6:
 			return "§3";
 
 		case 7:
-			return "§7" + p.getGameMoneyName() + " : §6" + p.getGameMoney().getFormatted();
+			if (plot == null)
+				return "§7Rang : " + PlotRank.VISITOR.getRankName();
+			else
+				return "§7Rang : " + plot.getMembers().getPlayerRank(p).getRankName();
 
 		case 8:
 			return "§4";
-		/*if (p.getCustomScoreboardLines().size() > 0 && plot != null)
-			return "§8Sidebar plot " + plot;
-		else*/
 		}
 		return "";
-	}
+	}*/
 
 	private String getAsRomanNumber(int i) {
 		switch (i) {

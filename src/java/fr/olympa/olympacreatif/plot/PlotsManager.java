@@ -244,7 +244,7 @@ public class PlotsManager {
 	}
 	
 	public void unloadPlot(Plot plot) {
-		plot.unload();
+		loadedPlots.remove(plot.getId().getId());
 		plugin.getDataManager().savePlot(plot, false);
 	}
 
