@@ -18,8 +18,8 @@ import org.bukkit.generator.ChunkGenerator;
 import fr.olympa.api.spigot.utils.Schematic;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCparam;
-import fr.olympa.zta.plots.Override;
 
+@SuppressWarnings("unused")
 public class OCChunkGenerator extends ChunkGenerator {
 	
 	public int plotSize;

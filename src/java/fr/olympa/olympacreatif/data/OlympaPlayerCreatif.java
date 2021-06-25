@@ -27,6 +27,7 @@ import fr.olympa.api.common.provider.OlympaPlayerObject;
 import fr.olympa.api.common.sql.SQLColumn;
 import fr.olympa.api.spigot.economy.MoneyPlayerInterface;
 import fr.olympa.api.spigot.economy.OlympaMoney;
+import fr.olympa.api.spigot.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
@@ -158,14 +159,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 			currentPlotMembersObs.unobserve("members_player_rank_change_" + getName());
 		}
 		
-		//System.out.println("Updating scoreboard " + title + " : " + scores.toString());
-		
-		//if (!sidebarRows[0].get().equals(ChatColor.BOLD + title))
 		sidebarRows[0].set(ChatColor.BOLD + title);
-		
-		//if (!sidebarRows[1].get().equals(ChatColor.BOLD + title))
 		sidebarRows[1].set("§1");
-
 		sidebarRows[maxSidebarRows- 1].set("§7[sidebar plot " + currentPlotObs.get() + "]");
 
 		List<String> keys = new ArrayList<String>(scores.keySet());
@@ -175,8 +170,10 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 				sidebarRows[i + 2].set(keys.get(i) + "§7 : " + scores.get(keys.get(i)));
 		
 		for (int i = keys.size() + 2 ; i < maxSidebarRows - 1 ; i++)
-			if (!sidebarRows[i].get().equals("§2"))
-				sidebarRows[i].set("§2");
+			if (!sidebarRows[i].get().equals(ScoreboardManager.INVISIBLE_ROW))
+				sidebarRows[i].set(ScoreboardManager.INVISIBLE_ROW);
+		
+		//Arrays.asList(sidebarRows).forEach(e -> System.out.println("Row : " + e.get().replace("§", "-")));
 	}
 	
 	public void reinitSidebar() {
@@ -197,7 +194,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 		sidebarRows[4].set("§7Grade : " + getGroupNameColored());
 		
 		for (int i = 6 ; i < maxSidebarRows ; i++)
-			sidebarRows[i].set("§3");
+			sidebarRows[i].set(ScoreboardManager.INVISIBLE_ROW);
 	}
 	
 	public ObservableValue<String> getSidebarRow(int row) {

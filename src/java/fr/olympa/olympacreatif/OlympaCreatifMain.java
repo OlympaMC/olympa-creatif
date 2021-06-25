@@ -286,7 +286,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	@SuppressWarnings("unchecked")
 	private void createScoreboard2(int serverIndex) {
 		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
-
+		
 		//initialisation lignes scoreboard
 		for (int i = 0; i < OlympaPlayerCreatif.maxSidebarRows; i++) {
 			final int line = i;
