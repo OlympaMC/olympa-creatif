@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.common.provider.AccountProvider;
@@ -279,7 +280,7 @@ public class CmdsLogic {
 		}
 	}
 
-	public void sendPlotsList(OlympaPlayerCreatif pc, Player target) {
+	public void sendPlotsList(CommandSender sender, Player target) {
 		String lp = "";
 		List<Plot> plots = new ArrayList<>();
 
@@ -294,11 +295,11 @@ public class CmdsLogic {
 			lp += plot + " ";
 
 		if (target == null)
-			pc.getPlayer().sendMessage("§aListe des " + plots.size() + " parcelles actuellement chargées : " + lp);
+			sender.sendMessage("§aListe des " + plots.size() + " parcelles actuellement chargées : " + lp);
 		else if (plots.size() > 0)
-			pc.getPlayer().sendMessage("§aListe des parcelles possédées par " + target.getName() + " : " + lp);
+			sender.sendMessage("§aListe des parcelles possédées par " + target.getName() + " : " + lp);
 		else
-			pc.getPlayer().sendMessage("§aListe des parcelles possédées par " + target.getName() + " : §cjoueur hors ligne ou ne possédant aucune parcelle");
+			sender.sendMessage("§aListe des parcelles possédées par " + target.getName() + " : §cjoueur hors ligne ou ne possédant aucune parcelle");
 	}
 
 	private Map<PlotId, String> plotsResetVerifCode = new HashMap<>();

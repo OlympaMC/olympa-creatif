@@ -59,12 +59,12 @@ public class OcaCmd extends AbstractCmd {
 	}
 
 	
-	@Cmd(player = true, syntax = "Afficher la liste des parcelles actuellement chargées", args = "PLAYERS")
+	@Cmd(player = false, syntax = "Afficher la liste des parcelles actuellement chargées", args = "PLAYERS")
 	public void plotslist(CommandContext cmd) {
 		if (cmd.getArgumentsLength() == 0)
-			plugin.getCmdLogic().sendPlotsList(getOlympaPlayer(), null);
+			plugin.getCmdLogic().sendPlotsList(getSender(), null);
 		else
-			plugin.getCmdLogic().sendPlotsList(getOlympaPlayer(), cmd.getArgument(0));
+			plugin.getCmdLogic().sendPlotsList(getSender(), cmd.getArgument(0));
 	}
 
 	@Cmd(syntax = "Gérer les composants du créatif", args = {"activate|deactivate", "SERVER_COMPONENT"})
@@ -236,6 +236,7 @@ public class OcaCmd extends AbstractCmd {
 		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null), (cmd.getArgumentsLength() > 1 ? (String) cmd.getArgument(1) : null));
 	}
 	
+	/*
 	@Cmd(syntax = "Gérer l'argent d'un joueur", args = {"PLAYERS", "info|give|withdraw", "INTEGER", }, min = 2)
 	public void money(CommandContext cmd) {
 		if (getOlympaPlayer() != null && !OcPermissions.STAFF_MANAGE_MONEY.hasPermissionWithMsg(getOlympaPlayer()))
@@ -279,7 +280,7 @@ public class OcaCmd extends AbstractCmd {
 			
 			break;
 		}
-	}
+	}*/
 	
 	@Cmd(player = true, syntax = "Ouvrir l'interface des parcelles d'un joueur", args = {"PLAYERS"}, min = 1)
 	public void openmenuas(CommandContext cmd) {
@@ -330,6 +331,12 @@ public class OcaCmd extends AbstractCmd {
 		}else if (cmd.getArgumentsLength() == 4) {
 			if (cmd.getArgument(2) instanceof KitType) {
 				KitType kit = cmd.getArgument(2);
+				
+				if (kit == KitType.ADMIN) {
+					sendMessage(Prefix.BAD, "Vous ne pouvez pas gérer ce kit.");
+					return;
+				}
+					
 				
 				if (pc.hasKit(kit) && (int) cmd.getArgument(3) == 1) {
 					sendMessage(Prefix.BAD, "Le joueur " + pc.getName() + " possède déjà le kit " + kit.getName() + ".");
