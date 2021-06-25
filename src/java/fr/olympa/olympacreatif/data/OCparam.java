@@ -61,11 +61,11 @@ public class OCparam<T> {
 
 	public static final OCparam<Integer> WE_MAX_NBT_SIZE = new OCparam<Integer>(8000);
 	
-	public static final OCparam<Map<UpgradeType, List<UpgradeData>>> SHOP_DATA = 
+	/*public static final OCparam<Map<UpgradeType, List<UpgradeData>>> SHOP_DATA = 
 			new OCparam<Map<UpgradeType, List<UpgradeData>>>(
 			//la valeur par défaut est un peu longue mais trql
 			Stream.of(UpgradeType.values()).collect(Collectors.toMap(type -> type, type -> Arrays.asList(new UpgradeData[]{new UpgradeData(0, UpgradeType.BONUS_PLOTS_LEVEL, "0 €", 0), new UpgradeData(1, UpgradeType.BONUS_PLOTS_LEVEL, "42 €", 1)}))), 
-			new TypeToken<HashMap<UpgradeType, List<UpgradeData>>>() {}.getType());
+			new TypeToken<HashMap<UpgradeType, List<UpgradeData>>>() {}.getType());*/
 	
 	
 	//public static final OCparam<Integer> MAX_CB_PER_PLOT = new OCparam<Integer>(1000);

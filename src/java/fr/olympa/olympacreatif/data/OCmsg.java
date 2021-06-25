@@ -177,8 +177,8 @@ public class OCmsg {
 			
 			.put("%playerGroup", pc -> {return pc.getGroupName();})
 
-			.put("%playerMoneyAndSymbol", pc -> {return pc.getGameMoney().getFormatted();})
-			.put("%playerMoney", pc -> {return pc.getGameMoney().get() + "";})
+			/*.put("%playerMoneyAndSymbol", pc -> {return pc.getGameMoney().getFormatted();})
+			.put("%playerMoney", pc -> {return pc.getGameMoney().get() + "";})*/
 			
 			.put("%playerPlotsCount", pc -> {return pc.getPlots(false).size() + "";})
 			.put("%playerPlotsMaxCount", pc -> {return pc.getPlotsSlots(false) + "";})

@@ -20,6 +20,8 @@ import org.bukkit.ChatColor;
 import com.google.common.collect.ImmutableMap;
 
 import fr.olympa.api.common.groups.OlympaGroup;
+import fr.olympa.api.common.observable.Observable.Observer;
+import fr.olympa.api.common.observable.ObservableValue;
 import fr.olympa.api.common.permission.OlympaSpigotPermission;
 import fr.olympa.api.common.provider.OlympaPlayerObject;
 import fr.olympa.api.common.sql.SQLColumn;
@@ -29,10 +31,11 @@ import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
+import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 
-public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlayerInterface {
+public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPlayerInterface*/ {
 	
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_MONEY = new SQLColumn<OlympaPlayerCreatif>("gameMoney", "INT NOT NULL DEFAULT 100", Types.INTEGER).setUpdatable();
 	
@@ -77,19 +80,25 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 	private OlympaCreatifMain plugin;
 	
 	private boolean hasClaimedVipRewards = false; //utilisé pour les récompenses uniques VIP
-	private OlympaMoney money = new OlympaMoney(0);
+	//private OlympaMoney money = new OlympaMoney(0);
 
 	private Set<KitType> kits = new HashSet<KitType>();
 	private Map<UpgradeType, Integer> upgrades = new HashMap<UpgradeType, Integer>();
 	private Set<PlayerParamType> playerParams = new HashSet<PlayerParamType>();
 
-	public static final int customScoreboardLinesSize = 8;
-	private String[] customScoreboardLines = new String[customScoreboardLinesSize];
-	private boolean isCustomSidebarEnabled = false;
+	/*public static final int customScoreboardLinesSize = 8;
+	private String[] customScoreboardLines = new String[customScoreboardLinesSize];*/
 	
 	private List<StaffPerm> staffPerm = new ArrayList<StaffPerm>();
-	
-	private Plot currentPlot = null;
+
+	private boolean isCustomSidebarEnabled = false;
+	public static final int maxSidebarRows = 13;
+	@SuppressWarnings("unchecked")
+	private ObservableValue<String>[] sidebarRows = new ObservableValue[maxSidebarRows];
+
+	private ObservableValue<Plot> currentPlotObs = new ObservableValue<Plot>(null);
+	private ObservableValue<PlotMembers> currentPlotMembersObs = new ObservableValue<PlotMembers>(null);
+	//private Plot currentPlot = null;
 	
 	public OlympaPlayerCreatif(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
@@ -103,7 +112,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 	
 	@Override
 	public void loadDatas(ResultSet resultSet) throws SQLException {
-		money.set(resultSet.getInt("gameMoney"));
+		//money.set(resultSet.getInt("gameMoney"));
 		
 		for (KitType kit : KitType.values())
 			if (resultSet.getBoolean(kit.getBddKey()))
@@ -119,85 +128,83 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 				playerParams.remove(param);
 		
 		hasClaimedVipRewards = resultSet.getBoolean("hasClaimedVipReward");
-		
-		//currentPlot = plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, 1));
 	}
 	
-	/*@Override
-	public void saveDatas(PreparedStatement statement) throws SQLException {
-		
-		statement.setInt(1, (int) gameMoney.get());
-		
-		//kits
-		for (int i = 2 ; i < 2 + KitType.values().length ; i++)
-			if (kits.contains(KitType.values()[i - 2]))
-				statement.setBoolean(i, true);
-			else
-				statement.setBoolean(i, false);
-		
-		int oldKeysLength = 2 + KitType.values().length;
-		
-		//améliorations
-		for (int i = oldKeysLength ; i < oldKeysLength + UpgradeType.values().length ; i++)
-			if (upgrades.get(UpgradeType.values()[i - oldKeysLength]) != null)
-				statement.setInt(i, upgrades.get(UpgradeType.values()[i - oldKeysLength]));
-			else
-				statement.setInt(i, 0);
-		
-		oldKeysLength += UpgradeType.values().length;
-		
-		//player params
-		for (int i = oldKeysLength ; i < oldKeysLength + PlayerParamType.values().length; i++)
-			if (playerParams.contains(PlayerParamType.values()[i - oldKeysLength]))
-				statement.setBoolean(i, true);
-			else
-				statement.setBoolean(i, false);
-	}*/
-
 	@Override
 	public void loaded() {
 		super.loaded();
-		money.observe("datas", () -> COLUMN_MONEY.updateAsync(this, money.get(), null, ex -> getPlayer().sendMessage("§cFailed to save your new money. Please send this to the staff.")));
 		
-		if (!hasClaimedVipRewards && getGroups().containsKey(OlympaGroup.VIP)) 
-			COLUMN_HAS_CLAIMED_VIP.updateAsync(this, true, () -> {
+		if (!hasClaimedVipRewards && getGroups().containsKey(OlympaGroup.VIP)) {
+			plugin.getLogger().severe("§4Player " + getName() + " recieved VIP advantages but none has been defined! Cancelling action.");
+			
+			/*COLUMN_HAS_CLAIMED_VIP.updateAsync(this, true, () -> {
 				OCmsg.GIVE_VIP_REWARD.send(this);
-				money.give(100);
-			}, null);
-		
-		currentPlot = plugin.getPlotsManager().getPlot(getPlayer().getLocation());
+				
+			}, null);*/
+		}
+		for (int i = 0 ; i < maxSidebarRows ; i++)
+			sidebarRows[i] = new ObservableValue<String>("");
+			
+		reinitSidebar();
+		currentPlotObs.set(plugin.getPlotsManager().getPlot(getPlayer().getLocation()));
 	}
 
-	@Override
-	public OlympaMoney getGameMoney() {
-		return money;
-	}
 	
-	/*
-	public OlympaMoney getMoney() {
-		return money;
-	}
-	
-	public boolean hasGameMoney(int money) {
-		return getGameMoney() > money;
-	}
-	
-	public void addGameMoney(int money, Runnable successRunnable) {
-		setGameMoney(money + getGameMoney(), successRunnable);
-	}
-	
-	public boolean withdrawGameMoney(int money, Runnable successRunnable) {
-		if (!hasGameMoney(money))
-			return false;
+	public void setCustomScoreboardLines(String title, LinkedHashMap<String, Integer> scores) {
+		if (!isCustomSidebarEnabled) {
+			isCustomSidebarEnabled = true;
+			currentPlotObs.unobserve("change_plot_" + getName());
+			currentPlotMembersObs.unobserve("members_owner_change_" + getName());
+			currentPlotMembersObs.unobserve("members_player_rank_change_" + getName());
+		}
 		
-		setGameMoney(getGameMoney() - money, successRunnable);
-		return true;
+		//System.out.println("Updating scoreboard " + title + " : " + scores.toString());
+		
+		//if (!sidebarRows[0].get().equals(ChatColor.BOLD + title))
+		sidebarRows[0].set(ChatColor.BOLD + title);
+		
+		//if (!sidebarRows[1].get().equals(ChatColor.BOLD + title))
+		sidebarRows[1].set("§1");
+
+		sidebarRows[maxSidebarRows- 1].set("§7[sidebar plot " + currentPlotObs.get() + "]");
+
+		List<String> keys = new ArrayList<String>(scores.keySet());
+		
+		for (int i = 0 ; i < Math.min(keys.size(), maxSidebarRows - 1) ; i++)
+			if (!sidebarRows[i].get().equals(keys.get(i) + "§7 : " + scores.get(keys.get(i))))
+				sidebarRows[i + 2].set(keys.get(i) + "§7 : " + scores.get(keys.get(i)));
+		
+		for (int i = keys.size() + 2 ; i < maxSidebarRows - 1 ; i++)
+			if (!sidebarRows[i].get().equals("§2"))
+				sidebarRows[i].set("§2");
 	}
 	
-	public void setGameMoney(int money, Runnable successRunnable) {
-		gameMoney = money;
-		COLUMN_MONEY.updateAsync(this, gameMoney, successRunnable, exception -> Prefix.DEFAULT_BAD.sendMessage(getPlayer(), "Une erreur est survenue lors de la mise à jour de vos informations. \nErreur à signaler au staff : §4" + exception.getCause().getMessage()));
-	}*/
+	public void reinitSidebar() {
+		isCustomSidebarEnabled = false;
+
+		sidebarRows[0].set("§1");
+		
+		currentPlotMembersObs.observe("members_player_rank_change_" + getName(), () -> {
+			sidebarRows[2].set(currentPlotMembersObs.mapOr(members -> "§7Proprio : §e" + members.getOwner().getName(), "§7Proprio : §eaucun"));
+			sidebarRows[5].set(currentPlotMembersObs.mapOr(members -> "§7Rang : " + members.getPlayerRank(this).getRankName(), "§7Rang : " + PlotRank.VISITOR.getRankName()));
+		});
+		
+		currentPlotObs.observe("change_plot_" + getName(), () -> {
+			currentPlotMembersObs.set(currentPlotObs.mapOr(plot -> plot.getMembers(), null));
+			sidebarRows[1].set(currentPlotObs.mapOr(plot -> "§7Parcelle : §e" + plot, "§7Parcelle : §eaucune"));
+		});
+
+		sidebarRows[4].set("§7Grade : " + getGroupNameColored());
+		
+		for (int i = 6 ; i < maxSidebarRows ; i++)
+			sidebarRows[i].set("§3");
+	}
+	
+	public ObservableValue<String> getSidebarRow(int row) {
+		return sidebarRows[row];
+	}
+	
+	
 	
 	public boolean hasKit(KitType kit) {
 		return kits.contains(kit);
@@ -285,7 +292,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		if (!onlyOwnedPlots)
 			return PlotsManager.maxPlotsPerPlayer;
 		
-		int count = UpgradeType.BONUS_PLOTS_LEVEL.getDataOf(upgrades.get(UpgradeType.BONUS_PLOTS_LEVEL)).value;
+		int count = UpgradeType.BONUS_PLOTS_LEVEL.getDataOf(this).value;
 
 		if (getGroups().containsKey(OlympaGroup.CREA_CONSTRUCTOR))
 			count += 1;
@@ -296,45 +303,28 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		return count;
 	}
 	
-	public void setCustomScoreboardLines(String title, LinkedHashMap<String, Integer> scores) {
-		isCustomSidebarEnabled = true;
-		customScoreboardLines[0] = ChatColor.BOLD + title;
-		customScoreboardLines[customScoreboardLinesSize - 1] = "§7Custom sb plot " + currentPlot;
+	
+	public boolean setPlot(Plot plot) {
+		reinitSidebar();
+		currentPlotObs.set(plot);
 		
-		for (int i = scores.size() + 1 ; i < customScoreboardLinesSize - 1 ; i++)
-			scores.put("§" + i, Integer.MIN_VALUE);
+		if (currentPlotObs.get() != null)
+			currentPlotObs.get().executeExitActions(getPlayer());
 		
-		List<String> keys = new ArrayList<String>(scores.keySet());
-		for (int i = 1 ; i < customScoreboardLinesSize - 1 ; i++)
-			if (keys.get(i - 1).length() == 2 && scores.get(keys.get(i - 1)) == Integer.MIN_VALUE)
-				customScoreboardLines[i] = keys.get(i - 1);
+		if (plot != null)
+			if (plot.canEnter(this))
+				plot.executeEntryActions(this, getPlayer().getLocation());
 			else
-				customScoreboardLines[i] = keys.get(i - 1) + "§7 : " + scores.get(keys.get(i - 1));
+				return false;
+		return true;
 	}
 	
-	
-	public String[] getCustomScoreboardLines() {
-		return isCustomSidebarEnabled ? customScoreboardLines : null;
-	}
-	
-	public void clearCustomSidebar() {
-		isCustomSidebarEnabled = false;
-		customScoreboardLines = new String[customScoreboardLinesSize];
-	}
-	
-	
-	
-
-	public String getGameMoneyName() {
-		return "Omegas";
+	public ObservableValue<Plot> getPlot() {
+		return currentPlotObs;
 	}
 	
 	public Plot getCurrentPlot() {
-		return currentPlot;
-	}
-	
-	public void setCurrentPlot(Plot plot) {
-		currentPlot = plot;
+		return currentPlotObs.get();
 	}
 	
 	public boolean hasStaffPerm(StaffPerm perm) {
@@ -354,7 +344,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject implements MoneyPlay
 		return true;
 	}
 	
-	public enum StaffPerm{
+	public enum StaffPerm {
 		BYPASS_KICK_BAN(OcPermissions.STAFF_BYPASS_PLOT_KICK_AND_BAN),
 		GHOST_MODE(OcPermissions.STAFF_BYPASS_VANILLA_COMMANDS),
 		WORLDEDIT(OcPermissions.STAFF_BYPASS_WORLDEDIT),

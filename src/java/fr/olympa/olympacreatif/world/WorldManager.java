@@ -50,7 +50,7 @@ public class WorldManager {
 		Bukkit.setDefaultGameMode(GameMode.CREATIVE);
 		
 		//task pour donner l'argent aux joueurs périodiquement
-		new BukkitRunnable() {
+		/*new BukkitRunnable() {
 
 			int currentPeriod = -1;
 			
@@ -69,7 +69,7 @@ public class WorldManager {
 						OCmsg.PERIODIC_INCOME_RECEIVED.send(p, income + OlympaMoney.OMEGA);
 				});
 			}
-		}.runTaskTimer(plugin, /*20*60*6*/200, 20*60*6);
+		}.runTaskTimer(plugin, 200, 20*60*6);*/
 	}
 	
 	public void defineWorldParams() {

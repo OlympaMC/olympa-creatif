@@ -18,6 +18,7 @@ import org.bukkit.generator.ChunkGenerator;
 import fr.olympa.api.spigot.utils.Schematic;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCparam;
+import fr.olympa.zta.plots.Override;
 
 public class OCChunkGenerator extends ChunkGenerator {
 	
@@ -147,4 +148,9 @@ public class OCChunkGenerator extends ChunkGenerator {
             }
         return chunk;
     }
+
+	@Override
+	public boolean isParallelCapable() {
+		return true;
+	}
 }
