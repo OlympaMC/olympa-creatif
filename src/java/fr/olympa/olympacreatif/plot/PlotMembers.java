@@ -1,10 +1,8 @@
 package fr.olympa.olympacreatif.plot;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -15,13 +13,15 @@ import org.bukkit.entity.Player;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import fr.olympa.api.common.observable.AbstractObservable;
+import fr.olympa.api.common.observable.Observable;
 import fr.olympa.api.common.player.OlympaPlayerInformations;
 import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
-public class PlotMembers{
+public class PlotMembers extends AbstractObservable {
 
 	private int maxMembers;
 	
@@ -65,6 +65,7 @@ public class PlotMembers{
 			
 		if (rank == PlotRank.VISITOR || members.size() < maxMembers) {
 			members.put(p, rank);
+			super.update();
 			return true;
 		}
 		

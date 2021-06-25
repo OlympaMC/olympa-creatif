@@ -99,8 +99,12 @@ public class Plot {
 	//actions to execute, wether if the plot is a new one or loaded from an asyncplot
 	private void executeCommonInstanciationActions() {
 		destroyScheduler = plugin.getTask().scheduleSyncRepeatingTask(() -> {
-			if (getPlayers().size() == 0 && !Bukkit.getOnlinePlayers().stream().anyMatch(p -> getMembers().getPlayerRank(p) != PlotRank.VISITOR))
+			if (getPlayers().size() == 0 && !Bukkit.getOnlinePlayers().stream().anyMatch(p -> getMembers().getPlayerRank(p) != PlotRank.VISITOR)) {
+				long l = System.currentTimeMillis();
+				unload();
 				plugin.getPlotsManager().unloadPlot(this);
+				plugin.getLogger().info("Plot " + this + " unload took " + (System.currentTimeMillis() - l) + "ms to proceed.");
+			}
 			
 		}, 20 * 5 * 60, 20 * 5 * 60);
 		
@@ -118,7 +122,7 @@ public class Plot {
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
-				if (canEnter(p))
+				if (((OlympaPlayerCreatif)AccountProvider.getter().get(p.getUniqueId())).setPlot(this)) 
 					executeEntryActions(p, p.getLocation());
 				else
 					teleportOut(p);
@@ -343,7 +347,6 @@ public class Plot {
 			return;
 		
 		Player p = pc.getPlayer();
-		pc.setCurrentPlot(this);
 		
 		//ajoute le joueur aux joueurs du plot s'il n'a pas la perm de bypass les commandes vanilla
 		if (!pc.hasStaffPerm(StaffPerm.GHOST_MODE))
@@ -410,7 +413,6 @@ public class Plot {
 
 		OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
 		
-		pc.setCurrentPlot(null);
 		removePlayerInPlot(p);
 
 		plugin.getCommandBlocksManager().excecuteQuitActions(this, p);
