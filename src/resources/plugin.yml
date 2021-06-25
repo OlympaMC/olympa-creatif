@@ -7,3 +7,4 @@ main: fr.olympa.olympacreatif.OlympaCreatifMain
 depend: [OlympaCore]
 softdepend: [NoteBlockAPI, WorldEdit, AsyncWorldEdit, FastAsyncWorldEdit, goBrush, goPaint]
 api-version: 1.16
+website: https://gitlab.com/olympa/olympacreatif
