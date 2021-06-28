@@ -56,9 +56,9 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	
 	protected Location parseLocation(String x, String y, String z, String yaw, String pitch) {
 		
-		Double xF = getUnverifiedPoint(x, sendingLoc.getX());
+		Double xF = getUnverifiedPoint(x, sendingLoc.getX()) + 0.5;
 		Double yF = getUnverifiedPoint(y, sendingLoc.getY());
-		Double zF = getUnverifiedPoint(z, sendingLoc.getZ());		
+		Double zF = getUnverifiedPoint(z, sendingLoc.getZ()) + 0.5;		
 
 		float yawF = 0;
 		float pitchF = 0; 

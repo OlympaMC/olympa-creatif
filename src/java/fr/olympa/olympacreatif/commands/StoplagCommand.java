@@ -5,11 +5,14 @@ import fr.olympa.api.common.command.complex.CommandContext;
 import fr.olympa.api.spigot.command.ComplexCommand;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
+import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotPerm;
+import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 
 public class StoplagCommand extends ComplexCommand {
 
@@ -22,35 +25,52 @@ public class StoplagCommand extends ComplexCommand {
 	}
 
 	@Cmd(player = true, args = "INTEGER", description = "Activer le stoplag sur parcelle")
+	public void force(CommandContext cmd) {
+		OlympaPlayerCreatif pc = getOlympaPlayer();
+
+		if (!pc.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE)) {
+			sendIncorrectSyntax("Cette commande est réservée au staff.");
+			return;
+		}
+
+		Plot plot = cmd.getArgumentsLength() == 0 ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, cmd.getArgument(0)));
+
+		manageStoplag(plot, pc, 2);
+	}
+
+	@Cmd(player = true, args = "INTEGER", description = "Activer le stoplag sur parcelle")
 	public void activate(CommandContext cmd) {
 		OlympaPlayerCreatif pc = getOlympaPlayer();
 
 		Plot plot = cmd.getArgumentsLength() == 0 ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, cmd.getArgument(0)));
 
-		manageStoplag(plot, pc, true);
+		manageStoplag(plot, pc, 1);
 	}
 
-	@Cmd(player = true, args = "INTEGER", description = "Désactiver le stoplag sur parcelle")
+	@Cmd(player = true, args = {"INTEGER", "INTEGER"}, description = "Désactiver le stoplag sur parcelle")
 	public void deactivate(CommandContext cmd) {
 		OlympaPlayerCreatif pc = getOlympaPlayer();
 
 		Plot plot = cmd.getArgumentsLength() == 0 ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, cmd.getArgument(0)));
 
-		manageStoplag(plot, pc, false);
+		manageStoplag(plot, pc, 0);
 	}
 
-	private void manageStoplag(Plot plot, OlympaPlayerCreatif pc, boolean enable) {
+	private void manageStoplag(Plot plot, OlympaPlayerCreatif pc, int level) {
+		if (level < 0 || level > 2)
+			throw new UnsupportedOperationException("Stoplag level mus be between 0 and 2.");
+		
 		if (plot == null) {
 			OCmsg.INVALID_PLOT_ID.send(pc);
 			return;
 		}
 
-		if (!PlotPerm.USE_STOPLAG.has(plot, (OlympaPlayerCreatif) getOlympaPlayer()) || plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS) > 1) {
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif) getOlympaPlayer(), PlotPerm.USE_STOPLAG);
+		if (!PlotPerm.USE_STOPLAG.has(plot, (OlympaPlayerCreatif) getOlympaPlayer()) || (plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS) > 1 && !pc.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE))) {
+			OCmsg.PLOT_FORCED_STOPLAG_FIRED.send(pc, StopLagDetect.UNKNOWN);
 			return;
 		}
 
-		PlotParamType.STOPLAG_STATUS.setValue(plot, enable ? 1 : 0);
-		OCmsg.PLOT_STOPLAG_FIRED_CMD.send(pc, enable ? "§aactivé" : "§sdésactivé", plot);
+		PlotParamType.STOPLAG_STATUS.setValue(plot, level);
+		OCmsg.PLOT_STOPLAG_FIRED_CMD.send(pc, level == 0 ? "§adésactivé" : level == 1 ? "§cactivé" : "§4forcé", plot);
 	}
 }

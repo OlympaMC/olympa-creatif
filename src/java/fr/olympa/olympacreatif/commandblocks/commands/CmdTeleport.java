@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -24,7 +25,7 @@ public class CmdTeleport extends CbCommand {
 	
 	@Override
 	public int execute() {
-		targetEntities.clear();
+		targetEntities = new ArrayList<Entity>();
 		
 		if (args.length == 1) {
 			if (sender instanceof Entity) {
@@ -71,7 +72,7 @@ public class CmdTeleport extends CbCommand {
 		if (tpLoc == null)
 			return 0;
 		
-		targetEntities.forEach(ent -> ent.teleport(tpLoc));
+		targetEntities.forEach(ent -> ent.teleportAsync(tpLoc));
 		
 		return targetEntities.size();
 	}

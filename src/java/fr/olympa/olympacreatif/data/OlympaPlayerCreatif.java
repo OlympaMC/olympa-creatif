@@ -198,17 +198,22 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 
 					setCustomScoreboardLines(title, scores);
 				}
-			}, 2);
+			}, 3);
 		}
 		
-		customScoreboard[0].set(ChatColor.BOLD + title);
-		customScoreboard[customScoreboard.length - 1].set("§7[sidebar plot " + currentPlotObs.get() + "]");
+		if (title != null) {
+			customScoreboard[0].set(ChatColor.BOLD + title);
+			customScoreboard[customScoreboard.length - 1].set("§7[sidebar plot " + currentPlotObs.get() + "]");	
+		}
 
 		List<String> keys = new ArrayList<String>(scores.keySet());
 		
-		for (int i = 2 ; i < Math.min(customScoreboard.length - 2, keys.size()) + 1 ; i++)
-			if (!customScoreboard[i].get().equals(keys.get(i - 2) + "§7 : " + scores.get(keys.get(i - 2))))
+		if (title != null)
+			for (int i = 2 ; i < Math.min(customScoreboard.length - 2, keys.size()) + 2 ; i++)
 				customScoreboard[i].set(keys.get(i - 2) + "§7 : " + scores.get(keys.get(i - 2)));
+		else
+			for (int i = 0 ; i < Math.min(customScoreboard.length - 2, keys.size()) ; i++)
+				customScoreboard[i].set(keys.get(i));
 	}
 	
 	public void reinitSidebar() {		
@@ -226,7 +231,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 			
 			for (ObservableValue<String> line : sidebarRows)
 				sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb -> line.get(), scb -> line));
-		}, 2);
+		}, 3);
 	}
 	
 	

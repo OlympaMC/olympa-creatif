@@ -93,8 +93,8 @@ public class DataManager implements Listener {
 					"PRIMARY KEY (`server_id`, `plot_id`, `player_id`));";
 
 	//statements select
-	private final String osSelectMessages =
-			"SELECT * FROM creatif_messages;";
+	private final OlympaStatement osSelectMessages = new OlympaStatement(
+			"SELECT * FROM creatif_messages;");
 
 	private final OlympaStatement osSelectPlotOwner = new OlympaStatement(
 			"SELECT * FROM creatif_plotsmembers WHERE `server_id` = ? AND `plot_id` = ? AND `player_plot_level` = ?;");
@@ -185,7 +185,16 @@ public class DataManager implements Listener {
 			statement.execute(osTableCreatePlotParameters);
 			statement.execute(osTableCreatePlotMembers);
 			
-			ResultSet messages = statement.executeQuery(osSelectMessages);
+			reloadMessages();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public synchronized void reloadMessages() {
+		try {
+			PreparedStatement statement = osSelectMessages.createStatement();
+			ResultSet messages = statement.executeQuery();
 
 			Map<String, OCmsg> ocMsgs = OCmsg.values();
 			Set<String> inexistantMessagesInBdd = new HashSet<>();
@@ -202,28 +211,9 @@ public class DataManager implements Listener {
 			inexistantMessagesInBdd.forEach(msg -> plugin.getLogger().warning("§eMessage " + msg + " existant DANS LE PLUGIN mais pas en bdd, veuiller ajouter l'entrée !"));
 			messages.close();
 			statement.close();
-			//System.out.println(ocMsgs);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		//load plot task
-		/*new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (serverIndex > -1 && !plotsToLoad.isEmpty())
-					loadPlot(plotsToLoad.remove(0));
-			}
-		}.runTaskTimerAsynchronously(plugin, 20, 1);
-
-		//unload plot task
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (!plotsToSave.isEmpty() && serverIndex > -1)
-					savePlotToBddSync(plotsToSave.remove(0));
-			}
-		}.runTaskTimer(plugin, 20, 1);*/
 	}
 
 	public synchronized void loadPlot(PlotId id, boolean syncLoad) {
