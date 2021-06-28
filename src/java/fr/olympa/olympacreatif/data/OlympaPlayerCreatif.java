@@ -27,6 +27,9 @@ import fr.olympa.api.common.provider.OlympaPlayerObject;
 import fr.olympa.api.common.sql.SQLColumn;
 import fr.olympa.api.spigot.economy.MoneyPlayerInterface;
 import fr.olympa.api.spigot.economy.OlympaMoney;
+import fr.olympa.api.spigot.lines.FixedLine;
+import fr.olympa.api.spigot.lines.PlayerObservableLine;
+import fr.olympa.api.spigot.scoreboard.sign.Scoreboard;
 import fr.olympa.api.spigot.scoreboard.sign.ScoreboardManager;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
@@ -93,9 +96,11 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 	private List<StaffPerm> staffPerm = new ArrayList<StaffPerm>();
 
 	private boolean isCustomSidebarEnabled = false;
-	public static final int maxSidebarRows = 13;
+	
 	@SuppressWarnings("unchecked")
-	private ObservableValue<String>[] sidebarRows = new ObservableValue[maxSidebarRows];
+	private ObservableValue<String>[] customScoreboard = new ObservableValue[10];
+	@SuppressWarnings("unchecked")
+	private ObservableValue<String>[] sidebarRows = new ObservableValue[6];
 
 	private ObservableValue<Plot> currentPlotObs = new ObservableValue<Plot>(null);
 	private ObservableValue<PlotMembers> currentPlotMembersObs = new ObservableValue<PlotMembers>(null);
@@ -143,63 +148,85 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 				
 			}, null);*/
 		}
-		for (int i = 0 ; i < maxSidebarRows ; i++)
-			sidebarRows[i] = new ObservableValue<String>("");
-			
-		reinitSidebar();
-		currentPlotObs.set(plugin.getPlotsManager().getPlot(getPlayer().getLocation()));
-	}
+		
+		//currentPlotObs.observe("update_sidebar_" + getName(), () -> reinitSidebar());
+		plugin.getTask().runTaskLater(() -> {
+			setPlot(plugin.getPlotsManager().getPlot(getPlayer().getLocation()));
+			//reinitSidebar();
+		}, 2);
 
+		currentPlotObs.observe("change_plot_members_" + getName(), () ->
+			currentPlotMembersObs.set(currentPlotObs.mapOr(plot -> plot.getMembers(), null)));
+	}
 	
 	public void setCustomScoreboardLines(String title, LinkedHashMap<String, Integer> scores) {
+		Scoreboard<OlympaPlayerCreatif> sidebar = plugin.getScoreboardManager().getPlayerScoreboard(this);
+		
 		if (!isCustomSidebarEnabled) {
 			isCustomSidebarEnabled = true;
 			currentPlotObs.unobserve("change_plot_" + getName());
 			currentPlotMembersObs.unobserve("members_owner_change_" + getName());
 			currentPlotMembersObs.unobserve("members_player_rank_change_" + getName());
+			
+			plugin.getScoreboardManager().refresh(this);
+			for (int i = 0 ; i < customScoreboard.length ; i++) {
+				final int j = i;
+				customScoreboard[j] = new ObservableValue<String>("");
+				sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb -> customScoreboard[j].get(), scb -> customScoreboard[j]));
+			}
 		}
 		
-		sidebarRows[0].set(ChatColor.BOLD + title);
-		sidebarRows[1].set("§1");
-		sidebarRows[maxSidebarRows- 1].set("§7[sidebar plot " + currentPlotObs.get() + "]");
+		customScoreboard[0].set(ChatColor.BOLD + title);
+		customScoreboard[customScoreboard.length - 1].set("§7[sidebar plot " + currentPlotObs.get() + "]");
 
 		List<String> keys = new ArrayList<String>(scores.keySet());
 		
-		for (int i = 0 ; i < Math.min(keys.size(), maxSidebarRows - 1) ; i++)
-			if (!sidebarRows[i].get().equals(keys.get(i) + "§7 : " + scores.get(keys.get(i))))
-				sidebarRows[i + 2].set(keys.get(i) + "§7 : " + scores.get(keys.get(i)));
+		for (int i = 2 ; i < Math.min(customScoreboard.length - 2, keys.size()) ; i++)
+			if (!customScoreboard[i - 2].get().equals(keys.get(i - 2) + "§7 : " + scores.get(keys.get(i - 2))))
+				customScoreboard[i].set(keys.get(i - 2) + "§7 : " + scores.get(keys.get(i - 2)));
 		
-		for (int i = keys.size() + 2 ; i < maxSidebarRows - 1 ; i++)
-			if (!sidebarRows[i].get().equals(ScoreboardManager.INVISIBLE_ROW))
-				sidebarRows[i].set(ScoreboardManager.INVISIBLE_ROW);
-		
-		//Arrays.asList(sidebarRows).forEach(e -> System.out.println("Row : " + e.get().replace("§", "-")));
+		sidebar.needsUpdate();
 	}
 	
 	public void reinitSidebar() {
+		boolean init = false;
+		
+		if (sidebarRows[0] == null) {
+			for (int i = 0 ; i < sidebarRows.length ; i++)
+				sidebarRows[i] = new ObservableValue<String>("");
+			
+			sidebarRows[0].set("§1");
+			
+			currentPlotMembersObs.observe("members_player_rank_change_" + getName(), () -> {
+				sidebarRows[2].set(currentPlotMembersObs.mapOr(members -> "§7Proprio : §e" + members.getOwner().getName(), "§7Proprio : §eaucun"));
+				sidebarRows[5].set(currentPlotMembersObs.mapOr(members -> "§7Rang : " + members.getPlayerRank(this).getRankName(), "§7Rang : " + PlotRank.VISITOR.getRankName()));
+			});
+			
+			currentPlotObs.observe("change_plot_" + getName(), () -> 
+				sidebarRows[1].set(currentPlotObs.mapOr(plot -> "§7Parcelle : §e" + plot, "§7Parcelle : §eaucune"))
+			);
+
+			sidebarRows[4].set("§7Grade : " + getGroupNameColored());
+			
+			init = true;
+		}
+		
+		if (!isCustomSidebarEnabled && !init)
+			return;
+		
 		isCustomSidebarEnabled = false;
+		
+		plugin.getScoreboardManager().refresh(this);
+		Scoreboard<OlympaPlayerCreatif> sidebar = plugin.getScoreboardManager().getPlayerScoreboard(this);
 
-		sidebarRows[0].set("§1");
-		
-		currentPlotMembersObs.observe("members_player_rank_change_" + getName(), () -> {
-			sidebarRows[2].set(currentPlotMembersObs.mapOr(members -> "§7Proprio : §e" + members.getOwner().getName(), "§7Proprio : §eaucun"));
-			sidebarRows[5].set(currentPlotMembersObs.mapOr(members -> "§7Rang : " + members.getPlayerRank(this).getRankName(), "§7Rang : " + PlotRank.VISITOR.getRankName()));
-		});
-		
-		currentPlotObs.observe("change_plot_" + getName(), () -> {
-			currentPlotMembersObs.set(currentPlotObs.mapOr(plot -> plot.getMembers(), null));
-			sidebarRows[1].set(currentPlotObs.mapOr(plot -> "§7Parcelle : §e" + plot, "§7Parcelle : §eaucune"));
-		});
-
-		sidebarRows[4].set("§7Grade : " + getGroupNameColored());
-		
-		for (int i = 6 ; i < maxSidebarRows ; i++)
-			sidebarRows[i].set(ScoreboardManager.INVISIBLE_ROW);
+		for (int i = 0; i < sidebarRows.length; i++) {
+			final int line = i;
+			sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(
+					holder -> sidebarRows[line].get(),
+					holder -> sidebarRows[line]));
+		}
 	}
 	
-	public ObservableValue<String> getSidebarRow(int row) {
-		return sidebarRows[row];
-	}
 	
 	
 	
@@ -301,28 +328,35 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 	}
 	
 	
-	public boolean setPlot(Plot plot) {
+	
+	
+	//true if player can enter in related plot, false otherwise
+	public boolean setPlot(Plot plot) {		
+		if (currentPlotObs.get() != null && !currentPlotObs.get().equals(plot))
+			currentPlotObs.get().executeExitActions(getPlayer());
+
 		reinitSidebar();
 		currentPlotObs.set(plot);
 		
-		if (currentPlotObs.get() != null)
-			currentPlotObs.get().executeExitActions(getPlayer());
-		
-		if (plot != null)
-			if (plot.canEnter(this))
+		if (plot != null && !plot.getPlayers().contains(getPlayer()))
+			if (plot.canEnter(this)) {
 				plot.executeEntryActions(this, getPlayer().getLocation());
-			else
+			}else
 				return false;
 		return true;
 	}
 	
-	public ObservableValue<Plot> getPlot() {
+	/*public ObservableValue<Plot> getPlot() {
 		return currentPlotObs;
-	}
+	}*/
 	
 	public Plot getCurrentPlot() {
 		return currentPlotObs.get();
 	}
+	
+	
+	
+	
 	
 	public boolean hasStaffPerm(StaffPerm perm) {
 		return staffPerm.contains(perm);

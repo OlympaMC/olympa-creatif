@@ -36,6 +36,8 @@ public class CmdTeleport extends CbCommand {
 		else if (args.length == 2) {
 			targetEntities = parseSelector(args[0], false);
 			tpLoc = getLocFromSelector(args[1]);
+			
+			//System.out.println("Command selector parse : " + args[0] + "(" + false + ") : " +targetEntities);
 		} 
 		
 		else if (args.length == 3) {
@@ -48,6 +50,8 @@ public class CmdTeleport extends CbCommand {
 		else if (args.length == 4) {
 			targetEntities = parseSelector(args[0], false);
 			tpLoc = parseLocation(args[1], args[2], args[3]);
+			
+			//System.out.println("Command selector parse : " + args[0] + "(" + false + ") : " +targetEntities);
 		}
 		
 		else if (args.length == 5) {
@@ -60,6 +64,8 @@ public class CmdTeleport extends CbCommand {
 		else if (args.length == 6) {
 			targetEntities = parseSelector(args[0], false);
 			tpLoc = parseLocation(args[1], args[2], args[3], args[4], args[5]);
+			
+			//System.out.println("Command selector parse : " + args[0] + "(" + false + ") : " +targetEntities);
 		}
 		
 		if (tpLoc == null)

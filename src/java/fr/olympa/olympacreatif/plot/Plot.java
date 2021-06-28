@@ -411,7 +411,7 @@ public class Plot {
 	 */
 	public void executeExitActions(Player p) {
 
-		OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
+		//OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
 		
 		removePlayerInPlot(p);
 

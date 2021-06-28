@@ -237,7 +237,8 @@ public class CmdsLogic {
 
 		List<Integer> set = new ArrayList<>();
 
-		for (int i = 1; i <= plugin.getDataManager().getPlotsCount(); i++)
+		//on retire les plots du spawn (et le 2 mais flemme de le rajouter)
+		for (int i = 6; i <= plugin.getDataManager().getPlotsCount(); i++)
 			set.add(i);
 
 		set.removeAll(pc.getPlots(false).stream().map(pl -> pl.getId().getId()).collect(Collectors.toList()));

@@ -288,12 +288,12 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
 		
 		//initialisation lignes scoreboard
-		for (int i = 0; i < OlympaPlayerCreatif.maxSidebarRows; i++) {
+		/*for (int i = 0; i < OlympaPlayerCreatif.maxSidebarRows; i++) {
 			final int line = i;
 			scm.addLines(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(
 					holder -> holder.getOlympaPlayer().getSidebarRow(line).get(), 
 					holder -> holder.getOlympaPlayer().getSidebarRow(line)));
-		}
+		}*/
 		scm.addFooters(FixedLine.EMPTY_LINE, CyclingLine.olympaAnimation());
 	}
 	
@@ -398,5 +398,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	public PermissionsManager getPermissionsManager() {
 		return permsManager;
+	}
+	
+	public ScoreboardManager<OlympaPlayerCreatif> getScoreboardManager() {
+		return scm;
 	}
 }

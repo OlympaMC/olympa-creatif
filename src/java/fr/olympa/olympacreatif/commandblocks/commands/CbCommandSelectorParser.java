@@ -196,6 +196,7 @@ public abstract class CbCommandSelectorParser {
 	}
 	
 	public List<Entity> parseSelector(String s, boolean onlyPlayers) {
+		
 		if (s == null)
 			return new ArrayList<Entity>();
 		
