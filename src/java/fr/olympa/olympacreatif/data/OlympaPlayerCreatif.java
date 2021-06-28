@@ -191,16 +191,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 			plugin.getScoreboardManager().refresh(this);
 			Scoreboard<OlympaPlayerCreatif> sidebar = plugin.getScoreboardManager().getPlayerScoreboard(this);
 			
-			for (ObservableValue<String> line : customScoreboard) {
-				line.set("");
-				sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb -> line.get(), scb -> line));
-				System.out.println("Set sidebar custom row : " + line.get());
-			}
-			/*for (int i = 0 ; i < customScoreboard.length ; i++) {
-				final int j = i;
-				//customScoreboard[j] = new ObservableValue<String>("");
-				sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb -> customScoreboard[j].get(), scb -> customScoreboard[j]));
-			}*/
+			plugin.getTask().runTaskLater(() -> { 
+				for (ObservableValue<String> line : customScoreboard) {
+					line.set("");
+					sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb -> line.get(), scb -> line));
+
+					setCustomScoreboardLines(title, scores);
+				}
+			}, 2);
 		}
 		
 		customScoreboard[0].set(ChatColor.BOLD + title);
@@ -208,8 +206,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 
 		List<String> keys = new ArrayList<String>(scores.keySet());
 		
-		for (int i = 2 ; i < Math.min(customScoreboard.length - 3, keys.size()) ; i++)
-			if (!customScoreboard[i - 2].get().equals(keys.get(i - 2) + "§7 : " + scores.get(keys.get(i - 2))))
+		for (int i = 2 ; i < Math.min(customScoreboard.length - 2, keys.size()) + 1 ; i++)
+			if (!customScoreboard[i].get().equals(keys.get(i - 2) + "§7 : " + scores.get(keys.get(i - 2))))
 				customScoreboard[i].set(keys.get(i - 2) + "§7 : " + scores.get(keys.get(i - 2)));
 	}
 	
@@ -220,10 +218,15 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 		isCustomSidebarEnabled = false;
 		
 		plugin.getScoreboardManager().refresh(this);
-		Scoreboard<OlympaPlayerCreatif> sidebar = plugin.getScoreboardManager().getPlayerScoreboard(this);
-
-		for (ObservableValue<String> line : sidebarRows)
-			sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb -> line.get(), scb -> line));
+		
+		plugin.getTask().runTaskLater(() -> {
+			Scoreboard<OlympaPlayerCreatif> sidebar = plugin.getScoreboardManager().getPlayerScoreboard(this);
+			if (sidebar == null)
+				return;
+			
+			for (ObservableValue<String> line : sidebarRows)
+				sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb -> line.get(), scb -> line));
+		}, 2);
 	}
 	
 	

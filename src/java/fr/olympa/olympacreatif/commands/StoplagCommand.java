@@ -45,7 +45,7 @@ public class StoplagCommand extends ComplexCommand {
 			return;
 		}
 
-		if (!PlotPerm.USE_STOPLAG.has((OlympaPlayerCreatif) getOlympaPlayer()) || plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS) > 1) {
+		if (!PlotPerm.USE_STOPLAG.has(plot, (OlympaPlayerCreatif) getOlympaPlayer()) || plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS) > 1) {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif) getOlympaPlayer(), PlotPerm.USE_STOPLAG);
 			return;
 		}
