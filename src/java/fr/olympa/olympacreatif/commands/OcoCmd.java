@@ -195,7 +195,7 @@ public class OcoCmd extends AbstractCmd {
 		}
 		
 		if (!PlotPerm.USE_ARMORSTAND_EDITOR.has((OlympaPlayerCreatif)getOlympaPlayer())) {
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif)getOlympaPlayer());
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif)getOlympaPlayer(), PlotPerm.USE_ARMORSTAND_EDITOR);
 			return;
 		}
 			

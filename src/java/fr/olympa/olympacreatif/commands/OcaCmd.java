@@ -371,7 +371,7 @@ public class OcaCmd extends AbstractCmd {
 			sendIncorrectSyntax();
 	}
 
-	@Cmd(syntax = "Accéder aux informations VIP d'un joueur", args = {"info|set", "PLAYERS", "KIT_TYPE|UPGRADE_TYPE", "INTEGER"}, min = 2)
+	@Cmd(syntax = "Recharger les messages depuis la bdd")
 	public void reload_messages(CommandContext cmd) {
 		if (!OcPermissions.STAFF_RELOAD_MESSAGES.hasPermissionWithMsg(getOlympaPlayer()))
 			return;

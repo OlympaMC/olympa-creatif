@@ -141,7 +141,7 @@ public class ArmorStandManager implements Listener {
 	private static OlympaCreatifMain plugin;
 	
 	ArmorStandManager(OlympaCreatifMain plugin) {
-		this.plugin = plugin;
+		ArmorStandManager.plugin = plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 	

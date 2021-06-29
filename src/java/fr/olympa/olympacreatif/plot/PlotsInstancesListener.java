@@ -43,6 +43,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -404,25 +405,10 @@ public class PlotsInstancesListener implements Listener{
 		if (clickedBlock == null)
 			return;
 		
-		/*
-		if (clickedBlock.getState() instanceof org.bukkit.block.CommandBlock) {
-			org.bukkit.block.CommandBlock cb = ((org.bukkit.block.CommandBlock)clickedBlock.getState());
-			
-			if (cb.getPersistentDataContainer().getKeys().contains(NamespacedKey.minecraft("cb_auto")))
-				System.out.println("Old value : " + cb.getPersistentDataContainer().get(NamespacedKey.minecraft("cb_auto"), PersistentDataType.BYTE));
-			cb.getPersistentDataContainer().set(NamespacedKey.minecraft("cb_auto"), PersistentDataType.BYTE, (byte) ThreadLocalRandom.current().nextInt(100));
-			System.out.println("New value : " + cb.getPersistentDataContainer().get(NamespacedKey.minecraft("cb_auto"), PersistentDataType.BYTE));
-			cb.update();
-		}*/
-		
 		if (e.getItem() != null && e.getItem().getType().isBlock())
 			plot = plugin.getPlotsManager().getPlot(OtherUtils.getFacingLoc(clickedBlock.getLocation(), e.getBlockFace()));
 		else
 			plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());
-		/*if (e.getMaterial().isSolid())
-			plot = plugin.getPlotsManager().getPlot(OtherUtils.getFacingLoc(clickedBlock.getLocation(), e.getBlockFace()));
-		else
-			plot = plugin.getPlotsManager().getPlot(clickedBlock.getLocation());*/
 		
 		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS) && plot == null)
 			return;
@@ -619,6 +605,23 @@ public class PlotsInstancesListener implements Listener{
 		if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_HOE && !(e.getRightClicked() instanceof Player) &&
 				PlotPerm.BUILD.has(plot, pc)) 
 			plot.removeEntityInPlot(e.getRightClicked(), true);
+	}
+	
+	@EventHandler //empêche la modification d'armorstands aux non membres
+	public void onInterractArmorStandEvent(PlayerArmorStandManipulateEvent e) {
+		plot = plugin.getPlotsManager().getPlot(e.getRightClicked().getLocation());
+		if (plot == null) {
+			e.setCancelled(true);
+			return;	
+		}
+
+		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
+		
+		if (!PlotPerm.BUILD.has(pc)) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.BUILD);
+			e.setCancelled(true);
+			return;
+		}
 	}
 
 	////////////////////////////////////////////////////////////

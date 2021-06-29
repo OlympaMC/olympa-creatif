@@ -312,14 +312,21 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 		if (currentPlotObs.get() != null && !currentPlotObs.get().equals(plot))
 			currentPlotObs.get().executeExitActions(player);
 
-		reinitSidebar();
-		currentPlotObs.set(plot);
 
 		if (plot != null && !plot.getPlayers().contains(player))
-			if (plot.canEnter(this))
-				plot.executeEntryActions(this, player.getLocation());
-			else
+			
+			if (plot.canEnter(this)) {
+				reinitSidebar();
+				currentPlotObs.set(plot);
+				plot.executeEntryActions(this, player.getLocation());	
+			}else
 				return false;
+		
+		else {
+			reinitSidebar();
+			currentPlotObs.set(plot);
+		}
+			
 		return true;
 	}
 

@@ -34,8 +34,18 @@ public class CmdTellraw extends CbCommand {
 		mark.addExtra("[CB] ");
 		text.addExtra(mark);
 		
+		if (args[1].contains("{")) 
+			text.addExtra(JSONtextUtil.getJsonText(this, args[1].replace('&', '§')));
+		else {
+			String str = "";
+			for (int i = 1 ; i < args.length ; i++)
+				str += args[i] + " ";
+			
+			text.addExtra(org.bukkit.ChatColor.translateAlternateColorCodes('&', str));
+		}
+			
+		
 		//Bukkit.broadcastMessage("listAsString : " + listAsString);
-		text.addExtra(JSONtextUtil.getJsonText(this, args[1]));
 		for (Entity e : targetEntities)
 			if (e.getType() == EntityType.PLAYER)
 				e.spigot().sendMessage(text);
@@ -43,3 +53,12 @@ public class CmdTellraw extends CbCommand {
 		return targetEntities.size();
 	}
 }
+
+
+
+
+
+
+
+
+
