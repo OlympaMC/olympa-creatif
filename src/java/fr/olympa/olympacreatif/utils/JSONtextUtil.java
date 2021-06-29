@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.commandblocks.CbObjective;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -30,6 +31,9 @@ public abstract class JSONtextUtil {
 		component = StringEscapeUtils.unescapeJava(component.replace("\"\",", "").replace(",\"\"", ""));
 		
 		TextComponent text = new TextComponent();
+
+		if (!component.contains("{"))
+			return new TextComponent(org.bukkit.ChatColor.translateAlternateColorCodes('&', component).replace('_', ' '));
 		
 		if (!component.startsWith("["))
 			component = "{rawText:[" + component + "]}";
