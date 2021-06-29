@@ -1,6 +1,9 @@
 package fr.olympa.olympacreatif;
 
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
 
@@ -71,14 +74,61 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	private ScoreboardManager<OlympaPlayerCreatif> scm;
 
-	public Random random = new Random();
+	//public Random random = new Random();
 
-	/*
-	@Override //defines the custom world generator
-	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-		return new CustomChunkGenerator(this);
-	}*/
 
+	public static final List<String> holoCommands = Stream.of(new String[] {
+			"§6§lOlympa Créatif",
+			"§aCommandes de base :",
+			"",
+			"§b§l/menu : §r§bouvrir le menu principal",
+			"§b§l/oc find : §r§bclaim une nouvelle parcelle",
+			"§b§l/oc invite <pseudo> : §r§binviter un joueur sur la parcelle",
+			"§b§l/oc members : §r§bvoir les membres de la parcelle",
+			"§b§l/oc plots : §r§bliste de tes parcelles",
+			"§b§l/shop : §r§baccéder à la boutique",
+			"",
+			"§eL'ensemble des objets pouvant faire lag le serveur (redstone,",
+			"§ecommandblocks, eau & lave, worldedit, entités, ...) est accessible",
+			"§evia un achat dans la boutique. Cela nous permet à la fois de payer une",
+			"§emeilleure machine et de limiter les lags sur le serveur",
+			"",
+			"§e§lNous vous conseillons de jouer en 1.16 pour avoir",
+			"§e§laccès au plein potentiel du serveur."
+	}).collect(Collectors.toList());
+	
+	public static final List<String> holoWelcome = Stream.of(new String[] {
+			"§6§lOlympa Créatif",
+			"",
+			"§e§lBienvenue sur le créatif d'Olympa !",
+			"§a§lVoici les spécificités du serveur :",
+			"",
+			"§9§kzz§3§kzz§b§kzz §r§b§lBLOCS DE COMMANDE ACTIFS §b§kzz§3§kzz§9§kzz",
+			"§c§lRedstone activée",
+			"§2§lPossibilité de faire spawn des mobs",
+			"§d§lWorldEdit et goBrush",
+			"",
+			"§3§lBon jeu sur Olympa !"
+	}).collect(Collectors.toList());
+	
+	public static final List<String> holoCommandblocks = Stream.of(new String[] {
+			"§5§lTutoriel commandblocks", 
+			"",
+			"§2L'usage des commandblocks et commandes vanilla requiert un kit (/shop)",
+			"",
+			"§aLes commandblocks ne font effet que sur le plot sur lequel ils sont placés",
+			"§aSeules les commandes vanilla (tellraw, kill, scoreboard, ...) sont autorisées",
+			"",
+			"§3Le nombre de commandes par seconde (CPS) exécutables est limité par parcelle",
+			"§3Vous pouvez consulter votre consommation de CPS avec '/oco debug'",
+			"",
+			"§7Si vous éditez une zone contenant des commandblocks avec worldedit,",
+			"§7vous devez utiliser /oco reload_commandblocks pour les recharger",
+			"",
+			"§eLes tags NBT sont autorisés dans toutes les commandes mais pas dans les sélecteurs",
+	}).collect(Collectors.toList());
+	
+	
 	public static OlympaCreatifMain getInstance() {
 		return plugin;
 	}
@@ -113,7 +163,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		new BackCommand(this, null).register();
 		new HatCommand(this).register();
-
+		
 		//set restrictions to /gm command
 		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND.setMinGroup(OlympaGroup.PLAYER);
 		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.PLAYER);

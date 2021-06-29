@@ -323,7 +323,7 @@ public class CmdsLogic {
 		if (!plotsResetVerifCode.containsKey(plot.getId())) {
 			String check = "";
 			for (int i = 0; i < 6; i++)
-				check += (char) (plugin.random.nextInt(26) + 'a');
+				check += (char) (ThreadLocalRandom.current().nextInt(26) + 'a');
 
 			plotsResetVerifCode.put(plot.getId(), check);
 			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco reset " + plot + " " + check);

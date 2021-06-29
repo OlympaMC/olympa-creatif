@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
@@ -102,7 +103,7 @@ public class MusicManager implements Listener {
 		
 		for (Entry<String, Song> e : songsName.entrySet()) {
 			i++;
-			ItemStack it = ItemUtils.item(discs.get(plugin.random.nextInt(discs.size())), "§7" + i + ". §d" + e.getKey());
+			ItemStack it = ItemUtils.item(discs.get(ThreadLocalRandom.current().nextInt(discs.size())), "§7" + i + ". §d" + e.getKey());
 			
 			if (!e.getValue().getOriginalAuthor().equals(""))
 				it = ItemUtils.loreAdd(it, "§7Musique par " + e.getValue().getOriginalAuthor());

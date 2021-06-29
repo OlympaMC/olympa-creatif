@@ -278,14 +278,6 @@ public class PlotsManager {
 		return plotsCount;
 	}
 	
-	/*
-	public void addAsyncPlot(AsyncPlot plot) {
-		if (plot != null)
-			synchronized (plot) {
-				asyncPlots.add(plot);	
-			}
-	}*/
-	
 	public void loadPlot(AsyncPlot ap, Consumer<Plot> callback) {
 		if (!isPlotLoaded(ap.getId())) {
 			long init = System.currentTimeMillis();
@@ -305,11 +297,9 @@ public class PlotsManager {
 	}
 
 	public void loadHelpHolos() {
-		//plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_1_LOC.get().toLoc()), false);
-		//plugin.getDataManager().addPlotToLoadQueue(PlotId.fromLoc(plugin, OCparam.HOLO_HELP_2_LOC.get().toLoc()), false);
-
-		setHelpHolo(OCparam.HOLO_HELP_1_LOC.get().toLoc(), OCparam.HOLO_HELP_1_TEXT.get());
-		setHelpHolo(OCparam.HOLO_HELP_2_LOC.get().toLoc(), OCparam.HOLO_HELP_2_TEXT.get());
+		setHelpHolo(OCparam.HOLO_WELCOME.get().toLoc(), OlympaCreatifMain.holoWelcome);
+		setHelpHolo(OCparam.HOLO_COMMANDS.get().toLoc(), OlympaCreatifMain.holoCommands);
+		setHelpHolo(OCparam.HOLO_COMMANDBLOCKS.get().toLoc(), OlympaCreatifMain.holoCommandblocks);
 	}
 	
 
@@ -319,10 +309,9 @@ public class PlotsManager {
 				.createHologram(loc, false, false, true/*, text.stream().map(s -> new FixedLine<HologramLine>(s)).collect(Collectors.toSet()).toArray(FixedLine[]::new)*/);
 		
 		text.forEach(s -> holo.addLine(new FixedLine<HologramLine>(s)));
-		//holo.getLines().forEach(HologramLine::updatePosition);
 		serverHolos.add(holo);
 
-		plugin.getLogger().info("§aHelp holo " + text.get(0) + " §aplaced at " + new Position(loc));
+		//plugin.getLogger().info("§aHelp holo " + text.get(0) + " §aplaced at " + new Position(loc));
 	}
 	
 	public void showHelpHolosTo(final Player p) {

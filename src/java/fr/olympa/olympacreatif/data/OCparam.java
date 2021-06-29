@@ -39,10 +39,11 @@ public class OCparam<T> {
 	public static final OCparam<String> WORLD_NAME = new OCparam<String>("world");
 	public static final OCparam<Position> SPAWN_LOC = new OCparam<Position>(new Position());
 	
-	public static final OCparam<Position> HOLO_HELP_1_LOC = new OCparam<Position>(new Position());
-	public static final OCparam<Position> HOLO_HELP_2_LOC = new OCparam<Position>(new Position());
-	public static final OCparam<List<String>> HOLO_HELP_1_TEXT = new OCparam<List<String>>(new ArrayList<String>(), new TypeToken<List<String>>() {}.getType());
-	public static final OCparam<List<String>> HOLO_HELP_2_TEXT = new OCparam<List<String>>(new ArrayList<String>(), new TypeToken<List<String>>() {}.getType());
+	public static final OCparam<Position> HOLO_WELCOME = new OCparam<Position>(new Position());
+	public static final OCparam<Position> HOLO_COMMANDS = new OCparam<Position>(new Position());
+	public static final OCparam<Position> HOLO_COMMANDBLOCKS = new OCparam<Position>(new Position());
+	//public static final OCparam<List<String>> HOLO_HELP_1_TEXT = new OCparam<List<String>>(new ArrayList<String>(), new TypeToken<List<String>>() {}.getType());
+	//public static final OCparam<List<String>> HOLO_HELP_2_TEXT = new OCparam<List<String>>(new ArrayList<String>(), new TypeToken<List<String>>() {}.getType());
 	
 	public static final OCparam<Integer> INCOME_NOT_AFK = new OCparam<Integer>(0); 
 	public static final OCparam<Integer> INCOME_AFK = new OCparam<Integer>(0); 
