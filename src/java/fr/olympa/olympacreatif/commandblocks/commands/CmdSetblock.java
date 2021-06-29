@@ -8,7 +8,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -34,7 +34,7 @@ public class CmdSetblock extends CbCommand {
 			return;
 		
 		if (sender instanceof Player)
-			pc = AccountProvider.getter().get(sender.getUniqueId());
+			pc = AccountProviderAPI.getter().get(sender.getUniqueId());
 		
 		placingLoc = parseLocation(args[0], args[1], args[2]);
 		item = getItemFromString(args[3], sender instanceof Player ? (Player) sender : null);

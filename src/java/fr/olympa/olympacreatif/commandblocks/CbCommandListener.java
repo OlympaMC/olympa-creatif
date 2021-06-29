@@ -14,7 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
@@ -107,7 +107,7 @@ public class CbCommandListener implements Listener {
 		if (!ComponentCreatif.COMMANDBLOCKS.isActivated())
 			return;
 		
-		OlympaPlayerCreatif p = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif p = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		
 		CbCommand cmd = CbCommand.getCommand(plugin, e.getPlayer(), e.getPlayer().getLocation(), e.getMessage());
 		

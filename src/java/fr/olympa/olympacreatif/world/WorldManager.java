@@ -22,7 +22,7 @@ import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.spigot.economy.OlympaMoney;
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
@@ -60,7 +60,7 @@ public class WorldManager {
 				currentPeriod = currentPeriod % 10;
 				
 				Bukkit.getOnlinePlayers().forEach(p -> {
-					OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
+					OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(p.getUniqueId());
 
 					int income = OlympaCore.getInstance().getAfkHandler().isAfk(p) ? OCparam.INCOME_AFK.get() : OCparam.INCOME_NOT_AFK.get();
 					pc.getGameMoney().give(income);

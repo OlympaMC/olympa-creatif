@@ -10,6 +10,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -170,10 +171,10 @@ public class PlotParametersGui extends IGui {
 				return;
 
 			if (PlotPerm.DEFINE_MUSIC.has(plot, p) && !isOpenByStaff)
-				plugin.getPerksManager().getSongManager().openGui(p.getPlayer(), plot);
+				plugin.getPerksManager().getSongManager().openGui((Player) p.getPlayer(), plot);
 		});
 		
-		Map<ItemStack, PlotParamType<Boolean>> switchButtons = new LinkedHashMap<ItemStack, PlotParamType<Boolean>>();
+		Map<ItemStack, PlotParamType<Boolean>> switchButtons = new LinkedHashMap<>();
 		
 		switchButtons.put(ItemUtils.item(Material.SLIME_BLOCK, "§6Activation des dégâts environnementaux"), PlotParamType.ALLOW_ENVIRONMENT_DAMAGE);
 		switchButtons.put(ItemUtils.item(Material.DROWNED_SPAWN_EGG, "§6Activation du PvE"), PlotParamType.ALLOW_PVE);

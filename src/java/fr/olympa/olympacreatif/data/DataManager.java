@@ -25,9 +25,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.olympa.api.common.player.OlympaPlayerInformations;
-import fr.olympa.api.common.provider.AccountProvider;
-import fr.olympa.api.common.redis.RedisAccess;
-import fr.olympa.api.common.redis.RedisChannel;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.common.sql.statement.OlympaStatement;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -41,10 +39,6 @@ import fr.olympa.olympacreatif.plot.PlotMembers;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
 import fr.olympa.olympacreatif.plot.PlotParameters;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
-
-
-
-
 
 public class DataManager implements Listener {
 
@@ -230,7 +224,7 @@ public class DataManager implements Listener {
 	public synchronized void loadPlot(final OlympaPlayerCreatif requester, final String player, final int plotId, final Consumer<Plot> callback) {
 		plugin.getTask().runTaskAsynchronously(() -> {
 			try {
-				OlympaPlayerInformations playerInformations = AccountProvider.getter().getPlayerInformations(player);
+				OlympaPlayerInformations playerInformations = AccountProviderAPI.getter().getPlayerInformations(player);
 				if (playerInformations == null) {
 					callback.accept(null);
 					return;
@@ -297,7 +291,7 @@ public class DataManager implements Listener {
 			plugin.getLogger().log(Level.WARNING, "§4[DataManager] §cIndex du serveur = -1 : impossible de charger un nouveau joueur !");
 			return;
 		}
-		OlympaPlayerCreatif pc = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		
 		//get player plots
 		plugin.getTask().runTaskAsynchronously(() -> {

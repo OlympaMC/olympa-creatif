@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.CbTeam.ColorType;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -170,7 +170,7 @@ public class CbObjective {
 			
 			if (displaySlot == DisplaySlot.SIDEBAR)
 				for (Player p : plot.getPlayers())
-					((OlympaPlayerCreatif)AccountProvider.getter().get(p.getUniqueId())).setCustomScoreboardLines(newObjName, getValues(true));
+					((OlympaPlayerCreatif)AccountProviderAPI.getter().get(p.getUniqueId())).setCustomScoreboardLines(newObjName, getValues(true));
 		}
 		
 		objName = newObjName;
@@ -232,7 +232,7 @@ public class CbObjective {
 			LinkedHashMap<String, Integer> values = getValues(true);
 			
 			for (Player p : plot.getPlayers()) 
-				((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);
+				((OlympaPlayerCreatif) AccountProviderAPI.getter().get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);
 			
 			//Bukkit.broadcastMessage("SCORES " + objId + " : " + values);	
 		}
@@ -267,7 +267,7 @@ public class CbObjective {
 			LinkedHashMap<String, Integer> values = getValues(true);
 			
 			for (Player p : plot.getPlayers()) 
-				((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);	
+				((OlympaPlayerCreatif) AccountProviderAPI.getter().get(p.getUniqueId())).setCustomScoreboardLines(getName(), values);	
 		}
 	}
 	
@@ -312,7 +312,7 @@ public class CbObjective {
 			LinkedHashMap<String, Integer> scores = getValues(true);
 			
 			for (Player p : plot.getPlayers()) {
-				OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
+				OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(p.getUniqueId());
 				
 				//pc.setCustomScoreboardTitle(getName());
 				pc.setCustomScoreboardLines(getName(), scores);
@@ -325,7 +325,7 @@ public class CbObjective {
 		if (displaySlot == DisplaySlot.SIDEBAR)
 			for (Player p : plot.getPlayers())
 				if (p.isOnline())
-					((OlympaPlayerCreatif)AccountProvider.getter().get(p.getUniqueId())).reinitSidebar();
+					((OlympaPlayerCreatif)AccountProviderAPI.getter().get(p.getUniqueId())).reinitSidebar();
 
 		if (displaySlot == DisplaySlot.BELOW_NAME)
 			plot.getCbData().clearBelowName();

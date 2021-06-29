@@ -58,7 +58,7 @@ import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.common.collect.ImmutableSet;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CmdSummon;
 import fr.olympa.olympacreatif.data.FakePlayerDeathEvent;
@@ -173,7 +173,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler(ignoreCancelled = true) //test place block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onPlaceBlockEvent(BlockPlaceEvent e) {
-		OlympaPlayerCreatif pc = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS))
 			return;
 		
@@ -211,7 +211,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler(ignoreCancelled = true) //test break block (autorisé uniquement pour les membres et pour la zone protégeé)
 	public void onBreakBlockEvent(BlockBreakEvent e) {
-		OlympaPlayerCreatif pc = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		if (pc.hasStaffPerm(StaffPerm.BUILD_ROADS))
 			return;
 		
@@ -257,7 +257,7 @@ public class PlotsInstancesListener implements Listener{
 			return;
 		}
 		
-		OlympaPlayerCreatif pc = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		
 		if (plot == null || plot.hasStoplag()) {
 			e.setCancelled(true);
@@ -391,7 +391,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
-		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)AccountProvider.getter().get(e.getPlayer().getUniqueId()));
+		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getPlayer().getUniqueId()));
 		
 		Block clickedBlock = e.getClickedBlock();
 		
@@ -462,7 +462,7 @@ public class PlotsInstancesListener implements Listener{
 			else if (!KitType.COMMANDBLOCK.hasKit(pc)) 
 				OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.COMMANDBLOCK);
 				
-			else if (!pc.getPlayer().isSneaking() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			else if (!((Player) pc.getPlayer()).isSneaking() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				
 				BlockPosition pos = new BlockPosition(clickedBlock.getLocation().getBlockX(), clickedBlock.getLocation().getBlockY(), clickedBlock.getLocation().getBlockZ());
 				NBTTagCompound tag = new NBTTagCompound();
@@ -608,7 +608,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 
-		OlympaPlayerCreatif pc = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		
 		if (!PlotPerm.BUILD.has(plot, pc) && !(e.getRightClicked() instanceof Vehicle)) {
 			e.setCancelled(true);
@@ -631,7 +631,7 @@ public class PlotsInstancesListener implements Listener{
 		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
 		Plot plotTo = plugin.getPlotsManager().getPlot(e.getTo());
 		
-		if (plotFrom != plotTo && !((OlympaPlayerCreatif)AccountProvider.getter().get(e.getPlayer().getUniqueId())).setPlot(plotTo))
+		if (plotFrom != plotTo && !((OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getPlayer().getUniqueId())).setPlot(plotTo))
 			e.setCancelled(true);
 	}
 	
@@ -650,7 +650,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plotTo == plotFrom)
 			return;
 		
-		if (plotFrom != plotTo && !((OlympaPlayerCreatif)AccountProvider.getter().get(e.getPlayer().getUniqueId())).setPlot(plotTo))
+		if (plotFrom != plotTo && !((OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getPlayer().getUniqueId())).setPlot(plotTo))
 			e.setCancelled(true);
 		
 		/*
@@ -686,7 +686,7 @@ public class PlotsInstancesListener implements Listener{
 				return;
 			}
 		
-		if (e.getDamager().getType() == EntityType.PLAYER && PlotPerm.BUILD.has(plot, (OlympaPlayerCreatif)AccountProvider.getter().get(e.getDamager().getUniqueId())))
+		if (e.getDamager().getType() == EntityType.PLAYER && PlotPerm.BUILD.has(plot, (OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getDamager().getUniqueId())))
 			return;
 		
 		if (!plot.getParameters().getParameter(PlotParamType.ALLOW_PVP) && e.getEntityType() == EntityType.PLAYER && e.getDamager().getType() == EntityType.PLAYER) {
@@ -741,7 +741,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			return;
 		
-		if (!PlotPerm.BUILD.has(plot, AccountProvider.getter().get(e.getRemover().getUniqueId()))) {
+		if (!PlotPerm.BUILD.has(plot, AccountProviderAPI.getter().get(e.getRemover().getUniqueId()))) {
 			e.setCancelled(true);	
 			return;
 		}
@@ -756,7 +756,7 @@ public class PlotsInstancesListener implements Listener{
 		if (plot == null)
 			e.setCancelled(true);
 		
-		else if (!PlotPerm.BUILD.has(plot, AccountProvider.getter().get(e.getPlayer().getUniqueId()))) {
+		else if (!PlotPerm.BUILD.has(plot, AccountProviderAPI.getter().get(e.getPlayer().getUniqueId()))) {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(e.getPlayer(), PlotPerm.BUILD);
 			e.setCancelled(true);
 		}
@@ -772,7 +772,7 @@ public class PlotsInstancesListener implements Listener{
 			return;	
 		}
 		
-		if (!PlotPerm.DROP_ITEM.has(plot, AccountProvider.getter().get(e.getPlayer().getUniqueId())) && !plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS)) {
+		if (!PlotPerm.DROP_ITEM.has(plot, AccountProviderAPI.getter().get(e.getPlayer().getUniqueId())) && !plot.getParameters().getParameter(PlotParamType.ALLOW_DROP_ITEMS)) {
 			e.setCancelled(true);
 			OCmsg.PLOT_DENY_ITEM_DROP.send(e.getPlayer());
 		}		

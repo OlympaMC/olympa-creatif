@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 import fr.olympa.api.common.permission.OlympaPermission;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -59,7 +60,7 @@ public class PlotPerm {
 	}
 	
 	public boolean has(OlympaPlayerCreatif p) {
-		return has(OlympaCreatifMain.getInstance().getPlotsManager().getPlot(p.getPlayer().getLocation()), p);
+		return has(OlympaCreatifMain.getInstance().getPlotsManager().getPlot(((Player) p.getPlayer()).getLocation()), p);
 	}
 	
 	public boolean has(Plot plot, OlympaPlayerCreatif p) {

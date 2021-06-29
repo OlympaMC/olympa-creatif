@@ -1,5 +1,6 @@
 package fr.olympa.olympacreatif.commandblocks;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -13,25 +14,26 @@ import fr.olympa.olympacreatif.plot.PlotId;
 public class CbTeamsListener implements Listener {
 
 	private OlympaCreatifMain plugin;
-	
+
 	public CbTeamsListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
-		
-		//update nametags des joueurs 
+
+		//update nametags des joueurs
 		OlympaCore.getInstance().getNameTagApi().addNametagHandler(EventPriority.LOW, (nametag, player, to) -> {
-			PlotId playerPlot = PlotId.fromLoc(plugin, player.getPlayer().getLocation());
-			
+			Player p = (Player) player.getPlayer();
+			PlotId playerPlot = PlotId.fromLoc(plugin, p.getLocation());
+
 			if (playerPlot == null)
 				return;
-			
+
 			//si les deux joueurs sont sur le même plot
-			if (playerPlot.equals(PlotId.fromLoc(plugin, to.getPlayer().getLocation()))) {
+			if (playerPlot.equals(PlotId.fromLoc(plugin, ((Player) to.getPlayer()).getLocation()))) {
 				//récupération du plot concerné
-				Plot plot = plugin.getPlotsManager().getPlot(player.getPlayer().getLocation());
-				
+				Plot plot = plugin.getPlotsManager().getPlot(p.getLocation());
+
 				if (plot != null) {
-					CbTeam team = plot.getCbData().getTeamOf(player.getPlayer());
-					
+					CbTeam team = plot.getCbData().getTeamOf(p);
+
 					//ajout du nom de la team au joueur concerné
 					if (team != null && team.getName() != "")
 						nametag.appendSuffix("§7(§r" + team.getName() + "§r§7)");
@@ -39,24 +41,24 @@ public class CbTeamsListener implements Listener {
 			}
 		});
 	}
-	
-	@EventHandler(priority=EventPriority.HIGH)
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onDamage(EntityDamageByEntityEvent e) {
 		if (e.isCancelled())
 			return;
 
 		Plot p1 = plugin.getPlotsManager().getPlot(e.getEntity().getLocation());
 		Plot p2 = plugin.getPlotsManager().getPlot(e.getDamager().getLocation());
-		
+
 		if (p1 == null || !p1.equals(p2))
 			return;
-		
+
 		CbTeam t1 = p1.getCbData().getTeamOf(e.getEntity());
-		CbTeam t2 = p1.getCbData().getTeamOf( e.getDamager());
-		
+		CbTeam t2 = p1.getCbData().getTeamOf(e.getDamager());
+
 		if (t1 != null && t1.equals(t2) && !t1.hasFriendlyFire())
 			e.setCancelled(true);
-		
+
 	}
 
 }

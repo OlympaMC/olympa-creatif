@@ -5,7 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.plot.Plot;
 
@@ -54,7 +54,7 @@ public class CmdGive extends CbCommand {
 		item.setAmount(amount);
 		
 		for (Entity e : targetEntities)
-			if (plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(AccountProvider.getter().get(e.getUniqueId()), item.getType()))
+			if (plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(AccountProviderAPI.getter().get(e.getUniqueId()), item.getType()))
 				((Player) e).getInventory().addItem(item);
 			else
 				((Player) e).getInventory().addItem(plugin.getPerksManager().getKitsManager().getNoKitPermItem(item.getType()));

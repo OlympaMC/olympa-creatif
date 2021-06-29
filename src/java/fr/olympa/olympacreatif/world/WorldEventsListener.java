@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableSet;
 
 import fr.olympa.api.spigot.customevents.AsyncPlayerAfkEvent;
 import fr.olympa.api.spigot.item.ItemUtils;
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OcPermissions;
@@ -183,8 +183,8 @@ public class WorldEventsListener implements Listener{
 		if (e.isSneaking())
 			if (sneakHistory.keySet().contains(e.getPlayer().getName()))
 				if (sneakHistory.get(e.getPlayer().getName()) + 200 > System.currentTimeMillis()) {
-					if (((OlympaPlayerCreatif)AccountProvider.getter().get(e.getPlayer().getUniqueId())).hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK))
-						MainGui.getMainGui(AccountProvider.getter().get(e.getPlayer().getUniqueId())).create(e.getPlayer());	
+					if (((OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getPlayer().getUniqueId())).hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK))
+						MainGui.getMainGui(AccountProviderAPI.getter().get(e.getPlayer().getUniqueId())).create(e.getPlayer());	
 				}
 
 				else
@@ -206,7 +206,7 @@ public class WorldEventsListener implements Listener{
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true) //chat de plot
 	public void onChat(PlayerChatEvent e) {		
 		Plot plot = plugin.getPlotsManager().getPlot(e.getPlayer().getLocation());
-		OlympaPlayerCreatif p = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif p = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		
 		if (OcPermissions.USE_COLORED_TEXT.hasPermission(p))
 			e.setMessage(ChatColor.translateAlternateColorCodes('&', e.getMessage()));
@@ -272,14 +272,14 @@ public class WorldEventsListener implements Listener{
 	@EventHandler //add perms worldedit si achat du grade correspondant
 	public void onPlayerChangeGroupEvent(AsyncOlympaPlayerChangeGroupEvent e) {
 		if (PermissionsList.USE_WORLD_EDIT.hasPermission(e.getOlympaPlayer()))
-			setWorldEditPerms(AccountProvider.getter().get(e.getPlayer().getUniqueId()), true);
+			setWorldEditPerms(AccountProviderAPI.getter().get(e.getPlayer().getUniqueId()), true);
 	}*/
 	
 	//GESTION DES KITS
 	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits
 	public void onBlockPlace(BlockPlaceEvent e) {
 		
-		OlympaPlayerCreatif p = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif p = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		
 		//retrictions dues aux kits
 		if (!plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getBlock().getType())) {
@@ -293,7 +293,7 @@ public class WorldEventsListener implements Listener{
 	@EventHandler(priority = EventPriority.LOWEST) //gestion des kits et des zones non claim
 	public void onInterract(PlayerInteractEvent e) {
 		
-		OlympaPlayerCreatif p = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif p = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		
 		//retrictions dues aux kits
 		if (!plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getMaterial())) {
@@ -313,7 +313,7 @@ public class WorldEventsListener implements Listener{
 		if (e.getEntityType() != EntityType.PLAYER)
 			return;
 		
-		OlympaPlayerCreatif p = AccountProvider.getter().get(e.getEntity().getUniqueId());
+		OlympaPlayerCreatif p = AccountProviderAPI.getter().get(e.getEntity().getUniqueId());
 		
 		//retrictions dues aux kits
 		if (!plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(p, e.getItem().getItemStack().getType())) {

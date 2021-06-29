@@ -13,10 +13,11 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
@@ -49,7 +50,7 @@ public class CmdsLogic {
 			if (pc.getPlotsSlots(false) - pc.getPlots(false).size() > 0) {
 
 				Plot plot = plugin.getPlotsManager().createNewPlot(pc);
-				plot.getId().teleport(pc.getPlayer());
+				plot.getId().teleport((Player) pc.getPlayer());
 
 				//TODO vérifier si le getCurrentPlot est bien MAJ
 				OCmsg.PLOT_NEW_CLAIM.send(pc);
@@ -108,7 +109,7 @@ public class CmdsLogic {
 		else if (!invitations.containsKey(plot.getId()) || !invitations.get(plot.getId()).getValue().equals(pc.getPlayer()))
 			OCmsg.PLOT_NO_PENDING_INVITATION.send(pc, plot);
 
-		else if (!invitations.get(plot.getId()).getKey().getPlayer().isOnline())
+		else if (!((OfflinePlayer) invitations.get(plot.getId()).getKey().getPlayer()).isOnline())
 			OCmsg.PLOT_JOIN_ERR_SENDER_OFFLINE.send(pc, plot, invitations.get(plot.getId()).getKey().getName());
 
 		else if (plot.getMembers().getMembers().size() >= plot.getMembers().getMaxMembers())
@@ -133,7 +134,7 @@ public class CmdsLogic {
 		else if (plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR || !plot.getPlayers().contains(target))
 			OCmsg.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.send(pc, target.getName());
 
-		else if (((OlympaPlayerCreatif) AccountProvider.getter().get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
+		else if (((OlympaPlayerCreatif) AccountProviderAPI.getter().get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
 			OCmsg.PLOT_IMPOSSIBLE_TO_KICK_PLAYER.send(pc, target.getName());
 
 		else {
@@ -161,12 +162,12 @@ public class CmdsLogic {
 		else if (!plot.getPlayers().contains(target) || plot.getMembers().getPlayerRank(target) != PlotRank.VISITOR)
 			OCmsg.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.send(pc, target.getName());
 
-		else if (((OlympaPlayerCreatif) AccountProvider.getter().get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
+		else if (((OlympaPlayerCreatif) AccountProviderAPI.getter().get(target.getUniqueId())).hasStaffPerm(StaffPerm.BYPASS_KICK_BAN))
 			OCmsg.PLOT_IMPOSSIBLE_TO_BAN_PLAYER.send(pc, target.getName());
 
 		else {
 			//exécution du ban
-			plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).add(AccountProvider.getter().get(target.getUniqueId()).getId());
+			plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).add(AccountProviderAPI.getter().get(target.getUniqueId()).getId());
 
 			plot.teleportOut(target);
 
@@ -189,7 +190,7 @@ public class CmdsLogic {
 		else if (!PlotPerm.BAN_VISITOR.has(plot, pc))
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.BAN_VISITOR);
 
-		else if (plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).remove(AccountProvider.getter().get(target.getUniqueId()).getId()))
+		else if (plot.getParameters().getParameter(PlotParamType.BANNED_PLAYERS).remove(AccountProviderAPI.getter().get(target.getUniqueId()).getId()))
 			OCmsg.PLOT_UNBAN_PLAYER.send(pc, target.getName());
 		else
 			OCmsg.PLOT_CANT_UNBAN_PLAYER.send(pc, target.getName());
@@ -202,7 +203,7 @@ public class CmdsLogic {
 		ComponentBuilder component = new ComponentBuilder(Prefix.DEFAULT.toString() + "§eJoueurs bannis de la parcelle " + plot + " : ");
 
 		for (int i = 0; i < list.size(); i++) {
-			String target = AccountProvider.getter().getPlayerInformations(list.get(i)).getName();
+			String target = AccountProviderAPI.getter().getPlayerInformations(list.get(i)).getName();
 			component.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/oc unban " + target));
 			component.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("§7Débannir " + target)));
 			component.append(target);
@@ -214,14 +215,15 @@ public class CmdsLogic {
 		if (list.size() == 0)
 			component.append("§7aucun");
 
-		pc.getPlayer().sendMessage(component.create());
+		((CommandSender) pc.getPlayer()).sendMessage(component.create());
 	}
 
 	public void visitPlot(OlympaPlayerCreatif pc, PlotId id) {
+		Player player = (Player) pc.getPlayer();
 		if (id == null)
-			OCmsg.INVALID_PLOT_ID.send(pc.getPlayer());
+			OCmsg.INVALID_PLOT_ID.send(player);
 		else {
-			id.teleport(pc.getPlayer());
+			id.teleport(player);
 			OCmsg.TELEPORT_IN_PROGRESS.send(pc, id);
 		}
 	}
@@ -231,8 +233,8 @@ public class CmdsLogic {
 			OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(pc, "/oc visitrandom");
 			return;
 		}
-
-		delayRandomPlotVisit.add(pc.getPlayer());
+		Player player = (Player) pc.getPlayer();
+		delayRandomPlotVisit.add(player);
 		plugin.getTask().runTaskLater(() -> delayRandomPlotVisit.remove(pc.getPlayer()), 30);
 
 		List<Integer> set = new ArrayList<>();
@@ -251,20 +253,20 @@ public class CmdsLogic {
 			return;
 
 		PlotId id = PlotId.fromId(plugin, set.get(ThreadLocalRandom.current().nextInt(set.size())));
-		id.teleport(pc.getPlayer());
+		id.teleport(player);
 		OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc, id);
 	}
 
 	public void visitPlotOf(OlympaPlayerCreatif pc, String p, int id) {
 		Player target = Bukkit.getPlayerExact(p);
-
+		Player player = (Player) pc.getPlayer();
 		if (target != null) {
-			List<Plot> plots = ((OlympaPlayerCreatif) AccountProvider.getter().get(target.getUniqueId())).getPlots(true);
+			List<Plot> plots = ((OlympaPlayerCreatif) AccountProviderAPI.getter().get(target.getUniqueId())).getPlots(true);
 
 			id -= 1;
 
 			if (id >= 0 && id < plots.size()) {
-				plots.get(id).getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
+				plots.get(id).getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(player);
 				OCmsg.TELEPORT_IN_PROGRESS.send(pc, plots.get(id).getId() + "");
 			} else
 				OCmsg.INVALID_PLOT_ID.send(pc);
@@ -274,7 +276,7 @@ public class CmdsLogic {
 				if (plot == null)
 					OCmsg.INVALID_PLOT_ID.send(pc);
 				else {
-					plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(pc.getPlayer());
+					plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(player);
 					OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc, plot);
 				}
 			});
@@ -288,7 +290,7 @@ public class CmdsLogic {
 		if (target == null)
 			plots.addAll(plugin.getPlotsManager().getPlots());
 		else
-			plots.addAll(((OlympaPlayerCreatif) AccountProvider.getter().get(target.getUniqueId())).getPlots(true));
+			plots.addAll(((OlympaPlayerCreatif) AccountProviderAPI.getter().get(target.getUniqueId())).getPlots(true));
 
 		Collections.sort(plots, (o1, o2) -> o1.getId().getId() - o2.getId().getId());
 

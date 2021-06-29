@@ -1,6 +1,7 @@
  package fr.olympa.olympacreatif.gui;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import fr.olympa.api.common.groups.OlympaGroup;
 import fr.olympa.api.spigot.item.ItemUtils;
@@ -35,11 +36,12 @@ public class ShopGuiPourApresLaBeta extends IGui {
 		setItem(8, ItemUtils.item(Material.GOLD_INGOT, "§6Ouvrir la boutique", "§7Cliquez ici pour ouvrir", "§7la boutique sur le site"), 
 				(it, click, slot) -> sendBuyMessage("Cliquez ici pour ouvrir la boutique.", "olympa.fr"));
 		
+		Player player = (Player) p.getPlayer();
 		//init rangs
 		addRank(OlympaGroup.CREA_CONSTRUCTOR, ItemUtils.item(Material.IRON_AXE, "§6Grade " + OlympaGroup.CREA_CONSTRUCTOR.getName(p.getGender()), 
 				"§2Ce grade donne accès à :", 
 				" ",
-				"§aPréfixe " + OlympaGroup.CREA_CONSTRUCTOR.getPrefix(p.getGender()) + p.getPlayer().getName(),  
+				"§aPréfixe " + OlympaGroup.CREA_CONSTRUCTOR.getPrefix(p.getGender()) + player.getName(),  
 				"§a+1 parcelle (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 1) + ")", 
 				"§aAccès aux microblocks et aux têtes (/mb, /skull)", 
 				"§aAccès à la réinitialisation de vos parcelles (/oco reset)",
@@ -51,7 +53,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				"§2En plus des avantages du niveau précédent,",
 				"§2ce grade donne accès à :",
 				" ",
-				"§aPréfixe " + OlympaGroup.CREA_ARCHITECT.getPrefix(p.getGender()) + p.getPlayer().getName(), 
+				"§aPréfixe " + OlympaGroup.CREA_ARCHITECT.getPrefix(p.getGender()) + player.getName(), 
 				"§a+2 parcelles (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 2) + ")",
 				"§aAccès aux commandes WorldEdit et goBrush",
 				"§aExport de vos parcelles en .schematic (/oco export)",
@@ -65,7 +67,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				"§2En plus des avantages du niveau précédent,",
 				"§2ce grade donne accès à :",
 				" ",
-				"§aPréfixe " + OlympaGroup.CREA_CREATOR.getPrefix(p.getGender()) + p.getPlayer().getName(), 
+				"§aPréfixe " + OlympaGroup.CREA_CREATOR.getPrefix(p.getGender()) + player.getName(), 
 				"§aAccès à toutes les couleurs dans le chat",
 				"§aAccès aux hologrammes (/holo)",
 				"§aAccès à l'éditeur d'armorstands (/oco armorstand_editor)",
@@ -239,7 +241,8 @@ public class ShopGuiPourApresLaBeta extends IGui {
 	}
 	
 	private void sendBuyMessage(String text, String url) {
-		p.getPlayer().closeInventory();
+		Player player = (Player) p.getPlayer();
+		player.closeInventory();
 		
 		TextComponent component = Component.text()
 				.append(Component.text("Olympa ").color(NamedTextColor.GOLD))
@@ -247,6 +250,6 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				.append(Component.text(text).color(NamedTextColor.AQUA))
 				.clickEvent(ClickEvent.openUrl(url)).build();
 		
-		p.getPlayer().sendMessage(component);
+		player.sendMessage(component);
 	}
 }

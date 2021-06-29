@@ -13,7 +13,7 @@ import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
 import fr.olympa.api.common.groups.OlympaGroup;
 import fr.olympa.api.spigot.economy.OlympaMoney;
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
@@ -48,7 +48,7 @@ public class OcaCmd extends AbstractCmd {
 		}, str -> {
 			Player p = Bukkit.getPlayerExact(str);
 			if (p != null)
-				return new MemberInformations(AccountProvider.getter().get(p.getUniqueId()).getInformation());
+				return new MemberInformations(AccountProviderAPI.getter().get(p.getUniqueId()).getInformation());
 			else if (str.equalsIgnoreCase("system"))
 				return new MemberInformations(28l, "System", UUID.fromString("1f2993c6-5c5f-3968-b8dc-b0f3ef15f7f0"));
 			else if (str.equalsIgnoreCase("spawn"))
@@ -242,7 +242,7 @@ public class OcaCmd extends AbstractCmd {
 		if (getOlympaPlayer() != null && !OcPermissions.STAFF_MANAGE_MONEY.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
-		OlympaPlayerCreatif target = AccountProvider.getter().get(((Player)cmd.getArgument(0)).getUniqueId());
+		OlympaPlayerCreatif target = AccountProviderAPI.getter().get(((Player)cmd.getArgument(0)).getUniqueId());
 		
 		int money = cmd.getArgumentsLength() == 3 ? cmd.getArgument(2) : 0;
 		
@@ -284,7 +284,7 @@ public class OcaCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Ouvrir l'interface des parcelles d'un joueur", args = {"PLAYERS"}, min = 1)
 	public void openmenuas(CommandContext cmd) {
-		MainGui.getMainGuiForStaff(AccountProvider.getter().get(((Player)cmd.getArgument(0)).getUniqueId()), getOlympaPlayer()).create(getPlayer());
+		MainGui.getMainGuiForStaff(AccountProviderAPI.getter().get(((Player)cmd.getArgument(0)).getUniqueId()), getOlympaPlayer()).create(getPlayer());
 	}
 
 	@Cmd(player = true, syntax = "Définir le propriétaire d'une parcelle", args = {"PLOT_OWNER"}, min = 1)
@@ -307,7 +307,7 @@ public class OcaCmd extends AbstractCmd {
 	@Cmd(syntax = "Accéder aux informations VIP d'un joueur", args = {"info|set", "PLAYERS", "KIT_TYPE|UPGRADE_TYPE", "INTEGER"}, min = 2)
 	public void shop(CommandContext cmd) {
 		
-		OlympaPlayerCreatif pc = AccountProvider.getter().get(((Player)cmd.getArgument(1)).getUniqueId());
+		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(((Player)cmd.getArgument(1)).getUniqueId());
 		
 		if (cmd.getArgument(0).equals("info")) {
 			sendMessage(Prefix.DEFAULT, "§6Elements VIP du joueur " + ((Player)cmd.getArgument(1)).getName());

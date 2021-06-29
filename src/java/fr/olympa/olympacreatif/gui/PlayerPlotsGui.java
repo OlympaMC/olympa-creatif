@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import fr.olympa.api.spigot.item.ItemUtils;
@@ -20,7 +21,8 @@ public class PlayerPlotsGui extends IGui {
 		super(gui, "Parcelles de " + gui.getPlayer().getName(), gui.getPlayer().getPlots(false).size()/9 + 2, gui.staffPlayer);
 		
 		playerPlots = p.getPlots(false);
-		
+
+		Player player = (Player) p.getPlayer();
 		int i = -1;
 		
 		//recherche des plots du joueur
@@ -38,21 +40,21 @@ public class PlayerPlotsGui extends IGui {
 						
 						(it, c, s) -> {
 							if (s < playerPlots.size()) 
-								p.getPlayer().closeInventory();
-								if (c == ClickType.LEFT) {
-									if (isOpenByStaff) {
-										playerPlots.get(s).getId().teleport(staffPlayer.getPlayer());
-										OCmsg.TELEPORT_IN_PROGRESS.send(staffPlayer, playerPlots.get(s).toString());
-									}else {
-										playerPlots.get(s).getId().teleport(p.getPlayer());
-										OCmsg.TELEPORT_IN_PROGRESS.send(p, playerPlots.get(s).toString());	
-									}	
-								}else if (c == ClickType.RIGHT) {
-									if (isOpenByStaff)
-										new PlotParametersGui(MainGui.getMainGuiForStaff(getPlayer(), staffPlayer, plot)).create(staffPlayer.getPlayer());
-									else
-										MainGui.getMainGui(getPlayer(), playerPlots.get(s)).create(getPlayer().getPlayer());
-								}
+								player.closeInventory();
+							if (c == ClickType.LEFT) {
+								if (isOpenByStaff) {
+									playerPlots.get(s).getId().teleport((Player) staffPlayer.getPlayer());
+									OCmsg.TELEPORT_IN_PROGRESS.send(staffPlayer, playerPlots.get(s).toString());
+								}else {
+									playerPlots.get(s).getId().teleport(player);
+									OCmsg.TELEPORT_IN_PROGRESS.send(p, playerPlots.get(s).toString());	
+								}	
+							}else if (c == ClickType.RIGHT) {
+								if (isOpenByStaff)
+									new PlotParametersGui(MainGui.getMainGuiForStaff(getPlayer(), staffPlayer, plot)).create((Player) staffPlayer.getPlayer());
+								else
+									MainGui.getMainGui(getPlayer(), playerPlots.get(s)).create((Player) getPlayer().getPlayer());
+							}
 						});
 			}	
 		}

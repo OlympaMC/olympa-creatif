@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
@@ -122,7 +122,7 @@ public class Plot {
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
 		for (Player p : Bukkit.getOnlinePlayers())
 			if (plotId.isInPlot(p.getLocation()))
-				if (((OlympaPlayerCreatif)AccountProvider.getter().get(p.getUniqueId())).setPlot(this)) 
+				if (((OlympaPlayerCreatif)AccountProviderAPI.getter().get(p.getUniqueId())).setPlot(this)) 
 					executeEntryActions(p, p.getLocation());
 				else
 					teleportOut(p);
@@ -296,7 +296,7 @@ public class Plot {
 			msg = ChatColor.translateAlternateColorCodes('&', msg);
 		
 		msg = "§7[Parcelle " + getId() + "] §r" + 
-		pc.getGroupNameColored() + " " + pc.getPlayer().getName() + " §r§7: " + msg;
+		pc.getGroupNameColored() + " " + pc.getName() + " §r§7: " + msg;
 		
 		for (Player p : getPlayers())
 			p.sendMessage(msg);
@@ -308,7 +308,7 @@ public class Plot {
 	}
 	
 	public boolean canEnter(Player p ) {
-		return canEnter((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId()));
+		return canEnter((OlympaPlayerCreatif) AccountProviderAPI.getter().get(p.getUniqueId()));
 	}
 	
 	public boolean canEnter(OlympaPlayerCreatif pc) {
@@ -333,7 +333,7 @@ public class Plot {
 	 * @return true si le joueur est autorisé à entrer, false sinon
 	 */
 	public void executeEntryActions(Player p, Location tpLoc) {
-		executeEntryActions((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId()), tpLoc);
+		executeEntryActions((OlympaPlayerCreatif) AccountProviderAPI.getter().get(p.getUniqueId()), tpLoc);
 	}
 		
 	/**
@@ -346,7 +346,7 @@ public class Plot {
 		if (!canEnter(pc))
 			return;
 		
-		Player p = pc.getPlayer();
+		Player p = (Player) pc.getPlayer();
 		
 		//ajoute le joueur aux joueurs du plot s'il n'a pas la perm de bypass les commandes vanilla
 		if (!pc.hasStaffPerm(StaffPerm.GHOST_MODE))
@@ -357,10 +357,10 @@ public class Plot {
 		
 		//clear les visiteurs en entrée & stockage de leur inventaire
 		if (parameters.getParameter(PlotParamType.CLEAR_INCOMING_PLAYERS) && !PlotPerm.BYPASS_ENTRY_ACTIONS.has(this, pc)) {
-			List<ItemStack> list = new ArrayList<ItemStack>();
+			List<ItemStack> list = new ArrayList<>();
 			for (ItemStack it : p.getInventory().getContents()) {
 				if (it != null && it.getType() != Material.AIR)
-				list.add(it);
+					list.add(it);
 			}
 			
 			inventoryStorage.put(p, list);
@@ -397,7 +397,7 @@ public class Plot {
 		
 		//reset fly speed if needed
 		if (!PlotPerm.DEFINE_OWN_FLY_SPEED.has(this, pc) && getParameters().getParameter(PlotParamType.RESET_VISITOR_FLY_SPEED))
-			pc.getPlayer().setFlySpeed(0.1f);
+			p.setFlySpeed(0.1f);
 		
 		
 		//send stoplag alert if activated
@@ -411,7 +411,7 @@ public class Plot {
 	 */
 	public void executeExitActions(Player p) {
 
-		//OlympaPlayerCreatif pc = AccountProvider.getter().get(p.getUniqueId());
+		//OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(p.getUniqueId());
 		
 		removePlayerInPlot(p);
 

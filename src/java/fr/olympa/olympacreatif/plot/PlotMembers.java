@@ -16,7 +16,7 @@ import com.google.gson.JsonSyntaxException;
 import fr.olympa.api.common.observable.AbstractObservable;
 import fr.olympa.api.common.observable.Observable;
 import fr.olympa.api.common.player.OlympaPlayerInformations;
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
@@ -42,7 +42,7 @@ public class PlotMembers extends AbstractObservable {
 	
 	//return false si le nombre de membres max est dépassé
 	public boolean set(Player p, PlotRank rank) {
-		return set(AccountProvider.getter().get(p.getUniqueId()).getInformation(), rank);
+		return set(AccountProviderAPI.getter().get(p.getUniqueId()).getInformation(), rank);
 	}
 	
 	public boolean set(OlympaPlayerCreatif p, PlotRank rank) {
@@ -84,7 +84,7 @@ public class PlotMembers extends AbstractObservable {
 		if (p == null)
 			return PlotRank.VISITOR;
 		
-		return getPlayerRank((OlympaPlayerCreatif) AccountProvider.getter().get(p.getUniqueId()));
+		return getPlayerRank((OlympaPlayerCreatif) AccountProviderAPI.getter().get(p.getUniqueId()));
 	}
 	
 	public PlotRank getPlayerRank(OlympaPlayerCreatif p) {

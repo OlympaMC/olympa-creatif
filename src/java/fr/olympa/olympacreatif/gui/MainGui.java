@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.gui;
 import java.util.function.Consumer;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.spigot.item.ItemUtils;
@@ -26,7 +27,8 @@ public class MainGui extends IGui {
 	
 	private MainGui(OlympaCreatifMain plugin, OlympaPlayerCreatif player, Plot plot, String inventoryName, OlympaPlayerCreatif staffPlayer) {
 		super(plugin, player, plot, inventoryName, 6, staffPlayer); 
-		
+		Player staffBukkitPlayer = (Player) staffPlayer.getPlayer();
+		Player playerBukkitPlayer = (Player) p.getPlayer();
 		String clickToOpenMenu = "§9Cliquez pour ouvrir le menu";
 		
 		//création de l'interface Olympa
@@ -49,7 +51,7 @@ public class MainGui extends IGui {
 			sk = ItemUtils.name(sk, "§6Paramètres de " + p.getName());
 			sk = ItemUtils.lore(sk, clickToOpenMenu);
 			
-			setItem(12, sk, (it, c, s) -> new PlayerParametersGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
+			setItem(12, sk, (it, c, s) -> new PlayerParametersGui(this).create(isOpenByStaff ? staffBukkitPlayer : playerBukkitPlayer));
 		};
 
 		headConsumer.accept(new ItemStack(Material.PLAYER_HEAD));
@@ -59,31 +61,31 @@ public class MainGui extends IGui {
 				"§eParcelles possédées : " + p.getPlots(true).size() + "/" + p.getPlotsSlots(true),
 				"§eParcelles totales : " + p.getPlots(false).size() + "/" + p.getPlotsSlots(false), 
 				clickToOpenMenu), 
-				(it, c, s) -> new PlayerPlotsGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
+				(it, c, s) -> new PlayerPlotsGui(this).create(isOpenByStaff ? staffBukkitPlayer : playerBukkitPlayer));
 		
 		setItem(14, ItemUtils.item(Material.GOLD_INGOT, "§6Boutique", clickToOpenMenu), 
-				(it, c, s) -> new ShopGuiPourApresLaBeta(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
+				(it, c, s) -> new ShopGuiPourApresLaBeta(this).create(isOpenByStaff ? staffBukkitPlayer : playerBukkitPlayer));
 		
 		if (plot != null) {
 			setItem(21, ItemUtils.item(Material.PAINTING, "§6Membres parcelle", "§eNombre de membres : " + plot.getMembers().getCount(), clickToOpenMenu), 
-					(it, c, s) -> new MembersGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
+					(it, c, s) -> new MembersGui(this).create(isOpenByStaff ? staffBukkitPlayer : playerBukkitPlayer));
 			
 			setItem(22, ItemUtils.item(Material.COMPARATOR, "§6Paramètres généraux parcelle", clickToOpenMenu), 
-					(it, c, s) -> new PlotParametersGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
+					(it, c, s) -> new PlotParametersGui(this).create(isOpenByStaff ? staffBukkitPlayer : playerBukkitPlayer));
 			
 			setItem(23, ItemUtils.item(Material.REPEATER, "§6Paramètres d'interraction parcelle", clickToOpenMenu), 
-					(it, c, s) -> new InteractionParametersGui(this).create(isOpenByStaff ? staffPlayer.getPlayer() : p.getPlayer()));
+					(it, c, s) -> new InteractionParametersGui(this).create(isOpenByStaff ? staffBukkitPlayer : playerBukkitPlayer));
 
 			setItem(31, ItemUtils.item(Material.ENDER_PEARL, "§6Téléportation au spawn parcelle"), 
 					(it, c, s) -> {
-						p.getPlayer().closeInventory();
-						plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(p.getPlayer());
+						playerBukkitPlayer.closeInventory();
+						plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(playerBukkitPlayer);
 						OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(p);
 					});	
 		}
 		
 		setItem(30, ItemUtils.item(Material.RED_BED, "§6Téléportation au spawn"), 
-				(it, c, s) -> OCparam.SPAWN_LOC.get().teleport(p.getPlayer()));
+				(it, c, s) -> OCparam.SPAWN_LOC.get().teleport(playerBukkitPlayer));
 		
 		setItem(32, ItemUtils.item(Material.ENDER_EYE, "§6Téléportation à une parcelle aléatoire"), 
 				(it, c, s) -> {
@@ -100,7 +102,7 @@ public class MainGui extends IGui {
 					null);
 		
 		setItem(49, ItemUtils.item(Material.PAPER, "§6Ouvrir l'aide"), 
-				(it, c, s) -> getPlayer().getPlayer().sendMessage("§7L'aide n'a pas encore été définie. En attendant, vous pouvez utiliser /oc ou /oco help !"));
+				(it, c, s) -> playerBukkitPlayer.sendMessage("§7L'aide n'a pas encore été définie. En attendant, vous pouvez utiliser /oc ou /oco help !"));
 		
 		/*Options à intégrer au menu :
 		 * Infos générales parcelle

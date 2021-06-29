@@ -13,13 +13,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachment;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
@@ -96,10 +97,11 @@ public class PermissionsManager implements Listener {
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		OlympaPlayerCreatif pc = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 
-		weAttachements.put(pc.getUniqueId(), pc.getPlayer().addAttachment(plugin));
-		cbAttachements.put(pc.getUniqueId(), pc.getPlayer().addAttachment(plugin));
+		Player player = (Player) pc.getPlayer();
+		weAttachements.put(pc.getUniqueId(), player.addAttachment(plugin));
+		cbAttachements.put(pc.getUniqueId(), player.addAttachment(plugin));
 
 		//if (PermissionsList.USE_WORLD_EDIT.hasPermission(pc) && ComponentCreatif.WORLDEDIT.isActivated())
 		//else if (pc.hasKit(KitType.COMMANDBLOCK) && ComponentCreatif.COMMANDBLOCKS.isActivated())
@@ -168,7 +170,7 @@ public class PermissionsManager implements Listener {
 
 			PermissionAttachment attachment = p.addAttachment(OlympaCore.getInstance());
 			
-			AccountProvider.getter().get(p.getUniqueId()).getGroup().getAllGroups().sorted(Comparator.comparing(OlympaGroup::getPower))
+			AccountProviderAPI.getter().get(p.getUniqueId()).getGroup().getAllGroups().sorted(Comparator.comparing(OlympaGroup::getPower))
 			.forEach(group -> group.runtimePermissions.forEach((key, value) -> attachment.setPermission(key, value)));
 			
 			p.recalculatePermissions();
@@ -181,12 +183,12 @@ public class PermissionsManager implements Listener {
 	
 	public enum ComponentCreatif {
 		WORLDEDIT("worldedit", () -> Bukkit.getOnlinePlayers().forEach(p -> 
-		OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(AccountProvider.getter().get(p.getUniqueId()))), 
-				() -> Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(AccountProvider.getter().get(p.getUniqueId())))),
+		OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(AccountProviderAPI.getter().get(p.getUniqueId()))), 
+				() -> Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(AccountProviderAPI.getter().get(p.getUniqueId())))),
 		
 		COMMANDBLOCKS("commandblocks_and_vanilla_commands", () -> Bukkit.getOnlinePlayers().forEach(p -> 
-		OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(AccountProvider.getter().get(p.getUniqueId()))), 
-				() -> Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(AccountProvider.getter().get(p.getUniqueId())))),
+		OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(AccountProviderAPI.getter().get(p.getUniqueId()))), 
+				() -> Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(AccountProviderAPI.getter().get(p.getUniqueId())))),
 		
 		ENTITIES("entities", null, () -> OlympaCreatifMain.getInstance().getWorldManager().getWorld().getEntities().stream().filter(e -> 
 		(e.getType() != EntityType.PLAYER)).forEach(e -> e.remove())),

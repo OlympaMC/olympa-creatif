@@ -238,7 +238,7 @@ public abstract class AWorldEditManager {
 		public void onCommand(PlayerCommandPreprocessEvent e) {
 			
 			if (e.getMessage().contains("/schem")) {
-				OlympaPlayerCreatif pc = AccountProvider.getter().get(e.getPlayer().getUniqueId());
+				OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 				
 				if (!PermissionsList.STAFF_BYPASS_WORLDEDIT.hasPermissionWithMsg(pc) || !pc.hasStaffPerm(StaffPerm.WORLDEDIT_EVERYWHERE))
 					e.setCancelled(true);
