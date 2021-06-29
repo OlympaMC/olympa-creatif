@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commands.CmdsLogic.OCtimerCommand;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.PlayerParamType;
@@ -106,6 +107,9 @@ public class OcCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Visiter une parcelle aléatoire")
 	public void visitrandom(CommandContext cmd) {
+		if (!OCtimerCommand.OC_VISIT_PLOT_RANDOM.canExecute(getOlympaPlayer()))
+			return;
+		
 		plugin.getCmdLogic().visitPlotRandom(getOlympaPlayer());
 	}
 

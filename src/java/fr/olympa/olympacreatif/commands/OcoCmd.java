@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
+import fr.olympa.olympacreatif.commands.CmdsLogic.OCtimerCommand;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OcPermissions;
@@ -22,7 +23,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class OcoCmd extends AbstractCmd {
 	
-	private Set<Player> launchedCbRecalculation = new HashSet<Player>();
+	//private Set<Player> launchedCbRecalculation = new HashSet<Player>();
 	
 	public OcoCmd(OlympaCreatifMain plugin) {
 		super(plugin, "oco", null, "Commandes spécialisées du Créatif");
@@ -91,6 +92,9 @@ public class OcoCmd extends AbstractCmd {
 			return;
 		}
 
+		if (!OCtimerCommand.OCO_EXPORT.canExecute(getOlympaPlayer()))
+			return;
+
 		plugin.getPerksManager().getSchematicCreator().export(plot, getOlympaPlayer());
 	}
 	
@@ -111,12 +115,18 @@ public class OcoCmd extends AbstractCmd {
 			return;
 		}
 
+		if (!OCtimerCommand.OCO_RESTORE.canExecute(getOlympaPlayer()))
+			return;
+		
 		plugin.getPerksManager().getSchematicCreator().restore(plot, getOlympaPlayer());
 	}
 	
 	
 	@Cmd(player = true, syntax = "Réinitialiser une parcelle. §cATTENTION : §4ACTION IRREVERSIBLE !!", args = {"INTEGER", "code"}/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
 	public void reset(CommandContext cmd) {
+		if (!OCtimerCommand.OCO_RESET.canExecute(getOlympaPlayer()))
+			return;
+		
 		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null), (cmd.getArgumentsLength() > 1 ? (String) cmd.getArgument(1) : null));
 	}
 
@@ -163,14 +173,8 @@ public class OcoCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Recharger tous les commandblocks de la parcelle"/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
 	public void reload_commandblocks(CommandContext cmd) {
-		if (launchedCbRecalculation.contains(getPlayer())) {
-			OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(getPlayer(), "/oco reloadcommandblocks");
+		if (!OCtimerCommand.OCO_RELOAD_COMMANDBLOCKS.canExecute(getOlympaPlayer()))
 			return;
-		}
-		
-		final Player p = getPlayer();
-		launchedCbRecalculation.add(getPlayer());
-		plugin.getTask().runTaskLater(() -> launchedCbRecalculation.remove(p), 30 * 20);
 		
 		Plot plot = ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot();
 		

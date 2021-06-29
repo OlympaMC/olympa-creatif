@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.utils.Prefix;
@@ -36,6 +39,8 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class CmdsLogic {
 
+	private static Map<OCtimerCommand, Set<Long>> timerCommands = new HashMap<OCtimerCommand, Set<Long>>();
+	
 	private OlympaCreatifMain plugin;
 	private Map<PlotId, Entry<OlympaPlayerCreatif, Player>> invitations = new HashMap<>();
 
@@ -229,10 +234,6 @@ public class CmdsLogic {
 	}
 
 	public void visitPlotRandom(final OlympaPlayerCreatif pc) {
-		if (delayRandomPlotVisit.contains(pc.getPlayer())) {
-			OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(pc, "/oc visitrandom");
-			return;
-		}
 		Player player = (Player) pc.getPlayer();
 		delayRandomPlotVisit.add(player);
 		plugin.getTask().runTaskLater(() -> delayRandomPlotVisit.remove(pc.getPlayer()), 30);
@@ -345,4 +346,42 @@ public class CmdsLogic {
 			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());
 		}
 	}
+	
+	public static enum OCtimerCommand {
+		OCO_RESET(180),
+		OCO_RESTORE(180),
+		OCO_EXPORT(180),
+		OCO_RELOAD_COMMANDBLOCKS(40),
+		OC_VISIT_PLOT_RANDOM(2),
+		;
+		
+		private int delay;
+		
+		/*static {
+			Bukkit.getServer().getPluginManager().registerEvents(new Listener() {
+				@EventHandler
+				public 
+			}, OlympaCreatifMain.getInstance());
+		}*/
+		
+		OCtimerCommand(int delay) {
+			this.delay = delay;
+			timerCommands.put(this, new HashSet<Long>());
+		}
+		
+		public boolean canExecute(OlympaPlayerCreatif pc) {
+			if (timerCommands.get(this).contains(pc.getId())) {
+				OCmsg.WAIT_BEFORE_REEXECUTE_COMMANDa.send(pc, delay + "");
+				return false;	
+			}
+			
+			OlympaCreatifMain.getInstance().getTask().runTaskLater(() -> timerCommands.get(this).remove(pc.getId()), 20 * delay);
+			timerCommands.get(this).add(pc.getId());
+			return true;
+		}
+	}
 }
+
+
+
+

@@ -47,9 +47,6 @@ public class SchematicCreator {
 	    if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 	    	OCmsg.WE_DISABLED.send(p);
 	    	return;
-	    }else if (exportingPlotsCache.contains(plot.getId())) {
-	    	OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(p, plot);
-	    	return;	
 	    }
 
 		OCmsg.WE_START_GENERATING_PLOT_SCHEM.send(p, plot);
@@ -103,9 +100,6 @@ public class SchematicCreator {
 	    if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 	    	OCmsg.WE_DISABLED.send(p);
 	    	return;
-	    }else if (restoringPlotCache.contains(plot.getId())) {
-	    	OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(p, plot);
-	    	return;	
 	    }
 
 		OCmsg.WE_START_RESTORING_PLOT.send(p, plot);
@@ -133,7 +127,7 @@ public class SchematicCreator {
 			        
 			        Operations.complete(operation);
 			    }
-			    
+			    plot.getCbData().reloadAllCommandBlocks(true);
 				OCmsg.WE_COMPLETE_RESTORING_PLOT.send(p, plot);
 			    
 			} catch (IOException | SQLException e) {

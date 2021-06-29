@@ -70,11 +70,6 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
 	@Override
 	public boolean resetPlot(OlympaPlayerCreatif requester, final Plot plot) {
-		if (resetingPlots.containsKey(plot.getId()) && !OcPermissions.STAFF_RESET_PLOT.hasPermission(requester)) {
-			OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(requester, "/oco reset");
-			return false;
-		}
-
 		resetingPlots.put(plot.getId(), 0);
 		plugin.getTask().runTaskAsynchronously(() -> {
 
