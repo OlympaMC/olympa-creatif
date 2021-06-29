@@ -16,18 +16,11 @@ import fr.olympa.olympacreatif.plot.PlotId;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 
 
-
-
-
-
-
-
-
 public class MainGui extends IGui {
 	
 	private MainGui(OlympaCreatifMain plugin, OlympaPlayerCreatif player, Plot plot, String inventoryName, OlympaPlayerCreatif staffPlayer) {
 		super(plugin, player, plot, inventoryName, 6, staffPlayer); 
-		Player staffBukkitPlayer = (Player) staffPlayer.getPlayer();
+		Player staffBukkitPlayer = isOpenByStaff ? (Player) staffPlayer.getPlayer() : null;
 		Player playerBukkitPlayer = (Player) p.getPlayer();
 		String clickToOpenMenu = "§9Cliquez pour ouvrir le menu";
 		
