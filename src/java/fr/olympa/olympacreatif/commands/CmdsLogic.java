@@ -371,7 +371,7 @@ public class CmdsLogic {
 		
 		public boolean canExecute(OlympaPlayerCreatif pc) {
 			if (timerCommands.get(this).contains(pc.getId())) {
-				OCmsg.WAIT_BEFORE_REEXECUTE_COMMANDa.send(pc, delay + "");
+				OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(pc, delay + "");
 				return false;	
 			}
 			
