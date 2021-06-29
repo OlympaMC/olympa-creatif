@@ -121,6 +121,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			"",
 			"§3Le nombre de commandes par seconde (CPS) exécutables est limité par parcelle",
 			"§3Vous pouvez consulter votre consommation de CPS avec '/oco debug'",
+			"§3La vitesse de tick est réglable avec la commande /oco set_tickspeed <1 à 20>",
 			"",
 			"§7Si vous éditez une zone contenant des commandblocks avec worldedit,",
 			"§7vous devez utiliser /oco reload_commandblocks pour les recharger",

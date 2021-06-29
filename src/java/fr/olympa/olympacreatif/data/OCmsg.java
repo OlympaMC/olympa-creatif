@@ -266,8 +266,8 @@ public class OCmsg {
 			.build();
 
 	private static final Map<String, Supplier<String>> fixedPlaceHolders = ImmutableMap.<String, Supplier<String>>builder()
-			.put("%incomeAsAfk", () -> OCparam.INCOME_AFK.get() + "")
-			.put("%incomeAsNotAfk", () -> OCparam.INCOME_NOT_AFK.get() + "")
+			//.put("%incomeAsAfk", () -> OCparam.INCOME_AFK.get() + "")
+			//.put("%incomeAsNotAfk", () -> OCparam.INCOME_NOT_AFK.get() + "")
 			.put("%serverIndex", () -> OlympaCreatifMain.getInstance() == null || OlympaCreatifMain.getInstance().getDataManager() == null ? "???" : OlympaCreatifMain.getInstance().getDataManager().getServerIndex() + "")
 			.build();
 

@@ -1,29 +1,19 @@
 package fr.olympa.olympacreatif.commandblocks;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.command.CraftBlockCommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand;
 import fr.olympa.olympacreatif.commandblocks.commands.CbCommand.CommandType;
 import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
-import fr.olympa.olympacreatif.plot.Plot;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -34,12 +24,12 @@ public class CbCommandListener implements Listener {
 	private OlympaCreatifMain plugin;
 	
 	//liste des commandblocks ayant exécuté une commande dans les PARAM_CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION derniers ticks
-	Map<Location, Integer> blockedExecutionLocs;	
+	//Map<Location, Integer> blockedExecutionLocs;	
 	
 	public CbCommandListener(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 		
-		blockedExecutionLocs =  new HashMap<Location, Integer>();
+		/*blockedExecutionLocs =  new HashMap<Location, Integer>();
 		
 		new BukkitRunnable() {
 			
@@ -60,7 +50,7 @@ public class CbCommandListener implements Listener {
 						iter.remove();
 				}
 			}
-		}.runTaskTimer(plugin, 10, 1);
+		}.runTaskTimer(plugin, 10, 1);*/
 	}
 	
 	

@@ -30,7 +30,7 @@ public class OCparam<T> {
 	public static final OCparam<Integer> CB_MAX_CMDS_LEFT = new OCparam<Integer>(0);
 	public static final OCparam<Integer> CB_MAX_OBJECTIVES_PER_PLOT = new OCparam<Integer>(0);
 	public static final OCparam<Integer> CB_MAX_TEAMS_PER_PLOT = new OCparam<Integer>(0);
-	public static final OCparam<Integer> CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION = new OCparam<Integer>(10000);
+	//public static final OCparam<Integer> CB_MIN_TICKS_BETWEEN_EACH_CB_EXECUTION = new OCparam<Integer>(10000);
 	
 	public static final OCparam<Integer> MAX_ENTITIES_PER_TYPE_PER_PLOT = new OCparam<Integer>(50);
 	public static final OCparam<Integer> MAX_TOTAL_ENTITIES_PER_PLOT = new OCparam<Integer>(60);
@@ -45,8 +45,8 @@ public class OCparam<T> {
 	//public static final OCparam<List<String>> HOLO_HELP_1_TEXT = new OCparam<List<String>>(new ArrayList<String>(), new TypeToken<List<String>>() {}.getType());
 	//public static final OCparam<List<String>> HOLO_HELP_2_TEXT = new OCparam<List<String>>(new ArrayList<String>(), new TypeToken<List<String>>() {}.getType());
 	
-	public static final OCparam<Integer> INCOME_NOT_AFK = new OCparam<Integer>(0); 
-	public static final OCparam<Integer> INCOME_AFK = new OCparam<Integer>(0); 
+	//public static final OCparam<Integer> INCOME_NOT_AFK = new OCparam<Integer>(0); 
+	//public static final OCparam<Integer> INCOME_AFK = new OCparam<Integer>(0); 
 	
 	public static final OCparam<Integer> PLOT_SIZE = new OCparam<Integer>(0);
 
