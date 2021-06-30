@@ -2,7 +2,6 @@ package fr.olympa.olympacreatif.plot;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,43 +15,42 @@ import com.google.gson.reflect.TypeToken;
 import fr.olympa.olympacreatif.data.Position;
 
 public class PlotParamType<T extends Object> implements Cloneable {
-	public static PlotParamType<Boolean> FORCE_SPAWN_LOC = new PlotParamType<Boolean>("FORCE_SPAWN_LOC", false);
-	public static PlotParamType<Boolean> CLEAR_INCOMING_PLAYERS = new PlotParamType<Boolean>("CLEAR_INCOMING_PLAYERS", false);
-	public static PlotParamType<Boolean> ALLOW_FLY_INCOMING_PLAYERS = new PlotParamType<Boolean>("ALLOW_FLY_INCOMING_PLAYERS", true);
-	public static PlotParamType<Boolean> ALLOW_SPLASH_POTIONS = new PlotParamType<Boolean>("ALLOW_SPLASH_POTIONS", true);
-	public static PlotParamType<Boolean> ALLOW_PRINT_TNT = new PlotParamType<Boolean>("ALLOW_PRINT_TNT", false);
-	public static PlotParamType<Boolean> ALLOW_PVP = new PlotParamType<Boolean>("ALLOW_PVP", false);
-	public static PlotParamType<Boolean> ALLOW_PVE = new PlotParamType<Boolean>("ALLOW_PVE", false);
-	public static PlotParamType<Boolean> ALLOW_ENVIRONMENT_DAMAGE = new PlotParamType<Boolean>("ALLOW_ENVIRONMENT_DAMAGE", false);
-	public static PlotParamType<Boolean> ALLOW_DROP_ITEMS = new PlotParamType<Boolean>("ALLOW_DROP_ITEMS", false);
-	public static PlotParamType<Boolean> ALLOW_LAUNCH_PROJECTILES = new PlotParamType<Boolean>("ALLOW_LAUNCH_PROJECTILES", true);
-	public static PlotParamType<Boolean> KEEP_MAX_FOOD_LEVEL = new PlotParamType<Boolean>("KEEP_MAX_FOOD_LEVEL", true);
-	public static PlotParamType<Boolean> KEEP_INVENTORY_ON_DEATH = new PlotParamType<Boolean>("KEEP_INVENTORY_ON_DEATH", true);
-	public static PlotParamType<Boolean> ALLOW_VISITORS = new PlotParamType<Boolean>("ALLOW_VISITORS", true);
-	
-	public static PlotParamType<Position> SPAWN_LOC = new PlotParamType<Position>("SPAWN_LOC", new Position());
-	
-	public static PlotParamType<Integer> PLOT_TIME = new PlotParamType<Integer>("PLOT_TIME", 6000);
+	public static PlotParamType<Boolean> FORCE_SPAWN_LOC = new PlotParamType<>("FORCE_SPAWN_LOC", false);
+	public static PlotParamType<Boolean> CLEAR_INCOMING_PLAYERS = new PlotParamType<>("CLEAR_INCOMING_PLAYERS", false);
+	public static PlotParamType<Boolean> ALLOW_FLY_INCOMING_PLAYERS = new PlotParamType<>("ALLOW_FLY_INCOMING_PLAYERS", true);
+	public static PlotParamType<Boolean> ALLOW_SPLASH_POTIONS = new PlotParamType<>("ALLOW_SPLASH_POTIONS", true);
+	public static PlotParamType<Boolean> ALLOW_PRINT_TNT = new PlotParamType<>("ALLOW_PRINT_TNT", false);
+	public static PlotParamType<Boolean> ALLOW_PVP = new PlotParamType<>("ALLOW_PVP", false);
+	public static PlotParamType<Boolean> ALLOW_PVE = new PlotParamType<>("ALLOW_PVE", false);
+	public static PlotParamType<Boolean> ALLOW_ENVIRONMENT_DAMAGE = new PlotParamType<>("ALLOW_ENVIRONMENT_DAMAGE", false);
+	public static PlotParamType<Boolean> ALLOW_DROP_ITEMS = new PlotParamType<>("ALLOW_DROP_ITEMS", false);
+	public static PlotParamType<Boolean> ALLOW_LAUNCH_PROJECTILES = new PlotParamType<>("ALLOW_LAUNCH_PROJECTILES", true);
+	public static PlotParamType<Boolean> KEEP_MAX_FOOD_LEVEL = new PlotParamType<>("KEEP_MAX_FOOD_LEVEL", true);
+	public static PlotParamType<Boolean> KEEP_INVENTORY_ON_DEATH = new PlotParamType<>("KEEP_INVENTORY_ON_DEATH", true);
+	public static PlotParamType<Boolean> ALLOW_VISITORS = new PlotParamType<>("ALLOW_VISITORS", true);
 
-	public static PlotParamType<String> SONG = new PlotParamType<String>("SONG", "");
-	
+	public static PlotParamType<Position> SPAWN_LOC = new PlotParamType<>("SPAWN_LOC", new Position());
+
+	public static PlotParamType<Integer> PLOT_TIME = new PlotParamType<>("PLOT_TIME", 6000);
+
+	public static PlotParamType<String> SONG = new PlotParamType<>("SONG", "");
+
 	//niveaux de stoplag : 0 aucun; 1 activé; 2 activé et bloqué jusqu'à vérif par un staff
-	public static PlotParamType<Integer> STOPLAG_STATUS = new PlotParamType<Integer>("STOPLAG_STATUS", 0);
-	
-	public static PlotParamType<WeatherType> PLOT_WEATHER = new PlotParamType<WeatherType>("PLOT_WEATHER", WeatherType.CLEAR);
-	public static PlotParamType<GameMode> GAMEMODE_INCOMING_PLAYERS = new PlotParamType<GameMode>("GAMEMODE_INCOMING_PLAYERS", GameMode.CREATIVE);
-	
-	public static PlotParamType<List<Material>> LIST_ALLOWED_INTERRACTION = new PlotParamType<List<Material>>("LIST_ALLOWED_INTERRACTION", new ArrayList<Material>(), new TypeToken<ArrayList<Material>>(){}.getType());
-	public static PlotParamType<List<Long>> BANNED_PLAYERS = new PlotParamType<List<Long>>("BANNED_PLAYERS", new ArrayList<Long>(), new TypeToken<ArrayList<Long>>(){}.getType());
+	public static PlotParamType<Integer> STOPLAG_STATUS = new PlotParamType<>("STOPLAG_STATUS", 0);
 
-	public static PlotParamType<Boolean> RESET_VISITOR_FLY_SPEED = new PlotParamType<Boolean>("RESET_VISITOR_FLY_SPEED", false);
+	public static PlotParamType<WeatherType> PLOT_WEATHER = new PlotParamType<>("PLOT_WEATHER", WeatherType.CLEAR);
+	public static PlotParamType<GameMode> GAMEMODE_INCOMING_PLAYERS = new PlotParamType<>("GAMEMODE_INCOMING_PLAYERS", GameMode.CREATIVE);
 
-	public static PlotParamType<Integer> TICK_SPEED = new PlotParamType<Integer>("TICK_SPEED", 4);
+	public static PlotParamType<List<Material>> LIST_ALLOWED_INTERRACTION = new PlotParamType<>("LIST_ALLOWED_INTERRACTION", new ArrayList<Material>(), new TypeToken<ArrayList<Material>>() {}.getType());
+	public static PlotParamType<List<Long>> BANNED_PLAYERS = new PlotParamType<>("BANNED_PLAYERS", new ArrayList<Long>(), new TypeToken<ArrayList<Long>>() {}.getType());
 
-	public static PlotParamType<Map<Integer, HologramData>> HOLOS_DATAS = new PlotParamType<Map<Integer,HologramData>>("HOLOS_DATAS", new HashMap<Integer, HologramData>(), new TypeToken<HashMap<Integer, HologramData>>(){}.getType());
-	
-	
-	private static ArrayList<Material> blocksWithInteractionsList = (ArrayList<Material>) Arrays.asList(new Material[] {
+	public static PlotParamType<Boolean> RESET_VISITOR_FLY_SPEED = new PlotParamType<>("RESET_VISITOR_FLY_SPEED", false);
+
+	public static PlotParamType<Integer> TICK_SPEED = new PlotParamType<>("TICK_SPEED", 4);
+
+	public static PlotParamType<Map<Integer, HologramData>> HOLOS_DATAS = new PlotParamType<>("HOLOS_DATAS", new HashMap<Integer, HologramData>(), new TypeToken<HashMap<Integer, HologramData>>() {}.getType());
+
+	private static List<Material> blocksWithInteractionsList = List.of(
 			Material.LEVER,
 
 			Material.OAK_FENCE_GATE,
@@ -104,16 +102,15 @@ public class PlotParamType<T extends Object> implements Cloneable {
 			Material.DISPENSER,
 			Material.DROPPER,
 			Material.HOPPER,
-			
+
 			Material.BREWING_STAND,
 			Material.FURNACE,
 			Material.ENCHANTING_TABLE,
 			Material.ANVIL,
 			Material.CRAFTING_TABLE,
 			Material.BELL,
-			Material.LECTERN,
-	});
-	
+			Material.LECTERN);
+
 	private String id;
 	private T defaultValue;
 	private Type type;
@@ -121,41 +118,41 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	private PlotParamType(String id, T defaultValue) {
 		this(id, defaultValue, defaultValue.getClass());
 	}
-	
+
 	private PlotParamType(String id, T defaultValue, Type type) {
 		this.id = id;
 		this.defaultValue = defaultValue;
 		this.type = type;
 	}
-	
+
 	public String getId() {
 		return id;
 	}
-	
+
 	public T getDefaultValue() {
 		return defaultValue;
 	}
-	
+
 	public Type getType() {
 		return type;
 	}
-	
+
 	public synchronized void setValue(Plot plot, T val) {
 		plot.getParameters().setParameter(this, val);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof PlotParamType && ((PlotParamType<?>)obj).getId().equals(id);
+		return obj instanceof PlotParamType && ((PlotParamType<?>) obj).getId().equals(id);
 	}
-	
+
 	public static List<Material> getAllPossibleIntaractibleBlocks() {
 		return blocksWithInteractionsList;
 		/*if (blocksWithInteractionsList.size() > 0)
 			return blocksWithInteractionsList;
-		
-		blocksWithInteractionsList.add(Material.LEVER);
 
+		blocksWithInteractionsList.add(Material.LEVER);
+		
 		blocksWithInteractionsList.add(Material.OAK_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.ACACIA_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.BIRCH_FENCE_GATE);
@@ -164,9 +161,9 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.SPRUCE_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.WARPED_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.CRIMSON_FENCE_GATE);
-
+		
 		blocksWithInteractionsList.add(Material.REPEATER);
-
+		
 		blocksWithInteractionsList.add(Material.OAK_DOOR);
 		blocksWithInteractionsList.add(Material.ACACIA_DOOR);
 		blocksWithInteractionsList.add(Material.BIRCH_DOOR);
@@ -175,9 +172,9 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.SPRUCE_DOOR);
 		blocksWithInteractionsList.add(Material.WARPED_DOOR);
 		blocksWithInteractionsList.add(Material.CRIMSON_DOOR);
-
+		
 		blocksWithInteractionsList.add(Material.COMPARATOR);
-
+		
 		blocksWithInteractionsList.add(Material.OAK_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.ACACIA_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.BIRCH_TRAPDOOR);
@@ -186,7 +183,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.SPRUCE_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.WARPED_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.CRIMSON_TRAPDOOR);
-
+		
 		blocksWithInteractionsList.add(Material.STONE_BUTTON);
 		blocksWithInteractionsList.add(Material.POLISHED_BLACKSTONE_BUTTON);
 		blocksWithInteractionsList.add(Material.OAK_BUTTON);
@@ -197,7 +194,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.SPRUCE_BUTTON);
 		blocksWithInteractionsList.add(Material.WARPED_BUTTON);
 		blocksWithInteractionsList.add(Material.CRIMSON_BUTTON);
-
+		
 		blocksWithInteractionsList.add(Material.CHEST);
 		blocksWithInteractionsList.add(Material.TRAPPED_CHEST);
 		blocksWithInteractionsList.add(Material.ENDER_CHEST);
@@ -205,7 +202,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.DISPENSER);
 		blocksWithInteractionsList.add(Material.DROPPER);
 		blocksWithInteractionsList.add(Material.HOPPER);
-		
+
 		blocksWithInteractionsList.add(Material.BREWING_STAND);
 		blocksWithInteractionsList.add(Material.FURNACE);
 		blocksWithInteractionsList.add(Material.ENCHANTING_TABLE);
@@ -213,16 +210,16 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.CRAFTING_TABLE);
 		blocksWithInteractionsList.add(Material.BELL);
 		blocksWithInteractionsList.add(Material.LECTERN);
-		
+
 		//blocksWithInteractionsList.add(Material.CARTOGRAPHY_TABLE);
 		//blocksWithInteractionsList.add(Material.SMOKER);
 		//blocksWithInteractionsList.add(Material.BLAST_FURNACE);
 		//
-		
-		
+
+
 		return blocksWithInteractionsList;*/
 	}
-	
+
 	/**
 	 * Class used to save holos datas in database
 	 *
@@ -231,21 +228,24 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		private int id;
 		private List<String> lines;
 		private Position bottom;
-		
+
 		public HologramData(int id, List<String> lines, Position bottom) {
 			this.id = id;
 			this.lines = lines;
 			this.bottom = bottom;
 		}
+
 		public int getId() {
 			return id;
 		}
+
 		/*public void setId(int id) {
 			this.id = id;
 		}*/
 		public List<String> getLines() {
 			return lines;
 		}
+
 		public Position getBottom() {
 			return bottom;
 		}
