@@ -436,6 +436,8 @@ public class Plot {
 			plugin.getWEManager().clearClipboard(this, p);
 		
 		plugin.getPerksManager().getArmorStandManager().closeFor(p);
+		
+		
 	}
 	
 	/*private boolean isHanging(Entity ent) {

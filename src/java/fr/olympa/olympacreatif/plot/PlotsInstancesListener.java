@@ -71,6 +71,7 @@ import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 import fr.olympa.olympacreatif.utils.OtherUtils;
+import fr.olympa.olympacreatif.world.WorldManager;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -655,6 +656,11 @@ public class PlotsInstancesListener implements Listener{
 		
 		if (plotFrom != plotTo && !((OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getPlayer().getUniqueId())).setPlot(plotTo))
 			e.setCancelled(true);
+		
+		//empêche que le joueur se retrouve bloqué dans la route
+		if (plotFrom != null && e.getTo().getBlockY() < WorldManager.worldLevel + 8)
+			e.setTo(e.getTo().clone().add(0, WorldManager.worldLevel + 8 - e.getTo().getY(), 0));
+			
 		
 		/*
 		if (plotTo != null) {
