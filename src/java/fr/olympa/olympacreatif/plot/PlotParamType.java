@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.plot;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,67 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	public static PlotParamType<Map<Integer, HologramData>> HOLOS_DATAS = new PlotParamType<Map<Integer,HologramData>>("HOLOS_DATAS", new HashMap<Integer, HologramData>(), new TypeToken<HashMap<Integer, HologramData>>(){}.getType());
 	
 	
-	private static ArrayList<Material> blocksWithInteractionsList = new ArrayList<Material>();
+	private static ArrayList<Material> blocksWithInteractionsList = (ArrayList<Material>) Arrays.asList(new Material[] {
+			Material.LEVER,
+
+			Material.OAK_FENCE_GATE,
+			Material.ACACIA_FENCE_GATE,
+			Material.BIRCH_FENCE_GATE,
+			Material.DARK_OAK_FENCE_GATE,
+			Material.JUNGLE_FENCE_GATE,
+			Material.SPRUCE_FENCE_GATE,
+			Material.WARPED_FENCE_GATE,
+			Material.CRIMSON_FENCE_GATE,
+
+			Material.REPEATER,
+
+			Material.OAK_DOOR,
+			Material.ACACIA_DOOR,
+			Material.BIRCH_DOOR,
+			Material.DARK_OAK_DOOR,
+			Material.JUNGLE_DOOR,
+			Material.SPRUCE_DOOR,
+			Material.WARPED_DOOR,
+			Material.CRIMSON_DOOR,
+
+			Material.COMPARATOR,
+
+			Material.OAK_TRAPDOOR,
+			Material.ACACIA_TRAPDOOR,
+			Material.BIRCH_TRAPDOOR,
+			Material.DARK_OAK_TRAPDOOR,
+			Material.JUNGLE_TRAPDOOR,
+			Material.SPRUCE_TRAPDOOR,
+			Material.WARPED_TRAPDOOR,
+			Material.CRIMSON_TRAPDOOR,
+
+			Material.STONE_BUTTON,
+			Material.POLISHED_BLACKSTONE_BUTTON,
+			Material.OAK_BUTTON,
+			Material.ACACIA_BUTTON,
+			Material.BIRCH_BUTTON,
+			Material.DARK_OAK_BUTTON,
+			Material.JUNGLE_BUTTON,
+			Material.SPRUCE_BUTTON,
+			Material.WARPED_BUTTON,
+			Material.CRIMSON_BUTTON,
+
+			Material.CHEST,
+			Material.TRAPPED_CHEST,
+			Material.ENDER_CHEST,
+			Material.BARREL,
+			Material.DISPENSER,
+			Material.DROPPER,
+			Material.HOPPER,
+			
+			Material.BREWING_STAND,
+			Material.FURNACE,
+			Material.ENCHANTING_TABLE,
+			Material.ANVIL,
+			Material.CRAFTING_TABLE,
+			Material.BELL,
+			Material.LECTERN,
+	});
 	
 	private String id;
 	private T defaultValue;
@@ -88,9 +149,12 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		return obj instanceof PlotParamType && ((PlotParamType<?>)obj).getId().equals(id);
 	}
 	
-	public static List<Material> getAllPossibleIntaractibleBlocks(){
-		if (blocksWithInteractionsList.size() > 0)
+	public static List<Material> getAllPossibleIntaractibleBlocks() {
+		return blocksWithInteractionsList;
+		/*if (blocksWithInteractionsList.size() > 0)
 			return blocksWithInteractionsList;
+		
+		blocksWithInteractionsList.add(Material.LEVER);
 
 		blocksWithInteractionsList.add(Material.OAK_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.ACACIA_FENCE_GATE);
@@ -101,6 +165,8 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.WARPED_FENCE_GATE);
 		blocksWithInteractionsList.add(Material.CRIMSON_FENCE_GATE);
 
+		blocksWithInteractionsList.add(Material.REPEATER);
+
 		blocksWithInteractionsList.add(Material.OAK_DOOR);
 		blocksWithInteractionsList.add(Material.ACACIA_DOOR);
 		blocksWithInteractionsList.add(Material.BIRCH_DOOR);
@@ -109,6 +175,8 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.SPRUCE_DOOR);
 		blocksWithInteractionsList.add(Material.WARPED_DOOR);
 		blocksWithInteractionsList.add(Material.CRIMSON_DOOR);
+
+		blocksWithInteractionsList.add(Material.COMPARATOR);
 
 		blocksWithInteractionsList.add(Material.OAK_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.ACACIA_TRAPDOOR);
@@ -119,8 +187,9 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.WARPED_TRAPDOOR);
 		blocksWithInteractionsList.add(Material.CRIMSON_TRAPDOOR);
 
-		blocksWithInteractionsList.add(Material.OAK_BUTTON);
 		blocksWithInteractionsList.add(Material.STONE_BUTTON);
+		blocksWithInteractionsList.add(Material.POLISHED_BLACKSTONE_BUTTON);
+		blocksWithInteractionsList.add(Material.OAK_BUTTON);
 		blocksWithInteractionsList.add(Material.ACACIA_BUTTON);
 		blocksWithInteractionsList.add(Material.BIRCH_BUTTON);
 		blocksWithInteractionsList.add(Material.DARK_OAK_BUTTON);
@@ -128,10 +197,6 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.SPRUCE_BUTTON);
 		blocksWithInteractionsList.add(Material.WARPED_BUTTON);
 		blocksWithInteractionsList.add(Material.CRIMSON_BUTTON);
-
-		blocksWithInteractionsList.add(Material.LEVER);
-		blocksWithInteractionsList.add(Material.REPEATER);
-		blocksWithInteractionsList.add(Material.COMPARATOR);
 
 		blocksWithInteractionsList.add(Material.CHEST);
 		blocksWithInteractionsList.add(Material.TRAPPED_CHEST);
@@ -141,36 +206,22 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		blocksWithInteractionsList.add(Material.DROPPER);
 		blocksWithInteractionsList.add(Material.HOPPER);
 		
-		blocksWithInteractionsList.add(Material.FURNACE);
 		blocksWithInteractionsList.add(Material.BREWING_STAND);
+		blocksWithInteractionsList.add(Material.FURNACE);
 		blocksWithInteractionsList.add(Material.ENCHANTING_TABLE);
 		blocksWithInteractionsList.add(Material.ANVIL);
 		blocksWithInteractionsList.add(Material.CRAFTING_TABLE);
-
-		blocksWithInteractionsList.add(Material.CARTOGRAPHY_TABLE);
-		blocksWithInteractionsList.add(Material.SMOKER);
-		blocksWithInteractionsList.add(Material.BLAST_FURNACE);
-		blocksWithInteractionsList.add(Material.LECTERN);
 		blocksWithInteractionsList.add(Material.BELL);
-		//blocksWithInteractionsList.add(Material.LOOM);
-		//blocksWithInteractionsList.add(Material.COMPOSTER);
+		blocksWithInteractionsList.add(Material.LECTERN);
 		
-		//blocksWithInteractionsList.add(Material.STONECUTTER);
+		//blocksWithInteractionsList.add(Material.CARTOGRAPHY_TABLE);
+		//blocksWithInteractionsList.add(Material.SMOKER);
+		//blocksWithInteractionsList.add(Material.BLAST_FURNACE);
+		//
 		
 		
-		return blocksWithInteractionsList;
+		return blocksWithInteractionsList;*/
 	}
-
-	/*public static List<Biome> getAllPossibleBiomes() {
-		List<Biome> list = new ArrayList<Biome>();
-
-		list.add(Biome.PLAINS);
-		list.add(Biome.NETHER);
-		list.add(Biome.THE_END);
-		list.add(Biome.MUSHROOM_FIELDS);
-		
-		return list;
-	}*/
 	
 	/**
 	 * Class used to save holos datas in database
@@ -198,11 +249,5 @@ public class PlotParamType<T extends Object> implements Cloneable {
 		public Position getBottom() {
 			return bottom;
 		}
-		/*public void setLines(List<String> lines) {
-			this.lines = lines;
-		}*/
-		
-		
-		
 	}
 }
