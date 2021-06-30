@@ -26,6 +26,7 @@ import fr.olympa.olympacreatif.perks.KitsManager.KitType;
 import fr.olympa.olympacreatif.perks.UpgradesManager.UpgradeType;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotMembers.MemberInformations;
+import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 
 public class OcaCmd extends AbstractCmd {
 
@@ -371,13 +372,18 @@ public class OcaCmd extends AbstractCmd {
 			sendIncorrectSyntax();
 	}
 
-	@Cmd(syntax = "Recharger les messages depuis la bdd")
-	public void reload_messages(CommandContext cmd) {
-		if (!OcPermissions.STAFF_RELOAD_MESSAGES.hasPermissionWithMsg(getOlympaPlayer()))
+	@Cmd(syntax = "Recharger les messages depuis la bdd", min = 1, args = "messages|nbttags")
+	public void reload(CommandContext cmd) {
+		if (!OcPermissions.STAFF_RELOAD.hasPermissionWithMsg(getOlympaPlayer()))
 			return;
 		
-		plugin.getDataManager().reloadMessages();
-		sendMessage(Prefix.DEFAULT_GOOD, "Les messages ont été rechargés. §7Veuillez ne pas abuser de cette commande, elle peut faire lag le serveur.");
+		if (cmd.getArgument(0).equals("messages")) 
+			plugin.getDataManager().reloadMessages();	
+		else if (cmd.getArgument(0).equals("nbttags"))
+			NBTcontrollerUtil.reloadConfig();
+			
+		
+		sendMessage(Prefix.DEFAULT_GOOD, "§aLa config des §2" + cmd.getArgument(0) + "§a. §7Veuillez ne pas abuser de cette commande, elle peut faire lag le serveur.");
 	}
 	
 	

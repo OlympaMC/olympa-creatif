@@ -35,7 +35,7 @@ public class OcPermissions {
 	public static final OlympaSpigotPermission STAFF_BUILD_ROADS = new OlympaSpigotPermission(OlympaGroup.DEV);
 
 	public static final OlympaSpigotPermission STAFF_SET_PLOT_OWNER = new OlympaSpigotPermission(OlympaGroup.MODP);
-	public static final OlympaSpigotPermission STAFF_RELOAD_MESSAGES = new OlympaSpigotPermission(OlympaGroup.DEVP);
+	public static final OlympaSpigotPermission STAFF_RELOAD = new OlympaSpigotPermission(OlympaGroup.DEVP);
 	
 	/*nb de plots propriétaire :
 	 * Joueur : 1

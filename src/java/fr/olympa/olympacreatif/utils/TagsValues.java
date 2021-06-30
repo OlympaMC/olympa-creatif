@@ -167,7 +167,7 @@ public class TagsValues {
 		}
 		@Override
 		public String toString() {
-			return "--------- Params "+ tagName + " ---------\nNbtClass:" + nbtClass.getSimpleName() + ", min:" + min + ", max:" + max + ", ListType:" + listType + "\n---------";
+			return "Params "+ tagName + " : class = " + nbtClass.getSimpleName() + ", min = " + min + ", max = " + max + ", list :" + listType;
 		}
 	}
 }

@@ -26,7 +26,7 @@ public abstract class NBTcontrollerUtil {
 	private final static int recurIndexMax = 20;
 	private final static int maxListSize = 10;
 	
-	private final static TagsValues allowedTags = new TagsValues();
+	private static TagsValues allowedTags = new TagsValues();
 	
 	//set default minecraft JsonReader lenient
 	/*static {
@@ -46,6 +46,10 @@ public abstract class NBTcontrollerUtil {
 			e.printStackTrace();
 		}
 	}*/
+	
+	public static void reloadConfig() {
+		allowedTags = new TagsValues();
+	}
 
 	public static NBTTagCompound getValidTags(String string, Player requester) {
 		return getValidTags(new OcMojangsonParser(string.replace("minecraft:", "")).parse(requester), requester);
