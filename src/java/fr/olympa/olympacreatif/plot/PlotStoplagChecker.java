@@ -85,7 +85,7 @@ public class PlotStoplagChecker {
 	}
 	
 	public double getScore() {
-		return detections.entrySet().stream().mapToDouble(e -> ((double) e.getValue() / (double) e.getKey().max) / StopLagDetect.values().length).sum() * 100;
+		return detections.entrySet().stream().mapToDouble(e -> ((double) e.getValue() / (double) e.getKey().max) / (StopLagDetect.values().length - 1)).sum() * 100;
 	}
 	
 	public double getScore(StopLagDetect lag) {
@@ -128,13 +128,13 @@ public class PlotStoplagChecker {
 		}
 		
 		public static void reloadConfig() {
-			YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
 			OlympaCreatifMain.getInstance().reloadConfig();
+			YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
 			
 			for (StopLagDetect lag : StopLagDetect.values()) {
-				if (config.getInt("stoplag_limit." + lag.toString()) == 0) {
+				if (!config.contains("stoplag_limit." + lag.toString()))
 					config.set("stoplag_limit." + lag.toString(), lag.defaultMax);
-				}
+				
 				lag.max = config.getInt("stoplag_limit." + lag.toString());
 			}
 			
