@@ -120,6 +120,9 @@ public class PermissionsManager implements Listener {
 	public void setWePerms(OlympaPlayerCreatif p) {
 		PermissionAttachment att = weAttachements.get(p.getUniqueId());
 		
+		if (att == null)
+			return;
+		
 		wePerms.forEach(perm -> {
 			if (OcPermissions.USE_WORLD_EDIT.hasPermission(p) && ComponentCreatif.WORLDEDIT.isActivated())
 				att.setPermission(perm, true); 
@@ -132,6 +135,9 @@ public class PermissionsManager implements Listener {
 	
 	public void setWePermsAdmin(OlympaPlayerCreatif p) {
 		PermissionAttachment att = weAttachements.get(p.getUniqueId());
+		
+		if (att == null)
+			return;
 		
 		wePermsAdmin.forEach(perm -> {
 			if (p.hasStaffPerm(StaffPerm.WORLDEDIT))
@@ -150,6 +156,9 @@ public class PermissionsManager implements Listener {
 	
 	public void setCbPerms(OlympaPlayerCreatif p) {
 		PermissionAttachment att = cbAttachements.get(p.getUniqueId());
+		
+		if (att == null)
+			return;
 		
 		cbPerms.forEach(perm -> {
 			if (p.hasKit(KitType.COMMANDBLOCK) && ComponentCreatif.COMMANDBLOCKS.isActivated()) 

@@ -60,7 +60,7 @@ public class PlotStoplagChecker {
 	}
 	
 	private void fireStopLag(StopLagDetect type) {
-		detections.put(type, 0);
+		//detections.put(type, 0);
 		
 		if (forcedStoplagResetTick < Bukkit.getCurrentTick())
 			stoplagCount = 1;

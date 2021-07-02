@@ -29,20 +29,23 @@ public class StoplagCommand extends ComplexCommand {
 		allowConsole = false;
 	}
 
-	@Cmd(player = true, description = "Afficher l'état de stoplag de la parcelle", args = "INTEGER")
+	@Cmd(description = "Afficher l'état de stoplag de la parcelle", args = "INTEGER")
 	public void info(CommandContext cmd) {
 		OlympaPlayerCreatif pc = getOlympaPlayer();
-		Plot plot = cmd.getArgumentsLength() == 0 ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, cmd.getArgument(0)));
+		Plot plot = cmd.getArgumentsLength() == 0 ? 
+				pc != null ? pc.getCurrentPlot() : 
+					null : 
+				plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, cmd.getArgument(0)));
 		
 		if (plot == null) {
 			OCmsg.NULL_CURRENT_PLOT.send(pc);
 			return;
 		}
-		
-		sendMessage(Prefix.DEFAULT_GOOD, "§7Etat du stoplag de la parcelle " + plot + " : " + (plot.hasStoplag() ? "§cactif" : "§ainactif") + 
-				"§7(entités : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.ENTITY)) + ", " + 
+
+		getSender().sendMessage(Prefix.DEFAULT_GOOD.toString() + "§7Etat du stoplag de la parcelle " + plot + " : " + (plot.hasStoplag() ? "§cactif" : "§ainactif") + 
+				" §7(entités : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.ENTITY)) + ", " + 
 				"redstone : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.WIRE)) + ", " + 
-				"lampes de redstone : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.LAMP)) + ", " + 
+				"lampes : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.LAMP)) + ", " + 
 				"pistons : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.PISTON)) + ", " + 
 				"liquides : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.LIQUID)) + ")");
 	}
