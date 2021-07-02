@@ -1,5 +1,8 @@
 package fr.olympa.olympacreatif.commands;
 
+import java.text.DecimalFormat;
+import java.util.function.Function;
+
 import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
 import fr.olympa.api.spigot.command.ComplexCommand;
@@ -17,6 +20,7 @@ import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 
 public class StoplagCommand extends ComplexCommand {
 
+	private Function<Double, String> stoplagFormatter = d -> ((int) (d * 100)) + "%";
 	private OlympaCreatifMain plugin;
 
 	public StoplagCommand(OlympaCreatifMain plugin) {
@@ -25,16 +29,22 @@ public class StoplagCommand extends ComplexCommand {
 		allowConsole = false;
 	}
 
-	@Cmd(player = true, description = "Afficher l'état de stoplag de la parcelle")
+	@Cmd(player = true, description = "Afficher l'état de stoplag de la parcelle", args = "INTEGER")
 	public void info(CommandContext cmd) {
 		OlympaPlayerCreatif pc = getOlympaPlayer();
+		Plot plot = cmd.getArgumentsLength() == 0 ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, cmd.getArgument(0)));
 		
-		if (pc.getCurrentPlot() == null) {
+		if (plot == null) {
 			OCmsg.NULL_CURRENT_PLOT.send(pc);
 			return;
 		}
 		
-		sendMessage(Prefix.DEFAULT_GOOD, "§7Etat du stoplag de la parcelle " + pc.getCurrentPlot() + " : " + (pc.getCurrentPlot().hasStoplag() ? "§cactif" : "§ainactif") + "§7 (plus d'informations avec /oco debug)");
+		sendMessage(Prefix.DEFAULT_GOOD, "§7Etat du stoplag de la parcelle " + plot + " : " + (plot.hasStoplag() ? "§cactif" : "§ainactif") + 
+				"§7(entités : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.ENTITY)) + ", " + 
+				"redstone : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.WIRE)) + ", " + 
+				"lampes de redstone : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.LAMP)) + ", " + 
+				"pistons : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.PISTON)) + ", " + 
+				"liquides : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.LIQUID)) + ")");
 	}
 
 	@Cmd(player = true, args = "INTEGER", description = "Activer le stoplag sur parcelle")

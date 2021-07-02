@@ -20,11 +20,11 @@ public class PlotStoplagChecker {
 	public static final int forcedStoplagPeriodDuration = 200;
 	public static final int forcedStoplagStoplagCount = 3;
 	
-	static {
+	/*static {
 		OlympaCreatifMain.getInstance().getTask().scheduleSyncRepeatingTask(
 				() -> OlympaCreatifMain.getInstance().getPlotsManager().getPlots().forEach(plot -> plot.getStoplagChecker().resetHistory()), 
 				5, 5, TimeUnit.SECONDS);
-	}
+	}*/
 	
 	private OlympaCreatifMain plugin;
 	private Plot plot;
@@ -41,10 +41,10 @@ public class PlotStoplagChecker {
 			detections.put(sld, 0);
 	}
 	
-	private void resetHistory() {
+	/*private void resetHistory() {
 		for (StopLagDetect sld : StopLagDetect.values())
 			detections.put(sld, 0);
-	}
+	}*/
 
 	public void addEvent(StopLagDetect type) {
 		if (plot.hasStoplag())
@@ -87,13 +87,17 @@ public class PlotStoplagChecker {
 	public double getScore() {
 		return detections.entrySet().stream().mapToDouble(e -> ((double) e.getValue() / (double) e.getKey().max) / StopLagDetect.values().length).sum() * 100;
 	}
+	
+	public double getScore(StopLagDetect lag) {
+		return (double) detections.get(lag) / lag.getMaxPerPeriod();
+	}
 
-	public enum StopLagDetect {
+	public enum StopLagDetect {//les valeurs sont par seconde
 		PISTON(400, "pistons"),
 		LAMP(250, "lampes de redstone"),
-		LIQUID(1000, "liquides fluides"),
+		LIQUID(750, "liquides fluides"),
 		ENTITY(400, "spawn entités"),
-		WIRE(15000, "systèmes de redstone"),
+		WIRE(4000, "systèmes de redstone"),
 		UNKNOWN(1, "inconnu")
 		;
 		
@@ -106,7 +110,7 @@ public class PlotStoplagChecker {
 			this.defaultMax = maxPerPeriod;
 			
 			YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
-			if (config.getInt("stoplag_limit." + toString()) == 0) {
+			if (!config.contains("stoplag_limit." + toString())) {
 				config.set("stoplag_limit." + toString(), defaultMax);
 				OlympaCreatifMain.getInstance().saveConfig();
 			}
@@ -125,15 +129,16 @@ public class PlotStoplagChecker {
 		
 		public static void reloadConfig() {
 			YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
+			OlympaCreatifMain.getInstance().reloadConfig();
 			
 			for (StopLagDetect lag : StopLagDetect.values()) {
 				if (config.getInt("stoplag_limit." + lag.toString()) == 0) {
 					config.set("stoplag_limit." + lag.toString(), lag.defaultMax);
-					OlympaCreatifMain.getInstance().saveConfig();
 				}
-
 				lag.max = config.getInt("stoplag_limit." + lag.toString());
 			}
+			
+			OlympaCreatifMain.getInstance().saveConfig();
 		}
 	}
 }

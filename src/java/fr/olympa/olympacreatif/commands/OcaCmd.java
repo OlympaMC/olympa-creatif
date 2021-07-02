@@ -384,7 +384,6 @@ public class OcaCmd extends AbstractCmd {
 			NBTcontrollerUtil.reloadConfig();
 		else if (cmd.getArgument(0).equals("stoplag_limits"))
 			StopLagDetect.reloadConfig();
-			
 		
 		sendMessage(Prefix.DEFAULT_GOOD, "§aLa config §2" + cmd.getArgument(0) + "§a. §7Veuillez ne pas abuser de cette commande, elle peut faire lag le serveur.");
 	}
