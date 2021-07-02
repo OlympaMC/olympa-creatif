@@ -77,9 +77,10 @@ public class PlotCbData {
 	private List<CbTeam> teams = new ArrayList<CbTeam>();
 	private Map<String, CbBossBar> bossbars = new HashMap<String, CbBossBar>();
 	
-	private double commandsLeft;
 	private Scoreboard scb;
-	
+
+	private int commandsReloadTask;
+	private double commandsLeft; //tickets cb restants
 	private int addTicketsPerSecond; //commandes par tick ajoutées
 	
 	private boolean hasUnlockedSummonCmd;
@@ -109,6 +110,9 @@ public class PlotCbData {
 		this.hasUnlockedSummonCmd = hasUnlockedSummonCmd;
 		
 		commandsLeft = OCparam.CB_MAX_CMDS_LEFT.get();
+		commandsReloadTask = plugin.getTask().scheduleSyncRepeatingTask(() -> 
+		commandsLeft = commandsLeft + (double) addTicketsPerSecond / 20.0 > OCparam.CB_MAX_CMDS_LEFT.get() ? OCparam.CB_MAX_CMDS_LEFT.get() :
+				commandsLeft + (double) addTicketsPerSecond / 20.0, 1, 1);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -158,6 +162,9 @@ public class PlotCbData {
 					.collect(Collectors.toList()), new Position(holo.getBottom())))));
 		
 		holosIds.keySet().forEach(id -> OlympaCore.getInstance().getHologramsManager().deleteHologram(id));
+		
+		//cancel task régen tickets commandblocks 
+		plugin.getTask().cancelTaskById(commandsReloadTask);
 	}
 
 
@@ -380,9 +387,9 @@ public class PlotCbData {
 		return (int) commandsLeft;
 	}
 	
-	public void addCommandTickets() {
+	/*public void addCommandTickets() {
 		commandsLeft = Math.min(OCparam.CB_MAX_CMDS_LEFT.get(), commandsLeft + addTicketsPerSecond);
-	}
+	}*/
 	
 	public boolean hasEmptyTickets() {
 		return commandsLeft > 1;

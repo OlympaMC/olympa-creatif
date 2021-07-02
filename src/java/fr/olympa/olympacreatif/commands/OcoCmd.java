@@ -40,12 +40,13 @@ public class OcoCmd extends AbstractCmd {
 		
 		String debug = "\n   §6>>> Débug parcelle " + plot.getId() + " :";
 		debug += "\n   §e> Joueurs : §a" + plot.getPlayers().size();
-		debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.get() + " (max " + OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.get() + " de chaque type) §7(détails avec /debugentities)";
+		debug += "\n   §e> Entités : §a" + plot.getEntities().size() + "/" + OCparam.MAX_TOTAL_ENTITIES_PER_PLOT.get() + " (max " + OCparam.MAX_ENTITIES_PER_TYPE_PER_PLOT.get() + "/type) §7(détails avec /debugentities)";
 		debug += "\n   §e> Tile entities : §a" + plot.getTilesCount();
 		debug += "\n   §e> Equipes : §a" + plot.getCbData().getTeams().size() + "/" + OCparam.CB_MAX_TEAMS_PER_PLOT.get();
 		debug += "\n   §e> Objectifs : §a" + plot.getCbData().getObjectives().size() + "/" + OCparam.CB_MAX_OBJECTIVES_PER_PLOT.get();
+		debug += "\n   §e> Stoplag : §a" + (!plot.hasStoplag() ? "§ainactif" : plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS) == 1 ? "§cactif" : "§4forcé §7(contactez un membre du staff)");
 		debug += "\n   §e> Tickets commandblocks : §a" + plot.getCbData().getCommandTicketsLeft() + "/" +
-				OCparam.CB_MAX_CMDS_LEFT.get() + " (+" + plot.getCbData().getCommandsPerSecond() * 20 + "/s)";
+				OCparam.CB_MAX_CMDS_LEFT.get() + " (+" + plot.getCbData().getCommandsPerSecond() + "/s)";
 		
 		sender.sendMessage(debug);
 	}
