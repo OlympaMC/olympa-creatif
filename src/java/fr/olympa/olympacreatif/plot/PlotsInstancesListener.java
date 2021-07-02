@@ -658,8 +658,8 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 		
 		//empêche que le joueur se retrouve bloqué dans la route
-		if (plotFrom != null && e.getTo().getBlockY() < WorldManager.worldLevel + 8)
-			e.setTo(e.getTo().clone().add(0, WorldManager.worldLevel + 8 - e.getTo().getY(), 0));
+		if (plotFrom != null && e.getTo().getBlockY() < WorldManager.worldLevel)
+			e.setTo(e.getTo().clone().add(0, WorldManager.worldLevel + 5 - e.getTo().getY(), 0));
 			
 		
 		/*

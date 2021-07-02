@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.commands;
 import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
 import fr.olympa.api.spigot.command.ComplexCommand;
+import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OcPermissions;
@@ -22,6 +23,18 @@ public class StoplagCommand extends ComplexCommand {
 		super(plugin, "stoplag", "Définir le statut de stoplag de la parcelle", null, new String[0]);
 		this.plugin = plugin;
 		allowConsole = false;
+	}
+
+	@Cmd(player = true, description = "Afficher l'état de stoplag de la parcelle")
+	public void info(CommandContext cmd) {
+		OlympaPlayerCreatif pc = getOlympaPlayer();
+		
+		if (pc.getCurrentPlot() == null) {
+			OCmsg.NULL_CURRENT_PLOT.send(pc);
+			return;
+		}
+		
+		sendMessage(Prefix.DEFAULT_GOOD, "§7Etat du stoplag de la parcelle " + pc.getCurrentPlot() + " : " + (pc.getCurrentPlot().hasStoplag() ? "§cactif" : "§ainactif") + "§7 (plus d'informations avec /oco debug)");
 	}
 
 	@Cmd(player = true, args = "INTEGER", description = "Activer le stoplag sur parcelle")
