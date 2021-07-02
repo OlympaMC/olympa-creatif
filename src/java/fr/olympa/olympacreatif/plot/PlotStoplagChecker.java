@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.checkerframework.checker.index.qual.HasSubsequence;
 
+import fr.olympa.api.spigot.config.CustomConfig;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
@@ -86,7 +88,7 @@ public class PlotStoplagChecker {
 		return detections.entrySet().stream().mapToDouble(e -> ((double) e.getValue() / (double) e.getKey().max) / StopLagDetect.values().length).sum() * 100;
 	}
 
-	public enum StopLagDetect{
+	public enum StopLagDetect {
 		PISTON(400, "pistons"),
 		LAMP(250, "lampes de redstone"),
 		LIQUID(1000, "liquides fluides"),
@@ -95,12 +97,21 @@ public class PlotStoplagChecker {
 		UNKNOWN(1, "inconnu")
 		;
 		
-		int max;
-		String name;
+		private int defaultMax;
+		private int max;
+		private String name;
 		
-		StopLagDetect(int maxPerPeriod, String name){
-			max = maxPerPeriod;
+		StopLagDetect(int maxPerPeriod, String name) {
 			this.name = name;
+			this.defaultMax = maxPerPeriod;
+			
+			YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
+			if (config.getInt("stoplag_limit." + toString()) == 0) {
+				config.set("stoplag_limit." + toString(), defaultMax);
+				OlympaCreatifMain.getInstance().saveConfig();
+			}
+
+			this.max = config.getInt("stoplag_limit." + toString());
 		}
 		
 		public int getMaxPerPeriod() {
@@ -110,6 +121,19 @@ public class PlotStoplagChecker {
 		@Override
 		public String toString() {
 			return name;
+		}
+		
+		public static void reloadConfig() {
+			YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
+			
+			for (StopLagDetect lag : StopLagDetect.values()) {
+				if (config.getInt("stoplag_limit." + lag.toString()) == 0) {
+					config.set("stoplag_limit." + lag.toString(), lag.defaultMax);
+					OlympaCreatifMain.getInstance().saveConfig();
+				}
+
+				lag.max = config.getInt("stoplag_limit." + lag.toString());
+			}
 		}
 	}
 }
