@@ -93,10 +93,10 @@ public class PlotStoplagChecker {
 	}
 
 	public enum StopLagDetect {//les valeurs sont par seconde
-		PISTON(400, "pistons"),
-		LAMP(250, "lampes de redstone"),
-		LIQUID(750, "liquides fluides"),
-		ENTITY(400, "spawn entités"),
+		PISTON(350, "pistons"),
+		LAMP(200, "lampes de redstone"),
+		LIQUID(800, "liquides fluides"),
+		ENTITY(320, "spawn entités"),
 		WIRE(4000, "systèmes de redstone"),
 		UNKNOWN(1, "inconnu")
 		;
