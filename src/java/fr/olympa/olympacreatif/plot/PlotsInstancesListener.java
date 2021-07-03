@@ -79,18 +79,18 @@ import net.minecraft.server.v1_16_R3.PacketPlayOutTileEntityData;
 
 public class PlotsInstancesListener implements Listener{
 
-	private OlympaCreatifMain plugin;
+	private final OlympaCreatifMain plugin;
 	private Plot plot;
 	
 	//private Map<UUID, List<ItemStack>> itemsToKeepOnDeath = new HashMap<UUID, List<ItemStack>>();
 			
 
 	//gère le placement des commandblocks
-	private List<Player> cbPlacementPlayer = new ArrayList<Player>();
-	private List<Location> cbPlacementLocation = new ArrayList<Location>();
-	private List<Material> cbPlacementTypeCb = new ArrayList<Material>();
+	private final List<Player> cbPlacementPlayer = new ArrayList<Player>();
+	private final List<Location> cbPlacementLocation = new ArrayList<Location>();
+	private final List<Material> cbPlacementTypeCb = new ArrayList<Material>();
 	
-	private Set<Material> interractProhibitedItems = ImmutableSet.<Material>builder()
+	private final Set<Material> interractProhibitedItems = ImmutableSet.<Material>builder()
 			.add(Material.WATER_BUCKET)
 			.add(Material.WATER)
 			.add(Material.LAVA_BUCKET)
@@ -393,7 +393,7 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
-		OlympaPlayerCreatif pc = ((OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getPlayer().getUniqueId()));
+		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
 		
 		Block clickedBlock = e.getClickedBlock();
 		
@@ -424,7 +424,9 @@ public class PlotsInstancesListener implements Listener{
 		
 		//test si permission d'interagir avec le bloc donné
 		if (!PlotPerm.BUILD.has(plot, pc)) {
-			if (PlotParamType.getAllPossibleIntaractibleBlocks().contains(clickedBlock.getType()) &&! plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(clickedBlock.getType()) ) {
+			if ((PlotParamType.getAllPossibleIntaractibleBlocks().contains(clickedBlock.getType()) &&
+					!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(clickedBlock.getType())) ||
+					(e.getAction() == Action.PHYSICAL && e.getClickedBlock().getType() == Material.WHEAT)) {
 				e.setCancelled(true);
 				OCmsg.PLOT_CANT_INTERRACT.send(pc);
 				
@@ -695,7 +697,7 @@ public class PlotsInstancesListener implements Listener{
 				return;
 			}
 		
-		if (e.getDamager().getType() == EntityType.PLAYER && PlotPerm.BUILD.has(plot, (OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getDamager().getUniqueId())))
+		if (e.getDamager().getType() == EntityType.PLAYER && PlotPerm.BUILD.has(plot, AccountProviderAPI.getter().get(e.getDamager().getUniqueId())))
 			return;
 		
 		if (!plot.getParameters().getParameter(PlotParamType.ALLOW_PVP) && e.getEntityType() == EntityType.PLAYER && e.getDamager().getType() == EntityType.PLAYER) {
