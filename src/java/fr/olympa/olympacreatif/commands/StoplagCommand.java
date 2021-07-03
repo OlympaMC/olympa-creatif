@@ -1,6 +1,5 @@
 package fr.olympa.olympacreatif.commands;
 
-import java.text.DecimalFormat;
 import java.util.function.Function;
 
 import fr.olympa.api.common.command.complex.Cmd;
@@ -20,7 +19,9 @@ import fr.olympa.olympacreatif.plot.PlotStoplagChecker.StopLagDetect;
 
 public class StoplagCommand extends ComplexCommand {
 
-	private Function<Double, String> stoplagFormatter = d -> ((int) (d * 100)) + "%";
+	private Function<Integer, String> stoplagName = i -> i == 0 ? "§ainactif" : i == 1 ? "§cactif" : i == 2 ? "§4forcé §7(contactez un staff)" : "§9inconnu";
+	
+	private Function<Double, String> stoplagFormatter = d -> ((int) (d * 100)) + "%%";
 	private OlympaCreatifMain plugin;
 
 	public StoplagCommand(OlympaCreatifMain plugin) {
@@ -42,7 +43,8 @@ public class StoplagCommand extends ComplexCommand {
 			return;
 		}
 
-		getSender().sendMessage(Prefix.DEFAULT_GOOD.toString() + "§7Etat du stoplag de la parcelle " + plot + " : " + (plot.hasStoplag() ? "§cactif" : "§ainactif") + 
+		sendMessage(Prefix.DEFAULT_GOOD, "§7Etat du stoplag de la parcelle " + plot + " : " + 
+				(plot.hasStoplag() ? plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS) == 1 ? "§cactif" : "§4forcé §7(contactez un staff)" : "§ainactif") + 
 				" §7(entités : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.ENTITY)) + ", " + 
 				"redstone : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.WIRE)) + ", " + 
 				"lampes : " + stoplagFormatter.apply(plot.getStoplagChecker().getScore(StopLagDetect.LAMP)) + ", " + 
@@ -90,13 +92,23 @@ public class StoplagCommand extends ComplexCommand {
 			OCmsg.INVALID_PLOT_ID.send(pc);
 			return;
 		}
-
-		if (!PlotPerm.USE_STOPLAG.has(plot, (OlympaPlayerCreatif) getOlympaPlayer()) || (plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS) > 1 && !pc.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE))) {
-			OCmsg.PLOT_FORCED_STOPLAG_FIRED.send(pc, StopLagDetect.UNKNOWN);
+		
+		if (level == 2 && !OcPermissions.STAFF_STOPLAG_MANAGEMENT.hasPermissionWithMsg(pc))
+			return;
+		
+		if (!PlotPerm.USE_STOPLAG.has(plot, (OlympaPlayerCreatif) getOlympaPlayer())) {
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.USE_STOPLAG);
 			return;
 		}
 
+		if (plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS) > 1 && !OcPermissions.STAFF_STOPLAG_MANAGEMENT.hasPermission(pc)) {
+			OCmsg.PLOT_FORCED_STOPLAG_FIRED.send(pc, StopLagDetect.UNKNOWN, plot);
+			return;
+		}
+		
+		OCmsg.PLOT_STOPLAG_FIRED_CMD.send(pc, stoplagName.apply(level) + 
+				" §7(anciennement : " + stoplagName.apply(plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)) + "§7)§a");
+
 		PlotParamType.STOPLAG_STATUS.setValue(plot, level);
-		OCmsg.PLOT_STOPLAG_FIRED_CMD.send(pc, level == 0 ? "§adésactivé" : level == 1 ? "§cactivé" : "§4forcé", plot);
 	}
 }

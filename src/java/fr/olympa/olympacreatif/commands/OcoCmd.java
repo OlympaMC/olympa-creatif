@@ -23,8 +23,6 @@ import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class OcoCmd extends AbstractCmd {
 	
-	//private Set<Player> launchedCbRecalculation = new HashSet<Player>();
-	
 	public OcoCmd(OlympaCreatifMain plugin) {
 		super(plugin, "oco", null, "Commandes spécialisées du Créatif");
 	}

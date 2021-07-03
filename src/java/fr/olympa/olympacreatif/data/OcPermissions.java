@@ -37,6 +37,8 @@ public class OcPermissions {
 	public static final OlympaSpigotPermission STAFF_SET_PLOT_OWNER = new OlympaSpigotPermission(OlympaGroup.MODP);
 	public static final OlympaSpigotPermission STAFF_RELOAD = new OlympaSpigotPermission(OlympaGroup.DEVP);
 	
+	public static final OlympaSpigotPermission STAFF_STOPLAG_MANAGEMENT = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);
+	
 	/*nb de plots propriétaire :
 	 * Joueur : 1
 	 * Constructeur : 3

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -31,6 +32,7 @@ import fr.olympa.olympacreatif.utils.NBTcontrollerUtil;
 
 public class OcaCmd extends AbstractCmd {
 
+	private Function<Double, String> stoplagFormatter = d -> ((int) (d * 100)) + "%%";
 	//private static final DecimalFormat stoplagFormatter = new DecimalFormat("###,##");;
 	
 	public OcaCmd(OlympaCreatifMain plugin) {
@@ -215,20 +217,27 @@ public class OcaCmd extends AbstractCmd {
 			topScores = plugin.getPlotsManager().getPlots().stream().sorted(Comparator.comparingDouble(plot -> -plot.getStoplagChecker().getScore())).collect(Collectors.toCollection(() -> new ArrayList<Plot>()));
 
 			sendMessage(Prefix.INFO, "§6>>> TOP scores stoplag Créatif " + plugin.getDataManager().getServerIndex());
-			for (int i = 0 ; i < Math.min(9, topScores.size()) ; i++)
-				sendHoverAndCommand(Prefix.INFO, "§e" + (i+1) + ". : parcelle §c" + 
-						getPlotIdOnFixedLength(topScores.get(i)) + " §eavec un score de " + 
-						String.format("%,.2f", topScores.get(i).getStoplagChecker().getScore()),
-						"§7Se téléporter à la parcelle " + topScores.get(i), "/oc visit " + topScores.get(i));
+			
+			for (int i = 0 ; i < Math.min(9, topScores.size()) ; i++) 
+				sendHoverAndCommand(Prefix.INFO, "§e" + (i+1) + ". parcelle §c" + 
+					getPlotIdOnFixedLength(topScores.get(i)) + " §e: " + stoplagFormatter.apply(topScores.get(i).getStoplagChecker().getScore()) +
+					" §7E." + stoplagFormatter.apply(topScores.get(i).getStoplagChecker().getScore(StopLagDetect.ENTITY)) + " " +
+					"R." + stoplagFormatter.apply(topScores.get(i).getStoplagChecker().getScore(StopLagDetect.WIRE)) + " " +
+					"P." + stoplagFormatter.apply(topScores.get(i).getStoplagChecker().getScore(StopLagDetect.PISTON)) + " " +
+					"LP." + stoplagFormatter.apply(topScores.get(i).getStoplagChecker().getScore(StopLagDetect.LAMP)) + " " +
+					"LQ." + stoplagFormatter.apply(topScores.get(i).getStoplagChecker().getScore(StopLagDetect.LIQUID)), 
+					"§7Se téléporter à la parcelle " + topScores.get(i), "/oc visit " + topScores.get(i));
+			
 			break;
 		}		
 	}
+	//String.format("%,.2f", topScores.get(i).getStoplagChecker().getScore()),
 	
 	
 	
 	private String getPlotIdOnFixedLength(Plot plot) {
 		String s = plot.getId().toString();
-		while (s.length() < 5)
+		while (s.length() < 4)
 			s = " " + s;
 		return s;
 	}
@@ -307,7 +316,7 @@ public class OcaCmd extends AbstractCmd {
 	}
 
 	@Cmd(syntax = "Accéder aux informations VIP d'un joueur", args = {"info|set", "PLAYERS", "KIT_TYPE|UPGRADE_TYPE", "INTEGER"}, min = 2)
-	public void shop(CommandContext cmd) {
+	public void manageshop(CommandContext cmd) {
 		
 		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(((Player)cmd.getArgument(1)).getUniqueId());
 		
@@ -390,3 +399,9 @@ public class OcaCmd extends AbstractCmd {
 	
 	
 }
+
+
+
+
+
+

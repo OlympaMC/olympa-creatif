@@ -30,7 +30,7 @@ public class PlotParametersGui extends IGui {
 	
 	private String clearWeather = "§eMétéo actuelle : ensoleillée";
 	private String rainyWeather = "§eMétéo actuelle : pluvieuse";
-	private String[] stoplagLevels = {"§eEtat : §ainactif", "§eEtat : §cactif", "§eEtat : §cforcé §4(contacter un staff)"};
+	//private String[] stoplagLevels = {"§eEtat : §ainactif", "§eEtat : §cactif", "§eEtat : §cforcé §4(contacter un staff)"};
 	
 	private boolean canChangeSettings = false; 
 	
@@ -127,7 +127,7 @@ public class PlotParametersGui extends IGui {
 		});
 
 		//3 : Etat stoplag
-		it = ItemUtils.item(Material.COMMAND_BLOCK, "§6Blocage tâches intensives (redstone & cb)");
+		/*it = ItemUtils.item(Material.COMMAND_BLOCK, "§6Blocage tâches intensives (redstone & cb)");
 		ItemUtils.lore(it, stoplagLevels[plot.getParameters().getParameter(PlotParamType.STOPLAG_STATUS)]);
 		ItemUtils.loreAdd(it, clickToChange);
 		
@@ -153,7 +153,7 @@ public class PlotParametersGui extends IGui {
 			item2 = ItemUtils.loreAdd(item2, clickToChange);
 			
 			changeItem(item, item2);
-		});
+		});*/
 
 		//4 : Playback music selection
 		it = ItemUtils.item(Material.MUSIC_DISC_STRAD, "§6Musique de la parcelle");
@@ -166,7 +166,7 @@ public class PlotParametersGui extends IGui {
 		
 		ItemUtils.loreAdd(it, clickToChange);
 		
-		setItem(4, it, (item, c, s) -> {
+		setItem(3, it, (item, c, s) -> {
 			if (!canChangeSettings)
 				return;
 
@@ -191,7 +191,7 @@ public class PlotParametersGui extends IGui {
 		switchButtons.put(ItemUtils.item(Material.ARROW, "§6Activation des projectiles"), PlotParamType.ALLOW_LAUNCH_PROJECTILES);
 		switchButtons.put(ItemUtils.item(Material.FIREWORK_ROCKET, "§6Reset vitesse de vol des visiteurs"), PlotParamType.RESET_VISITOR_FLY_SPEED);
 		
-		int i = 4;
+		int i = 3;
 		
 		for(Entry<ItemStack, PlotParamType<Boolean>> e : switchButtons.entrySet()) {
 			i++;

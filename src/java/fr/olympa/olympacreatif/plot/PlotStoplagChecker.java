@@ -85,7 +85,7 @@ public class PlotStoplagChecker {
 	}
 	
 	public double getScore() {
-		return detections.entrySet().stream().mapToDouble(e -> ((double) e.getValue() / (double) e.getKey().max) / (StopLagDetect.values().length - 1)).sum() * 100;
+		return detections.entrySet().stream().mapToDouble(e -> ((double) e.getValue() / (double) e.getKey().max) / (StopLagDetect.values().length - 1)).sum();
 	}
 	
 	public double getScore(StopLagDetect lag) {
