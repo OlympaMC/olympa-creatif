@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.boydti.fawe.util.EditSessionBuilder;
+import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -51,15 +51,18 @@ public class SchematicCreator {
 
 		OCmsg.WE_START_GENERATING_PLOT_SCHEM.send(p, plot);
 		exportingPlotsCache.add(plot.getId());
-		
-	    plugin.getTask().runTaskAsynchronously(() -> {
-			
+
+		//création fichier & dir si existants
+		//create the Clipboard to copy
+		//Generates the .schematic file from the clipboard
+		plugin.getTask().runTaskAsynchronously(() -> {
+
 			//création fichier & dir si existants
-		    File dir = new File(plugin.getDataFolder() + "/schematics");
-		    File schemFile = new File(dir.getAbsolutePath(), plot.getMembers().getOwner().getName() + "_" + plot.getId() + ".schem");
-		    plugin.getDataFolder().mkdir();
-		    dir.mkdir();
-		    try {
+			File dir = new File(plugin.getDataFolder() + "/schematics");
+			File schemFile = new File(dir.getAbsolutePath(), plot.getMembers().getOwner().getName() + "_" + plot.getId() + ".schem");
+			plugin.getDataFolder().mkdir();
+			dir.mkdir();
+			try {
 				schemFile.delete();
 				schemFile.createNewFile();
 				schemFile.deleteOnExit();
@@ -67,28 +70,28 @@ public class SchematicCreator {
 				e1.printStackTrace();
 			}
 
-		    //create the Clipboard to copy
-		    BlockVector3 v1 = BlockVector3.at(plot.getId().getLocation().getBlockX(), 0, plot.getId().getLocation().getBlockZ());
-		    BlockVector3 v2 = BlockVector3.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 255, plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
-		    
-		    CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), v1, v2);
-		    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+			//create the Clipboard to copy
+			BlockVector3 v1 = BlockVector3.at(plot.getId().getLocation().getBlockX(), 0, plot.getId().getLocation().getBlockZ());
+			BlockVector3 v2 = BlockVector3.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 255, plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
 
-		    EditSession session = WorldEdit.getInstance().getEditSessionFactory().getEditSession(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), -1);
+			CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), v1, v2);
+			BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
 
-		    ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(session, region, clipboard, region.getMinimumPoint());
-		    forwardExtentCopy.setCopyingEntities(true);
-		    
-		    
-		    //Generates the .schematic file from the clipboard
+			EditSession session = WorldEdit.getInstance().getEditSessionFactory().getEditSession(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), -1);
+
+			ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(session, region, clipboard, region.getMinimumPoint());
+			forwardExtentCopy.setCopyingEntities(true);
+
+
+			//Generates the .schematic file from the clipboard
 			try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(schemFile))) {
-			    Operations.complete(forwardExtentCopy);
-			    writer.write(clipboard);
-			    
+				Operations.complete(forwardExtentCopy);
+				writer.write(clipboard);
+
 			} catch (IOException | WorldEditException e) {
 				e.printStackTrace();
 			}
-			
+
 			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
 			OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.send(p, plot);
 	    	plugin.getTask().runTaskLater(() -> exportingPlotsCache.remove(plot.getId()), 20 * 60 * 60);

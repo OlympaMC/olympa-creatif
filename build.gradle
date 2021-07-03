@@ -14,10 +14,11 @@ repositories {
     maven {
         url = uri('https://papermc.io/repo/repository/maven-public/')
     }
-    
-    maven { 
-    	url = uri("https://mvn.intellectualsites.com/content/repositories/releases/") 
-    }// FAWE
+
+    maven {
+        name = "IntellectualSites Releases"
+        url = uri("https://mvn.intellectualsites.com/content/repositories/releases/")
+    }
     
     /*maven { 
     	url = uri("https://raw.githubusercontent.com/SBPrime/AsyncWorldEdit/maven-artifact/") 
@@ -46,8 +47,8 @@ configurations {
 
 dependencies {
     compileOnly 'fr.olympa:olympa-core:0.0.1-SNAPSHOT'
-    compileOnly 'com.intellectualsites.fawe:FAWE-Bukkit:1.16-687'
-    compileOnly 'com.intellectualsites.fawe:FAWE-Core:1.16-687'
+    compileOnly("com.fastasyncworldedit:FAWE-Bukkit:1.17-23")
+    compileOnly("com.fastasyncworldedit:FAWE-Core:1.17-23")
     compileOnly 'com.github.koca2000:NoteBlockAPI:-SNAPSHOT'
     compileOnly 'org.primesoft.asyncworldedit:AsyncWorldEdit:3.8.4'
 }
