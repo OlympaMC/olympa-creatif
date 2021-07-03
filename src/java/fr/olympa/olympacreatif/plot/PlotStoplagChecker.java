@@ -130,11 +130,15 @@ public class PlotStoplagChecker {
 		public static void reloadConfig() {
 			OlympaCreatifMain.getInstance().reloadConfig();
 			YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
-			
+
+			System.out.println("Reloaded config : " + config);
+
 			for (StopLagDetect lag : StopLagDetect.values()) {
 				if (!config.contains("stoplag_limit." + lag.toString()))
 					config.set("stoplag_limit." + lag.toString(), lag.defaultMax);
-				
+
+				System.out.println("Reload config " + lag + " : " + config.getInt("stoplag_limit." + lag.toString()));
+
 				lag.max = config.getInt("stoplag_limit." + lag.toString());
 			}
 			
