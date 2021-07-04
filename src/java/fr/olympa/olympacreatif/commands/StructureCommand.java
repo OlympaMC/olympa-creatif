@@ -9,6 +9,7 @@ import fr.olympa.api.utils.Prefix;
 import fr.olympa.core.common.provider.AccountProvider;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
+import fr.olympa.olympacreatif.data.OCparam;
 import fr.olympa.olympacreatif.data.OcPermissions;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
@@ -23,8 +24,8 @@ import java.util.stream.Stream;
 
 public class StructureCommand extends AbstractCmd {
 
-    private Function<Integer, File> getPlotSchemsFolder = id -> new File(OlympaCreatifMain.getInstance().getDataFolder() + "/plot_schematics/plot_" + id);
-    private Map<Integer, Set<String>> knownSchems = new HashMap<Integer, Set<String>>();
+    private static Function<Integer, File> getPlotSchemsFolder = id -> new File(OlympaCreatifMain.getInstance().getDataFolder() + "/plot_schematics/plot_" + id);
+    private static Map<Integer, Set<String>> knownSchems = new HashMap<Integer, Set<String>>();
 
     public StructureCommand(OlympaCreatifMain plugin, OlympaSpigotPermission permission, String desc) {
         super(plugin, "structure", OcPermissions.STRUCTURE_COMMAND, desc);
@@ -34,17 +35,7 @@ public class StructureCommand extends AbstractCmd {
             if (pc == null || pc.getCurrentPlot() == null)
                 return null;
 
-            if (knownSchems.containsKey(pc.getCurrentPlot().getId().getId()))
-                return knownSchems.get(pc.getCurrentPlot().getId().getId());
-
-            if (!getPlotSchemsFolder.apply(pc.getCurrentPlot().getId().getId()).exists())
-                knownSchems.put(pc.getCurrentPlot().getId().getId(), new HashSet<String>());
-            else
-                knownSchems.put(pc.getCurrentPlot().getId().getId(),
-                        Stream.of(getPlotSchemsFolder.apply(pc.getCurrentPlot().getId().getId()).list()).map(s ->
-                        pc.getCurrentPlot() + "_" + s.replace(".schem","")).collect(Collectors.toSet()));
-
-            return knownSchems.get(pc.getCurrentPlot().getId().getId());
+            return getSchemsOf(pc.getCurrentPlot().getId().getId());
 
         }, arg -> {
             int plotIndex = arg.indexOf("_");
@@ -56,8 +47,11 @@ public class StructureCommand extends AbstractCmd {
                 if (!knownSchems.containsKey(plotId) || !knownSchems.get(plotId).contains(arg))
                     return null;
 
-                return new File(getPlotSchemsFolder.apply(plotId), arg.substring(plotIndex + 1, arg.length() - 1) + ".schem");
-            }catch(Exception ex){
+                File file = new File(getPlotSchemsFolder.apply(plotId), arg.substring(plotIndex + 1, arg.length() - 1) + ".schem");
+
+                return file.exists() ? file : null;
+            }catch(Exception ex) {
+                ex.printStackTrace();
                 return null;
             }
 
@@ -71,6 +65,20 @@ public class StructureCommand extends AbstractCmd {
 
         Plot plot = ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot();
 
+        list(getOlympaPlayer(), plot);
+    }
+
+    private static Set<String> getSchemsOf(int plotId) {
+        if (knownSchems.containsKey(plotId))
+            return knownSchems.get(plotId);
+
+        if (!getPlotSchemsFolder.apply(plotId).exists())
+            knownSchems.put(plotId, new HashSet<String>());
+        else
+            knownSchems.put(plotId, Stream.of(getPlotSchemsFolder.apply(plotId).list()).map(s ->
+                    s.replace(".schem","")).collect(Collectors.toSet()));
+
+        return knownSchems.get(plotId);
     }
 
     public static void list(OlympaPlayerCreatif pc, Plot plot) {
@@ -82,7 +90,11 @@ public class StructureCommand extends AbstractCmd {
             return;
         }
 
-        Prefix.INFO.sendMessage((CommandSender) pc.getPlayer(), "Structures de la parcelle " + plot);
+        Prefix.INFO.sendMessage((CommandSender) pc.getPlayer(), "§6Structures de la parcelle " + plot +
+                " (" + getSchemsOf(plot.getId().getId()) + "/" + OCparam.PLOT_MAX_SCHEMS.get() + ") :");
+
+        for (String s : getSchemsOf(plot.getId().getId()))
+            Prefix.INFO.sendMessage((CommandSender) pc.getPlayer(), "§e > " + s);
     }
 
 }
