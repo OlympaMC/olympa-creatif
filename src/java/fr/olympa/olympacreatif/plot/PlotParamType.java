@@ -32,6 +32,7 @@ public class PlotParamType<T extends Object> implements Cloneable {
 	public static PlotParamType<Position> SPAWN_LOC = new PlotParamType<>("SPAWN_LOC", new Position());
 
 	public static PlotParamType<Integer> PLOT_TIME = new PlotParamType<>("PLOT_TIME", 6000);
+	public static PlotParamType<Boolean> PLOT_TIME_CYCLE = new PlotParamType<>("PLOT_TIME_CYCLE", false);
 
 	public static PlotParamType<String> SONG = new PlotParamType<>("SONG", "");
 

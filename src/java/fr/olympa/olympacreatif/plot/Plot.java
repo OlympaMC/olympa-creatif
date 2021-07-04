@@ -42,9 +42,13 @@ public class Plot {
 	
 	private OlympaCreatifMain plugin;
 
-	private int destroyScheduler;
-	private int entitiesCheckupScheduler;
-	
+	private int timeUpdateScheduler = -1;
+	private int destroyScheduler = -1;
+	private int entitiesCheckupScheduler = -1;
+
+	private int tilesCount = 0;
+	private int currentTime = -1;
+
 	private PlotMembers members;
 	private PlotParameters parameters;
 	private PlotId plotId;
@@ -116,7 +120,7 @@ public class Plot {
 					removeEntityInPlot(ent, true);
 			}
 		}, 20 * 20, 20 * 20);
-		
+
 		cbData.setPlot(this);
 		
 		//exécution des actions d'entrée pour les joueurs étant arrivés sur le plot avant chargement des données du plot
@@ -168,8 +172,21 @@ public class Plot {
 	}*/
 
 	//private int nextAllowedTilesCheckup = 0;
-	private int tilesCount = 0;
-	
+
+	public void updateTimeTask() {
+		currentTime = -1;
+		plugin.getTask().cancelTaskById(timeUpdateScheduler);
+
+		if (getParameters().getParameter(PlotParamType.PLOT_TIME_CYCLE)){
+			currentTime = getParameters().getParameter(PlotParamType.PLOT_TIME);
+
+			timeUpdateScheduler = plugin.getTask().scheduleSyncRepeatingTask(() -> {
+				currentTime = (currentTime + 20 * 60) % 24_000;
+				getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
+			}, 20*60, 20*60);
+		}
+	}
+
 	public int getTilesCount() {
 		/*if (nextAllowedTilesCheckup >= Bukkit.getCurrentTick())
 			return tilesCount;
@@ -387,7 +404,7 @@ public class Plot {
 		}
 		
 		//définition de l'heure du joueur
-		p.setPlayerTime(parameters.getParameter(PlotParamType.PLOT_TIME), false);
+		p.setPlayerTime(currentTime == -1 ? parameters.getParameter(PlotParamType.PLOT_TIME) : currentTime, false);
 		
 		//définition de la météo
 		p.setPlayerWeather(parameters.getParameter(PlotParamType.PLOT_WEATHER));

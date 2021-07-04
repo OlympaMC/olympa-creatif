@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -79,22 +80,34 @@ public class PlotParametersGui extends IGui {
 
 		//1 : Heure du plot
 		it = ItemUtils.item(Material.CLOCK, "§6Heure de la parcelle");
-		it = ItemUtils.lore(it, "§eHeure actuelle : " + ((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) / 1000 + timeToAdd) % 25) + "h");
-		
-		it = ItemUtils.loreAdd(it, clickToChange);
+		it = ItemUtils.lore(it, "§eHeure actuelle : " +
+				((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) / 1000 + timeToAdd) % 25) + "h",
+				"§eDéfilement auto : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME_CYCLE) ? "§aoui" : "§cnon"), "");
+
+		if (canChangeSettings)
+			it = ItemUtils.loreAdd(it, "§7Clic droit : +1h", "§7Clic gauche : -1h", "§7Clic molette : activer/désactiver lemouvement du soleil");
 		
 		setItem(1, it, (item, c, s) -> {
 			if (!canChangeSettings)
 				return;
-			
-			PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
-			ItemStack item2 = ItemUtils.lore(item.clone(), "§eHeure actuelle : " + 
-			((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) / 1000 + timeToAdd) % 25) + "h");
-			
-			item2 = ItemUtils.loreAdd(item2, clickToChange);
+
+			if (c == ClickType.MIDDLE) {
+				PlotParamType.PLOT_TIME_CYCLE.setValue(plot, !plot.getParameters().getParameter(PlotParamType.PLOT_TIME_CYCLE));
+			}else if (c == ClickType.LEFT)
+				PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%25000);
+			else if (c == ClickType.RIGHT)
+				PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 23000)%25000);
+
+			ItemStack item2 = ItemUtils.lore(item.clone(), "§eHeure actuelle : " +
+							((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) / 1000 + timeToAdd) % 25) + "h",
+							"§eDéfilement auto : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME_CYCLE) ? "§aoui" : "§cnon"),
+							"",	"§7Clic droit : +1h", "§7Clic gauche : -1h", "§7Clic molette : activer/désactiver lemouvement du soleil");
+
+			//item2 = ItemUtils.loreAdd(item2, clickToChange);
 			changeItem(item, item2);
 			
-			plot.getPlayers().forEach(pp -> pp.setPlayerTime(plot.getParameters().getParameter(PlotParamType.PLOT_TIME), false));
+			//plot.getPlayers().forEach(pp -> pp.setPlayerTime(plot.getParameters().getParameter(PlotParamType.PLOT_TIME), false));
+			plot.updateTimeTask();
 		});
 		
 
