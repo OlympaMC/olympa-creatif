@@ -37,7 +37,7 @@ import fr.olympa.olympacreatif.utils.TagsValues.TagParams;
 
 public class OCmsg {
 
-	private static final Map<Player, Set<OCmsg>> delayedMessages = new HashMap<>();
+    private static final Map<Player, Set<OCmsg>> delayedMessages = new HashMap<>();
 
 	public static final OCmsg CB_INVALID_CMD = new OCmsg();
 	public static final OCmsg CB_NO_COMMANDS_LEFT = new OCmsg(10);
@@ -152,6 +152,14 @@ public class OCmsg {
 
 	public static final OCmsg INSUFFICIENT_GROUP_PERMISSION = new OCmsg();
 	public static final OCmsg PLOT_LOADING_IN_PROGRESS = new OCmsg();
+
+	public static final OCmsg PLOT_SCHEMS_MAX_COUNT_REACHED = new OCmsg();
+	public static final OCmsg PLOT_SCHEMS_SAVED = new OCmsg();
+	public static final OCmsg PLOT_SCHEMS_ERROR = new OCmsg();
+	public static final OCmsg PLOT_SCHEMS_UNKNOWN_FILE = new OCmsg();
+	public static final OCmsg PLOT_SCHEMS_PASTED = new OCmsg();
+	public static final OCmsg PLOT_SCHEMS_PASTE_OUT_OF_PLOT = new OCmsg();
+
 
 	static {
 		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {

@@ -1,5 +1,10 @@
 package fr.olympa.olympacreatif.worldedit;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,6 +19,16 @@ import com.fastasyncworldedit.core.regions.general.RegionFilter;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import fr.olympa.olympacreatif.data.*;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
@@ -39,10 +54,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OCmsg;
-import fr.olympa.olympacreatif.data.OCparam;
-import fr.olympa.olympacreatif.data.OcPermissions;
-import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.perks.KitsManager.KitType;
@@ -351,6 +362,89 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 					return true;
 				}
 			}
+		});
+	}
+
+	@Override
+	public void savePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos1, Position pos2) {
+		plugin.getTask().runTaskAsynchronously(() -> {
+
+			File dir = new File(plugin.getDataFolder() + "/plot_schematics/plot_" + plot);
+			dir.mkdirs();
+
+			if (dir.list().length >= OCparam.PLOT_MAX_SCHEMS.get()) {
+				OCmsg.PLOT_SCHEMS_MAX_COUNT_REACHED.send(pc, plot, OCparam.PLOT_MAX_SCHEMS.get() + "");
+				return;
+			}
+
+			File file = new File(dir.getAbsolutePath(), schemName + ".schem");
+
+			BlockVector3 vec1 = BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ());
+			BlockVector3 vec2 = BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ());
+
+			EditSession session = WorldEdit.getInstance().getEditSessionFactory().getEditSession(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), -1);
+
+			CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), vec1, vec2);
+			BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+
+			ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(session, region, clipboard, region.getMinimumPoint());
+			forwardExtentCopy.setCopyingEntities(true);
+
+			try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(file))) {
+				Operations.complete(forwardExtentCopy);
+				writer.write(clipboard);
+				OCmsg.PLOT_SCHEMS_SAVED.send(pc, plot, schemName);
+
+			} catch (IOException | WorldEditException e) {
+				e.printStackTrace();
+				OCmsg.PLOT_SCHEMS_ERROR.send(pc, plot);
+			}
+
+		});
+
+	}
+
+	@Override
+	public void pastePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos) {
+		plugin.getTask().runTaskAsynchronously(() -> {
+			File dir = new File(plugin.getDataFolder() + "/plot_schematics/plot_" + plot);
+			File file = new File(dir.getAbsolutePath(), schemName + ".schem");
+
+			if (!file.exists()) {
+				OCmsg.PLOT_SCHEMS_UNKNOWN_FILE.send(pc, plot, schemName);
+				return;
+			}
+
+			try (ClipboardReader reader = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getReader(new FileInputStream(file))) {
+				Clipboard clipboard = reader.read();
+				BlockVector3 origin = BlockVector3.at(pos.getX(), pos.getY(), pos.getZ());
+
+				if (!plot.getId().isInPlot(pos) ||
+						!plot.getId().isInPlot((int) pos.getX() + clipboard.getDimensions().getBlockX(), (int) pos.getZ() + clipboard.getDimensions().getBlockZ(), 0) ){
+					OCmsg.PLOT_SCHEMS_PASTE_OUT_OF_PLOT.send(pc, plot, schemName);
+					return;
+				}
+
+				clipboard.getDimensions().getBlockX();
+
+				try (EditSession editSession = new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()))
+						.allowedRegionsEverywhere().limitUnlimited().build()) {
+					Operation operation = new ClipboardHolder(clipboard)
+							.createPaste(editSession)
+							.to(origin)
+							.ignoreAirBlocks(false)
+							.build();
+
+					Operations.complete(operation);
+				}
+				//plot.getCbData().reloadAllCommandBlocks(true);
+				OCmsg.PLOT_SCHEMS_PASTED.send(pc, plot, schemName);
+
+			} catch (IOException e) {
+				OCmsg.PLOT_SCHEMS_ERROR.send(pc, plot, schemName);
+				e.printStackTrace();
+			}
+
 		});
 	}
 }

@@ -3,6 +3,8 @@ package fr.olympa.olympacreatif.worldedit;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sk89q.worldedit.math.BlockVector3;
+import fr.olympa.olympacreatif.data.Position;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -245,4 +247,12 @@ public abstract class AWorldEditManager {
 			}	
 		}
 	};*/
+
+	public void savePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos1, Position pos2) {
+		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
+	}
+
+	public void pastePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position origin) {
+		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
+	}
 }

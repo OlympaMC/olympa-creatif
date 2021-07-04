@@ -61,7 +61,9 @@ public class OCparam<T> {
 	public static final OCparam<Integer> MAX_LINES_PER_HOLO = new OCparam<Integer>(15);
 
 	public static final OCparam<Integer> WE_MAX_NBT_SIZE = new OCparam<Integer>(8000);
-	
+
+	public static final OCparam<Integer> PLOT_MAX_SCHEMS = new OCparam<Integer>(15);
+
 	/*public static final OCparam<Map<UpgradeType, List<UpgradeData>>> SHOP_DATA = 
 			new OCparam<Map<UpgradeType, List<UpgradeData>>>(
 			//la valeur par défaut est un peu longue mais trql
