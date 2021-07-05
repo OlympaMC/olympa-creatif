@@ -53,9 +53,19 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	protected Location parseLocation(String x, String y, String z) {
 		return parseLocation(x, y, z, null, null);
 	}
-	
+
 	protected Location parseLocation(String x, String y, String z, String yaw, String pitch) {
-		
+		return parseLocation(plot, sendingLoc, x, y, z, yaw, pitch);
+	}
+
+	public static Location parseLocation(Plot plot, Location sendingLoc, String x, String y, String z) {
+		return parseLocation(plot, sendingLoc, x, y, z, "0", "0");
+	}
+
+	public static Location parseLocation(Plot plot, Location sendingLoc, String x, String y, String z, String yaw, String pitch) {
+		if (plot == null || sendingLoc == null)
+			return null;
+
 		Double xF = getUnverifiedPoint(x, sendingLoc.getX()) + 0.5;
 		Double yF = getUnverifiedPoint(y, sendingLoc.getY());
 		Double zF = getUnverifiedPoint(z, sendingLoc.getZ()) + 0.5;		
@@ -64,14 +74,13 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		float pitchF = 0; 
 		
 		try {
-			yawF = Float.valueOf(yaw);
-			pitchF = Float.valueOf(pitch);
+			yawF = Float.parseFloat(yaw);
+			pitchF = Float.parseFloat(pitch);
 		}catch(Exception ex) {
-			
 		}
 		
 		if (xF != null && yF != null && zF != null) {
-			Location loc = new Location(plugin.getWorldManager().getWorld(), xF, yF, zF, yawF, pitchF); 
+			Location loc = new Location(OlympaCreatifMain.getInstance().getWorldManager().getWorld(), xF, yF, zF, yawF, pitchF);
 			if (plot.getId().isInPlot(loc))
 				return loc;
 			else
@@ -81,7 +90,7 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	}
 	
 	//renvoie la coordonnée x, y ou z à partir du string (en coordonnée absolue ou relative)
-	private Double getUnverifiedPoint(String s, double potentialVectorValueToAdd) {
+	private static Double getUnverifiedPoint(String s, double potentialVectorValueToAdd) {
 		
 		try{
 			return Double.valueOf(s);

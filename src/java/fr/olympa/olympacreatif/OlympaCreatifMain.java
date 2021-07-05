@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import fr.olympa.olympacreatif.commands.*;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.common.groups.OlympaGroup;
@@ -22,20 +23,6 @@ import fr.olympa.api.spigot.lines.FixedLine;
 import fr.olympa.api.spigot.scoreboard.sign.ScoreboardManager;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
-import fr.olympa.olympacreatif.commands.CiCommand;
-import fr.olympa.olympacreatif.commands.CmdsLogic;
-import fr.olympa.olympacreatif.commands.HatCommand;
-import fr.olympa.olympacreatif.commands.MenuCommand;
-import fr.olympa.olympacreatif.commands.MicroblockCommand;
-import fr.olympa.olympacreatif.commands.OcCmd;
-import fr.olympa.olympacreatif.commands.OcaCmd;
-import fr.olympa.olympacreatif.commands.OcoCmd;
-import fr.olympa.olympacreatif.commands.ShopCommand;
-import fr.olympa.olympacreatif.commands.SkullCommand;
-import fr.olympa.olympacreatif.commands.SpawnCommand;
-import fr.olympa.olympacreatif.commands.SpeedCommand;
-import fr.olympa.olympacreatif.commands.StoplagCommand;
-import fr.olympa.olympacreatif.commands.TpfCommand;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
@@ -161,6 +148,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new StoplagCommand(this).register();
 		new TpfCommand(this).register();
 		new CiCommand(this).register();
+
+		new StructureCommand(this).register();
 
 		new BackCommand(this, null).register();
 		new HatCommand(this).register();

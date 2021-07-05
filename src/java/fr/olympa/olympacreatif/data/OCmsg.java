@@ -158,7 +158,11 @@ public class OCmsg {
 	public static final OCmsg PLOT_SCHEMS_ERROR = new OCmsg();
 	public static final OCmsg PLOT_SCHEMS_UNKNOWN_FILE = new OCmsg();
 	public static final OCmsg PLOT_SCHEMS_PASTED = new OCmsg();
-	public static final OCmsg PLOT_SCHEMS_PASTE_OUT_OF_PLOT = new OCmsg();
+	public static final OCmsg PLOT_SCHEMS_OPERATION_OUT_OF_PLOT = new OCmsg();
+
+	public static final OCmsg PLOT_SCHEMS_TOO_MANY_BLOCKS = new OCmsg();
+	public static final OCmsg PLOT_SCHEMS_FILE_DELETED = new OCmsg();
+	public static final OCmsg PLOT_SCHEMS_INVALID_SELECTION = new OCmsg();
 
 
 	static {
@@ -285,6 +289,13 @@ public class OCmsg {
 			.put("%tagMax", param -> param.getMax() + "")
 			.build();
 
+
+	private static final Map<String, Function<OCparam, String>> serverParamPlaceHolders = ImmutableMap.<String, Function<OCparam, String>>builder()
+			.put("%paramValue", param -> param.get().toString())
+			.build();
+
+
+
 	private String message = null;
 	private int delay;
 
@@ -373,6 +384,10 @@ public class OCmsg {
 			else if (o instanceof TagParams)
 				for (Entry<String, Function<TagParams, String>> e : nbtTagPlaceHolders.entrySet())
 					msg = msg.replace(e.getKey(), e.getValue().apply((TagParams) o));
+
+			else if (o instanceof OCparam)
+				for (Entry<String, Function<OCparam, String>> e : serverParamPlaceHolders.entrySet())
+					msg = msg.replace(e.getKey(), e.getValue().apply((OCparam) o));
 
 		if (!plotAlreadyAdded && pc != null)
 			for (Entry<String, BiFunction<OlympaPlayerCreatif, Plot, String>> e : plotPlaceHolders.entrySet())

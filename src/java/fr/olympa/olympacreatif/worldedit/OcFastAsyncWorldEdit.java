@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;
@@ -366,14 +365,24 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 	}
 
 	@Override
-	public void savePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos1, Position pos2) {
+	public void savePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos1, Position pos2, final Runnable successCallback) {
 		plugin.getTask().runTaskAsynchronously(() -> {
 
 			File dir = new File(plugin.getDataFolder() + "/plot_schematics/plot_" + plot);
 			dir.mkdirs();
 
 			if (dir.list().length >= OCparam.PLOT_MAX_SCHEMS.get()) {
-				OCmsg.PLOT_SCHEMS_MAX_COUNT_REACHED.send(pc, plot, OCparam.PLOT_MAX_SCHEMS.get() + "");
+				OCmsg.PLOT_SCHEMS_MAX_COUNT_REACHED.send(pc, plot, OCparam.PLOT_MAX_SCHEMS);
+				return;
+			}
+
+			if (getVolume(pos1, pos2) > OCparam.PLOT_MAX_SCHEM_BLOCKS.get()) {
+				OCmsg.PLOT_SCHEMS_TOO_MANY_BLOCKS.send(pc, plot, getVolume(pos1, pos2) + "", OCparam.PLOT_MAX_SCHEM_BLOCKS);
+				return;
+			}
+
+			if (!plot.getId().isInPlot(pos1) || !plot.getId().isInPlot(pos2)) {
+				OCmsg.PLOT_SCHEMS_OPERATION_OUT_OF_PLOT.send(pc, plot, schemName);
 				return;
 			}
 
@@ -393,15 +402,29 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(file))) {
 				Operations.complete(forwardExtentCopy);
 				writer.write(clipboard);
+
+				if (successCallback != null)
+					successCallback.run();
+
 				OCmsg.PLOT_SCHEMS_SAVED.send(pc, plot, schemName);
 
 			} catch (IOException | WorldEditException e) {
 				e.printStackTrace();
 				OCmsg.PLOT_SCHEMS_ERROR.send(pc, plot);
 			}
-
 		});
+	}
 
+	@Override
+	public void deletePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Runnable successCallback) {
+		File file = new File(plugin.getDataFolder() + "/plot_schematics/plot_" + plot + "/" + schemName + ".schem");
+
+		if (!file.delete())
+			OCmsg.PLOT_SCHEMS_UNKNOWN_FILE.send(pc, plot, schemName);
+		else {
+			OCmsg.PLOT_SCHEMS_FILE_DELETED.send(pc, plot, schemName);
+			successCallback.run();
+		}
 	}
 
 	@Override
@@ -421,7 +444,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 
 				if (!plot.getId().isInPlot(pos) ||
 						!plot.getId().isInPlot((int) pos.getX() + clipboard.getDimensions().getBlockX(), (int) pos.getZ() + clipboard.getDimensions().getBlockZ(), 0) ){
-					OCmsg.PLOT_SCHEMS_PASTE_OUT_OF_PLOT.send(pc, plot, schemName);
+					OCmsg.PLOT_SCHEMS_OPERATION_OUT_OF_PLOT.send(pc, plot, schemName);
 					return;
 				}
 
@@ -446,5 +469,22 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			}
 
 		});
+	}
+
+	@Override
+	public Position[] convertSelectionToPositions(OlympaPlayerCreatif pc) {
+		LocalSession weSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt((Player)pc.getPlayer()));
+		World world = weSession.getSelectionWorld();
+
+		//reset worldedit positions
+		if (world == null || weSession.getRegionSelector(world) == null)
+			return null;
+		else{
+			BlockVector3 vec1 = weSession.getRegionSelector(world).getRegion().getMinimumPoint();
+			BlockVector3 vec2 = weSession.getRegionSelector(world).getRegion().getMaximumPoint();
+
+			return new Position[]{new Position(vec1.getBlockX(), vec1.getBlockY(), vec1.getBlockZ(), 0, 0),
+					new Position(vec2.getBlockX(), vec2.getBlockY(), vec2.getBlockZ(), 0, 0)};
+		}
 	}
 }

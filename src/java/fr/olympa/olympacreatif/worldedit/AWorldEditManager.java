@@ -248,11 +248,25 @@ public abstract class AWorldEditManager {
 		}
 	};*/
 
-	public void savePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos1, Position pos2) {
+	public Position[] convertSelectionToPositions(OlympaPlayerCreatif pc) {
+		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
+	}
+
+	public void savePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos1, Position pos2, Runnable successCallback) {
+		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
+	}
+
+	public void deletePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Runnable successCallback) {
 		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
 	}
 
 	public void pastePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position origin) {
 		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
+	}
+
+	protected final int getVolume(Position pos1, Position pos2){
+		return (int) ((Math.max(pos1.getX(), pos2.getX()) - Math.min(pos1.getX(), pos2.getX())) *
+				(Math.max(pos1.getY(), pos2.getY()) - Math.min(pos1.getY(), pos2.getY())) *
+				(Math.max(pos1.getZ(), pos2.getZ()) - Math.min(pos1.getZ(), pos2.getZ())));
 	}
 }

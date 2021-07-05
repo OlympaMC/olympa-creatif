@@ -48,7 +48,13 @@ public class Position {
 		return z;
 	}
 	
-	
+	public Position add(double x, double y, double z) {
+		this.x += x;
+		this.y += y;
+		this.z += z;
+		return this;
+	}
+
 	public void teleport(Player p) {
 		p.teleport(toLoc());
 	}

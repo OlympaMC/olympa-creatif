@@ -63,6 +63,7 @@ public class OCparam<T> {
 	public static final OCparam<Integer> WE_MAX_NBT_SIZE = new OCparam<Integer>(8000);
 
 	public static final OCparam<Integer> PLOT_MAX_SCHEMS = new OCparam<Integer>(15);
+	public static final OCparam<Integer> PLOT_MAX_SCHEM_BLOCKS = new OCparam<Integer>(4096);
 
 	/*public static final OCparam<Map<UpgradeType, List<UpgradeData>>> SHOP_DATA = 
 			new OCparam<Map<UpgradeType, List<UpgradeData>>>(
