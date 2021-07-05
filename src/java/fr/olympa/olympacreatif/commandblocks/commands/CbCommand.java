@@ -66,17 +66,20 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		if (plot == null || sendingLoc == null)
 			return null;
 
-		Double xF = getUnverifiedPoint(x, sendingLoc.getX()) + 0.5;
-		Double yF = getUnverifiedPoint(y, sendingLoc.getY());
-		Double zF = getUnverifiedPoint(z, sendingLoc.getZ()) + 0.5;		
-
+		Double xF;
+		Double yF;
+		Double zF;
 		float yawF = 0;
 		float pitchF = 0; 
 		
 		try {
+			xF = getUnverifiedPoint(x, sendingLoc.getX()) + 0.5;
+			yF = getUnverifiedPoint(y, sendingLoc.getY());
+			zF = getUnverifiedPoint(z, sendingLoc.getZ()) + 0.5;
 			yawF = Float.parseFloat(yaw);
 			pitchF = Float.parseFloat(pitch);
 		}catch(Exception ex) {
+			return null;
 		}
 		
 		if (xF != null && yF != null && zF != null) {

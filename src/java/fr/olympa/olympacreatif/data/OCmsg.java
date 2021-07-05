@@ -266,7 +266,7 @@ public class OCmsg {
 			.build();
 
 	private static final Map<String, Function<StopLagDetect, String>> stoplagPlaceHolders = ImmutableMap.<String, Function<StopLagDetect, String>>builder()
-			.put("%stopLagType", s -> s.toString())
+			.put("%stopLagType", s -> s.getName())
 			.build();
 
 	private static final Map<String, Function<KitType, String>> kitPlaceHolders = ImmutableMap.<String, Function<KitType, String>>builder()

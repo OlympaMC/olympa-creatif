@@ -1,11 +1,15 @@
 package fr.olympa.olympacreatif.plot;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.file.YamlConstructor;
 import org.checkerframework.checker.index.qual.HasSubsequence;
 
 import fr.olympa.api.spigot.config.CustomConfig;
@@ -108,41 +112,74 @@ public class PlotStoplagChecker {
 		StopLagDetect(int maxPerPeriod, String name) {
 			this.name = name;
 			this.defaultMax = maxPerPeriod;
-			
-			YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
-			if (!config.contains("stoplag_limit." + toString())) {
-				config.set("stoplag_limit." + toString(), defaultMax);
+
+			try {
+				rlConfig();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			/*YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
+			if (!config.contains("stoplag_limit." + this)) {
+				config.set("stoplag_limit." + this, defaultMax);
 				OlympaCreatifMain.getInstance().saveConfig();
 			}
 
-			this.max = config.getInt("stoplag_limit." + toString());
+			this.max = config.getInt("stoplag_limit." + toString());*/
+		}
+
+		private void rlConfig() throws IOException, InvalidConfigurationException {
+			File file = new File(OlympaCreatifMain.getInstance().getDataFolder(), "stoplag_config.yml");
+			if (!file.exists())
+				file.createNewFile();
+
+			YamlConfiguration config = new YamlConfiguration();
+			config.load(file);
+
+			if (!config.contains("stoplag." + this)) {
+				config.set("stoplag." + this, defaultMax);
+				config.save(file);
+			}
+
+			max = config.getInt("stoplag." + this);
 		}
 		
 		public int getMaxPerPeriod() {
 			return max;
 		}
-		
-		@Override
-		public String toString() {
+
+		public String getName() {
 			return name;
 		}
 		
 		public static void reloadConfig() {
+
+			for (StopLagDetect lag : StopLagDetect.values())
+				try{
+					lag.rlConfig();
+				}catch (Exception ex){
+					ex.printStackTrace();
+				}
+
+			/*System.out.println("Source config : " + (OlympaCreatifMain.getInstance().getConfig().saveToString()));
+
 			OlympaCreatifMain.getInstance().reloadConfig();
 			YamlConfiguration config = OlympaCreatifMain.getInstance().getConfig();
 
-			System.out.println("Reloaded config : " + config);
+			System.out.println("Reloaded config : " + (config.saveToString()));
 
 			for (StopLagDetect lag : StopLagDetect.values()) {
-				if (!config.contains("stoplag_limit." + lag.toString()))
-					config.set("stoplag_limit." + lag.toString(), lag.defaultMax);
 
-				System.out.println("Reload config " + lag + " : " + config.getInt("stoplag_limit." + lag.toString()));
+				System.out.println("Reload config avant " + lag + " : " + config.getInt("stoplag_limit." + lag));
 
-				lag.max = config.getInt("stoplag_limit." + lag.toString());
+				if (!config.contains("stoplag_limit." + lag))
+					config.set("stoplag_limit." + lag, lag.defaultMax);
+
+				System.out.println("Reload config après " + lag + " : " + config.getInt("stoplag_limit." + lag));
+
+				lag.max = config.getInt("stoplag_limit." + lag);
 			}
 			
-			OlympaCreatifMain.getInstance().saveConfig();
+			OlympaCreatifMain.getInstance().saveConfig();*/
 		}
 	}
 }
