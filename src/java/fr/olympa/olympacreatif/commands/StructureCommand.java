@@ -34,7 +34,7 @@ public class StructureCommand extends AbstractCmd {
         addArgumentParser("SCHEMS_NAMES", (sender, arg) -> {
             OlympaPlayerCreatif pc = AccountProvider.getter().get(((Player)sender).getUniqueId());
             if (pc == null || pc.getCurrentPlot() == null)
-                return null;
+                return new ArrayList<String>();
 
             return getSchemsOf(pc.getCurrentPlot().getId().getId());
 
@@ -59,7 +59,7 @@ public class StructureCommand extends AbstractCmd {
                 return null;
             }
 
-        }, s -> "Nom de structure non reconnu.", true);
+        }, s -> "Nom de structure non reconnu.");
     }
 
     @Cmd(player = false, syntax = "Lister les structures enregistrées de la parcelle")
@@ -76,7 +76,7 @@ public class StructureCommand extends AbstractCmd {
         list(getOlympaPlayer(), plot);
     }
 
-    @Cmd(player = false, syntax = "Sauvegarder une structure", min = 1, args = "structure_name")
+    @Cmd(player = false, syntax = "Sauvegarder une structure", min = 1, args = {"structure_name", "~", "~", "~", "~", "~", "~"})
     public void save(CommandContext cmd) {
         if (getOlympaPlayer() == null)
             return;
@@ -92,7 +92,17 @@ public class StructureCommand extends AbstractCmd {
             return;
         }
 
-        Position[] pos = plugin.getWEManager().convertSelectionToPositions(getOlympaPlayer());
+        Position[] pos;
+
+        if (cmd.getArgumentsLength() == 7) {
+            pos = new Position[2];
+            pos[0] = new Position(CbCommand.parseLocation(plot, getPlayer().getLocation(), cmd.getArgument(1), cmd.getArgument(2),cmd.getArgument(3)));
+            pos[1] = new Position(CbCommand.parseLocation(plot, getPlayer().getLocation(), cmd.getArgument(4), cmd.getArgument(5),cmd.getArgument(6)));
+
+            if (pos[0] == null || pos[1] == null)
+                pos = null;
+        }else
+            pos = plugin.getWEManager().convertSelectionToPositions(getOlympaPlayer());
 
         if (pos == null) {
             OCmsg.PLOT_SCHEMS_INVALID_SELECTION.send((OlympaPlayerCreatif) getOlympaPlayer());
@@ -161,11 +171,6 @@ public class StructureCommand extends AbstractCmd {
     }
 
     public static void save(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos1, Position pos2) {
-        if (!PlotPerm.COMMAND_BLOCK.has(pc)){
-            OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.COMMAND_BLOCK, plot);
-            return;
-        }
-
         OlympaCreatifMain.getInstance().getWEManager().savePlotSchem(pc, schemName + "_" + plot, plot, pos1, pos2,
                 () -> getSchemsOf(plot.getId().getId()).add(schemName + "_" + plot));
     }
@@ -176,11 +181,6 @@ public class StructureCommand extends AbstractCmd {
     }
 
     public static void paste(OlympaPlayerCreatif pc, String schemName, Plot plot, Position origin) {
-        if (!PlotPerm.COMMAND_BLOCK.has(pc)) {
-            OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.COMMAND_BLOCK, plot);
-            return;
-        }
-
         OlympaCreatifMain.getInstance().getWEManager().pastePlotSchem(pc, schemName, plot, origin);
     }
 

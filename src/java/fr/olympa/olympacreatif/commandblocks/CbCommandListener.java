@@ -88,10 +88,13 @@ public class CbCommandListener implements Listener {
 	public void onPreprocessCommandPlayer(PlayerCommandPreprocessEvent e) {
 		//cancel commande si c'est une commande commandblock
 		CommandType cmdType = CbCommand.getCommandType(e.getMessage());
-		
-		if (cmdType == null)
+
+		//System.out.println("CbCommand : " + cmdType + " : " + (cmdType == null || cmdType.cancelPlayerExecution));
+
+		if (cmdType == null || !cmdType.cancelPlayerExecution)
 			return;
-		
+
+		//System.out.println("Command " + cmdType + " cancelled");
 		e.setCancelled(true);
 		
 		if (!ComponentCreatif.COMMANDBLOCKS.isActivated())

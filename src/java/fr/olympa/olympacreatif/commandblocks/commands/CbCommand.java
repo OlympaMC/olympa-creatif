@@ -201,18 +201,25 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		time(CmdTime::new), 
 		setworldspawn(CmdSetworldspawn::new), 
 		spreadplayers(CmdSpreadplayers::new),
+		structure(CmdStructure::new, 50, false)
 		;
 		
-		private CommandBuilder builder;
-		private int requiredCmdTickets;
+		private final CommandBuilder builder;
+		private final int requiredCmdTickets;
+		public final boolean cancelPlayerExecution;
 		
 		CommandType(CommandBuilder builder) {
 			this(builder, 1);
 		}
-		 
+
 		CommandType(CommandBuilder builder, int i) {
+			this(builder, i, true);
+		}
+
+		CommandType(CommandBuilder builder, int i, boolean cancelPlayerExecution) {
 			this.builder = builder;
 			requiredCmdTickets = i;
+			this.cancelPlayerExecution = cancelPlayerExecution;
 		}
 		
 		public int getRequiredCbTickets() {
