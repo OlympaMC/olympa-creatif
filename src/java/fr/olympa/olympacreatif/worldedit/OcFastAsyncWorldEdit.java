@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +28,7 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import fr.olympa.olympacreatif.data.*;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -66,6 +64,17 @@ import fr.olympa.olympacreatif.utils.OtherUtils;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcFastAsyncWorldEdit extends AWorldEditManager {
+
+	private Set<BlockType> blocksWithNbtNature = Set.of(
+			BlockTypes.HOPPER,
+			BlockTypes.CHEST,
+			BlockTypes.TRAPPED_CHEST,
+			BlockTypes.DISPENSER,
+			BlockTypes.DROPPER,
+			BlockTypes.END_PORTAL,
+			BlockTypes.NETHER_PORTAL,
+			BlockTypes.END_PORTAL_FRAME
+			);
 
 	private Cache<String, Clipboard> plotSchemsCache = CacheBuilder.newBuilder().concurrencyLevel(10).expireAfterAccess(5, TimeUnit.MINUTES).build();
 
@@ -273,6 +282,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				private boolean pasteCommandBlocks = true;
 
 				private int tilesCount = 0;
+				private boolean hasSentErrorMessage = false;
 
 				public OcExtent(Extent extent, OlympaPlayerCreatif pc, Plot plot) {
 					super(extent);
@@ -310,17 +320,26 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				private <T extends BlockStateHolder<T>> boolean isBlockAllowed(int x, int y, int z, T block) {
 					//System.out.println("Can place block at " + x + ", " + y + ", " + z + " : " + !(plot == null || !PlotPerm.USE_WE.has(plot, pc)));
 					if (plot == null || !PlotPerm.USE_WE.has(plot, pc)) {
-						OCmsg.NULL_CURRENT_PLOT.send(pc);
+						if (!hasSentErrorMessage)
+							OCmsg.NULL_CURRENT_PLOT.send(pc);
+
+						hasSentErrorMessage = true;
 						return false;
 					}
 
 					if (block.hasNbtData() && block.getNbtData().toString().length() > OCparam.WE_MAX_NBT_SIZE.get()) {
-						OCmsg.WE_TOO_LONG_NBT.send(pc);
+						if (!hasSentErrorMessage)
+							OCmsg.WE_TOO_LONG_NBT.send(pc);
+
+						hasSentErrorMessage = true;
 						return false;
 					}
 
-					if (block.hasNbtData() && tilesCount++ > OCparam.MAX_TILE_PER_PLOT.get()) {
-						OCmsg.WE_TOO_MUCH_TILES.send(pc, OCparam.MAX_TILE_PER_PLOT.get() + "");
+					if ((blocksWithNbtNature.contains(block.getBlockType()) || block.hasNbtData()) && tilesCount++ > OCparam.MAX_TILE_PER_PLOT.get()) {
+						if (!hasSentErrorMessage)
+							OCmsg.WE_TOO_MUCH_TILES.send(pc, OCparam.MAX_TILE_PER_PLOT.get() + "");
+
+						hasSentErrorMessage = true;
 						return false;
 					}
 
@@ -358,7 +377,10 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 							commandBlocksCount.put(chFull.getChunkKey(), currentCbCount);
 
 							if (currentCbCount > OCparam.MAX_CB_PER_CHUNK.get()) {
-								OCmsg.PLOT_LOAD_TOO_MUCH_CB_CHUNK.send(pc, plot, ch.getX() + ", " + ch.getZ());
+								if (!hasSentErrorMessage)
+									OCmsg.PLOT_LOAD_TOO_MUCH_CB_CHUNK.send(pc, plot, ch.getX() + ", " + ch.getZ());
+
+								hasSentErrorMessage = true;
 								return false;
 							}
 						} else
