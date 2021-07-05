@@ -8,6 +8,8 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import com.fastasyncworldedit.bukkit.regions.BukkitMaskManager;
 import com.fastasyncworldedit.core.Fawe;
@@ -17,6 +19,8 @@ import com.fastasyncworldedit.core.regions.general.CuboidRegionFilter;
 import com.fastasyncworldedit.core.regions.general.RegionFilter;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -62,6 +66,8 @@ import fr.olympa.olympacreatif.utils.OtherUtils;
 import fr.olympa.olympacreatif.world.WorldManager;
 
 public class OcFastAsyncWorldEdit extends AWorldEditManager {
+
+	private Cache<String, Clipboard> plotSchemsCache = CacheBuilder.newBuilder().concurrencyLevel(10).expireAfterAccess(5, TimeUnit.MINUTES).build();
 
 	public OcFastAsyncWorldEdit(OlympaCreatifMain pl) {
 		super(pl);
@@ -439,7 +445,8 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 			}
 
 			try (ClipboardReader reader = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getReader(new FileInputStream(file))) {
-				Clipboard clipboard = reader.read();
+				Clipboard clipboard = plotSchemsCache.get(schemName, () -> reader.read());
+
 				BlockVector3 origin = BlockVector3.at(pos.getX(), pos.getY(), pos.getZ());
 
 				if (!plot.getId().isInPlot(pos) ||
@@ -463,7 +470,7 @@ public class OcFastAsyncWorldEdit extends AWorldEditManager {
 				//plot.getCbData().reloadAllCommandBlocks(true);
 				OCmsg.PLOT_SCHEMS_PASTED.send(pc, plot, schemName);
 
-			} catch (IOException e) {
+			} catch (IOException | ExecutionException e) {
 				OCmsg.PLOT_SCHEMS_ERROR.send(pc, plot, schemName);
 				e.printStackTrace();
 			}

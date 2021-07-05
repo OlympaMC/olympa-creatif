@@ -308,17 +308,18 @@ public class CmdsLogic {
 
 	private Map<PlotId, String> plotsResetVerifCode = new HashMap<>();
 
-	public void resetPlot(OlympaPlayerCreatif pc, Integer plotId, String code) {
+	//return true if plot reset has been started
+	public boolean resetPlot(OlympaPlayerCreatif pc, Integer plotId, String code) {
 		Plot plot = plotId == null ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, plotId));
 
 		if (plot == null) {
 			OCmsg.NULL_CURRENT_PLOT.send(pc);
-			return;
+			return false;
 		}
 
 		if (!PlotPerm.RESET_PLOT.has(plot, pc) && !OcPermissions.STAFF_RESET_PLOT.hasPermission(pc)) {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.RESET_PLOT);
-			return;
+			return false;
 		}
 
 		if (!plotsResetVerifCode.containsKey(plot.getId())) {
@@ -337,14 +338,18 @@ public class CmdsLogic {
 		else {
 			if (!plotsResetVerifCode.get(plot.getId()).equals(code)) {
 				OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco reset " + plot + " " + plotsResetVerifCode.get(plot.getId()));
-				return;
+				return false;
 			}
 
 			plotsResetVerifCode.remove(plot.getId());
 			//OCmsg.PLOT_RESET_START.send(pc, plot);
 			plugin.getWEManager().resetPlot(pc, plot);
+
+			return true;
 			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());
 		}
+
+		return false;
 	}
 	
 	public static enum OCtimerCommand {
@@ -368,7 +373,11 @@ public class CmdsLogic {
 			this.delay = delay;
 			timerCommands.put(this, new HashSet<Long>());
 		}
-		
+
+		public void reset(OlympaPlayerCreatif pc) {
+			timerCommands.get(this).remove(pc.getId());
+		}
+
 		public boolean canExecute(OlympaPlayerCreatif pc) {
 			if (timerCommands.get(this).contains(pc.getId())) {
 				OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(pc, delay + "");

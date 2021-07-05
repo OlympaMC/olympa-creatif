@@ -126,7 +126,10 @@ public class OcoCmd extends AbstractCmd {
 		if (!OCtimerCommand.OCO_RESET.canExecute(getOlympaPlayer()))
 			return;
 		
-		plugin.getCmdLogic().resetPlot(getOlympaPlayer(), (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null), (cmd.getArgumentsLength() > 1 ? (String) cmd.getArgument(1) : null));
+		boolean isReseting = plugin.getCmdLogic().resetPlot(getOlympaPlayer(), (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null), (cmd.getArgumentsLength() > 1 ? (String) cmd.getArgument(1) : null));
+
+		if (!isReseting)
+			OCtimerCommand.OCO_RESET.reset(getOlympaPlayer());
 	}
 
 	/*

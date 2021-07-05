@@ -55,7 +55,7 @@ public class StructureCommand extends AbstractCmd {
 
                 return file.exists() ? arg : null;
             }catch(Exception ex) {
-                ex.printStackTrace();
+                //ex.printStackTrace();
                 return null;
             }
 
