@@ -109,7 +109,7 @@ public class PacketListener implements Listener {
 		});
 	}
 
-	private void handlePlayerPackets(Player player) {
+	private void handlePlayerPackets(final Player player) {
 
 		final OlympaPlayerCreatif p = AccountProviderAPI.getter().get(player.getUniqueId());
 
@@ -186,8 +186,10 @@ public class PacketListener implements Listener {
 						}
 
 						if (packet.getItemStack().getTag() != null)
-							//packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag(), p.getPlayer()));
-							packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag()));
+							if (p.hasPlayerParam(OlympaPlayerCreatif.PlayerParamType.SHOW_INVALID_NBT_ALERT))
+								packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag(), player));
+							else
+								packet.getItemStack().setTag(NBTcontrollerUtil.getValidTags(packet.getItemStack().getTag()));
 					}
 				}
 

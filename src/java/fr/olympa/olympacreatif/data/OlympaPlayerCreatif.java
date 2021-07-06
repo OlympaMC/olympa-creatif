@@ -51,13 +51,14 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_DEFAULT_PLOT_CHAT = new SQLColumn<OlympaPlayerCreatif>("playerParamDefaultPlotChat", "TINYINT(1) NOT NULL DEFAULT 0", Types.TINYINT).setUpdatable();
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_MENU_ON_SNEAK = new SQLColumn<OlympaPlayerCreatif>("playerParamOpenMenuOnSneak", "TINYINT(1) NOT NULL DEFAULT 1", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_PARAM_SHOW_INVALID_NBT_ALERT = new SQLColumn<OlympaPlayerCreatif>("playerParamShowInvalidNbtAlert", "TINYINT(1) NOT NULL DEFAULT 1", Types.TINYINT).setUpdatable();
 
 	private static final SQLColumn<OlympaPlayerCreatif> COLUMN_HAS_CLAIMED_VIP = new SQLColumn<OlympaPlayerCreatif>("hasClaimedVipReward", "BOOLEAN NOT NULL DEFAULT FALSE", Types.BOOLEAN).setUpdatable();
 
 	public static final List<SQLColumn<OlympaPlayerCreatif>> COLUMNS = Arrays.asList(COLUMN_MONEY, COLUMN_REDSTONE_KIT, COLUMN_PEACEFUL_KIT,
-			COLUMN_HOSTILE_KIT, COLUMN_FLUID_KIT, COLUMN_COMMANDBLOCK_KIT,
-			COLUMN_ADMIN_KIT, COLUMN_UPGRADE_COMMANDBLOCK, COLUMN_UPGRADE_BONUSPLOTS,
-			COLUMN_UPGRADE_BONUSMEMBERS, COLUMN_PARAM_DEFAULT_PLOT_CHAT, COLUMN_PARAM_MENU_ON_SNEAK,
+			COLUMN_HOSTILE_KIT, COLUMN_FLUID_KIT, COLUMN_COMMANDBLOCK_KIT, COLUMN_ADMIN_KIT,
+			COLUMN_UPGRADE_COMMANDBLOCK, COLUMN_UPGRADE_BONUSPLOTS, COLUMN_UPGRADE_BONUSMEMBERS,
+			COLUMN_PARAM_DEFAULT_PLOT_CHAT, COLUMN_PARAM_MENU_ON_SNEAK, COLUMN_PARAM_SHOW_INVALID_NBT_ALERT,
 			COLUMN_HAS_CLAIMED_VIP);
 
 	private static final Map<KitType, SQLColumn<OlympaPlayerCreatif>> kitsColumns = ImmutableMap.<KitType, SQLColumn<OlympaPlayerCreatif>>builder()
@@ -107,7 +108,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 		for (UpgradeType upg : UpgradeType.values())
 			upgrades.put(upg, 0);
 
-		playerParams.add(PlayerParamType.OPEN_GUI_ON_SNEAK);
+		playerParams.addAll(Arrays.asList(PlayerParamType.values()));
 	}
 
 	@Override
@@ -397,7 +398,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 
 	public enum PlayerParamType {
 		DEFAULT_PLOT_CHAT("playerParamDefaultPlotChat"),
-		OPEN_GUI_ON_SNEAK("playerParamOpenMenuOnSneak");
+		OPEN_GUI_ON_SNEAK("playerParamOpenMenuOnSneak"),
+		SHOW_INVALID_NBT_ALERT("playerParamShowInvalidNbtAlert");
 
 		private String bddKey;
 

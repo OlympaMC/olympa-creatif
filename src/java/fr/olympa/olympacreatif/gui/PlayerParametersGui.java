@@ -20,14 +20,23 @@ public class PlayerParametersGui extends IGui{
 					
 					changeItem(it, PlotParametersGui.setSwitchState(it, p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT), true));
 				});
-		
-		setItem(1, PlotParametersGui.setSwitchState(ItemUtils.item(Material.CRAFTING_TABLE, "§6Double sneak pour ouvrir le menu"), 
-				p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK), true), 
+
+		setItem(1, PlotParametersGui.setSwitchState(ItemUtils.item(Material.CRAFTING_TABLE, "§6Double sneak pour ouvrir le menu"),
+				p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK), true),
 				(it, i, s) -> {
 					if (!isOpenByStaff)
 						p.setPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK, !p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK));
-					
+
 					changeItem(it, PlotParametersGui.setSwitchState(it, p.hasPlayerParam(PlayerParamType.OPEN_GUI_ON_SNEAK), true));
+				});
+
+		setItem(2, PlotParametersGui.setSwitchState(ItemUtils.item(Material.NAME_TAG, "§6Afficher alertes tags non acceptés"),
+				p.hasPlayerParam(PlayerParamType.SHOW_INVALID_NBT_ALERT), true),
+				(it, i, s) -> {
+					if (!isOpenByStaff)
+						p.setPlayerParam(PlayerParamType.SHOW_INVALID_NBT_ALERT, !p.hasPlayerParam(PlayerParamType.SHOW_INVALID_NBT_ALERT));
+
+					changeItem(it, PlotParametersGui.setSwitchState(it, p.hasPlayerParam(PlayerParamType.SHOW_INVALID_NBT_ALERT), true));
 				});
 	}
 	

@@ -173,12 +173,14 @@ public class Plot {
 
 	//private int nextAllowedTilesCheckup = 0;
 
-	public void updateTimeTask() {
+	public void updateTime() {
 		currentTime = -1;
 		plugin.getTask().cancelTaskById(timeUpdateScheduler);
 
 		if (getParameters().getParameter(PlotParamType.PLOT_TIME_CYCLE)){
 			currentTime = getParameters().getParameter(PlotParamType.PLOT_TIME);
+
+			getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
 
 			timeUpdateScheduler = plugin.getTask().scheduleSyncRepeatingTask(() -> {
 				currentTime = (currentTime + 20 * 60) % 24_000;
