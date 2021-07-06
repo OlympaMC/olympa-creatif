@@ -183,9 +183,9 @@ public class Plot {
 			getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
 
 			timeUpdateScheduler = plugin.getTask().scheduleSyncRepeatingTask(() -> {
-				currentTime = (currentTime + 20 * 60) % 24_000;
+				currentTime = (currentTime + 20 * 20) % 24_000;
 				getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
-			}, 20*60, 20*60);
+			}, 20*20, 20*20);
 		}
 	}
 

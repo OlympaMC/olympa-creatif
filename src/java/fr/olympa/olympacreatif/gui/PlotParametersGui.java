@@ -91,15 +91,15 @@ public class PlotParametersGui extends IGui {
 			if (!canChangeSettings)
 				return;
 
-			if (c == ClickType.MIDDLE) {
+			if (c == ClickType.MIDDLE)
 				PlotParamType.PLOT_TIME_CYCLE.setValue(plot, !plot.getParameters().getParameter(PlotParamType.PLOT_TIME_CYCLE));
-			}else if (c == ClickType.LEFT)
+			else if (c == ClickType.LEFT)
 				PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 1000)%24000);
 			else if (c == ClickType.RIGHT)
 				PlotParamType.PLOT_TIME.setValue(plot, (plot.getParameters().getParameter(PlotParamType.PLOT_TIME) + 23000)%24000);
 
 			ItemStack item2 = ItemUtils.lore(item.clone(), "§eHeure actuelle : " +
-							((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) / 1000 + timeToAdd) % 25) + "h",
+							((plot.getParameters().getParameter(PlotParamType.PLOT_TIME) / 1000 + timeToAdd) % 24) + "h",
 							"§eDéfilement auto : " + (plot.getParameters().getParameter(PlotParamType.PLOT_TIME_CYCLE) ? "§aoui" : "§cnon"),
 							"",	"§7Clic droit : +1h", "§7Clic gauche : -1h", "§7Clic molette : activer/désactiver lemouvement du soleil");
 
