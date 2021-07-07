@@ -260,6 +260,6 @@ public abstract class AWorldEdit {
 
 	public abstract boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Material mat, int matY);
 
-	public abstract boolean export(final Plot plot, final OlympaPlayerCreatif p);
-	public abstract boolean restore(final Plot plot, final OlympaPlayerCreatif p);
+	public abstract boolean exportPlot(final Plot plot, final OlympaPlayerCreatif p);
+	public abstract boolean restorePlot(final Plot plot, final OlympaPlayerCreatif p);
 }

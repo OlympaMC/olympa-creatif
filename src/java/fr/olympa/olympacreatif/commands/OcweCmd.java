@@ -2,7 +2,6 @@ package fr.olympa.olympacreatif.commands;
 
 import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
-import fr.olympa.api.common.permission.OlympaSpigotPermission;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
@@ -62,7 +61,7 @@ public class OcweCmd extends AbstractCmd {
             return;
         }
 
-        if (plugin.getWEManager().export(plot, getOlympaPlayer()))
+        if (plugin.getWEManager().exportPlot(plot, getOlympaPlayer()))
             CmdsLogic.OCtimerCommand.EXPORT.delay(getOlympaPlayer());
     }
 
@@ -95,7 +94,7 @@ public class OcweCmd extends AbstractCmd {
             return;
         }
 
-        if (plugin.getWEManager().restore(plot, getOlympaPlayer()))
+        if (plugin.getWEManager().restorePlot(plot, getOlympaPlayer()))
             CmdsLogic.OCtimerCommand.RESTORE.delay(getOlympaPlayer());
     }
 

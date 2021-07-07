@@ -16,8 +16,6 @@ public class OcEmptyWorldEdit extends AWorldEdit {
 
     @Override
     public void clearClipboard(Plot plot, Player p) {
-        //OCmsg.WE_DISABLED.send(p);
-        //return false;
     }
 
     @Override
@@ -28,7 +26,7 @@ public class OcEmptyWorldEdit extends AWorldEdit {
 
     @Override
     public Position[] convertSelectionToPositions(OlympaPlayerCreatif pc) {
-        OCmsg.WE_DISABLED.send(pc);
+        //OCmsg.WE_DISABLED.send(pc);
         return null;
     }
 
@@ -54,13 +52,13 @@ public class OcEmptyWorldEdit extends AWorldEdit {
     }
 
     @Override
-    public boolean export(Plot plot, OlympaPlayerCreatif p) {
+    public boolean exportPlot(Plot plot, OlympaPlayerCreatif p) {
         OCmsg.WE_DISABLED.send(p);
         return false;
     }
 
     @Override
-    public boolean restore(Plot plot, OlympaPlayerCreatif p) {
+    public boolean restorePlot(Plot plot, OlympaPlayerCreatif p) {
         OCmsg.WE_DISABLED.send(p);
         return false;
     }

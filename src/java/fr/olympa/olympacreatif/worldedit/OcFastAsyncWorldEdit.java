@@ -30,6 +30,7 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import fr.olympa.olympacreatif.data.*;
 import org.bukkit.Bukkit;
@@ -513,8 +514,12 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.RESET_PLOT);
 			return false;
 
-		}else*/ if (mat.isBlock()) {
+		}else*/ if (!mat.isBlock()) {
 			OCmsg.WE_NOT_BLOCK_BLOCK.send(pc);
+			return false;
+
+		}else if (!plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(pc, mat)) {
+			OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, plugin.getPerksManager().getKitsManager().getKitOf(mat));
 			return false;
 
 		}else if (matY < 1 || matY > 250){
@@ -535,10 +540,12 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 					for (int z = zMin; z <= zMax; z++)
 						session.setBlock(x, 0, z, BlockTypes.BEDROCK);
 
+				BlockState state = BukkitAdapter.adapt(Bukkit.createBlockData(mat));
+
 				for (int x = xMin; x <= xMax; x++)
 					for (int z = zMin; z <= zMax; z++)
 						for (int y = 1; y <= matY; y++)
-							session.setBlock(x, y, z, BukkitAdapter.adapt(Bukkit.createBlockData(mat)));
+							session.setBlock(x, y, z, state);
 
 				for (int x = xMin; x <= xMax; x++)
 					for (int z = zMin; z <= zMax; z++)
@@ -573,7 +580,7 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 	}
 
 	@Override
-	public boolean export(final Plot plot, final OlympaPlayerCreatif p) {
+	public boolean exportPlot(final Plot plot, final OlympaPlayerCreatif p) {
 		if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 			OCmsg.WE_DISABLED.send(p);
 			return false;
@@ -630,7 +637,7 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 	}
 
 	@Override
-	public boolean restore(final Plot plot, final OlympaPlayerCreatif p) {
+	public boolean restorePlot(final Plot plot, final OlympaPlayerCreatif p) {
 		if (!ComponentCreatif.WORLDEDIT.isActivated()) {
 			OCmsg.WE_DISABLED.send(p);
 			return false;
