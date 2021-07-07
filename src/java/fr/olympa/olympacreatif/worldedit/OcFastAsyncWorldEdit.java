@@ -63,7 +63,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.utils.OtherUtils;
 import fr.olympa.olympacreatif.world.WorldManager;
 
-public class OcFastAsyncWorldEdit extends AWorldEditManager {
+public class OcFastAsyncWorldEdit extends AWorldEdit {
 
 	private Set<BlockType> blocksWithNbtNature = Set.of(
 			BlockTypes.HOPPER,

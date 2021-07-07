@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import fr.olympa.olympacreatif.worldedit.AWorldEdit;
+import fr.olympa.olympacreatif.worldedit.OcEmptyWorldEdit;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -191,9 +193,21 @@ public class PermissionsManager implements Listener {
 	
 	
 	public enum ComponentCreatif {
-		WORLDEDIT("worldedit", () -> Bukkit.getOnlinePlayers().forEach(p -> 
-		OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(AccountProviderAPI.getter().get(p.getUniqueId()))), 
-				() -> Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance().getPermissionsManager().setWePerms(AccountProviderAPI.getter().get(p.getUniqueId())))),
+
+		//WE("worldedit", )
+
+		WORLDEDIT("worldedit", () -> {
+			Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance()
+					.getPermissionsManager().setWePerms(AccountProviderAPI.getter().get(p.getUniqueId())));
+
+			OlympaCreatifMain.getInstance().setWeActivationState(false);
+		},
+		() -> {
+			Bukkit.getOnlinePlayers().forEach(p -> OlympaCreatifMain.getInstance()
+					.getPermissionsManager().setWePerms(AccountProviderAPI.getter().get(p.getUniqueId())));
+
+			OlympaCreatifMain.getInstance().setWeActivationState(true);
+		}),
 		
 		COMMANDBLOCKS("commandblocks_and_vanilla_commands", () -> Bukkit.getOnlinePlayers().forEach(p -> 
 		OlympaCreatifMain.getInstance().getPermissionsManager().setCbPerms(AccountProviderAPI.getter().get(p.getUniqueId()))), 
@@ -203,7 +217,7 @@ public class PermissionsManager implements Listener {
 		(e.getType() != EntityType.PLAYER)).forEach(e -> e.remove())),
 		
 		REDSTONE("redstone", null, null);
-		
+
 		private String name;
 		private boolean isActivated = true;
 		private Runnable onActivate;

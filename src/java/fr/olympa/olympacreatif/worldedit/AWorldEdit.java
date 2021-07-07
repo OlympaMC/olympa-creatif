@@ -13,13 +13,13 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
 
-public abstract class AWorldEditManager {
+public abstract class AWorldEdit {
 	
 	protected OlympaCreatifMain plugin;
 	
 	protected static Map<PlotId, Integer> resetingPlots = new HashMap<PlotId, Integer>();
 	
-	public AWorldEditManager(OlympaCreatifMain plugin) {
+	public AWorldEdit(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
 	}
 	
@@ -32,10 +32,7 @@ public abstract class AWorldEditManager {
 		return false;
 	}
 	
-	public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {
-		OCmsg.WE_DISABLED.send(requester);
-		return false;
-	}
+	public abstract boolean resetPlot(OlympaPlayerCreatif requester, Plot plot);
 	
 	/*public boolean resetPlot(OlympaPlayerCreatif requester, Plot plot) {
 		if (isReseting(plot))
@@ -248,21 +245,13 @@ public abstract class AWorldEditManager {
 		}
 	};*/
 
-	public Position[] convertSelectionToPositions(OlympaPlayerCreatif pc) {
-		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
-	}
+	public abstract Position[] convertSelectionToPositions(OlympaPlayerCreatif pc);
 
-	public void savePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos1, Position pos2, Runnable successCallback) {
-		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
-	}
+	public abstract void savePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position pos1, Position pos2, Runnable successCallback);
 
-	public void deletePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Runnable successCallback) {
-		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
-	}
+	public abstract void deletePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Runnable successCallback);
 
-	public void pastePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position origin) {
-		throw new UnsupportedOperationException("Impossible to execute this function, none of WE or FAWE are available.");
-	}
+	public abstract void pastePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position origin);
 
 	protected final int getVolume(Position pos1, Position pos2){
 		return (int) ((Math.max(pos1.getX(), pos2.getX()) - Math.min(pos1.getX(), pos2.getX())) *

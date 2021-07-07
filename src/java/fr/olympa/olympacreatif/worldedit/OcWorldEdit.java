@@ -33,13 +33,13 @@ import fr.olympa.olympacreatif.data.PermissionsManager.ComponentCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 
-public class OcWorldEdit extends AWorldEditManager {
+public class OcWorldEdit /*extends AWorldEdit*/ {
 
 	private WorldEdit we;
 	private IAsyncWorldEdit awe;
 
 	public OcWorldEdit(OlympaCreatifMain plugin) {
-		super(plugin);
+		//super(plugin);
 
 		we = ((WorldEditPlugin) plugin.getServer().getPluginManager().getPlugin("WorldEdit")).getWorldEdit();
 		registerEventHandler();
@@ -59,7 +59,7 @@ public class OcWorldEdit extends AWorldEditManager {
 		plugin.getLogger().info("§dLoaded WorldEdit + AsyncWorldEdit.");
 	}
 
-	@Override
+	//@Override
 	public void clearClipboard(Plot plot, Player p) {
 		LocalSession weSession = we.getSessionManager().get(BukkitAdapter.adapt(p));
 
@@ -205,7 +205,7 @@ public class OcWorldEdit extends AWorldEditManager {
 
 				OlympaPlayerCreatif p = AccountProviderAPI.getter().get(e.getActor().getUniqueId());
 
-				Plot plot = plugin.getPlotsManager().getPlot(((Player) p.getPlayer()).getLocation());
+				Plot plot = null;//plugin.getPlotsManager().getPlot(((Player) p.getPlayer()).getLocation());
 
 				if (!p.hasStaffPerm(StaffPerm.WORLDEDIT) && (plot == null || !PlotPerm.USE_WE.has(plot, p))) {
 					e.setExtent(new AbstractDelegateExtent(e.getExtent()) {

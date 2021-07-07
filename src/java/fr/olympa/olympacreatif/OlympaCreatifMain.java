@@ -1,11 +1,11 @@
 package fr.olympa.olympacreatif;
 
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import fr.olympa.olympacreatif.commands.*;
+import fr.olympa.olympacreatif.worldedit.OcEmptyWorldEdit;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.common.groups.OlympaGroup;
@@ -35,7 +35,7 @@ import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldManager;
-import fr.olympa.olympacreatif.worldedit.AWorldEditManager;
+import fr.olympa.olympacreatif.worldedit.AWorldEdit;
 import fr.olympa.olympacreatif.worldedit.OcFastAsyncWorldEdit;
 import fr.olympa.olympacreatif.worldedit.OcWorldEdit;
 
@@ -50,7 +50,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	private CmdsLogic cmdLogic;
 
 	private PermissionsManager permsManager;
-	private AWorldEditManager weManager = null;
+
+	private AWorldEdit unusedWeInterface = null;
+	private AWorldEdit weManager;
 
 	//private LuckPerms luckperms;
 
@@ -193,8 +195,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		if (getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") != null)
 			weManager = new OcFastAsyncWorldEdit(this);
-		else if (getServer().getPluginManager().getPlugin("WorldEdit") != null && getServer().getPluginManager().getPlugin("AsyncWorldEdit") != null)
-			weManager = new OcWorldEdit(this);
+		else
+			weManager = new OcEmptyWorldEdit(this);
+		/*else if (getServer().getPluginManager().getPlugin("WorldEdit") != null && getServer().getPluginManager().getPlugin("AsyncWorldEdit") != null)
+			weManager = new OcWorldEdit(this);*/
 
 		//gestion particulière des hologrammes
 		OlympaAPIPermissionsSpigot.COMMAND_HOLOGRAMS_MANAGE.setMinGroup(OcPermissions.USE_HOLOGRAMS.getMinGroup());
@@ -404,8 +408,19 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		return worldManager;
 	}
 
-	public AWorldEditManager getWEManager() {
+	public AWorldEdit getWEManager() {
 		return weManager;
+	}
+
+	public void setWeActivationState(boolean activated) {
+		if (unusedWeInterface == null && !activated){
+			unusedWeInterface = weManager;
+			weManager = new OcEmptyWorldEdit(this);
+
+		}else if (unusedWeInterface != null && activated){
+			weManager = unusedWeInterface;
+			unusedWeInterface = null;
+		}
 	}
 
 	public PlotsManager getPlotsManager() {
