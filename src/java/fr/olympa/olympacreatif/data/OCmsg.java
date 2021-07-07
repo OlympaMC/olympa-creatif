@@ -164,6 +164,8 @@ public class OCmsg {
 	public static final OCmsg PLOT_SCHEMS_FILE_DELETED = new OCmsg();
 	public static final OCmsg PLOT_SCHEMS_INVALID_SELECTION = new OCmsg();
 
+	public static final OCmsg WE_NOT_BLOCK_BLOCK = new OCmsg();
+
 
 	static {
 		Bukkit.getServer().getPluginManager().registerEvents(new Listener() {

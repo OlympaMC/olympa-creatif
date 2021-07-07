@@ -139,6 +139,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		new OcCmd(this).register();
 		new OcoCmd(this).register();
+		new OcweCmd(this).register();
 		new OcaCmd(this).register();
 
 		new MenuCommand(this).register();

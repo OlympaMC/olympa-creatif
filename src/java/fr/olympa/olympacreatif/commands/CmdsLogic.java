@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import fr.olympa.api.common.player.OlympaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -306,10 +307,10 @@ public class CmdsLogic {
 			sender.sendMessage("§aListe des parcelles possédées par " + target.getName() + " : §cjoueur hors ligne ou ne possédant aucune parcelle");
 	}
 
-	private Map<PlotId, String> plotsResetVerifCode = new HashMap<>();
+	//private Map<PlotId, String> plotsResetVerifCode = new HashMap<>();
 
 	//return true if plot reset has been started
-	public boolean resetPlot(OlympaPlayerCreatif pc, Integer plotId, String code) {
+	public boolean resetPlot(OlympaPlayerCreatif pc, Integer plotId) {
 		Plot plot = plotId == null ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, plotId));
 
 		if (plot == null) {
@@ -322,42 +323,18 @@ public class CmdsLogic {
 			return false;
 		}
 
-		if (!plotsResetVerifCode.containsKey(plot.getId())) {
-			String check = "";
-			for (int i = 0; i < 6; i++)
-				check += (char) (ThreadLocalRandom.current().nextInt(26) + 'a');
+		plugin.getWEManager().resetPlot(pc, plot);
 
-			plotsResetVerifCode.put(plot.getId(), check);
-			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco reset " + plot + " " + check);
-			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dVeuillez saisir la commande /oca resetplot %s %s pour réinitialiser la parcelle %s (%s). \n§cAttention cette action est irréversible !!", plot.getPlotId(), check, plot.getPlotId(), plot.getMembers().getOwner().getName());
-
-			plugin.getTask().runTaskLater(() -> plotsResetVerifCode.remove(plot.getId()), 600);
-
-		} else if (code == null)
-			OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco reset " + plot + " " + plotsResetVerifCode.get(plot.getId()));
-		else {
-			if (!plotsResetVerifCode.get(plot.getId()).equals(code)) {
-				OCmsg.PLOT_PRE_RESET.send(pc, plot, "/oco reset " + plot + " " + plotsResetVerifCode.get(plot.getId()));
-				return false;
-			}
-
-			plotsResetVerifCode.remove(plot.getId());
-			//OCmsg.PLOT_RESET_START.send(pc, plot);
-			plugin.getWEManager().resetPlot(pc, plot);
-
-			return true;
-			//Prefix.DEFAULT.sendMessage(pc.getPlayer(), "§dLa parcelle %s (%s) va se réinitialiser.", plot.getPlotId(), plot.getMembers().getOwner().getName());
-		}
-
-		return false;
+		return true;
 	}
 	
 	public static enum OCtimerCommand {
-		OCO_RESET(180),
-		OCO_RESTORE(180),
-		OCO_EXPORT(180),
-		OCO_RELOAD_COMMANDBLOCKS(40),
-		OC_VISIT_PLOT_RANDOM(2),
+		RESET(10),
+		RESTORE(10),
+		EXPORT(10),
+		RELOAD_COMMANDBLOCKS(40),
+		VISIT_PLOT_RANDOM(2),
+		SETFLOOR(10),
 		;
 		
 		private int delay;
@@ -374,21 +351,27 @@ public class CmdsLogic {
 			timerCommands.put(this, new HashSet<Long>());
 		}
 
-		public void reset(OlympaPlayerCreatif pc) {
+		public void reset2(OlympaPlayerCreatif pc) {
 			timerCommands.get(this).remove(pc.getId());
 		}
 
-		public boolean canExecute(OlympaPlayerCreatif pc) {
+		public boolean canExecute2(OlympaPlayerCreatif pc) {
 			if (timerCommands.get(this).contains(pc.getId())) {
 				OCmsg.WAIT_BEFORE_REEXECUTE_COMMAND.send(pc, delay + "");
 				return false;	
 			}
-			
-			OlympaCreatifMain.getInstance().getTask().runTaskLater(() -> timerCommands.get(this).remove(pc.getId()), 20 * delay);
-			timerCommands.get(this).add(pc.getId());
+
 			return true;
 		}
-	}
+
+        public void delay(OlympaPlayerCreatif pc) {
+			if (timerCommands.get(this).contains(pc.getId()))
+				return;
+
+			OlympaCreatifMain.getInstance().getTask().runTaskLater(() -> timerCommands.get(this).remove(pc.getId()), 20 * delay);
+			timerCommands.get(this).add(pc.getId());
+        }
+    }
 }
 
 

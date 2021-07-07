@@ -5,6 +5,7 @@ import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.Position;
 import fr.olympa.olympacreatif.plot.Plot;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class OcEmptyWorldEdit extends AWorldEdit {
@@ -44,5 +45,23 @@ public class OcEmptyWorldEdit extends AWorldEdit {
     @Override
     public void pastePlotSchem(OlympaPlayerCreatif pc, String schemName, Plot plot, Position origin) {
         OCmsg.WE_DISABLED.send(pc);
+    }
+
+    @Override
+    public boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Material mat, int matY) {
+        OCmsg.WE_DISABLED.send(pc);
+        return false;
+    }
+
+    @Override
+    public boolean export(Plot plot, OlympaPlayerCreatif p) {
+        OCmsg.WE_DISABLED.send(p);
+        return false;
+    }
+
+    @Override
+    public boolean restore(Plot plot, OlympaPlayerCreatif p) {
+        OCmsg.WE_DISABLED.send(p);
+        return false;
     }
 }

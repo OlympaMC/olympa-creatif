@@ -15,7 +15,6 @@ import fr.olympa.olympacreatif.data.Position;
 import fr.olympa.olympacreatif.gui.MainGui;
 import fr.olympa.olympacreatif.gui.MembersGui;
 import fr.olympa.olympacreatif.gui.PlayerPlotsGui;
-import fr.olympa.olympacreatif.gui.ShopGui;
 import fr.olympa.olympacreatif.gui.ShopGuiPourApresLaBeta;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -107,7 +106,7 @@ public class OcCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Visiter une parcelle aléatoire")
 	public void visitrandom(CommandContext cmd) {
-		if (!OCtimerCommand.OC_VISIT_PLOT_RANDOM.canExecute(getOlympaPlayer()))
+		if (!OCtimerCommand.VISIT_PLOT_RANDOM.canExecute2(getOlympaPlayer()))
 			return;
 		
 		plugin.getCmdLogic().visitPlotRandom(getOlympaPlayer());

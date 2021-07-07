@@ -2,12 +2,9 @@ package fr.olympa.olympacreatif.commands;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
@@ -75,62 +72,7 @@ public class OcoCmd extends AbstractCmd {
 		getPlayer().sendMessage(debug);
 	}
 	
-	@Cmd(player = true, syntax = "Exporter sa parcelle en .schematic")
-	public void export(CommandContext cmd) {
-		if (!OcPermissions.USE_PLOT_EXPORTATION.hasPermissionWithMsg(getOlympaPlayer()))
-			return;
-		
-		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
-		
-		if (plot == null) {
-			//OCmsg.WE_PLOT_EXPORT_FAILED.send(getPlayer(), plot);
-			OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
-			return;
-		}else if (!PlotPerm.EXPORT_PLOT.has((OlympaPlayerCreatif) getOlympaPlayer())) {
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.EXPORT_PLOT);
-			return;
-		}
 
-		if (!OCtimerCommand.OCO_EXPORT.canExecute(getOlympaPlayer()))
-			return;
-
-		plugin.getPerksManager().getSchematicCreator().export(plot, getOlympaPlayer());
-	}
-	
-	
-	@Cmd(player = true, syntax = "Restaurer sa parcelle vers la dernière version sauvegardée")
-	public void restore(CommandContext cmd) {
-		if (!OcPermissions.USE_PLOT_EXPORTATION.hasPermissionWithMsg(getOlympaPlayer()))
-			return;
-		
-		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
-		
-		if (plot == null) {
-			//OCmsg.WE_PLOT_RESTAURATION_FAILED.send(getPlayer(), plot);
-			OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
-			return;
-		}else if (!PlotPerm.EXPORT_PLOT.has((OlympaPlayerCreatif) getOlympaPlayer())) {
-			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.EXPORT_PLOT);
-			return;
-		}
-
-		if (!OCtimerCommand.OCO_RESTORE.canExecute(getOlympaPlayer()))
-			return;
-		
-		plugin.getPerksManager().getSchematicCreator().restore(plot, getOlympaPlayer());
-	}
-	
-	
-	@Cmd(player = true, syntax = "Réinitialiser une parcelle. §cATTENTION : §4ACTION IRREVERSIBLE !!", args = {"INTEGER", "code"}/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
-	public void reset(CommandContext cmd) {
-		if (!OCtimerCommand.OCO_RESET.canExecute(getOlympaPlayer()))
-			return;
-		
-		boolean isReseting = plugin.getCmdLogic().resetPlot(getOlympaPlayer(), (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null), (cmd.getArgumentsLength() > 1 ? (String) cmd.getArgument(1) : null));
-
-		if (!isReseting)
-			OCtimerCommand.OCO_RESET.reset(getOlympaPlayer());
-	}
 
 	/*
 	@Cmd(player = true, syntax = "Définir votre vitesse de vol", args = "INTEGER", min = 1)
@@ -175,7 +117,7 @@ public class OcoCmd extends AbstractCmd {
 	
 	@Cmd(player = true, syntax = "Recharger tous les commandblocks de la parcelle"/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
 	public void reloadcommandblocks(CommandContext cmd) {
-		if (!OCtimerCommand.OCO_RELOAD_COMMANDBLOCKS.canExecute(getOlympaPlayer()))
+		if (!OCtimerCommand.RELOAD_COMMANDBLOCKS.canExecute2(getOlympaPlayer()))
 			return;
 		
 		Plot plot = ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot();
@@ -183,11 +125,14 @@ public class OcoCmd extends AbstractCmd {
 		if (plot == null) {
 			OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
 			return;
+
 		}else if (!PlotPerm.COMMAND_BLOCK.has(plot, getOlympaPlayer())) {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send((OlympaPlayerCreatif) getOlympaPlayer(), PlotPerm.COMMAND_BLOCK);
 			return;
 		}
-		
+
+		OCtimerCommand.RELOAD_COMMANDBLOCKS.delay(getOlympaPlayer());
+
 		plot.getCbData().reloadAllCommandBlocks(true);
 		OCmsg.PLOT_COMMANDBLOCKS_WILL_RELOAD.send(getPlayer());
 	}

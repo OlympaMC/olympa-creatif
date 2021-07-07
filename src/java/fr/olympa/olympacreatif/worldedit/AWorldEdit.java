@@ -3,12 +3,11 @@ package fr.olympa.olympacreatif.worldedit;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sk89q.worldedit.math.BlockVector3;
 import fr.olympa.olympacreatif.data.Position;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import fr.olympa.olympacreatif.OlympaCreatifMain;
-import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotId;
@@ -258,4 +257,9 @@ public abstract class AWorldEdit {
 				(Math.max(pos1.getY(), pos2.getY()) - Math.min(pos1.getY(), pos2.getY())) *
 				(Math.max(pos1.getZ(), pos2.getZ()) - Math.min(pos1.getZ(), pos2.getZ())));
 	}
+
+	public abstract boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Material mat, int matY);
+
+	public abstract boolean export(final Plot plot, final OlympaPlayerCreatif p);
+	public abstract boolean restore(final Plot plot, final OlympaPlayerCreatif p);
 }

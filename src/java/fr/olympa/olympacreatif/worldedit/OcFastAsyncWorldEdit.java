@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +32,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import fr.olympa.olympacreatif.data.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
@@ -501,6 +504,58 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 	}
 
 	@Override
+	public boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Material mat, int matY) {
+		/*if (plot == null){
+			OCmsg.NULL_CURRENT_PLOT.send(pc);
+			return false;
+
+		} else if (!PlotPerm.RESET_PLOT.has(plot, pc)){
+			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.RESET_PLOT);
+			return false;
+
+		}else*/ if (mat.isBlock()) {
+			OCmsg.WE_NOT_BLOCK_BLOCK.send(pc);
+			return false;
+
+		}else if (matY < 1 || matY > 250){
+			OCmsg.WE_FAIL_RESTORING_PLOT.send(pc);
+			return false;
+		}
+
+		plugin.getTask().runTaskAsynchronously(() -> {
+			int xMin = plot.getId().getLocation().getBlockX();
+			int zMin = plot.getId().getLocation().getBlockZ();
+			int xMax = xMin + OCparam.PLOT_SIZE.get() - 1;
+			int zMax = zMin + OCparam.PLOT_SIZE.get() - 1;
+
+			try (EditSession session = new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld())))) {
+				OCmsg.PLOT_RESET_START.send(pc, plot);
+
+				for (int x = xMin; x <= xMax; x++)
+					for (int z = zMin; z <= zMax; z++)
+						session.setBlock(x, 0, z, BlockTypes.BEDROCK);
+
+				for (int x = xMin; x <= xMax; x++)
+					for (int z = zMin; z <= zMax; z++)
+						for (int y = 1; y <= matY; y++)
+							session.setBlock(x, y, z, BukkitAdapter.adapt(Bukkit.createBlockData(mat)));
+
+				for (int x = xMin; x <= xMax; x++)
+					for (int z = zMin; z <= zMax; z++)
+						for (int y = matY + 1; y < 256; y++)
+							session.setBlock(x, y, z, BlockTypes.AIR);
+
+				session.flushQueue();
+				session.close();
+
+				OCmsg.PLOT_RESET_END.send(pc);
+			}
+		});
+
+		return true;
+	}
+
+	@Override
 	public Position[] convertSelectionToPositions(OlympaPlayerCreatif pc) {
 		LocalSession weSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt((Player)pc.getPlayer()));
 		World world = weSession.getSelectionWorld();
@@ -515,5 +570,105 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 			return new Position[]{new Position(vec1.getBlockX(), vec1.getBlockY(), vec1.getBlockZ(), 0, 0),
 					new Position(vec2.getBlockX(), vec2.getBlockY(), vec2.getBlockZ(), 0, 0)};
 		}
+	}
+
+	@Override
+	public boolean export(final Plot plot, final OlympaPlayerCreatif p) {
+		if (!ComponentCreatif.WORLDEDIT.isActivated()) {
+			OCmsg.WE_DISABLED.send(p);
+			return false;
+		}
+
+		OCmsg.WE_START_GENERATING_PLOT_SCHEM.send(p, plot);
+
+		//création fichier & dir si existants
+		//create the Clipboard to copy
+		//Generates the .schematic file from the clipboard
+		plugin.getTask().runTaskAsynchronously(() -> {
+
+			//création fichier & dir si existants
+			File dir = new File(plugin.getDataFolder() + "/schematics");
+			File schemFile = new File(dir.getAbsolutePath(), plot.getMembers().getOwner().getName() + "_" + plot.getId() + ".schem");
+			plugin.getDataFolder().mkdir();
+			dir.mkdir();
+			try {
+				schemFile.delete();
+				schemFile.createNewFile();
+				schemFile.deleteOnExit();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+
+			//create the Clipboard to copy
+			BlockVector3 v1 = BlockVector3.at(plot.getId().getLocation().getBlockX(), 0, plot.getId().getLocation().getBlockZ());
+			BlockVector3 v2 = BlockVector3.at(plot.getId().getLocation().getBlockX() + OCparam.PLOT_SIZE.get() - 1, 255, plot.getId().getLocation().getBlockZ() + OCparam.PLOT_SIZE.get() - 1);
+
+			CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), v1, v2);
+			BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+
+			EditSession session = WorldEdit.getInstance().getEditSessionFactory().getEditSession(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()), -1);
+
+			ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(session, region, clipboard, region.getMinimumPoint());
+			forwardExtentCopy.setCopyingEntities(true);
+
+
+			//Generates the .schematic file from the clipboard
+			try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(schemFile))) {
+				Operations.complete(forwardExtentCopy);
+				writer.write(clipboard);
+
+			} catch (IOException | WorldEditException e) {
+				e.printStackTrace();
+			}
+
+			plugin.getDataManager().saveSchemToDb(p, plot, schemFile);
+			OCmsg.WE_COMPLETE_GENERATING_PLOT_SCHEM.send(p, plot);
+		});
+
+		return true;
+		//return "§4La fonctionnalité d'export de la parcelle est indisponible pendant la bêta, désolé ¯\\_༼ ಥ ‿ ಥ ༽_/¯";
+	}
+
+	@Override
+	public boolean restore(final Plot plot, final OlympaPlayerCreatif p) {
+		if (!ComponentCreatif.WORLDEDIT.isActivated()) {
+			OCmsg.WE_DISABLED.send(p);
+			return false;
+		}
+
+		OCmsg.WE_START_RESTORING_PLOT.send(p, plot);
+
+		plugin.getTask().runTaskAsynchronously(() -> {
+			Blob blob = plugin.getDataManager().loadSchemFromDb(p, plot);
+
+			if (blob == null) {
+				OCmsg.WE_NO_PLOT_SCHEM_FOUND.send(p);
+				return;
+			}
+
+			try (ClipboardReader reader = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getReader(blob.getBinaryStream())) {
+				Clipboard clipboard = reader.read();
+				BlockVector3 origin = BlockVector3.at(plot.getId().getLocation().getBlockX(), 0, plot.getId().getLocation().getBlockZ());
+
+				try (EditSession editSession = new EditSessionBuilder(BukkitAdapter.adapt(plugin.getWorldManager().getWorld()))
+						.allowedRegionsEverywhere().limitUnlimited().build()) {
+					Operation operation = new ClipboardHolder(clipboard)
+							.createPaste(editSession)
+							.to(origin)
+							.ignoreAirBlocks(false)
+							.build();
+
+					Operations.complete(operation);
+				}
+				plot.getCbData().reloadAllCommandBlocks(true);
+				OCmsg.WE_COMPLETE_RESTORING_PLOT.send(p, plot);
+
+			} catch (IOException | SQLException e) {
+				OCmsg.WE_FAIL_RESTORING_PLOT.send(p, plot);
+				e.printStackTrace();
+			}
+		});
+
+		return true;
 	}
 }
