@@ -531,7 +531,7 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 							.hasPlayerPermissionFor(pc, m)).findAny().get()));
 			return false;
 
-		}else if (blocksWithNbtNature.stream().anyMatch(block -> states.contains(block))) {
+		}else if (blocksWithNbtNature.stream().anyMatch(block -> states.contains(block.getDefaultState()))) {
 			OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.ADMIN);
 			return false;
 
