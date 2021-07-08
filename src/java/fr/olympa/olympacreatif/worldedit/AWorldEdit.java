@@ -2,6 +2,7 @@ package fr.olympa.olympacreatif.worldedit;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import fr.olympa.olympacreatif.data.Position;
 import org.bukkit.Material;
@@ -258,7 +259,7 @@ public abstract class AWorldEdit {
 				(Math.max(pos1.getZ(), pos2.getZ()) - Math.min(pos1.getZ(), pos2.getZ())));
 	}
 
-	public abstract boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Material mat, int matY);
+	public abstract boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Set<Material> mat, int matY);
 
 	public abstract boolean exportPlot(final Plot plot, final OlympaPlayerCreatif p);
 	public abstract boolean restorePlot(final Plot plot, final OlympaPlayerCreatif p);

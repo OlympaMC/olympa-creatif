@@ -10,13 +10,29 @@ import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.world.WorldManager;
 import org.bukkit.Material;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class OcweCmd extends AbstractCmd {
     public OcweCmd(OlympaCreatifMain plugin) {
         super(plugin, "ocwe", null, "Commandes de manipulation de la parcelle");
+        addArgumentParser("FLOOR_LEVEL",
+                (sender, str) -> List.of("1 à 250"),str -> {
+                    try{
+                        int val = Integer.parseInt(str);
+                        return val < 1 || val > 250 ? null : val;
+                    }catch(Exception ex) {
+                        return null;
+                    }
+                },
+                p -> "Le niveau renseigné doit être compris entre 1 et 250 (par défaut " + WorldManager.worldLevel + ")");
         addArgumentParser("MATERIAL", Material.class);
     }
 
-    @Cmd(player = true, syntax = "Modifier le sol et la hauteur du sol de la parcelle", min = 1, args = {"MATERIAL", "INTEGER"})
+    @Cmd(player = true, syntax = "Modifier la hauteur et le matériau du sol de la parcelle", min = 2, args = {"FLOOR_LEVEL",
+            "MATERIAL", "MATERIAL", "MATERIAL", "MATERIAL", "MATERIAL",
+            "MATERIAL", "MATERIAL", "MATERIAL", "MATERIAL", "MATERIAL"})
     public void setfloor(CommandContext cmd) {
         if (!CmdsLogic.OCtimerCommand.SETFLOOR.canExecute2(getOlympaPlayer()))
             return;
@@ -33,14 +49,12 @@ public class OcweCmd extends AbstractCmd {
             return;
         }
 
-        if (plot == null) {
-            OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
-            return;
-        }
+        //int y = cmd.getArgumentsLength() >= 2 ? cmd.getArgument(1) : WorldManager.worldLevel;
+        Set<Material> mats = new HashSet<>();
+        for (int i = 1 ; i < cmd.getArgumentsLength() ; i++)
+            mats.add(cmd.getArgument(i));
 
-        int y = cmd.getArgumentsLength() >= 2 ? cmd.getArgument(1) : WorldManager.worldLevel;
-
-        if (plugin.getWEManager().setPlotFloor(getOlympaPlayer(), plot, cmd.getArgument(0), y))
+        if (plugin.getWEManager().setPlotFloor(getOlympaPlayer(), plot, mats, cmd.getArgument(0)))
             CmdsLogic.OCtimerCommand.SETFLOOR.delay(getOlympaPlayer());
     }
 
@@ -56,7 +70,7 @@ public class OcweCmd extends AbstractCmd {
         if (plot == null) {
             OCmsg.NULL_CURRENT_PLOT.send(getPlayer());
             return;
-        }else if (!PlotPerm.EXPORT_PLOT.has(plot, (OlympaPlayerCreatif) getOlympaPlayer())) {
+        }else if (!PlotPerm.EXPORT_PLOT.has(plot, getOlympaPlayer())) {
             OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.EXPORT_PLOT);
             return;
         }
@@ -66,13 +80,14 @@ public class OcweCmd extends AbstractCmd {
     }
 
 
-    @Cmd(player = true, syntax = "Réinitialiser une parcelle", args = {"INTEGER"}/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
+    @Cmd(player = true, syntax = "Réinitialiser la parcelle"/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
     public void reset(CommandContext cmd) {
         if (!CmdsLogic.OCtimerCommand.RESET.canExecute2(getOlympaPlayer()))
             return;
 
-        if (plugin.getCmdLogic().resetPlot(getOlympaPlayer(),
-                (cmd.getArgumentsLength() > 0 ? (Integer) cmd.getArgument(0) : null)))
+        Plot plot = ((OlympaPlayerCreatif)getOlympaPlayer()).getCurrentPlot();
+
+        if (plugin.getCmdLogic().resetPlot(getOlympaPlayer(), plot == null ? null : plot.getId().getId()))
             CmdsLogic.OCtimerCommand.RESET.delay(getOlympaPlayer());
     }
 

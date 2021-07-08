@@ -8,7 +8,9 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.fastasyncworldedit.bukkit.regions.BukkitMaskManager;
 import com.fastasyncworldedit.core.Fawe;
@@ -505,7 +507,7 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 	}
 
 	@Override
-	public boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Material mat, int matY) {
+	public boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Set<Material> mat, int matY) {
 		/*if (plot == null){
 			OCmsg.NULL_CURRENT_PLOT.send(pc);
 			return false;
@@ -514,16 +516,27 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(pc, PlotPerm.RESET_PLOT);
 			return false;
 
-		}else*/ if (!mat.isBlock()) {
-			OCmsg.WE_NOT_BLOCK_BLOCK.send(pc);
+		}else*/
+		if (mat.stream().anyMatch(m -> !m.isBlock())) {
+			OCmsg.WE_NOT_BLOCK_BLOCK.send(pc, mat.toString().toLowerCase());
 			return false;
 
-		}else if (!plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(pc, mat)) {
-			OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, plugin.getPerksManager().getKitsManager().getKitOf(mat));
+		}
+
+		List<BlockState> states = mat.stream().map(block -> BukkitAdapter.adapt(Bukkit.createBlockData(block))).collect(Collectors.toList());
+
+		if (mat.stream().anyMatch(m -> !plugin.getPerksManager().getKitsManager().hasPlayerPermissionFor(pc, m))) {
+			OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, plugin.getPerksManager().getKitsManager()
+					.getKitOf(mat.stream().filter(m -> !plugin.getPerksManager().getKitsManager()
+							.hasPlayerPermissionFor(pc, m)).findAny().get()));
 			return false;
 
-		}else if (matY < 1 || matY > 250){
-			OCmsg.WE_FAIL_RESTORING_PLOT.send(pc);
+		}else if (blocksWithNbtNature.stream().anyMatch(block -> states.contains(block))) {
+			OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, KitType.ADMIN);
+			return false;
+
+		}else if (matY < 1 || matY > 250) {
+			OCmsg.WE_SETFLOOR_INVALID_Y.send(pc, "1 à 250");
 			return false;
 		}
 
@@ -540,12 +553,10 @@ public class OcFastAsyncWorldEdit extends AWorldEdit {
 					for (int z = zMin; z <= zMax; z++)
 						session.setBlock(x, 0, z, BlockTypes.BEDROCK);
 
-				BlockState state = BukkitAdapter.adapt(Bukkit.createBlockData(mat));
-
 				for (int x = xMin; x <= xMax; x++)
 					for (int z = zMin; z <= zMax; z++)
 						for (int y = 1; y <= matY; y++)
-							session.setBlock(x, y, z, state);
+							session.setBlock(x, y, z, states.get(ThreadLocalRandom.current().nextInt(states.size())));
 
 				for (int x = xMin; x <= xMax; x++)
 					for (int z = zMin; z <= zMax; z++)

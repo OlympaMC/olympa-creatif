@@ -8,6 +8,8 @@ import fr.olympa.olympacreatif.plot.Plot;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.Set;
+
 public class OcEmptyWorldEdit extends AWorldEdit {
 
     public OcEmptyWorldEdit(OlympaCreatifMain plugin) {
@@ -46,7 +48,7 @@ public class OcEmptyWorldEdit extends AWorldEdit {
     }
 
     @Override
-    public boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Material mat, int matY) {
+    public boolean setPlotFloor(OlympaPlayerCreatif pc, Plot plot, Set<Material> mat, int matY) {
         OCmsg.WE_DISABLED.send(pc);
         return false;
     }
