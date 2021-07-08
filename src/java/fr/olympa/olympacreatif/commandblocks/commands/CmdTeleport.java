@@ -68,10 +68,12 @@ public class CmdTeleport extends CbCommand {
 			
 			//System.out.println("Command selector parse : " + args[0] + "(" + false + ") : " +targetEntities);
 		}
-		
+
+		//System.out.println("TP loc : " + tpLoc + ", targets : " + targetEntities);
+
 		if (tpLoc == null)
 			return 0;
-		
+
 		targetEntities.forEach(ent -> ent.teleportAsync(tpLoc));
 		
 		return targetEntities.size();

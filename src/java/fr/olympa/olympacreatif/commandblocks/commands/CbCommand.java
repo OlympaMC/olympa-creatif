@@ -69,15 +69,15 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 		Double xF;
 		Double yF;
 		Double zF;
-		float yawF = 0;
-		float pitchF = 0; 
+		float yawF;
+		float pitchF;
 		
 		try {
-			xF = getUnverifiedPoint(x, sendingLoc.getX()) + 0.5;
-			yF = getUnverifiedPoint(y, sendingLoc.getY());
-			zF = getUnverifiedPoint(z, sendingLoc.getZ()) + 0.5;
-			yawF = Float.parseFloat(yaw);
-			pitchF = Float.parseFloat(pitch);
+			xF = getUnverifiedPoint(x, sendingLoc.getX(), true);
+			yF = getUnverifiedPoint(y, sendingLoc.getY(), false);
+			zF = getUnverifiedPoint(z, sendingLoc.getZ(), true);
+			yawF = yaw == null ? sendingLoc.getYaw() : (float) (double) getUnverifiedPoint(yaw, sendingLoc.getYaw(), false);
+			pitchF = pitch == null ? sendingLoc.getPitch() : (float) (double) getUnverifiedPoint(pitch, sendingLoc.getPitch(), false);
 		}catch(Exception ex) {
 			return null;
 		}
@@ -93,17 +93,17 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	}
 	
 	//renvoie la coordonnée x, y ou z à partir du string (en coordonnée absolue ou relative)
-	private static Double getUnverifiedPoint(String s, double potentialVectorValueToAdd) {
+	private static Double getUnverifiedPoint(String s, double potentialVectorValueToAdd, boolean isHorizontalParse) {
 		
 		try{
-			return Double.valueOf(s);
+			return Double.parseDouble(s) + (isHorizontalParse ? 0.5 : 0);
 		}catch(NumberFormatException e) {
 		}
 		
 		if (s.startsWith("~"))
 			if (s.length() >= 2)
 				try{
-					return Double.valueOf(s.substring(1, s.length())) + potentialVectorValueToAdd;	
+					return Double.parseDouble(s.substring(1)) + potentialVectorValueToAdd;
 				}catch(NumberFormatException e) {
 					return null;
 				}
