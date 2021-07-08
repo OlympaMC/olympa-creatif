@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import fr.olympa.olympacreatif.perks.KitsManager;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 
 import fr.olympa.api.common.command.complex.Cmd;
@@ -17,6 +19,7 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.plot.Plot;
 import fr.olympa.olympacreatif.plot.PlotParamType;
 import fr.olympa.olympacreatif.plot.PlotPerm;
+import org.bukkit.inventory.ItemStack;
 
 public class OcoCmd extends AbstractCmd {
 	
@@ -152,6 +155,18 @@ public class OcoCmd extends AbstractCmd {
 			
 		plugin.getPerksManager().getArmorStandManager().listeningFor(getPlayer());
 		OCmsg.ARMORSTAND_EDITOR_SELECT_ARMORSTAND.send((OlympaPlayerCreatif) getOlympaPlayer());
+	}
+
+	@Cmd(player = true, syntax = "Se donner les objets spéciaux", args = "commandblock|debugstick", min = 1/*, description = "/oca resetplot [plot] [confirmationCode]"*/)
+	public void give(CommandContext cmd) {
+		if (cmd.getArgument(0).equals("commandblock"))
+			if (KitsManager.KitType.COMMANDBLOCK.hasKit(getOlympaPlayer()))
+				getPlayer().getInventory().addItem(new ItemStack(Material.COMMAND_BLOCK));
+			else
+				OCmsg.INSUFFICIENT_KIT_PERMISSION.send((OlympaPlayerCreatif) getOlympaPlayer(), KitsManager.KitType.COMMANDBLOCK);
+
+		else if (cmd.getArgument(0).equals("debugstick"))
+			getPlayer().getInventory().addItem(new ItemStack(Material.DEBUG_STICK));
 	}
 	
 	

@@ -81,7 +81,7 @@ public class KitsManager {
 		
 		List<Material> list = new ArrayList<Material>();
 
-		list.add(Material.DEBUG_STICK);
+		//list.add(Material.DEBUG_STICK);
 		list.add(Material.STRUCTURE_VOID);
 		list.add(Material.STRUCTURE_BLOCK);
 		list.add(Material.LINGERING_POTION);
@@ -194,7 +194,9 @@ public class KitsManager {
 		list.add(Material.TROPICAL_FISH_BUCKET);
 
 		list.forEach(mat -> builder.put(mat, KitType.PEACEFUL_MOBS));
-		
+
+		//builder.put(Material.DEBUG_STICK, KitType.DEBUG_STICK);
+
 		kits2 = builder.build();
 	}
 	
@@ -204,6 +206,7 @@ public class KitsManager {
 		HOSTILE_MOBS("hasHostileMobsKit", "monstres"),
 		FLUIDS("hasFluidKit", "fluides"),
 		COMMANDBLOCK("hasCommandblockKit", "command blocks"),
+		//DEBUG_STICK("hasDebugStick", "débug stick"),
 		ADMIN("hasAdminKit", "admin");
 		
 		String bddKey;

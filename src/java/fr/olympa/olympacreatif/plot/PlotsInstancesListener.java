@@ -91,30 +91,16 @@ public class PlotsInstancesListener implements Listener{
 	private final List<Material> cbPlacementTypeCb = new ArrayList<Material>();
 	
 	private final Set<Material> interractProhibitedItems = ImmutableSet.<Material>builder()
-			.add(Material.WATER_BUCKET)
 			.add(Material.WATER)
-			.add(Material.LAVA_BUCKET)
 			.add(Material.LAVA)
-			
-			.add(Material.HOPPER_MINECART)
-			.add(Material.FURNACE_MINECART)
-			.add(Material.CHEST_MINECART)
-			.add(Material.TNT_MINECART)
-			.add(Material.MINECART)
-
-			.add(Material.ACACIA_BOAT)
-			.add(Material.JUNGLE_BOAT)
-			.add(Material.DARK_OAK_BOAT)
-			.add(Material.BIRCH_BOAT)
-			.add(Material.OAK_BOAT)
-			.add(Material.SPRUCE_BOAT)
-			
 			.add(Material.BONE_MEAL)
-			
 			.add(Material.ARMOR_STAND)
+			.add(Material.DEBUG_STICK)
 
 			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("_EGG")).collect(Collectors.toSet()).iterator())
 			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("BUCKET")).collect(Collectors.toSet()).iterator())
+			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("MINECART")).collect(Collectors.toSet()).iterator())
+			.addAll(Stream.of(Material.values()).filter(mat -> mat.toString().contains("BOAT")).collect(Collectors.toSet()).iterator())
 			.build();
 	
 	public PlotsInstancesListener(OlympaCreatifMain plugin) {

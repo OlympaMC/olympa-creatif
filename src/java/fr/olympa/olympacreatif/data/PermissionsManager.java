@@ -105,6 +105,9 @@ public class PermissionsManager implements Listener {
 		weAttachements.put(pc.getUniqueId(), player.addAttachment(plugin));
 		cbAttachements.put(pc.getUniqueId(), player.addAttachment(plugin));
 
+		PermissionAttachment att = e.getPlayer().addAttachment(plugin);
+		att.setPermission("minecraft.debugstick", true);
+
 		//if (PermissionsList.USE_WORLD_EDIT.hasPermission(pc) && ComponentCreatif.WORLDEDIT.isActivated())
 		//else if (pc.hasKit(KitType.COMMANDBLOCK) && ComponentCreatif.COMMANDBLOCKS.isActivated())
 		plugin.getTask().runTaskLater(() -> {

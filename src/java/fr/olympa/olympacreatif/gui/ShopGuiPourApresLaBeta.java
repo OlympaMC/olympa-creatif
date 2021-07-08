@@ -60,6 +60,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				"§a+1 parcelle (passage de " + p.getPlotsSlots(true) + " à " + (p.getPlotsSlots(true) + 1) + ")", 
 				"§aAccès aux microblocks et aux têtes (/mb, /skull)", 
 				"§aAccès à la réinitialisation de vos parcelles (/oco reset)",
+				"§aAccès au débugstick (/oco give)",
 				"§aAccès aux chapeaux (/hat)"
 				
 				), "olympa.fr", "1 €");
