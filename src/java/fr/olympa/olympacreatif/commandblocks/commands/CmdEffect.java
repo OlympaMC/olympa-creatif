@@ -120,7 +120,7 @@ public class CmdEffect extends CbCommand {
 			if (StringUtils.isNumeric(args[3]))
 				duration = (int) (double) Math.max(Math.min(Double.valueOf(args[3]), 1000000), 0) * 20;
 			if (StringUtils.isNumeric(args[4]))
-				amplifier = (int) (double) Math.max(Math.min(Double.valueOf(args[4]), 4), 0);
+				amplifier = (int) (double) Math.max(Math.min(Double.valueOf(args[4]), 50), 0);
 			if (args[5].equals("true"))
 				showParticles = false;
 			

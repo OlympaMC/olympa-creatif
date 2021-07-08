@@ -164,8 +164,8 @@ public class WorldEventsListener implements Listener{
 	@EventHandler //cancel potions jetables si effet > 10
 	public void onSplashPotionEvent(PotionSplashEvent e) {
 		for (PotionEffect effect : e.getPotion().getEffects())
-			if (effect.getAmplifier() >= 10)
-				effect.withAmplifier(9);
+			if (effect.getAmplifier() >= 50)
+				effect.withAmplifier(49);
 	}
 	
 	@EventHandler //cancel potion avec effet > 10
@@ -174,8 +174,8 @@ public class WorldEventsListener implements Listener{
 			return;
 			
 		for (PotionEffect effect : ((PotionMeta) e.getItem().getItemMeta()).getCustomEffects())
-			if (effect.getAmplifier() >= 10)
-				effect.withAmplifier(9);
+			if (effect.getAmplifier() >= 50)
+				effect.withAmplifier(49);
 	}
 	
 	@EventHandler //ouvre le menu si joueur a sneak deux fois rapidement (délai : 0.2s)

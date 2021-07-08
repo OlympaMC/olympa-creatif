@@ -619,9 +619,16 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true) //modifie la destination téléport si joueur banni du plot
 	public void onTeleportEvent(PlayerTeleportEvent e) {
-		
-		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
-		Plot plotTo = plugin.getPlotsManager().getPlot(e.getTo());
+
+		PlotId idTo = PlotId.fromLoc(plugin, e.getTo());
+		PlotId idFrom = PlotId.fromLoc(plugin, e.getFrom());
+
+		//sortie de l'évent si pas de changement de plot
+		if (idTo != null && idTo.equals(idFrom) || (idTo == idFrom))
+			return;
+
+		Plot plotTo = plugin.getPlotsManager().getPlot(idTo);
+		Plot plotFrom = plugin.getPlotsManager().getPlot(idFrom);
 		
 		if (plotFrom != plotTo && !((OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getPlayer().getUniqueId())).setPlot(plotTo))
 			e.setCancelled(true);
@@ -631,17 +638,17 @@ public class PlotsInstancesListener implements Listener{
 	public void onPlayerMove(PlayerMoveEvent e) {
 		if (e.getFrom().getChunk() == e.getTo().getChunk())
 			return;
-		
-		
-		Plot plotTo = plugin.getPlotsManager().getPlot(e.getTo());
-		Plot plotFrom = plugin.getPlotsManager().getPlot(e.getFrom());
 
-		//Bukkit.broadcastMessage("DETECTED chunk SWITCH FOR " + e.getPlayer().getName() + " : " + plotFrom + " TO " + plotTo);
+		PlotId idTo = PlotId.fromLoc(plugin, e.getTo());
+		PlotId idFrom = PlotId.fromLoc(plugin, e.getFrom());
 		
 		//sortie de l'évent si pas de changement de plot
-		if (plotTo == plotFrom)
+		if (idTo != null && idTo.equals(idFrom) || (idTo == null && idFrom == null))
 			return;
-		
+
+		Plot plotTo = plugin.getPlotsManager().getPlot(idTo);
+		Plot plotFrom = plugin.getPlotsManager().getPlot(idFrom);
+
 		if (plotFrom != plotTo && !((OlympaPlayerCreatif)AccountProviderAPI.getter().get(e.getPlayer().getUniqueId())).setPlot(plotTo))
 			e.setCancelled(true);
 		
