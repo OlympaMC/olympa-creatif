@@ -67,6 +67,8 @@ public class CmdExperience extends CbCommand {
 			}
 			break;
 		}
+
+		definedAmount = Math.max(definedAmount, 0);
 	}
 
 	private enum Type{
