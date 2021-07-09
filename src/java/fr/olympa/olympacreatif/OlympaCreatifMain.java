@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import fr.olympa.api.spigot.holograms.HologramsCommand;
 import fr.olympa.olympacreatif.commands.*;
 import fr.olympa.olympacreatif.worldedit.OcEmptyWorldEdit;
 import org.bukkit.entity.Player;
@@ -204,6 +205,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		//gestion particulière des hologrammes
 		OlympaAPIPermissionsSpigot.COMMAND_HOLOGRAMS_MANAGE.setMinGroup(OcPermissions.USE_HOLOGRAMS.getMinGroup());
 		OlympaCore.getInstance().getHologramsManager().setTempHoloCreationMode(true);
+
 		OlympaCore.getInstance().getHologramsManager().setHoloControlSupplier((sender, holo, action) -> {
 			if (!(sender instanceof Player))
 				return true;
@@ -265,6 +267,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			}
 
 		});
+		HologramsCommand.onlyListPersistentHolo = false;
 	}
 
 	private boolean canEditHoloWithMsg(OlympaPlayerCreatif pc, Hologram holo, boolean isForHoloCreation) {

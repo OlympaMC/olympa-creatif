@@ -180,7 +180,7 @@ public class PlotCbData {
 		holosIds.put(holo.getID(), getRealHoloIdFromHoloPlotId(holo.getID()));
 		//holosLocs.put(holo.getID(), holo.getBottom());
 		
-		plot.getPlayers().forEach(p -> holo.show(p));
+		plot.getPlayers().forEach(holo::show);
 	}
 
 	public boolean removeHolo(Hologram holo) {
@@ -189,16 +189,16 @@ public class PlotCbData {
 		
 		if (containsHolo(holo))
 			if (plot == null)
-				Bukkit.getOnlinePlayers().forEach(p -> holo.hide(p));
+				Bukkit.getOnlinePlayers().forEach(holo::hide);
 			else
-				plot.getPlayers().forEach(p -> holo.hide(p));
+				plot.getPlayers().forEach(holo::hide);
 
 		//holosLocs.remove(holo.getID());
 		return holosIds.remove(holo.getID()) != null;
 	}
 	
 	public boolean containsHolo(Hologram holo) {
-		return holosIds.containsKey(holo.getID());
+		return holo != null && holosIds.containsKey(holo.getID());
 	}
 	
 	public Set<Integer> getHolos() {
