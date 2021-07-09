@@ -45,13 +45,16 @@ public class CbTeam {
 			teamName = "";
 		else
 			teamName = JSONtextUtil.getJsonText(newTeamName).toLegacyText();
+
+		if (newTeamName.equals(teamName))
+			return;
 		
 		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
 		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProviderAPI.getter().get(p.getUniqueId())));
 		
 		for (Entity e : members)
-			if (plotPlayers.stream().filter(p -> p.getUniqueId().equals(e.getUniqueId())).count() > 1)
-				OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProviderAPI.getter().get(e.getUniqueId()), plotPlayers);
+			OlympaCore.getInstance().getNameTagApi().callNametagUpdate(
+					AccountProviderAPI.getter().get(e.getUniqueId()), plotPlayers);
 	}
 	
 	public Plot getPlot() {
