@@ -110,6 +110,7 @@ public class OcCmd extends AbstractCmd {
 			return;
 		
 		plugin.getCmdLogic().visitPlotRandom(getOlympaPlayer());
+		OCtimerCommand.VISIT_PLOT_RANDOM.delay(getOlympaPlayer());
 	}
 
 	

@@ -255,7 +255,7 @@ public class CmdsLogic {
 			return;
 
 		PlotId id = PlotId.fromId(plugin, set.get(ThreadLocalRandom.current().nextInt(set.size())));
-		id.teleport(player);
+		((Player) pc.getPlayer()).teleportAsync(id.getLocation());
 		OCmsg.TELEPORTED_TO_PLOT_SPAWN.send(pc, id);
 	}
 
@@ -333,7 +333,7 @@ public class CmdsLogic {
 		RESTORE(10),
 		EXPORT(10),
 		RELOAD_COMMANDBLOCKS(40),
-		VISIT_PLOT_RANDOM(2),
+		VISIT_PLOT_RANDOM(4),
 		SETFLOOR(10),
 		;
 		

@@ -296,7 +296,7 @@ public class PlotId {
 		if (plot != null)
 			plot.getParameters().getParameter(PlotParamType.SPAWN_LOC).teleport(p);
 		else
-			p.teleport(getLocation());
+			p.teleportAsync(getLocation());
 	}
 	
 	public boolean isInPlot(Position loc) {

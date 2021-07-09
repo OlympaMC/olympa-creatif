@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.commandblocks;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.olympa.core.common.provider.AccountProvider;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
@@ -82,6 +83,7 @@ public class CbTeam {
 		
 		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
 		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProviderAPI.getter().get(p.getUniqueId())));
+		plotPlayers.add(AccountProvider.getter().get(e.getUniqueId()));
 		
 		if (e.getType() == EntityType.PLAYER)
 			OlympaCore.getInstance().getNameTagApi().callNametagUpdate(AccountProviderAPI.getter().get(e.getUniqueId()), plotPlayers);
