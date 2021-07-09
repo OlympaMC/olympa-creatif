@@ -184,9 +184,11 @@ public class Plot {
 				currentTime = (currentTime + 20 * 20) % 24_000;
 				getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
 			}, 20*20, 20*20);
-		}
 
-		getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
+			getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
+		}else
+			getPlayers().forEach(p -> p.setPlayerTime(getParameters().getParameter(PlotParamType.PLOT_TIME), false));
+
 	}
 
 	public int getTilesCount() {
