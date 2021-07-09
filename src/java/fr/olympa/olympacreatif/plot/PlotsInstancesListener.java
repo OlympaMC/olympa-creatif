@@ -34,13 +34,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -379,8 +373,18 @@ public class PlotsInstancesListener implements Listener{
 	
 	@EventHandler //test interract block (cancel si pas la permission d'interagir avec le bloc) & test placement liquide
 	public void onInterractEvent(PlayerInteractEvent e) {
+		//System.out.println("INTERRACT " + e.getClickedBlock().getType() + ", ACTION " + e.getAction());
+
+		if (e.getAction() == Action.PHYSICAL &&
+				(e.getClickedBlock().getType() == Material.FARMLAND || e.getClickedBlock().getType() == Material.TURTLE_EGG)) {
+			e.setCancelled(true);
+			e.setUseInteractedBlock(Result.DENY);
+			e.setUseItemInHand(Result.DENY);
+			//System.out.println("FARMLAND CANCELLED");
+			return;
+		}
+
 		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(e.getPlayer().getUniqueId());
-		
 		Block clickedBlock = e.getClickedBlock();
 		
 		//detect if clicked on water or on block
@@ -411,8 +415,7 @@ public class PlotsInstancesListener implements Listener{
 		//test si permission d'interagir avec le bloc donné
 		if (!PlotPerm.BUILD.has(plot, pc)) {
 			if ((PlotParamType.getAllPossibleIntaractibleBlocks().contains(clickedBlock.getType()) &&
-					!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(clickedBlock.getType())) ||
-					(e.getAction() == Action.PHYSICAL && e.getClickedBlock().getType() == Material.WHEAT)) {
+					!plot.getParameters().getParameter(PlotParamType.LIST_ALLOWED_INTERRACTION).contains(clickedBlock.getType())) ) {
 				e.setCancelled(true);
 				OCmsg.PLOT_CANT_INTERRACT.send(pc);
 				
