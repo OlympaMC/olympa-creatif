@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -656,7 +657,7 @@ public class PlotsInstancesListener implements Listener{
 			e.setCancelled(true);
 		
 		//empêche que le joueur se retrouve bloqué dans la route
-		if (plotFrom != null && e.getTo().getBlockY() < WorldManager.worldLevel)
+		if (plotFrom != null && e.getTo().getBlockY() < WorldManager.worldLevel && e.getPlayer().getGameMode() == GameMode.SPECTATOR)
 			e.setTo(e.getTo().clone().add(0, WorldManager.worldLevel + 5 - e.getTo().getY(), 0));
 			
 		

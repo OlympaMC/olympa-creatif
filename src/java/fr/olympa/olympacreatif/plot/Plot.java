@@ -180,13 +180,13 @@ public class Plot {
 		if (getParameters().getParameter(PlotParamType.PLOT_TIME_CYCLE)){
 			currentTime = getParameters().getParameter(PlotParamType.PLOT_TIME);
 
-			getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
-
 			timeUpdateScheduler = plugin.getTask().scheduleSyncRepeatingTask(() -> {
 				currentTime = (currentTime + 20 * 20) % 24_000;
 				getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
 			}, 20*20, 20*20);
 		}
+
+		getPlayers().forEach(p -> p.setPlayerTime(currentTime, false));
 	}
 
 	public int getTilesCount() {
