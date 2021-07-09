@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.commandblocks.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.olympa.api.utils.Prefix;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -143,10 +144,16 @@ public class CmdTeam extends CbCommand {
 					return 0;	
 				
 				switch (args[2]) {
-				case "suffix":					
-					if (args.length >= 4) 
+				case "suffix":
+					if (args.length >= 4)
 						t.setName(JSONtextUtil.getJsonText(this, args[3]).toLegacyText());
-					
+
+					return 1;
+
+				case "prefix":
+					if (args.length >= 4)
+						t.setName(JSONtextUtil.getJsonText(this, args[3]).toLegacyText());
+
 					return 1;
 					
 				case "friendlyFire":
@@ -165,8 +172,10 @@ public class CmdTeam extends CbCommand {
 						t.setColor(null);
 						return 1;
 					}else if (t.setColor(args[3]))
-							return 1; 
-						
+							return 1;
+
+				default:
+					Prefix.BAD.sendMessage(sender, "L'argument " + args[2] + " n'est pas accepté.");
 				}
 			}
 			break;
