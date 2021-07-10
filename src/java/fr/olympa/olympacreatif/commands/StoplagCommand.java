@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
+import fr.olympa.api.common.player.OlympaPlayer;
 import fr.olympa.api.spigot.command.ComplexCommand;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
@@ -55,11 +56,6 @@ public class StoplagCommand extends ComplexCommand {
 	@Cmd(player = true, args = "INTEGER", description = "Activer le stoplag sur parcelle")
 	public void force(CommandContext cmd) {
 		OlympaPlayerCreatif pc = getOlympaPlayer();
-
-		if (!pc.hasStaffPerm(StaffPerm.OWNER_EVERYWHERE)) {
-			sendIncorrectSyntax("Cette commande est réservée au staff.");
-			return;
-		}
 
 		Plot plot = cmd.getArgumentsLength() == 0 ? pc.getCurrentPlot() : plugin.getPlotsManager().getPlot(PlotId.fromId(plugin, cmd.getArgument(0)));
 

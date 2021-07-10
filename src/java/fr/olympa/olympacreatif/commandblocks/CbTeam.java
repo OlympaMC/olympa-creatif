@@ -41,13 +41,13 @@ public class CbTeam {
 	}
 	
 	public void setName(String newTeamName) {
+		if (teamName.equals(newTeamName))
+			return;
+
 		if (newTeamName == null)
 			teamName = "";
 		else
 			teamName = JSONtextUtil.getJsonText(newTeamName).toLegacyText();
-
-		if (newTeamName.equals(teamName))
-			return;
 		
 		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
 		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProviderAPI.getter().get(p.getUniqueId())));
