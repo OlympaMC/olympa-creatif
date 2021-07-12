@@ -214,17 +214,17 @@ public class WorldEventsListener implements Listener {
 			invertTarget = true;
 		}
 
-		if (plot == null)
-			return;
-
-		if (p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT) && !invertTarget ||
-				!p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT) && invertTarget) {
-			e.setCancelled(true);
-			if (OcPermissions.USE_COLORED_TEXT.hasPermission(p))
-				e.setMessage(ColorUtils.color(e.getMessage()));
-			plot.sendMessage(p, e.getMessage());
-
-		} else if (OcPermissions.USE_COLORED_TEXT.hasPermission(p))
+		if (plot != null) {
+			boolean hasPermission = p.hasPlayerParam(PlayerParamType.DEFAULT_PLOT_CHAT);
+			if (hasPermission && !invertTarget || !hasPermission && invertTarget) {
+				e.setCancelled(true);
+				if (OcPermissions.USE_COLORED_TEXT.hasPermission(p))
+					e.setMessage(ColorUtils.color(e.getMessage()));
+				plot.sendMessage(p, e.getMessage());
+				return;
+			}
+		}
+		if (OcPermissions.USE_COLORED_TEXT.hasPermission(p))
 			e.setMessage(ColorUtils.colorSoft(e.getMessage()));
 	}
 
