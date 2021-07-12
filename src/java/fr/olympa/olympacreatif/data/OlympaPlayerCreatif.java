@@ -132,6 +132,13 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 	}
 
 	@Override
+	public void updateGroups() {
+		super.updateGroups();
+		if (sidebarRows != null && sidebarRows.length >= 5)
+			sidebarRows[4].set("§7Grade : " + getGroupNameColored());
+	}
+
+	@Override
 	public void loaded() {
 		super.loaded();
 
@@ -313,21 +320,20 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 		if (currentPlotObs.get() != null && !currentPlotObs.get().equals(plot))
 			currentPlotObs.get().executeExitActions(player);
 
-
 		if (plot != null && !plot.getPlayers().contains(player))
-			
+
 			if (plot.canEnter(this)) {
 				reinitSidebar();
 				currentPlotObs.set(plot);
-				plot.executeEntryActions(this, player.getLocation());	
-			}else
+				plot.executeEntryActions(this, player.getLocation());
+			} else
 				return false;
-		
+
 		else {
 			reinitSidebar();
 			currentPlotObs.set(plot);
 		}
-			
+
 		return true;
 	}
 
