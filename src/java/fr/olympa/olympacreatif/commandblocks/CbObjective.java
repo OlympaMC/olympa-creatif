@@ -301,7 +301,7 @@ public class CbObjective {
 		
 		for (CbObjective obj : plot.getCbData().getObjectives())
 			if (obj.getDisplaySlot() == newDisplaySlot)
-				obj.clearDisplaySlot();
+				obj.clearDisplaySlot(false);
 
 		displaySlot = newDisplaySlot;
 		
@@ -321,8 +321,8 @@ public class CbObjective {
 		return 1;
 	}
 	
-	public void clearDisplaySlot() {
-		if (displaySlot == DisplaySlot.SIDEBAR)
+	public void clearDisplaySlot(boolean resetSidebar) {
+		if (displaySlot == DisplaySlot.SIDEBAR && resetSidebar)
 			for (Player p : plot.getPlayers())
 				if (p.isOnline())
 					((OlympaPlayerCreatif)AccountProviderAPI.getter().get(p.getUniqueId())).reinitSidebar();

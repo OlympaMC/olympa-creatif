@@ -135,7 +135,7 @@ public class PlotCbData {
 			plugin.getTask().cancelTaskById(cbTask);
 		
 		for (CbObjective o : objectives) 
-			o.clearDisplaySlot();
+			o.clearDisplaySlot(true);
 			
 		for (CbTeam t : teams)
 			for (Entity e : t.getMembers())
@@ -272,7 +272,7 @@ public class PlotCbData {
 		
 		objectives.add(obj);
 		if (objectives.size() > OCparam.CB_MAX_OBJECTIVES_PER_PLOT.get()) {
-			objectives.remove(0).clearDisplaySlot();
+			objectives.remove(0).clearDisplaySlot(true);
 		}
 		
 		return true;

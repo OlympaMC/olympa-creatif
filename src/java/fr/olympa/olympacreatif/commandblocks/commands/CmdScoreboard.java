@@ -67,7 +67,7 @@ public class CmdScoreboard extends CbCommand {
 					CbObjective obj = plotCbData.getObjective(args[2]);
 					
 					if (obj != null) {
-						obj.clearDisplaySlot();
+						obj.clearDisplaySlot(true);
 						plotCbData.getObjectives().remove(obj);
 						return 1;
 					}
