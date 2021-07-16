@@ -184,7 +184,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 			plugin.getTask().runTaskLater(() -> {
 				for (ObservableValue<String> line : customScoreboard) {
 					line.set("");
-					sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb -> line.get(), scb -> line));
+					sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb ->
+							line.get().substring(0, Math.min(line.get().length(), 24)), scb -> line));
 
 					setCustomScoreboardLines(title, scores);
 				}
@@ -192,7 +193,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 		}
 
 		if (title != null) {
-			customScoreboard[0].set(ChatColor.BOLD + title);
+			customScoreboard[0].set(ChatColor.BOLD + title.substring(0, Math.min(title.length(), 24)));
 			customScoreboard[customScoreboard.length - 1].set("§7[sidebar plot " + currentPlotObs.get() + "]");
 		}
 
@@ -200,10 +201,11 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 
 		if (title != null)
 			for (int i = 2; i < Math.min(customScoreboard.length - 2, keys.size()) + 2; i++)
-				customScoreboard[i].set(keys.get(i - 2) + "§7 : " + scores.get(keys.get(i - 2)));
+				customScoreboard[i].set(keys.get(i - 2).substring(0, Math.min(keys.get(i - 2).length(), 24))
+						+ "§7 : " + scores.get(keys.get(i - 2)));
 		else
 			for (int i = 0; i < Math.min(customScoreboard.length - 2, keys.size()); i++)
-				customScoreboard[i].set(keys.get(i));
+				customScoreboard[i].set(keys.get(i).substring(0, Math.min(keys.get(i).length(), 24)));
 	}
 
 	public void reinitSidebar() {

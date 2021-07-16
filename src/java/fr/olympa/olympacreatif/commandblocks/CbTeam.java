@@ -48,7 +48,7 @@ public class CbTeam {
 			teamName = "";
 		else
 			teamName = JSONtextUtil.getJsonText(newTeamName).toLegacyText();
-		
+
 		List<OlympaPlayer> plotPlayers = new ArrayList<OlympaPlayer>();
 		plot.getPlayers().forEach(p -> plotPlayers.add(AccountProviderAPI.getter().get(p.getUniqueId())));
 		
