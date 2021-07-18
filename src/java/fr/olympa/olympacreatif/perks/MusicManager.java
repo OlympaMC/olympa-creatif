@@ -95,8 +95,13 @@ public class MusicManager implements Listener {
 		
 		//store songs and their representative items
 		for (int i = 0 ; i < list.size() ; i++) {
-			Song s = NBSDecoder.parse(list.get(i));
-			songsName.put(list.get(i).getName().replace(".nbs", "").toLowerCase(), s);
+			try{
+				Song s = NBSDecoder.parse(list.get(i));
+				songsName.put(list.get(i).getName().replace(".nbs", "").toLowerCase(), s);
+			}catch (Exception ex){
+				plugin.getLogger().warning("Failed to load song " + list.get(i));
+				ex.printStackTrace();
+			}
 		}
 		
 		int i = 0;

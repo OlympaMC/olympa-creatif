@@ -65,7 +65,11 @@ public class PlotMembers {
 			
 		if (rank == PlotRank.VISITOR || members.size() < maxMembers) {
 			members.put(p, rank);
-			((OlympaPlayerCreatif)AccountProviderAPI.getter().get(p.getUUID())).updatePlotMembers();
+
+			OlympaPlayerCreatif pc = (OlympaPlayerCreatif)AccountProviderAPI.getter().get(p.getUUID());
+			if (pc != null)
+				pc.updatePlotMembers();
+
 			return true;
 		}
 		
