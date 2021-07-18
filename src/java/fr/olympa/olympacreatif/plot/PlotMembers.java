@@ -21,10 +21,10 @@ import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif.StaffPerm;
 import fr.olympa.olympacreatif.plot.PlotPerm.PlotRank;
 
-public class PlotMembers extends AbstractObservable {
+public class PlotMembers {
 
 	private int maxMembers;
-	
+
 	//membres triés par ordre alphabétique
 	private Map<MemberInformations, PlotRank> members = new TreeMap<MemberInformations, PlotRank>(new Comparator<MemberInformations>() {
 
@@ -65,7 +65,7 @@ public class PlotMembers extends AbstractObservable {
 			
 		if (rank == PlotRank.VISITOR || members.size() < maxMembers) {
 			members.put(p, rank);
-			super.update();
+			((OlympaPlayerCreatif)AccountProviderAPI.getter().get(p.getUUID())).updatePlotMembers();
 			return true;
 		}
 		

@@ -167,7 +167,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 		sidebarRows[4].set("§7Grade : " + getGroupNameColored());
 
 		//maj auto la liste des membres quand le plot change
-		currentPlotObs.observe("change_plot_members_" + getName(), () -> currentPlotMembersObs.set(currentPlotObs.mapOr(plot -> plot.getMembers(), null)));
+		currentPlotObs.observe("change_plot_members_" + getName(), () -> currentPlotMembersObs.set(currentPlotObs.mapOr(Plot::getMembers, null)));
 	}
 
 	public void setCustomScoreboardLines(String title, LinkedHashMap<String, Integer> scores) {
@@ -224,6 +224,10 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 			for (ObservableValue<String> line : sidebarRows)
 				sidebar.addLine(new PlayerObservableLine<Scoreboard<OlympaPlayerCreatif>>(scb -> line.get(), scb -> line));
 		}, 3);
+	}
+
+	public void updatePlotMembers() {
+		currentPlotMembersObs.set(currentPlotObs.mapOr(Plot::getMembers, null));
 	}
 
 	public boolean hasKit(KitType kit) {

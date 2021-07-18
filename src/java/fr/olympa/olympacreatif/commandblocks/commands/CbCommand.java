@@ -96,19 +96,19 @@ public abstract class CbCommand extends CbCommandSelectorParser {
 	private static Double getUnverifiedPoint(String s, double potentialVectorValueToAdd, boolean isHorizontalParse) {
 		
 		try{
-			return Double.parseDouble(s) + (isHorizontalParse ? 0.5 : 0);
-		}catch(NumberFormatException e) {
+			return Double.parseDouble(s) + (isHorizontalParse ? 0.5d : 0d);
+		}catch(NumberFormatException ignored) {
 		}
 		
-		if (s.startsWith("~"))
+		if (s.charAt(0) == '~')
 			if (s.length() >= 2)
 				try{
-					return Double.parseDouble(s.substring(1)) + potentialVectorValueToAdd;
+					return Double.parseDouble(s.substring(1)) + potentialVectorValueToAdd + (isHorizontalParse ? 0.5d : 0d);
 				}catch(NumberFormatException e) {
 					return null;
 				}
 			else
-				return potentialVectorValueToAdd;
+				return potentialVectorValueToAdd + (isHorizontalParse ? 0.5d : 0d);
 				
 		return null;
 	}
