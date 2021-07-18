@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import fr.olympa.api.spigot.holograms.HologramsCommand;
+import fr.olympa.api.spigot.utils.SitManager;
 import fr.olympa.olympacreatif.commands.*;
 import fr.olympa.olympacreatif.worldedit.OcEmptyWorldEdit;
 import org.bukkit.entity.Player;
@@ -157,7 +158,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		new BackCommand(this, null).register();
 		new HatCommand(this).register();
-		
+
+		//à tester
+		//getServer().getPluginManager().registerEvents(new SitManager(this), this);
+
 		//set restrictions to /gm command
 		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND.setMinGroup(OlympaGroup.PLAYER);
 		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.PLAYER);
