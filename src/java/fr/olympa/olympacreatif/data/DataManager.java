@@ -102,6 +102,10 @@ public class DataManager implements Listener {
 	private final OlympaStatement osSelectPlayerPlots = new OlympaStatement(
 			"SELECT * FROM creatif_plotsmembers WHERE `server_id` = ? AND `player_id` = ?;");
 
+	private final OlympaStatement osSelectOwnedPlayerPlots = new OlympaStatement(
+			"SELECT * FROM creatif_plotsmembers WHERE `server_id` = ? AND `player_id` = ? " +
+					"AND `player_plot_level` = " + PlotRank.OWNER.getLevel() + ";");
+
 	private final OlympaStatement osCountPlots = new OlympaStatement(
 			"SELECT COUNT (*) FROM creatif_plotsdatas WHERE `server_id` = ?;");
 
@@ -230,7 +234,7 @@ public class DataManager implements Listener {
 					return;
 				}
 				
-				PreparedStatement statement = osSelectPlayerPlots.createStatement();
+				PreparedStatement statement = osSelectOwnedPlayerPlots.createStatement();
 				statement.setInt(1, serverIndex);
 				statement.setLong(2, playerInformations.getId());
 				ResultSet result = statement.executeQuery();
