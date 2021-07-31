@@ -3,6 +3,7 @@ package fr.olympa.olympacreatif.commands;
 import java.util.Arrays;
 import java.util.List;
 
+import fr.olympa.olympacreatif.plot.PlotParamType;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -29,7 +30,10 @@ public class SpeedCommand extends OlympaCommand {
 		}
 		Plot plot = ((OlympaPlayerCreatif) getOlympaPlayer()).getCurrentPlot();
 		
-		if (plot != null && !PlotPerm.DEFINE_OWN_FLY_SPEED.has(plot, getOlympaPlayer())) {
+		if (plot != null && (
+				!PlotPerm.DEFINE_OWN_FLY_SPEED.has(plot, getOlympaPlayer()) ||
+				!plot.getParameters().getParameter(PlotParamType.ALLOW_FLY_INCOMING_PLAYERS))) {
+
 			OCmsg.INSUFFICIENT_PLOT_PERMISSION.send(getPlayer(), PlotPerm.DEFINE_OWN_FLY_SPEED);
 			return false;
 		}
