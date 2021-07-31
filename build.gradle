@@ -47,8 +47,8 @@ configurations {
 
 dependencies {
     compileOnly 'fr.olympa:olympa-core:0.0.1-SNAPSHOT'
-    compileOnly("com.fastasyncworldedit:FAWE-Bukkit:1.17-23")
-    compileOnly("com.fastasyncworldedit:FAWE-Core:1.17-23")
+    compileOnly("com.fastasyncworldedit:FAWE-Bukkit:1.17-93")
+    compileOnly("com.fastasyncworldedit:FAWE-Core:1.17-93")
     compileOnly 'com.github.koca2000:NoteBlockAPI:-SNAPSHOT'
     compileOnly 'org.primesoft.asyncworldedit:AsyncWorldEdit:3.8.4'
 }
