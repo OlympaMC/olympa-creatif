@@ -28,7 +28,8 @@ public class OcCmd extends AbstractCmd {
 		super(plugin, "oc", null, "Commandes principales du Créatif d'Olympa", "plot");
 		addArgumentParser("FREE_OWNER", (sender, str) -> {
 			return Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).filter(p -> p.toLowerCase().startsWith(str.toLowerCase())).collect(Collectors.toList());
-		}, s -> s, s -> s);
+		}, s -> s, s -> s
+		);
 	}
 
 

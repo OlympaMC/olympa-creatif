@@ -78,13 +78,19 @@ public class PlotStoplagChecker {
 			PlotParamType.STOPLAG_STATUS.setValue(plot, 1);	
 			
 			//message
-			plot.getPlayers().forEach(p -> OCmsg.PLOT_STOPLAG_FIRED.send(p, type));
+			plot.getPlayers().forEach(p -> {
+				if (plot.getMembers().getPlayerRank(p) != PlotPerm.PlotRank.VISITOR)
+					OCmsg.PLOT_STOPLAG_FIRED.send(p, type);
+			});
 		}
 		else {
 			PlotParamType.STOPLAG_STATUS.setValue(plot, 2);
 			
 			//message
-			plot.getPlayers().forEach(p -> OCmsg.PLOT_FORCED_STOPLAG_FIRED.send(p, type));
+			plot.getPlayers().forEach(p -> {
+				if (plot.getMembers().getPlayerRank(p) != PlotPerm.PlotRank.VISITOR)
+					OCmsg.PLOT_FORCED_STOPLAG_FIRED.send(p, type);
+			});
 		}
 	}
 	

@@ -88,7 +88,7 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 	/*public static final int customScoreboardLinesSize = 8;
 	private String[] customScoreboardLines = new String[customScoreboardLinesSize];*/
 
-	private List<StaffPerm> staffPerm = new ArrayList<>();
+	private Set<StaffPerm> staffPerm = new HashSet<>();
 
 	private boolean isCustomSidebarEnabled = true; //laisser l'init à true !
 
@@ -235,8 +235,8 @@ public class OlympaPlayerCreatif extends OlympaPlayerObject /*implements MoneyPl
 	}
 
 	public void addKit(KitType kit) {
-		if (!kits.contains(kit))
-			kits.add(kit);
+		if (!kits.add(kit))
+			return;
 
 		if (kits.contains(KitType.HOSTILE_MOBS) && kits.contains(KitType.PEACEFUL_MOBS))
 			for (Plot plot : getPlots(true)) {

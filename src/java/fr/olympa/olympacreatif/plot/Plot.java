@@ -422,8 +422,8 @@ public class Plot {
 		
 		
 		//send stoplag alert if activated
-		if (hasStoplag())
-			OCmsg.PLOT_ENTER_STOPLAG_ACTIVATED.send(pc, this);
+		/*if (hasStoplag())
+			OCmsg.PLOT_ENTER_STOPLAG_ACTIVATED.send(pc, this);*/
 	}
 
 	/**
