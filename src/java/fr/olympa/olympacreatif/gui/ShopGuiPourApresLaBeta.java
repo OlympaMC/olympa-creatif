@@ -63,7 +63,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				"§aAccès au débugstick (/oco give)",
 				"§aAccès aux chapeaux (/hat)"
 				
-				), "olympa.fr", "1 €");
+				), "olympa.fr", "5 €");
 		
 		addRank(OlympaGroup.CREA_ARCHITECT, ItemUtils.item(Material.GOLDEN_AXE, "§6Grade " + OlympaGroup.CREA_ARCHITECT.getName(p.getGender()), 
 				"§2En plus des avantages du niveau précédent,",
@@ -77,7 +77,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				" ",
 				"§7Le niveau précédent est requis pour acheter ce grade."
 				
-				), "olympa.fr", "2 €");
+				), "olympa.fr", "15 €");
 		
 		addRank(OlympaGroup.CREA_CREATOR, ItemUtils.item(Material.DIAMOND_AXE, "§6Grade " + OlympaGroup.CREA_CREATOR.getName(p.getGender()), 
 				"§2En plus des avantages du niveau précédent,",
@@ -95,7 +95,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				"§6En espérant vous voir encore longtemps parmis nous,",
 				"§cL'équipe dévouée d'Olympa"
 				
-				), "olympa.fr", "3 €");
+				), "olympa.fr", "25 €");
 
 		
 		
@@ -114,7 +114,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				" ",
 				"§7Pour voir votre consommation de CPS : /oco debug"
 				
-				), "olympa.fr", "4 €");
+				), "olympa.fr", "6 €");
 		
 		addKit(KitType.REDSTONE, ItemUtils.item(Material.REDSTONE_TORCH, "§6Kit redstone",
 				"§2Caractéristiques :",
@@ -128,7 +128,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				"§7En cas d'abus, les courants de redstone",
 				"§7se bloqueront sur la parcelle."
 				
-				), "olympa.fr", "5 €");
+				), "olympa.fr", "6 €");
 		
 		addKit(KitType.FLUIDS, ItemUtils.item(Material.WATER_BUCKET, "§6Kit fluides",
 				"§2Caractéristiques :",
@@ -141,7 +141,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				"§7En cas d'abus, les fluides arrêteront",
 				"§7de couler sur la parcelle."
 				
-				), "olympa.fr", "6 €");
+				), "olympa.fr", "3 €");
 		
 		addKit(KitType.PEACEFUL_MOBS, ItemUtils.item(Material.PIG_SPAWN_EGG, "§6Kit animaux",
 				"§2Caractéristiques :",
@@ -157,7 +157,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				"§7En cas d'abus, les entités",
 				"§7n'apparaîtront plus sur la parcelle."
 				
-				), "olympa.fr", "7 €");
+				), "olympa.fr", "3 €");
 		
 		addKit(KitType.HOSTILE_MOBS, ItemUtils.item(Material.CREEPER_SPAWN_EGG, "§6Kit monstres",
 				"§2Caractéristiques :",
@@ -173,7 +173,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				"§7En cas d'abus, les entités",
 				"§7n'apparaîtront plus sur la parcelle."
 				
-				), "olympa.fr", "8 €");
+				), "olympa.fr", "3 €");
 		
 		addUpgrade(UpgradeType.BONUS_PLOTS_LEVEL, ItemUtils.item(Material.GRASS_BLOCK, "§6Augmentation du nombre de parcelles",
 				"§2Contenu :",

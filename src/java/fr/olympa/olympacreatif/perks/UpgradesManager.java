@@ -57,28 +57,28 @@ public class UpgradesManager {
 		);*/
 
 		UpgradeType.CB_LEVEL.values.put(0, new UpgradeData(0, UpgradeType.CB_LEVEL, "0 €", 20));
-		UpgradeType.CB_LEVEL.values.put(1, new UpgradeData(1, UpgradeType.CB_LEVEL, "1 €", 40));
-		UpgradeType.CB_LEVEL.values.put(2, new UpgradeData(2, UpgradeType.CB_LEVEL, "2 €", 60));
+		UpgradeType.CB_LEVEL.values.put(1, new UpgradeData(1, UpgradeType.CB_LEVEL, "3 €", 40));
+		UpgradeType.CB_LEVEL.values.put(2, new UpgradeData(2, UpgradeType.CB_LEVEL, "3 €", 60));
 		UpgradeType.CB_LEVEL.values.put(3, new UpgradeData(3, UpgradeType.CB_LEVEL, "3 €", 80));
-		UpgradeType.CB_LEVEL.values.put(4, new UpgradeData(4, UpgradeType.CB_LEVEL, "4 €", 100));
-		UpgradeType.CB_LEVEL.values.put(5, new UpgradeData(5, UpgradeType.CB_LEVEL, "5 €", 120));
-		UpgradeType.CB_LEVEL.values.put(6, new UpgradeData(6, UpgradeType.CB_LEVEL, "6 €", 140));
+		UpgradeType.CB_LEVEL.values.put(4, new UpgradeData(4, UpgradeType.CB_LEVEL, "3 €", 100));
+		UpgradeType.CB_LEVEL.values.put(5, new UpgradeData(5, UpgradeType.CB_LEVEL, "3 €", 120));
+		UpgradeType.CB_LEVEL.values.put(6, new UpgradeData(6, UpgradeType.CB_LEVEL, "3 €", 140));
 
 		UpgradeType.BONUS_MEMBERS_LEVEL.values.put(0, new UpgradeData(0, UpgradeType.BONUS_MEMBERS_LEVEL, "0 €", 6));
-		UpgradeType.BONUS_MEMBERS_LEVEL.values.put(1, new UpgradeData(1, UpgradeType.BONUS_MEMBERS_LEVEL, "1 €", 9));
+		UpgradeType.BONUS_MEMBERS_LEVEL.values.put(1, new UpgradeData(1, UpgradeType.BONUS_MEMBERS_LEVEL, "2 €", 9));
 		UpgradeType.BONUS_MEMBERS_LEVEL.values.put(2, new UpgradeData(2, UpgradeType.BONUS_MEMBERS_LEVEL, "2 €", 12));
-		UpgradeType.BONUS_MEMBERS_LEVEL.values.put(3, new UpgradeData(3, UpgradeType.BONUS_MEMBERS_LEVEL, "3 €", 15));
-		UpgradeType.BONUS_MEMBERS_LEVEL.values.put(4, new UpgradeData(4, UpgradeType.BONUS_MEMBERS_LEVEL, "4 €", 18));
+		UpgradeType.BONUS_MEMBERS_LEVEL.values.put(3, new UpgradeData(3, UpgradeType.BONUS_MEMBERS_LEVEL, "2 €", 15));
+		UpgradeType.BONUS_MEMBERS_LEVEL.values.put(4, new UpgradeData(4, UpgradeType.BONUS_MEMBERS_LEVEL, "2 €", 18));
 
 		UpgradeType.BONUS_PLOTS_LEVEL.values.put(0, new UpgradeData(0, UpgradeType.BONUS_PLOTS_LEVEL, "0 €", 1));
-		UpgradeType.BONUS_PLOTS_LEVEL.values.put(1, new UpgradeData(1, UpgradeType.BONUS_PLOTS_LEVEL, "1 €", 2));
+		UpgradeType.BONUS_PLOTS_LEVEL.values.put(1, new UpgradeData(1, UpgradeType.BONUS_PLOTS_LEVEL, "2 €", 2));
 		UpgradeType.BONUS_PLOTS_LEVEL.values.put(2, new UpgradeData(2, UpgradeType.BONUS_PLOTS_LEVEL, "2 €", 3));
-		UpgradeType.BONUS_PLOTS_LEVEL.values.put(3, new UpgradeData(3, UpgradeType.BONUS_PLOTS_LEVEL, "3 €", 4));
-		UpgradeType.BONUS_PLOTS_LEVEL.values.put(4, new UpgradeData(4, UpgradeType.BONUS_PLOTS_LEVEL, "4 €", 5));
-		UpgradeType.BONUS_PLOTS_LEVEL.values.put(5, new UpgradeData(5, UpgradeType.BONUS_PLOTS_LEVEL, "5 €", 6));
-		UpgradeType.BONUS_PLOTS_LEVEL.values.put(6, new UpgradeData(6, UpgradeType.BONUS_PLOTS_LEVEL, "6 €", 7));
-		UpgradeType.BONUS_PLOTS_LEVEL.values.put(7, new UpgradeData(7, UpgradeType.BONUS_PLOTS_LEVEL, "7 €", 8));
-		UpgradeType.BONUS_PLOTS_LEVEL.values.put(8, new UpgradeData(8, UpgradeType.BONUS_PLOTS_LEVEL, "8 €", 9));
+		UpgradeType.BONUS_PLOTS_LEVEL.values.put(3, new UpgradeData(3, UpgradeType.BONUS_PLOTS_LEVEL, "2 €", 4));
+		UpgradeType.BONUS_PLOTS_LEVEL.values.put(4, new UpgradeData(4, UpgradeType.BONUS_PLOTS_LEVEL, "2 €", 5));
+		UpgradeType.BONUS_PLOTS_LEVEL.values.put(5, new UpgradeData(5, UpgradeType.BONUS_PLOTS_LEVEL, "2 €", 6));
+		UpgradeType.BONUS_PLOTS_LEVEL.values.put(6, new UpgradeData(6, UpgradeType.BONUS_PLOTS_LEVEL, "2 €", 7));
+		UpgradeType.BONUS_PLOTS_LEVEL.values.put(7, new UpgradeData(7, UpgradeType.BONUS_PLOTS_LEVEL, "2 €", 8));
+		UpgradeType.BONUS_PLOTS_LEVEL.values.put(8, new UpgradeData(8, UpgradeType.BONUS_PLOTS_LEVEL, "2 €", 9));
 	}
 	
 	public enum UpgradeType {
