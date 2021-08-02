@@ -25,6 +25,7 @@ public class OcPermissions {
 	public static final OlympaSpigotPermission STAFF_OCA_CMD = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);
 
 	public static final OlympaSpigotPermission STAFF_MANAGE_COMPONENT = new OlympaSpigotPermission(OlympaGroup.MODP);
+	public static final OlympaSpigotPermission STAFF_MANAGE_SHOP = new OlympaSpigotPermission(OlympaGroup.MODP);
 
 	public static final OlympaSpigotPermission CREA_TPA_COMMAND = new OlympaSpigotPermission(OlympaGroup.PLAYER);
 	public static final OlympaSpigotPermission CREA_TPF_COMMAND = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);

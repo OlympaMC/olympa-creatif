@@ -317,6 +317,8 @@ public class OcaCmd extends AbstractCmd {
 
 	@Cmd(syntax = "Accéder aux informations VIP d'un joueur", args = {"info|set", "PLAYERS", "KIT_TYPE|UPGRADE_TYPE", "INTEGER"}, min = 2)
 	public void manageshop(CommandContext cmd) {
+		if (!OcPermissions.STAFF_MANAGE_SHOP.hasPermissionWithMsg((OlympaPlayerCreatif)getOlympaPlayer()))
+			return;
 		
 		OlympaPlayerCreatif pc = AccountProviderAPI.getter().get(((Player)cmd.getArgument(1)).getUniqueId());
 		
