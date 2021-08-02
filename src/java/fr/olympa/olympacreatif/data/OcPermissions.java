@@ -17,28 +17,28 @@ public class OcPermissions {
 	public static final OlympaSpigotPermission USE_COLORED_TEXT = new OlympaSpigotPermission(OlympaGroup.CREA_CREATOR);
 	public static final OlympaSpigotPermission USE_ARMORSTAND_EDITOR = new OlympaSpigotPermission(OlympaGroup.CREA_CREATOR);
 
-	public static final OlympaSpigotPermission STAFF_BYPASS_PLOT_KICK_AND_BAN = new OlympaSpigotPermission(OlympaGroup.DEV);
-	public static final OlympaSpigotPermission STAFF_BYPASS_VANILLA_COMMANDS = new OlympaSpigotPermission(OlympaGroup.DEV);
-	public static final OlympaSpigotPermission STAFF_BYPASS_WORLDEDIT = new OlympaSpigotPermission(OlympaGroup.DEV);
-	public static final OlympaSpigotPermission STAFF_PLOT_FAKE_OWNER = new OlympaSpigotPermission(OlympaGroup.DEV);
-	public static final OlympaSpigotPermission STAFF_RESET_PLOT = new OlympaSpigotPermission(OlympaGroup.DEV);
-	public static final OlympaSpigotPermission STAFF_OCA_CMD = new OlympaSpigotPermission(OlympaGroup.DEV);
+	public static final OlympaSpigotPermission STAFF_BYPASS_PLOT_KICK_AND_BAN = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);
+	public static final OlympaSpigotPermission STAFF_BYPASS_VANILLA_COMMANDS = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);
+	public static final OlympaSpigotPermission STAFF_BYPASS_WORLDEDIT = new OlympaSpigotPermission(OlympaGroup.MOD);
+	public static final OlympaSpigotPermission STAFF_PLOT_FAKE_OWNER = new OlympaSpigotPermission(OlympaGroup.MODP);
+	public static final OlympaSpigotPermission STAFF_RESET_PLOT = new OlympaSpigotPermission(OlympaGroup.MOD);
+	public static final OlympaSpigotPermission STAFF_OCA_CMD = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);
 
-	public static final OlympaSpigotPermission STAFF_MANAGE_COMPONENT = new OlympaSpigotPermission(OlympaGroup.DEV);
+	public static final OlympaSpigotPermission STAFF_MANAGE_COMPONENT = new OlympaSpigotPermission(OlympaGroup.MODP);
 
 	public static final OlympaSpigotPermission CREA_TPA_COMMAND = new OlympaSpigotPermission(OlympaGroup.PLAYER);
-	public static final OlympaSpigotPermission CREA_TPF_COMMAND = new OlympaSpigotPermission(OlympaGroup.DEV);
+	public static final OlympaSpigotPermission CREA_TPF_COMMAND = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);
 
-	public static final OlympaSpigotPermission STAFF_MANAGE_MONEY = new OlympaSpigotPermission(OlympaGroup.DEV);
+	//public static final OlympaSpigotPermission STAFF_MANAGE_MONEY = new OlympaSpigotPermission(OlympaGroup.DEV);
 
-	public static final OlympaSpigotPermission STAFF_BYPASS_OP_CHECK = new OlympaSpigotPermission(OlympaGroup.DEV);
-	public static final OlympaSpigotPermission STAFF_BUILD_ROADS = new OlympaSpigotPermission(OlympaGroup.DEV);
+	public static final OlympaSpigotPermission STAFF_BYPASS_OP_CHECK = new OlympaSpigotPermission(OlympaGroup.RESP);
+	public static final OlympaSpigotPermission STAFF_BUILD_ROADS = new OlympaSpigotPermission(OlympaGroup.MOD);
 
 	public static final OlympaSpigotPermission STAFF_SET_PLOT_OWNER = new OlympaSpigotPermission(OlympaGroup.MODP);
-	public static final OlympaSpigotPermission STAFF_RELOAD = new OlympaSpigotPermission(OlympaGroup.DEVP);
+	public static final OlympaSpigotPermission STAFF_RELOAD = new OlympaSpigotPermission(OlympaGroup.MODP);
 
 	public static final OlympaSpigotPermission STAFF_STOPLAG_MANAGEMENT = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);
-	public static final OlympaSpigotPermission STRUCTURE_COMMAND = new OlympaSpigotPermission(OlympaGroup.DEVP);
+	public static final OlympaSpigotPermission STRUCTURE_COMMAND = new OlympaSpigotPermission(OlympaGroup.CREA_ARCHITECT);
 
 	public static final OlympaSpigotPermission WEBSHOP = new OlympaSpigotPermission(OlympaGroup.FONDA);
 
