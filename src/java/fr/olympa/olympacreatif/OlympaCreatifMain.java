@@ -139,6 +139,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 		//new BackCommand(plugin, null);
 
+		new WebShop(this).register();
+
 		new OcCmd(this).register();
 		new OcoCmd(this).register();
 		new OcweCmd(this).register();

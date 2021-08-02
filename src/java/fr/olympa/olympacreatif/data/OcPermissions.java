@@ -40,6 +40,9 @@ public class OcPermissions {
 	public static final OlympaSpigotPermission STAFF_STOPLAG_MANAGEMENT = new OlympaSpigotPermission(OlympaGroup.ASSISTANT);
 	public static final OlympaSpigotPermission STRUCTURE_COMMAND = new OlympaSpigotPermission(OlympaGroup.DEVP);
 
+	public static final OlympaSpigotPermission WEBSHOP = new OlympaSpigotPermission(OlympaGroup.FONDA);
+
+
 	/*nb de plots propriétaire :
 	 * Joueur : 1
 	 * Constructeur : 3
