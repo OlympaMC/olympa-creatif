@@ -92,7 +92,7 @@ public class ShopGuiPourApresLaBeta extends IGui {
 				" ",
 				"§6Mais avant tout, nous vous remercions",
 				"§6chaleureusement du soutien que vous nous apportez !",
-				"§6En espérant vous voir encore longtemps parmis nous,",
+				"§6En espérant vous voir encore longtemps parmi nous,",
 				"§cL'équipe dévouée d'Olympa"
 				
 				), "olympa.fr", "25 €");

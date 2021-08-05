@@ -92,7 +92,7 @@ public class ShopGui extends IGui {
 				" ",
 				"§6Mais avant tout, nous vous remercions",
 				"§6chaleureusement du soutien que vous nous apportez !",
-				"§6En espérant vous voir encore longtemps parmis nous,",
+				"§6En espérant vous voir encore longtemps parmi nous,",
 				"§cL'équipe dévouée d'Olympa")));
 
 		kits.add(new MarketItemData(p, KitType.COMMANDBLOCK, 1, ItemUtils.item(Material.COMMAND_BLOCK, "§6Kit commandblocks",
