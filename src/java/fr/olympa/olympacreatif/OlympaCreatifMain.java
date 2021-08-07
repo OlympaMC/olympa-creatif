@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import fr.olympa.api.spigot.holograms.HologramsCommand;
-import fr.olympa.api.spigot.utils.SitManager;
-import fr.olympa.olympacreatif.commands.*;
-import fr.olympa.olympacreatif.worldedit.OcEmptyWorldEdit;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.common.groups.OlympaGroup;
@@ -17,14 +13,33 @@ import fr.olympa.api.common.plugin.OlympaAPIPlugin;
 import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.common.report.ReportReason;
 import fr.olympa.api.common.server.OlympaServer;
+import fr.olympa.api.spigot.command.OlympaCommand;
 import fr.olympa.api.spigot.command.essentials.BackCommand;
 import fr.olympa.api.spigot.command.essentials.tp.TpaHandler;
 import fr.olympa.api.spigot.holograms.Hologram;
+import fr.olympa.api.spigot.holograms.HologramsCommand;
 import fr.olympa.api.spigot.lines.CyclingLine;
 import fr.olympa.api.spigot.lines.FixedLine;
 import fr.olympa.api.spigot.scoreboard.sign.ScoreboardManager;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
+import fr.olympa.olympacreatif.commands.CiCommand;
+import fr.olympa.olympacreatif.commands.CmdsLogic;
+import fr.olympa.olympacreatif.commands.HatCommand;
+import fr.olympa.olympacreatif.commands.MenuCommand;
+import fr.olympa.olympacreatif.commands.MicroblockCommand;
+import fr.olympa.olympacreatif.commands.OcCmd;
+import fr.olympa.olympacreatif.commands.OcaCmd;
+import fr.olympa.olympacreatif.commands.OcoCmd;
+import fr.olympa.olympacreatif.commands.OcweCmd;
+import fr.olympa.olympacreatif.commands.ShopCommand;
+import fr.olympa.olympacreatif.commands.SkullCommand;
+import fr.olympa.olympacreatif.commands.SpawnCommand;
+import fr.olympa.olympacreatif.commands.SpeedCommand;
+import fr.olympa.olympacreatif.commands.StoplagCommand;
+import fr.olympa.olympacreatif.commands.StructureCommand;
+import fr.olympa.olympacreatif.commands.TpfCommand;
+import fr.olympa.olympacreatif.commands.WebShop;
 import fr.olympa.olympacreatif.data.DataManager;
 import fr.olympa.olympacreatif.data.OCmsg;
 import fr.olympa.olympacreatif.data.OCparam;
@@ -38,8 +53,8 @@ import fr.olympa.olympacreatif.plot.PlotPerm;
 import fr.olympa.olympacreatif.plot.PlotsManager;
 import fr.olympa.olympacreatif.world.WorldManager;
 import fr.olympa.olympacreatif.worldedit.AWorldEdit;
+import fr.olympa.olympacreatif.worldedit.OcEmptyWorldEdit;
 import fr.olympa.olympacreatif.worldedit.OcFastAsyncWorldEdit;
-import fr.olympa.olympacreatif.worldedit.OcWorldEdit;
 
 public class OlympaCreatifMain extends OlympaAPIPlugin {
 
@@ -67,7 +82,6 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	//public Random random = new Random();
 
-
 	public static final List<String> holoCommands = Stream.of(new String[] {
 			"§6§lOlympa Créatif",
 			"§aCommandes de base :",
@@ -87,7 +101,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			"§e§lNous vous conseillons de jouer en 1.16 pour avoir",
 			"§e§laccès au plein potentiel du serveur."
 	}).collect(Collectors.toList());
-	
+
 	public static final List<String> holoWelcome = Stream.of(new String[] {
 			"§6§lOlympa Créatif",
 			"",
@@ -101,9 +115,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			"",
 			"§3§lBon jeu sur Olympa !"
 	}).collect(Collectors.toList());
-	
+
 	public static final List<String> holoCommandblocks = Stream.of(new String[] {
-			"§5§lTutoriel commandblocks", 
+			"§5§lTutoriel commandblocks",
 			"",
 			"§2L'usage des commandblocks et commandes vanilla requiert un kit (/shop)",
 			"",
@@ -119,8 +133,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			"",
 			"§eLes tags NBT sont autorisés dans toutes les commandes mais pas dans les sélecteurs",
 	}).collect(Collectors.toList());
-	
-	
+
 	public static OlympaCreatifMain getInstance() {
 		return plugin;
 	}
@@ -128,7 +141,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	@Override
 	public void onEnable() {
 		super.onEnable();
-
+		OlympaCommand.getCmd("tp").unregister();
 		plugin = this;
 		OlympaCore.getInstance().setOlympaServer(OlympaServer.CREATIF);
 
@@ -313,16 +326,16 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	/*@SuppressWarnings("unchecked")
 	private void createScoreboard(int serverIndex) {
 		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
-
+	
 		//initialisation lignes scoreboard
 		for (int i = 0; i < OlympaPlayerCreatif.customScoreboardLinesSize; i++) {
 			final int line = i;
-
+	
 			scm.addLines(
 					new TimerLine<Scoreboard<OlympaPlayerCreatif>>(p -> {
 						return getLine(p.getOlympaPlayer(), line);
 					}, plugin, 20));
-	
+
 			//new DynamicLine<Scoreboard<OlympaPlayerCreatif>>(p -> p.getName(), null);
 		}
 		scm.addFooters(FixedLine.EMPTY_LINE, CyclingLine.olympaAnimation());
@@ -344,23 +357,23 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	/*
 		public String getLine(OlympaPlayerCreatif p, int i) {
-
+	
 			//Bukkit.broadcastMessage(message)
-
+	
 			if (p.getCustomScoreboardLines() != null)
 				return p.getCustomScoreboardLines()[i];
-
+	
 			Plot plot = p.getCurrentPlot();
 			switch (i) {
 			case 0:
 				return "§1";
-
+	
 			case 1:
 				if (plot == null)
 					return "§7Parcelle : §eaucune";
 				else
 					return "§7Parcelle : §e" + plot;
-
+	
 			case 2:
 				if (plot == null)
 					return "§7Proprio : §eaucun";
@@ -369,28 +382,28 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 							.getMembers()
 							.getOwner()
 							.getName();
-
+	
 			case 3:
 				return "§2";
-
+	
 			case 4:
 				return "§7Grade : " + p.getGroupNameColored();
-
+	
 			case 5:
 				if (plot == null)
 					return "§7Visiteurs : 0";
 				else
 					return "§7Visiteurs : " + plot.getPlayers().size();
-
+	
 			case 6:
 				return "§3";
-
+	
 			case 7:
 				if (plot == null)
 					return "§7Rang : " + PlotRank.VISITOR.getRankName();
 				else
 					return "§7Rang : " + plot.getMembers().getPlayerRank(p).getRankName();
-
+	
 			case 8:
 				return "§4";
 			}
@@ -425,7 +438,7 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			unusedWeInterface = weManager;
 			weManager = new OcEmptyWorldEdit(this);
 
-		}else if (activated && !(unusedWeInterface instanceof OcEmptyWorldEdit)){
+		} else if (activated && !(unusedWeInterface instanceof OcEmptyWorldEdit)) {
 			weManager = unusedWeInterface;
 			unusedWeInterface = new OcEmptyWorldEdit(this);
 		}
