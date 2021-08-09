@@ -21,6 +21,7 @@ import fr.olympa.api.spigot.holograms.HologramsCommand;
 import fr.olympa.api.spigot.lines.CyclingLine;
 import fr.olympa.api.spigot.lines.FixedLine;
 import fr.olympa.api.spigot.scoreboard.sign.ScoreboardManager;
+import fr.olympa.api.spigot.utils.TeleportationManager;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.olympacreatif.commandblocks.CommandBlocksManager;
 import fr.olympa.olympacreatif.commands.CiCommand;
@@ -200,8 +201,9 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 			else
 				return true;
 		});
-
-		getServer().getPluginManager().registerEvents(new TpaHandler(this, OcPermissions.CREA_TPA_COMMAND, 0), plugin);
+		TeleportationManager teleportationManager = new TeleportationManager(this, OcPermissions.CREA_TPA_COMMAND);
+		getServer().getPluginManager().registerEvents(teleportationManager, plugin);
+		getServer().getPluginManager().registerEvents(new TpaHandler(this, OcPermissions.CREA_TPA_COMMAND, teleportationManager), plugin);
 
 		dataManager = new DataManager(this);
 		worldManager = new WorldManager(this);
