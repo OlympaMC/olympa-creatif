@@ -142,7 +142,10 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	@Override
 	public void onEnable() {
 		super.onEnable();
-		OlympaCommand.getCmd("tp").unregister();
+		OlympaCommand tp = OlympaCommand.getCmd("tp");
+		if (tp != null) {
+			tp.unregister();
+		}
 		plugin = this;
 		OlympaCore.getInstance().setOlympaServer(OlympaServer.CREATIF);
 
