@@ -1,5 +1,7 @@
 package fr.olympa.olympacreatif.commandblocks.commands;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,18 +26,18 @@ public class CmdSetblock extends CbCommand {
 	ItemStack item;
 	OlympaPlayerCreatif pc = null;
 	KitType kit  = null;
-	
+
 	public CmdSetblock(Entity sender, Location sendingLoc, OlympaCreatifMain plugin,
 			Plot plot, String[] commandString) {
 		super(CommandType.setblock, sender, sendingLoc, plugin, plot, commandString);
-		
+
 
 		if (args.length < 4)
 			return;
-		
+
 		if (sender instanceof Player)
 			pc = AccountProviderAPI.getter().get(sender.getUniqueId());
-		
+
 		placingLoc = parseLocation(args[0], args[1], args[2]);
 		item = getItemFromString(args[3], sender instanceof Player ? (Player) sender : null);
 
@@ -45,42 +47,43 @@ public class CmdSetblock extends CbCommand {
 
 	@Override
 	public int execute() {
-		
+
 		if (placingLoc == null || item == null || !placingLoc.isChunkLoaded())
 			return 0;
-		
+
 		//return si le proprio n'a pas débloqué les spawners
 		if (item.getType() == Material.SPAWNER && !plotCbData.hasUnlockedSpawnerSetblock() || plugin.getWEManager().isReseting(getPlot()))
 			return 0;
-		
+
 		/*if (OtherUtils.isCommandBlock(item) && OtherUtils.getCbCount(placingLoc.getChunk()) > OCparam.MAX_CB_PER_CHUNK.get())
 			return 0;*/
-		
-		if (kit == KitType.ADMIN || kit == KitType.COMMANDBLOCK) {
+
+		if (kit == KitType.ADMIN || kit == KitType.COMMANDBLOCK)
 			return 0;
-		}
-		
+
 		if (pc != null && kit != null && !pc.hasKit(kit)) {
 			OCmsg.INSUFFICIENT_KIT_PERMISSION.send(pc, kit);
 			return 0;
 		}
-		
+
 		Block block = plugin.getWorldManager().getWorld().getBlockAt(placingLoc);
 		plot.getCbData().removeCommandBlock(block);
-		
+
 		block.setType(item.getType());
-		
+
 		net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-		
+
 		if (nmsItem != null && nmsItem.getTag() != null) {
+			@Nullable
 			TileEntity tile = plugin.getWorldManager().getNmsWorld().getTileEntity(new BlockPosition(placingLoc.getBlockX(), placingLoc.getBlockY(), placingLoc.getBlockZ()));
-			
-			NBTTagCompound tag = nmsItem.getTag();
-			tag.setInt("x", placingLoc.getBlockX());
-			tag.setInt("y", placingLoc.getBlockY());
-			tag.setInt("z", placingLoc.getBlockZ());
-			
-			tile.load(null, tag);	
+			if (tile != null) {
+				NBTTagCompound tag = nmsItem.getTag();
+				tag.setInt("x", placingLoc.getBlockX());
+				tag.setInt("y", placingLoc.getBlockY());
+				tag.setInt("z", placingLoc.getBlockZ());
+
+				tile.load(null, tag);
+			}
 		}
 		return 1;
 	}
