@@ -143,9 +143,8 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	public void onEnable() {
 		super.onEnable();
 		OlympaCommand tp = OlympaCommand.getCmd("tp");
-		if (tp != null) {
+		if (tp != null)
 			tp.unregister();
-		}
 		plugin = this;
 		OlympaCore.getInstance().setOlympaServer(OlympaServer.CREATIF);
 
@@ -179,11 +178,15 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 		new HatCommand(this).register();
 
 		//à tester
-		//getServer().getPluginManager().registerEvents(new SitManager(this), this);
+		//		getServer().getPluginManager().registerEvents(new SitManager(this), this);
 
 		//set restrictions to /gm command
 		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND.setMinGroup(OlympaGroup.PLAYER);
 		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.PLAYER);
+		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND_OTHER.setMinGroup(OlympaGroup.MOD);
+		OlympaAPIPermissionsSpigot.INVSEE_COMMAND_INTERACT.setMinGroup(OlympaGroup.MOD);
+		OlympaAPIPermissionsSpigot.ECSEE_COMMAND_INTERACT.setMinGroup(OlympaGroup.MOD);
+		OlympaAPIPermissionsSpigot.VANISH_COMMAND.setMinGroup(OlympaGroup.MOD);
 
 		OlympaCore.getInstance().gamemodeCommand.setCanExecuteFunction((sender, target) -> {
 
@@ -331,11 +334,11 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 	/*@SuppressWarnings("unchecked")
 	private void createScoreboard(int serverIndex) {
 		scm = new ScoreboardManager<>(plugin, "§6Olympa Créatif " + getAsRomanNumber(serverIndex));
-	
+
 		//initialisation lignes scoreboard
 		for (int i = 0; i < OlympaPlayerCreatif.customScoreboardLinesSize; i++) {
 			final int line = i;
-	
+
 			scm.addLines(
 					new TimerLine<Scoreboard<OlympaPlayerCreatif>>(p -> {
 						return getLine(p.getOlympaPlayer(), line);
@@ -362,23 +365,23 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 
 	/*
 		public String getLine(OlympaPlayerCreatif p, int i) {
-	
+
 			//Bukkit.broadcastMessage(message)
-	
+
 			if (p.getCustomScoreboardLines() != null)
 				return p.getCustomScoreboardLines()[i];
-	
+
 			Plot plot = p.getCurrentPlot();
 			switch (i) {
 			case 0:
 				return "§1";
-	
+
 			case 1:
 				if (plot == null)
 					return "§7Parcelle : §eaucune";
 				else
 					return "§7Parcelle : §e" + plot;
-	
+
 			case 2:
 				if (plot == null)
 					return "§7Proprio : §eaucun";
@@ -387,28 +390,28 @@ public class OlympaCreatifMain extends OlympaAPIPlugin {
 							.getMembers()
 							.getOwner()
 							.getName();
-	
+
 			case 3:
 				return "§2";
-	
+
 			case 4:
 				return "§7Grade : " + p.getGroupNameColored();
-	
+
 			case 5:
 				if (plot == null)
 					return "§7Visiteurs : 0";
 				else
 					return "§7Visiteurs : " + plot.getPlayers().size();
-	
+
 			case 6:
 				return "§3";
-	
+
 			case 7:
 				if (plot == null)
 					return "§7Rang : " + PlotRank.VISITOR.getRankName();
 				else
 					return "§7Rang : " + plot.getMembers().getPlayerRank(p).getRankName();
-	
+
 			case 8:
 				return "§4";
 			}
