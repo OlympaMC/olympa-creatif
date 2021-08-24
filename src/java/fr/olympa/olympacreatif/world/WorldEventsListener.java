@@ -128,7 +128,7 @@ public class WorldEventsListener implements Listener {
 	}
 
 	@EventHandler
-	public void onBlockSpread(BlockFormEvent e) {
+	public void onBlockForm(BlockFormEvent e) {
 		e.setCancelled(true);
 	}
 
@@ -329,7 +329,7 @@ public class WorldEventsListener implements Listener {
 			return;
 		}
 
-		if (Bukkit.getOnlinePlayers().size() == 0)
+		if (Bukkit.getOnlinePlayers().isEmpty())
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e1) {

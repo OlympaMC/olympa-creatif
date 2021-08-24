@@ -252,4 +252,9 @@ public class PlotParametersGui extends IGui {
 		else
 			return false;
 	}
+	
+	@Override
+	public boolean noDoubleClick() {
+		return false;
+	}
 }

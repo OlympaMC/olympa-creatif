@@ -115,4 +115,9 @@ public class StaffGui extends IGui {
 		else
 			return ItemUtils.item(Material.RED_WOOL, "§cInactif", "§7Rang nécessaire : " + perm.getMinGroup().getName(p.getGender()), " ", "§7Pour modifier la valeur, cliquez", "§7sur l'item au dessus");
 	}
+
+	@Override
+	public boolean noDoubleClick() {
+		return false;
+	}
 }
