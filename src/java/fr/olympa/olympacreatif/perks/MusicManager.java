@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -29,9 +28,10 @@ import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 
-import fr.olympa.api.spigot.gui.templates.PagedGUI;
-import fr.olympa.api.spigot.item.ItemUtils;
 import fr.olympa.api.common.provider.AccountProviderAPI;
+import fr.olympa.api.spigot.gui.OlympaGUI;
+import fr.olympa.api.spigot.gui.templates.PagedView;
+import fr.olympa.api.spigot.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 import fr.olympa.olympacreatif.data.OlympaPlayerCreatif;
 import fr.olympa.olympacreatif.gui.IGui;
@@ -43,7 +43,7 @@ import fr.olympa.olympacreatif.plot.PlotPerm;
 
 public class MusicManager implements Listener {
 
-	private static final List<Material> discs = new ArrayList<Material>(Arrays.asList(new Material[] {
+	private static final List<Material> discs = Arrays.asList(
 			Material.MUSIC_DISC_BLOCKS,
 			Material.MUSIC_DISC_CAT,
 			Material.MUSIC_DISC_CHIRP,
@@ -54,13 +54,13 @@ public class MusicManager implements Listener {
 			Material.MUSIC_DISC_WAIT,
 			Material.MUSIC_DISC_WARD,
 			Material.MUSIC_DISC_STRAD
-	}));
+	);
 	
 	private OlympaCreatifMain plugin;
-	private Map<String, Song> songsName = new HashMap<String, Song>();
-	private Map<ItemStack, Entry<String, Song>> songsItem = new LinkedHashMap<ItemStack, Map.Entry<String,Song>>();
+	private Map<String, Song> songsName = new HashMap<>();
+	private Map<Song, Entry<String, ItemStack>> songs = new LinkedHashMap<>();
 	
-	private Map<UUID, RadioSongPlayer> radios = new HashMap<UUID, RadioSongPlayer>();
+	private Map<UUID, RadioSongPlayer> radios = new HashMap<>();
 	
 	public MusicManager(OlympaCreatifMain plugin) {
 		this.plugin = plugin;
@@ -115,7 +115,7 @@ public class MusicManager implements Listener {
 			if (!e.getValue().getAuthor().equals(""))
 				it = ItemUtils.loreAdd(it, "§7Transcription par " + e.getValue().getAuthor());
 			
-			songsItem.put(it, new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue()));
+			songs.put(e.getValue(), new AbstractMap.SimpleEntry<>(e.getKey(), it));
 		}
 		
 		plugin.getLogger().info("§aLoaded " + songsName.size() + " songs.");
@@ -175,7 +175,7 @@ public class MusicManager implements Listener {
 	 * @param plot
 	 */
 	public void openGui(Player p, Plot plot) {			
-		new MusicGui(plugin, plot, p, plot == null ? new HashMap<ItemStack, Entry<String, Song>>() : songsItem).create(p);	
+		new MusicGui(plot, p).toGUI().create(p);
 	}
 	
 	@EventHandler
@@ -191,20 +191,20 @@ public class MusicManager implements Listener {
 		e.getSongPlayer().getPlayerUUIDs().forEach(p -> startSong(Bukkit.getPlayer(p), e.getSongPlayer().getSong()));
 	}
 
-	public class MusicGui extends PagedGUI<ItemStack> {
-
-		private Map<ItemStack, Consumer<Player>> items = new HashMap<ItemStack, Consumer<Player>>();
+	public class MusicGui extends PagedView<Song> {
 		
-		protected MusicGui(OlympaCreatifMain plugin, Plot plot, Player p0, Map<ItemStack, Entry<String, Song>> songsMap) {
-			super("Musiques disponibles", DyeColor.GREEN, new ArrayList<ItemStack>(songsMap.keySet()), 6);
+		private Plot plot;
+		private Player p0;
 
-			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProviderAPI.getter().get(p0.getUniqueId())))
-				songsMap.forEach((it, songEntry) -> items.put(it, p -> {					
-					PlotParamType.SONG.setValue(plot, songEntry.getKey());
-					ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §a" + songEntry.getKey());
-					
-					plot.getPlayers().forEach(player -> startSong(player, songEntry.getValue()));
-				}));
+		protected MusicGui(Plot plot, Player p0) {
+			super(DyeColor.GREEN, new ArrayList<>(songs.keySet()));
+			this.plot = plot;
+			this.p0 = p0;
+		}
+		
+		@Override
+		public void init() {
+			super.init();
 			
 			//set current selected music
 			ItemStack it = ItemUtils.item(Material.JUKEBOX, "§eMusique sélectionnée : §caucune", "§7Tous les joueurs entrant sur", "§7la parcelle entendront cette musique !");
@@ -212,42 +212,47 @@ public class MusicManager implements Listener {
 			if (!"".equals(plot.getParameters().getParameter(PlotParamType.SONG)))
 				ItemUtils.name(it, "§eMusique sélectionnée : §d" + plot.getParameters().getParameter(PlotParamType.SONG));
 			
-			getInventory().setItem(17, it);
+			right.setItem(1, it);
 			
 			//create remove music item
-			getInventory().setItem(26, it = ItemUtils.item(Material.RED_WOOL, "§cSupprimer la musique actuelle"));
-			
-			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProviderAPI.getter().get(p0.getUniqueId())))
-				items.put(it, p -> {
-					PlotParamType.SONG.setValue(plot, "");
-					getInventory().setItem(17, ItemUtils.name(getInventory().getItem(17), "§eMusique sélectionnée : §caucune"));
-					plot.getPlayers().forEach(pp -> stopSong(pp));
-				});
+			right.setItem(2, ItemUtils.item(Material.RED_WOOL, "§cSupprimer la musique actuelle"));
 			
 			//add back item
-			getInventory().setItem(44, it = IGui.getBackItem());
-			items.put(it, p -> {
+			right.setItem(4, IGui.getBackItem());
+		}
+
+		@Override
+		public ItemStack getItemStack(Song object) {
+			return songs.get(object).getValue();
+		}
+
+		@Override
+		public void click(Song existing, Player p, ClickType click) {
+			if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProviderAPI.getter().get(p0.getUniqueId()))) {
+				String selected = songs.get(existing).getKey();
+				PlotParamType.SONG.setValue(plot, selected);
+				ItemUtils.name(right.getItem(1), "§eMusique sélectionnée : §a" + selected);
+				
+				plot.getPlayers().forEach(player -> startSong(player, existing));
+			}
+		}
+		
+		@Override
+		protected boolean onBarItemClick(Player p, ItemStack current, int barSlot, ClickType click) {
+			if (barSlot == 2) {
+				if (PlotPerm.DEFINE_MUSIC.has(plot, AccountProviderAPI.getter().get(p0.getUniqueId()))) {
+					PlotParamType.SONG.setValue(plot, "");
+					ItemUtils.name(right.getItem(1), "§eMusique sélectionnée : §caucune");
+					plot.getPlayers().forEach(MusicManager.this::stopSong);
+				}
+			}else if (barSlot == 4) {
 				new PlotParametersGui(MainGui.getMainGui(AccountProviderAPI.getter().get(p.getUniqueId()), plot)).create(p);
-			});
-		}
-
-		@Override
-		public ItemStack getItemStack(ItemStack object) {
-			return object;
-		}
-
-		@Override
-		public void click(ItemStack existing, Player p, ClickType click) {
-		}
-
-		@Override
-		public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
-			super.onClick(p, current, slot, click);
-
-			if (items.get(current) != null)
-				items.get(current).accept(p);
-			
+			}
 			return true;
+		}
+		
+		public OlympaGUI toGUI() {
+			return super.toGUI("Musiques disponibles", 6);
 		}
 	}
 }

@@ -30,7 +30,7 @@ import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import fr.olympa.api.spigot.gui.templates.PagedGUI;
+import fr.olympa.api.spigot.gui.templates.PagedView;
 import fr.olympa.api.spigot.item.ItemUtils;
 import fr.olympa.olympacreatif.OlympaCreatifMain;
 
@@ -85,13 +85,13 @@ public class MicroBlocks {
 	}
 	
 	public void openGui(Player p){
-		new MbGuiInterface("§9Microblocks", DyeColor.ORANGE, microBlocks.values()).create(p);
+		new MbGuiInterface(DyeColor.ORANGE, microBlocks.values()).toGUI("§9Microblocks", 5).create(p);
 	}
 	
-	private class MbGuiInterface extends PagedGUI<ItemStack>{
+	private class MbGuiInterface extends PagedView<ItemStack>{
 
-		protected MbGuiInterface(String name, DyeColor color, Collection<ItemStack> collection) {
-			super(name, color, new ArrayList<ItemStack>(Arrays.asList(collection.toArray(new ItemStack[collection.size()]))), 5);
+		protected MbGuiInterface(DyeColor color, Collection<ItemStack> collection) {
+			super(color, new ArrayList<>(Arrays.asList(collection.toArray(new ItemStack[collection.size()]))));
 		}
 
 		@Override
